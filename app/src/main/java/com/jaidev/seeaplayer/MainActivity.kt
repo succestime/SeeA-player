@@ -546,12 +546,12 @@ class MainActivity : AppCompatActivity() {
         FavoritesManager.saveFavorites(this)
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        // Save favorites when the app resumes
-        FavoritesManager.saveFavorites(this)
-    }
+//    override fun onResume() {
+//        super.onResume()
+//
+//        // Save favorites when the app resumes
+//        FavoritesManager.saveFavorites(this)
+//    }
 
 }
 
