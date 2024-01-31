@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/swipeRefreshVideo"
+    tools:context=".recantFragment.DaysDownload">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/daysTotalVideos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:layout_marginTop="69dp"
+        android:layout_marginStart="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:text="Recant Videos :" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/DownloadRV"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="95dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</FrameLayout>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

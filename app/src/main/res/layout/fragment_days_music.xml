@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefreshMusic"
+    tools:context=".DaysMusic">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <TextView
+       android:id="@+id/daysTotalMusics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:layout_marginTop="69dp"
+        android:layout_marginStart="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:text="Recant Musics :" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/MusicRV"
+        android:layout_marginTop="95dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/shuffleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                app:icon="@drawable/shuffle_icon"
+                app:iconSize="35dp"
+                app:iconTint="@color/cool_blue"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.9"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.9"
+                app:strokeColor="@color/cool_blue"
+                app:strokeWidth="2dp"
+                tools:ignore="MissingConstraints" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+
+
+
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="40dp"
+        android:layout_height="250dp"
+        app:cardCornerRadius="20dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/light_gray">
+    <com.lukelorusso.verticalseekbar.VerticalSeekBar
+        android:id="@+id/verticalBar"
+        android:layout_width="20dp"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/black"
+
+        app:vsb_bar_corner_radius="20dp"
+        app:vsb_max_value="20"
+        app:vsb_progress="0"
+        android:background="@android:color/transparent"
+        app:vsb_thumb_placeholder_src="@drawable/booster_black_volume_con" />
+    </com.google.android.material.card.MaterialCardView>
+    <TextView
+        android:id="@+id/progressText"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:text="@string/booster"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="@color/white"/>
+
+</LinearLayout>

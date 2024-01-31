@@ -1,0 +1,117 @@
+<resources>
+    <string name="app_name">SeeA Player</string>
+    <string name="link_fragment_text">Link Tube allow you to use your favourite app as fastest you want , thankyou </string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="google_map_api_key">AIzaSyA1hm7jOAf61Sc2kmAS_JE9E3hkBpf-fKk</string>
+    <string name="youtube_description">YouTube icon</string>
+    <string name="linktube_text">Link Tube allow yor to use your favourite app in SeeA Video Player, if you are using SeeA Video Player</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="loading">Loading..</string>
+    <string name="duration">00:00</string>
+    <string name="semi_colon">:</string>
+
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="feedback">Feedback</string>
+    <string name="themes">Themes</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="about">About</string>
+    <string name="exit">Exit</string>
+    <string name="nav_text">Welcome to World of Entertainment </string>
+
+
+    <string name="lock">Lock Icon</string>
+    <string name="back_btn">Back Button</string>
+    <string name="menu">Menu</string>
+    <string name="prev_btn">Previous Button</string>
+    <string name="next_btn">Next Button</string>
+    <string name="repeat_btn">Repeat Button</string>
+    <string name="fullscreen_btn">Fullscreen Button</string>
+    <string name="play_btn">Play Button</string>
+
+    // for menu
+    <string name="audio_track">Audio Track</string>
+    <string name="subtitle">Subtitle</string>
+    <string name="booster">Booster</string>
+    <string name="speed">Speed</string>
+    <string name="sleep_timer">Sleep Timer</string>
+    <string name="pip_mode">PIP Mode</string>
+    <string name="search">Search</string>
+
+    // for video more features
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="info">Info</string>
+    <string name="share">Share</string>
+    <string name="orientation">Orientation</string>
+    <string name="O">O</string>
+
+    // music player feature
+    <string name="playlist_btn">Playlist</string>
+    <string name="favourites_btn">Favourite</string>
+    <string name="shuffle_btn">Shuffle</string>
+    <string name="total_songs">Total Songs</string>
+    <string name="world_of_music">World Of Music</string>
+    <string name="song_name">Song Name</string>
+    <string name="back_music_btn">Back</string>
+    <string name="start_tv">00:00</string>
+    <string name="end_tv">Loading..</string>
+    <string name="equalizer_btn">Equalizer</string>
+    <string name="min_15">15 Minutes</string>
+    <string name="min_30"> 30 Minutes</string>
+    <string name="min_60"> 60 Minutes</string>
+    <string name="song_img">Song Image</string>
+    <string name="playlist_name">Playlist Name</string>
+    <string name="playlist_delete"> Delete</string>
+    <string name="user_name"> Your Name</string>
+    <string name="add_song"> Add</string>
+    <string name="remove_all"> Remove All</string>
+    <string name="search_song"> Search Song</string>
+    <string name="settings">Settings</string>
+    <string name="topic_feedback">Topic i.e. Suggestion, Error, etc.</string>
+    <string name="email_feedback">Email Address (Optional)</string>
+    <string name="send">Send</string>
+    <string name="set_theme">Set Theme</string>
+    <string name="sort_by">Sort By</string>
+    <string name="version_name">Version Name</string>
+    <string name="play_next">Play Next</string>
+    <string name="play_next_note">Tip: Long Press On Any Video To Add It Into Play Next. &#128522; </string>
+    <string name="favourite_note">Tip: Play Music And Click On &#10084; To Add It Into Favourites. </string>
+    <string name="playlist_note">Tip: Click On ➕ To Create New Playlist. </string>
+    <string name="choose">Choose</string>
+    <string name="enter_url">Enter Url</string>
+    <string name="go_btn">Go Butten</string>
+    <string name="settings_btn">Setting Butten</string>
+
+
+    // for now , browseLinktybe
+    <string name="homePage">HomePage</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="back">Back</string>
+    <string name="forward">Forward</string>
+    <string name="fullscreen">FullScreen</string>
+    <string name="save">Save</string>
+    <string name="desktop">Desktop</string>
+    <string name="bookmark_name">Bookmark Name</string>
+    <string name="view_all">View All</string>
+    <string name="all_bookmarks">All Bookmarks</string>
+    <string name="refresh_btn">Refresh</string>
+    <string name="one">1</string>
+    <string name="one_browse">1</string>
+    <string name="durationChangeTextView">   %1$s\n[ %2$s ]</string>
+    <string name="vol_icon">vol_icon</string>
+    <string name="volume">Volume:</string>
+    <string name="text">13</string>
+    <string name="Brightness_icon">brightness_icon</string>
+    <string name="brightness">Brightness:</string>
+    <string name="enter_video_name">Enter Video Name...</string>
+    <string name="total_videos">Total Videos :</string>
+    <string name="total_folders">Total Folders :</string>
+    <string name="searchbackbtn">searchBackBtn</string>
+    <string name="home">Home</string>
+    <string name="music">Music</string>
+    <string name="download">Download</string>
+    <string name="link_tube">Link Tube</string>
+    <string name="more">More</string>
+
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+ <item android:id="@+id/home"
+     android:title="@string/home"
+     android:icon="@drawable/home_icon"  />
+
+ <item android:id="@+id/music"
+       android:title="@string/music"
+  android:icon="@drawable/music_icon"/>
+
+ <item android:id="@+id/download"
+  android:title="@string/download"
+  android:icon="@drawable/download_icon"/>
+
+ <item android:id="@+id/linkTube"
+  android:title="@string/link_tube"
+  android:icon="@drawable/link_tube_icon"/>
+
+ <item android:id="@+id/more"
+     android:title="@string/more"
+     android:icon="@drawable/more_icon"/>
+
+</menu>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+android:orientation="vertical"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    >
+
+
+        <TextView
+            android:id="@+id/chooseItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Choose"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:layout_marginTop="5dp"/>
+
+
+
+
+
+        <LinearLayout
+            android:id="@+id/shareBtn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/info_share"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/share"
+                    android:layout_marginStart="30dp"
+                    android:textSize="25sp"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/infoBtn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/info_speaker"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/info"
+                    android:layout_marginStart="30dp"
+                    android:textSize="24sp"/>
+
+        </LinearLayout>
+
+</LinearLayout>

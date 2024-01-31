@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "424755529731",
+    "project_id": "seea-player",
+    "storage_bucket": "seea-player.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424755529731:android:1f5ad8f4d797e44ccf2636",
+        "android_client_info": {
+          "package_name": "com.jaidev.seeaplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "424755529731-65bh09e57713humkjvvnf6rffq48kvci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7SqGKOlwLvk0lHsaLJHfQc1QOImKZ6iU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "424755529731-65bh09e57713humkjvvnf6rffq48kvci.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
