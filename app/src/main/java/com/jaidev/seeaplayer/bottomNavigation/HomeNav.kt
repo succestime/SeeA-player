@@ -75,7 +75,7 @@ class homeNav : Fragment() {
 
             val deleteText = view.findViewById<TextView>(R.id.deleteText)
             val cancelText = view.findViewById<TextView>(R.id.cancelText)
-            val iconImageView = view.findViewById<ImageView>(R.id.iconImageView)
+            val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
 
             // Set the delete text color to red
             deleteText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
@@ -88,15 +88,13 @@ class homeNav : Fragment() {
             val alertDialog = alertDialogBuilder.create()
 
             deleteText.setOnClickListener {
-                // Handle delete action here
-                alertDialog.dismiss()
+
             }
 
             cancelText.setOnClickListener {
                 // Handle cancel action here
                 alertDialog.dismiss()
             }
-
             alertDialog.show()
         }
         binding.chip2.setOnClickListener {
@@ -104,7 +102,6 @@ class homeNav : Fragment() {
             startActivity(intent)
         }
         binding.chip.setOnClickListener {
-
         }
         return binding.root
     }

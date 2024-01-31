@@ -14,7 +14,7 @@ import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentNowPlayingBinding
 
 class NowPlaying : Fragment() {
-
+    lateinit var adapter: MusicAdapter
     companion object{
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: FragmentNowPlayingBinding
@@ -47,6 +47,7 @@ class NowPlaying : Fragment() {
         return view
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
         if(PlayerMusicActivity.musicService != null){

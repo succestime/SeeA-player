@@ -104,6 +104,15 @@ class musicNav : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
+    override fun onResume() {
+        super.onResume()
+        if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
+        MainActivity.adapterChanged= false
+
+
+
+    }
     override fun onDestroy() {
         super.onDestroy()
 

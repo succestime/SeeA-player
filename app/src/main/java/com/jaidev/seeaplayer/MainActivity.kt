@@ -11,6 +11,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var currentFragment: Fragment
     private lateinit var toggle: ActionBarDrawerToggle
+private  var runnable : Runnable? = null
 
     companion object {
         var videoRecantList = ArrayList<RecantVideo>()
@@ -52,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         lateinit var searchList: ArrayList<VideoData>
         lateinit var folderList: ArrayList<Folder>
         var dataChanged: Boolean = false
+        var adapterChanged: Boolean = false
         var sortValue: Int = 0
         val sortList = arrayOf(
             MediaStore.Video.Media.DATE_ADDED + " DESC",
@@ -89,7 +93,14 @@ class MainActivity : AppCompatActivity() {
             setFragment(homeNav())
             MusicListMA = getAllAudios()
 
-
+            runnable = Runnable {
+                if(dataChanged){
+                    dataChanged = false
+                    adapterChanged = true
+                }
+                Handler(Looper.getMainLooper()).postDelayed(runnable!!, 200)
+            }
+            Handler(Looper.getMainLooper()).postDelayed(runnable!!, 0)
         } else {
             folderList = ArrayList()
             videoList = ArrayList()
@@ -97,7 +108,7 @@ class MainActivity : AppCompatActivity() {
           MusicListMA = getAllAudios()
         }
 
-        FavoritesManager.loadFavorites(this)
+
 
         binding.bottomNav.setOnItemSelectedListener {
 
@@ -543,7 +554,7 @@ class MainActivity : AppCompatActivity() {
         if (!PlayerMusicActivity.isPlaying && PlayerMusicActivity.musicService != null) {
             exitApplication()
         }
-        FavoritesManager.saveFavorites(this)
+      runnable = null
     }
 
 //    override fun onResume() {

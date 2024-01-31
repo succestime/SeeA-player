@@ -1,17 +1,24 @@
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.text.bold
@@ -21,8 +28,11 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
-import com.jaidev.seeaplayer.databinding.MusicMoreFeatureBinding
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
+import com.jaidev.seeaplayer.databinding.RenameFieldBinding
+import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
+import java.io.File
+
 
 class
 MusicAdapter(
@@ -62,13 +72,13 @@ MusicAdapter(
         holder.more.setOnClickListener {
             newPosition = position
             val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.music_more_feature, holder.root, false)
-            val bindingMf = MusicMoreFeatureBinding.bind(customDialog)
+                .inflate(R.layout.video_more_features, holder.root, false)
+            val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
             val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
                 .create()
             dialog.show()
 
-            bindingMf.shareBtn2.setOnClickListener {
+            bindingMf.shareBtn.setOnClickListener {
 
                 dialog.dismiss()
                 val shareIntent = Intent()
@@ -83,7 +93,7 @@ MusicAdapter(
 
 
             }
-            bindingMf.infoBtn2.setOnClickListener {
+            bindingMf.infoBtn.setOnClickListener {
                 dialog.dismiss()
                 val customDialogIf = LayoutInflater.from(context)
                     .inflate(R.layout.details_view, holder.root, false)
@@ -110,20 +120,144 @@ MusicAdapter(
                     .bold { append("\n\nLocation : ") }.append(musicList[position].path)
                 bindingIf.detailTV.text = infoText
             }
-//
-//            bindingMf.renameMusicBtn.setOnClickListener {
-//                dialog.dismiss()
-//                requestWriteR()
-//                notifyDataSetChanged()
-//
-//            }
-//            bindingMf.deleteMusicBtn.setOnClickListener {
-//                dialog.dismiss()
-//                requestDeleteR(position = position)
-//                notifyDataSetChanged()
-//            }
+
+            bindingMf.renameBtn.setOnClickListener {
+                dialog.dismiss()
+                requestPermissionR()
+                val customDialogRF =
+                    LayoutInflater.from(context).inflate(R.layout.rename_field, holder.root, false)
+                val bindingRF = RenameFieldBinding.bind(customDialogRF)
+                val dialogRF = MaterialAlertDialogBuilder(context).setView(customDialogRF)
+                    .setCancelable(false)
+                    .setPositiveButton("Rename") { self, _ ->
+                        val currentFile = File(musicList[position].path)
+                        val newName = bindingRF.renameField.text
+                        if (newName != null && currentFile.exists() && newName.toString()
+                                .isNotEmpty()
+                        ) {
+                            val newFile = File(
+                                currentFile.parentFile,
+                                newName.toString() + "." + currentFile.extension
+                            )
+                            if (currentFile.renameTo(newFile)) {
+                                MediaScannerConnection.scanFile(
+                                    context, arrayOf(newFile.toString()),
+                                    arrayOf("audio/*"), null
+                                )
+                                when {
+                                    MainActivity.search -> {
+                                        MainActivity.musicListSearch[position].title =
+                                            newName.toString()
+                                        MainActivity.musicListSearch[position].path = newFile.path
+                                        MainActivity.musicListSearch[position].artUri =
+                                            Uri.fromFile(newFile)
+
+                                        MainActivity.dataChanged = true
+                                        notifyItemChanged(position)
+                                    }
+
+                                    else -> {
+                                        MainActivity.MusicListMA[position].title =
+                                            newName.toString()
+                                        MainActivity.MusicListMA[position].path = newFile.path
+                                        MainActivity.MusicListMA[position].artUri =
+                                            Uri.fromFile(newFile)
+                                        Glide.with(context)
+                                            .asBitmap()
+                                            .load(musicList[position].artUri)
+                                            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+                                            .into(holder.image)
+                                        MainActivity.dataChanged = true
+                                        notifyItemChanged(position)
+                                    }
+
+                                }
+                            } else {
+                                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+
+                        self.dismiss()
+                    }
+                    .setNegativeButton("Cancel") { self, _ ->
+                        self.dismiss()
+                    }
+                    .create()
+                dialogRF.show()
+                bindingRF.renameField.text = SpannableStringBuilder(musicList[position].title)
+                dialogRF.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
+                    .setBackgroundColor(Color.BLACK)
+                dialogRF.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
+                    .setBackgroundColor(Color.BLACK)
+
+            }
+            bindingMf.deleteBtn.setOnClickListener {
+                requestPermissionR()
+                dialog.dismiss()
+                val alertDialogBuilder = AlertDialog.Builder(context)
+                val layoutInflater = LayoutInflater.from(context)
+                val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
+
+
+                val videoNameDelete = view.findViewById<TextView>(R.id.videoNameDelete)
+                val deleteText = view.findViewById<TextView>(R.id.deleteText)
+                val cancelText = view.findViewById<TextView>(R.id.cancelText)
+                val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
+                // Set the delete text color to red
+                deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+
+                // Set the cancel text color to black
+                cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+
+                // Load video image into iconImageView using Glide
+                Glide.with(context)
+                    .asBitmap()
+                    .load(musicList[position].artUri)
+                    .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+                    .into(iconImageView)
+
+                videoNameDelete.text = musicList[position].title
+
+                alertDialogBuilder.setView(view)
+
+                val alertDialog = alertDialogBuilder.create()
+                deleteText.setOnClickListener {
+                    val file = File(musicList[position].path)
+                    if (file.exists() && file.delete()) {
+                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                        when {
+                            MainActivity.search -> {
+                                MainActivity.dataChanged = true
+                                musicList.removeAt(position)
+                                notifyDataSetChanged()
+                            }
+
+                            else -> {
+                                MainActivity.dataChanged = true
+                                MainActivity.MusicListMA.removeAt(position)
+                                notifyDataSetChanged()
+                            }
+
+                        }
+                    } else {
+                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+                    }
+                    alertDialog.dismiss()
+                }
+
+                cancelText.setOnClickListener {
+                    // Handle cancel action here
+                    alertDialog.dismiss()
+                }
+                alertDialog.show()
+            }
+
 
         }
+
+
+
 
             when {
             playlistDetails -> {
@@ -155,185 +289,6 @@ MusicAdapter(
         }
 
     }
-//
-//    @SuppressLint("ObsoleteSdkInt")
-//    @RequiresApi(Build.VERSION_CODES.R)
-//    private fun requestDeleteR(position: Int) {
-//        // list of videos to delete
-//        val uriList: List<Uri> = listOf(
-//            Uri.withAppendedPath(
-//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//                musicList[position].id
-//            )
-//        )
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//
-//            // requesting for delete permission
-//            val pi = MediaStore.createDeleteRequest(context.contentResolver, uriList)
-//            (context as Activity).startIntentSenderForResult(
-//                pi.intentSender, 125, null,
-//                0, 0, 0, null
-//            )
-//
-//        } else {
-//            // for devices less than android 11
-//            val file = File(musicList[position].path)
-//            val builder = MaterialAlertDialogBuilder(context)
-//            builder.setTitle("Delete Video ?")
-//                .setTitle("Deleting Video ? ")
-//                .setMessage(musicList[position].title)
-//                .setPositiveButton("Yes") { self, _ ->
-//                    if (file.exists() && file.delete()) {
-//                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-//                        updateDeleteUI(position = position)
-//                    }
-//                    self.dismiss()
-//                }
-//                .setNegativeButton("No"){self, _ -> self.dismiss() }
-//            val delDialog = builder.create()
-//            delDialog.show()
-//            delDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-//            delDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLUE)
-//
-//        }
-//
-//    }
-//    @SuppressLint("NotifyDataSetChanged")
-//    private fun updateDeleteUI(position: Int) {
-//        Log.d("MusicAdapter", "Deleting item at position $position")
-//
-//        when {
-//            isMusic -> {
-//                MainActivity.MusicListMA.removeAt(position)
-//                notifyItemRemoved(position)
-//                notifyDataSetChanged()
-//                notifyItemRangeChanged(position, itemCount)
-//                MainActivity.dataChanged = true
-//            }
-//            else -> {
-//                MainActivity.MusicListMA.removeAt(position)
-//                notifyItemRemoved(position)
-//                notifyItemRangeChanged(position, itemCount)
-//                notifyDataSetChanged()
-//            }
-//        }
-//
-//        // Log the size of the dataset after deletion
-//        Log.d("MusicAdapter", "Dataset size after deletion: ${musicList.size}")
-//    }
-
-
-//    @SuppressLint("ObsoleteSdkInt")
-//    @RequiresApi(Build.VERSION_CODES.R)
-//    private fun requestWriteR(){
-//        // files to modify
-//        val uriList : List<Uri> =listOf(Uri.withAppendedPath(
-//            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-//            , musicList[newPosition].id))
-//
-//        // requesting file write permission for specific files
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-//            val pi = MediaStore.createWriteRequest(context.contentResolver, uriList)
-//            (context as Fragment).startIntentSenderForResult(pi.intentSender , 126 , null ,
-//                0 ,0,0,null)
-//        }else renameFunction(newPosition)
-//
-//    }
-//
-//    @SuppressLint("SuspiciousIndentation", "ObsoleteSdkInt")
-//    private  fun renameFunction(position: Int) {
-//        val customDialogRF = LayoutInflater.from(context).inflate(
-//            R.layout.rename_field,
-//            (context as Activity).findViewById(R.id.drawerLayoutMA),
-//            false
-//        )
-//        val bindingRf = RenameFieldBinding.bind(customDialogRF)
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            dialogRF = MaterialAlertDialogBuilder(context).setView(customDialogRF)
-//                .setCancelable(false)
-//                .setPositiveButton("Rename") { self, _ ->
-//                    val currentFile = File(musicList[position].path)
-//                    val newName = bindingRf.renameField.text
-//                    if (newName != null && currentFile.exists() && newName.toString()
-//                            .isNotEmpty()
-//                    ) {
-//                        val newFile = File(
-//                            currentFile.parentFile,
-//                            newName.toString() + "." + currentFile.extension
-//                        )
-//                        val fromUri = Uri.withAppendedPath(
-//                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, musicList[position].id
-//                        )
-//
-//                        ContentValues().also {
-//                            it.put(MediaStore.Files.FileColumns.IS_PENDING, 1)
-//                            context.contentResolver.update(fromUri, it, null, null)
-//                            it.clear()
-//
-//                            // updating file details
-//                            it.put(MediaStore.Files.FileColumns.DISPLAY_NAME, newName.toString())
-//                            it.put(MediaStore.Files.FileColumns.IS_PENDING, 0)
-//                            context.contentResolver.update(fromUri, it, null, null)
-//
-//                        }
-//                        updateRenameUI(position, newName = newName.toString(), newFile = newFile)
-//                    }
-//                    self.dismiss()
-//                }
-//                .setNegativeButton("Cancel") { self, _ ->
-//                    self.dismiss()
-//                }
-//                .create()
-//        } else {
-//            dialogRF = MaterialAlertDialogBuilder(context).setView(customDialogRF)
-//                .setCancelable(false)
-//                .setPositiveButton("Rename") { self, _ ->
-//                    val currentFile = File(musicList[position].path)
-//                    val newName = bindingRf.renameField.text
-//                    if (newName != null && currentFile.exists() && newName.toString().isNotEmpty()) {
-//                        val newFile = File(currentFile.parentFile, newName.toString() + "." + currentFile.extension)
-//                        if(currentFile.renameTo(newFile)){
-//                            MediaScannerConnection.scanFile(context, arrayOf(newFile.toString()) , arrayOf("audio/*"), null)
-//                            updateRenameUI(position = position , newName= newName.toString(), newFile = newFile)
-//                        }
-//                    }
-//                    self.dismiss()
-//                }
-//                .setNegativeButton("Cancel"){self, _ ->
-//                    self.dismiss()
-//                }
-//                .create()
-//        }
-//
-//        bindingRf.renameField.text = SpannableStringBuilder(musicList[newPosition].title)
-//        dialogRF.show()
-//        dialogRF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(
-//            MaterialColors.getColor(context, com.bumptech.glide.R.attr.theme , Color.BLACK))
-//        dialogRF.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(
-//            MaterialColors.getColor(context, com.bumptech.glide.R.attr.theme , Color.BLACK))
-//    }
-
-//    private fun updateRenameUI(position: Int, newName:String, newFile: File){
-//        when{
-//            isMusic -> {
-//                MainActivity.MusicListMA[position].title = newName
-//                MainActivity.MusicListMA[position].path = newFile.path
-//                MainActivity.MusicListMA[position].artUri = Uri.fromFile(newFile)
-//                notifyItemChanged(position)
-//                MainActivity.dataChanged = true
-//
-//            }
-//            else -> {
-//                   MainActivity.MusicListMA[position].title = newName
-//                MainActivity.MusicListMA[position].path = newFile.path
-//                MainActivity.MusicListMA[position].artUri = Uri.fromFile(newFile)
-//                notifyItemChanged(position)
-//
-//
-//            }
-//        }
-//    }
 
     override fun getItemCount(): Int {
             return musicList.size
@@ -372,24 +327,17 @@ MusicAdapter(
         notifyDataSetChanged()
     }
 
-//    private  fun requestPermissionR(){
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-//            intent.addCategory("android.intent.category.DEFAULT")
-//            intent.data = Uri.parse("package:${context.applicationContext.packageName}")
-//            ContextCompat.startActivity(context, intent, null)
-//        }
-//
-//    }
-//    fun onResult(requestCode : Int , resultCode : Int){
-//        when(requestCode){
-//            125 -> {
-//                if(resultCode == Activity.RESULT_OK) updateDeleteUI(newPosition)
-//
-//            }
-//            126 -> if(resultCode == Activity.RESULT_OK) renameFunction(newPosition)
-//        }
-//    }
+     private fun requestPermissionR() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.data = Uri.parse("package:${context.applicationContext.packageName}")
+                ContextCompat.startActivity(context, intent, null)
+            }
+        }
+    }
+
 }
 
 
