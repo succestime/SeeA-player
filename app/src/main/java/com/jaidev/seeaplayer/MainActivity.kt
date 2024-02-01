@@ -554,15 +554,9 @@ private  var runnable : Runnable? = null
         if (!PlayerMusicActivity.isPlaying && PlayerMusicActivity.musicService != null) {
             exitApplication()
         }
-      runnable = null
+
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//
-//        // Save favorites when the app resumes
-//        FavoritesManager.saveFavorites(this)
-//    }
 
 }
 

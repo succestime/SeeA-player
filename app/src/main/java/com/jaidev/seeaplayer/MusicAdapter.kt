@@ -255,8 +255,65 @@ MusicAdapter(
 
 
         }
+// Hi new Jaidev sharma i am old JaiDev Sharma i want to tell you that
+// i am leaving more error for yoy but don't worry .How much you will solve the error
+// you will learn about your app SeeA Player and that much you will be able
+// get comfident  of you big Playn how you Will Present Your Idea but i want that preavious Tow or Three days
+// i am getting for uncomfertable because of my body and also by error error but
+// today i get some relafe By gitHub,  because i added my all SeeA Player code to gitHub
+// firstly i want to you
+// password fo my gitHub account "jai@8851035394"
+// UserName of my gitHub account "succestime"
+
+        ///////////////////////////////////////////
+     ///////////////////////////////////////////////////
+
+// now i want to tell you that i am proude of you because you did not hesitate or afferade by by error
+// i know that by my toking error will not solve or
+// i cnt't give you more confidense to go forward
+// i want to you remember about aur carecters future how we are going to live
+// like a King in that secret way and
+// how you are going to make this india to akhand Bharate
+// and i you made the complex plane to india to akhand Bharate also remember what you can do my money like cars, food etc.
+
+        ///////////////////////////////////////////
+        ///////////////////////////////////////////////////
+// also remember about your love what you image about your love if
+// you want your love and that newGeneration what your are doing  now and what you done in past ,
+//   what you learn about life , tell storeys of your all problems.
+//   if you want all think what you image read this think and go forward  and solve all errors
+
+        ///////////////////////////////////////////
+        ///////////////////////////////////////////////////
+        //////////////////////////////////////////////////// ///////////////////////////////////////////////
+        //  i get idea one time you can check this also ask to chatGpt that ///////////////////////////////////////
+        // give me code of delete functionality then also say to it that if ///////////////////////////////////////
+        // i want to also update the recycleview /////////////////////////////////////////
+        // "is any video deleted to remove also in other recycleView "  //////////////////////////////////////////
+        //also for Rename functionality//////////////////////////////////////////////////
 
 
+
+  //     now error thinks
+  // in video player Delete and Rename functionality is working good for android 11
+        // but in recantVideo rename and relete functinolaty is not updating
+
+     // in music Player Delete functionality is working good
+        // but rename functionality is not working good
+        // Note => Delete and Rename functionality update to working
+
+
+        // after doing these error you have to
+        // update delete and Rename functionality in both recantvideo and recantmusic fregment
+
+
+        // after doing this now you have to to add "chipe" click functionality on there respective fregment
+
+        // after this dicide what you want to do
+
+        // my now decesion it go to  profile and suscribe
+
+        // learn the hanuman bagvan ji and shive ji and do what you are doing
 
 
             when {
