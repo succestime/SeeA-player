@@ -23,7 +23,7 @@ import com.jaidev.seeaplayer.databinding.RecantDownloadViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.recantFragment.ReVideoPlayerActivity
 
-class RecentVideoAdapter(private val context: Context, private var videoReList: ArrayList<RecantVideo> ,private val isRecantVideo: Boolean = false,private val removeClickListener: OnRemoveClickListener? = null  ) :
+class RecentVideoAdapter(private val context: Context, private var videoReList: ArrayList<RecantVideo> ,private val isRecantVideo: Boolean = false ) :
     RecyclerView.Adapter<RecentVideoAdapter.MyAdapter>() {
 
     private  var newPosition = 0
@@ -79,11 +79,11 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             dialog.show()
 
 
-            bindingMf.renameBtn.setOnClickListener {
-                dialog.show()
-                 removeClickListener?.onRemoveClicked(position)
-
-            }
+//            bindingMf.renameBtn.setOnClickListener {
+//                dialog.show()
+//                 removeClickListener?.onRemoveClicked(position)
+//
+//            }
 
 
 
