@@ -41,7 +41,7 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
 
     @SuppressLint("UnspecifiedImmutableFlag", "ForegroundServiceType")
     fun showNotification(playPauseBtn : Int) {
-        val intent = Intent(baseContext, musicNav::class.java)
+        val intent = Intent(baseContext, MainActivity::class.java)
         val contentIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
 //        val reIntent = Intent(baseContext, DaysMusic::class.java)

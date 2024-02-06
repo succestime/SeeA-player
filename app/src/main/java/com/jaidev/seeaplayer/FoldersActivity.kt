@@ -17,13 +17,13 @@ import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityFoldersBinding
 import java.io.File
 
-class FoldersActivity : AppCompatActivity() {
+class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener  {
     private lateinit var binding: ActivityFoldersBinding
-    lateinit var adapter: VideoAdapter
+private lateinit var adapter: VideoAdapter
     private var isSearchViewClicked = false
-companion object {
-    lateinit var currentFolderVideos: ArrayList<VideoData>
-}
+    companion object {
+        lateinit var currentFolderVideos: ArrayList<VideoData>
+    }
 
     @SuppressLint("SetTextI18n", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,9 +31,11 @@ companion object {
         binding = ActivityFoldersBinding.inflate(layoutInflater)
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
+
+
         val position = intent.getIntExtra("position", 0)
 
-     currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
+        currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = MainActivity.folderList[position].folderName
         binding.videoRVFA.setHasFixedSize(true)
@@ -62,13 +64,28 @@ companion object {
         binding.nowPlayingBtn.setOnClickListener {
             val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
             intent.putExtra("class", "NowPlaying")
-          startActivity( intent )
+            startActivity( intent )
         }
         binding.searchBackBtn.setOnClickListener {
             binding.recyclerView.visibility = View.GONE
         }
     }
-
+    @SuppressLint("SetTextI18n")
+    override fun onVideoDeleted() {
+        // Reload videos in RecyclerView
+        val position = intent.getIntExtra("position", 0)
+        currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
+        adapter.updateList(currentFolderVideos)
+        binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
+    }
+//////////////////////////////////
+//    @SuppressLint("SetTextI18n")/////////
+//    fun reloadVideos() {      ///////////////
+//        val position = intent.getIntExtra("position", 0)  /////////////////
+//        currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)   ////////////
+//        adapter.updateList(currentFolderVideos)   ///////////////////////
+//        binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"  //////////////
+//    } ////////////////////////////////////////////////
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
@@ -141,7 +158,7 @@ companion object {
 
 
     @SuppressLint("Range")
-   fun getAllVideos(folderId: String): ArrayList<VideoData> {
+    fun getAllVideos(folderId: String): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
         MainActivity.sortValue = sortEditor.getInt("sortValue", 0)
 
@@ -195,8 +212,8 @@ companion object {
     override fun onResume() {
         super.onResume()
         if(PlayerActivity.position != -1) binding.nowPlayingBtn.visibility = View.VISIBLE
-           if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
-               MainActivity.adapterChanged= false
+        if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
+        MainActivity.adapterChanged= false
 
 
 
@@ -212,5 +229,3 @@ companion object {
 //        adapter.onResult(requestCode, resultCode)
 //    }
 }
-
-

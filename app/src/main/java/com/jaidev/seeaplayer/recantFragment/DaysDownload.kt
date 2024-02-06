@@ -16,7 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaidev.seeaplayer.MainActivity
-import com.jaidev.seeaplayer.MainActivity.Companion.videoRecantList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.RecentVideoAdapter
 import com.jaidev.seeaplayer.dataClass.RecantVideo
@@ -27,6 +26,7 @@ import java.util.concurrent.TimeUnit
 class DaysDownload : Fragment() {
     private lateinit var binding: FragmentDaysDownloadBinding
     lateinit var adapter: RecentVideoAdapter
+    private var videoRecantList = ArrayList<RecantVideo>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,8 +67,10 @@ class DaysDownload : Fragment() {
             binding.swipeRefreshVideo.isRefreshing = false // Hide the refresh indicator
         }, 2000) // 2000 milliseconds (2 seconds)
 
+
         return view
     }
+
 
     @SuppressLint("SetTextI18n")
     private fun loadRecentVideos(){
@@ -82,6 +84,7 @@ class DaysDownload : Fragment() {
 
 
     }
+
 
     private fun getAllRecantVideos(context: Context): ArrayList<RecantVideo> {
         val recantVList = ArrayList<RecantVideo>()
@@ -135,9 +138,5 @@ class DaysDownload : Fragment() {
         if (MainActivity.dataChanged) adapter.notifyDataSetChanged()
         MainActivity.dataChanged = false
     }
-//    @Deprecated("Deprecated in Java")
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        adapter.onResult(  requestCode,resultCode )
-//    }
+
 }

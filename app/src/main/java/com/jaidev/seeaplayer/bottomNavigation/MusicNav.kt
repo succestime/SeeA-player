@@ -80,6 +80,7 @@ class musicNav : Fragment() {
         return view
     }
 
+
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_music_view, menu)

@@ -20,10 +20,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantDownloadViewBinding
-import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
+import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.recantFragment.ReVideoPlayerActivity
 
-class RecentVideoAdapter(private val context: Context, private var videoReList: ArrayList<RecantVideo> ,private val isRecantVideo: Boolean = false ) :
+class RecentVideoAdapter(private val context: Context, private var videoReList: ArrayList<RecantVideo> ,private val isRecantVideo: Boolean = false,private val removeClickListener: OnRemoveClickListener? = null  ) :
     RecyclerView.Adapter<RecentVideoAdapter.MyAdapter>() {
 
     private  var newPosition = 0
@@ -37,6 +37,8 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
         val root = binding.root
 
     }
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter {
         val binding = RecantDownloadViewBinding.inflate(
@@ -70,17 +72,18 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             newPosition = position
 
             val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.recant_video_more_features, holder.root, false)
-            val bindingMf = RecantVideoMoreFeaturesBinding.bind(customDialog)
+                .inflate(R.layout.video_more_features, holder.root, false)
+            val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
             val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
                 .create()
             dialog.show()
 
 
-//            bindingMf.renameBtn.setOnClickListener {
-//                dialog.dismiss()
-//                requestWriteR()
-//            }
+            bindingMf.renameBtn.setOnClickListener {
+                dialog.show()
+                 removeClickListener?.onRemoveClicked(position)
+
+            }
 
 
 
@@ -133,14 +136,16 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             return videoReList.size
         }
 
-        @SuppressLint("NotifyDataSetChanged")
+
+    @SuppressLint("NotifyDataSetChanged")
         fun updateRecentVideos(recentVideos: List<RecantVideo>) {
             videoReList.clear()
             videoReList.addAll(recentVideos)
             notifyDataSetChanged()
         }
 
-        private fun sendIntent(pos: Int, ref: String) {
+
+    private fun sendIntent(pos: Int, ref: String) {
             ReVideoPlayerActivity.position = pos
             val intent = Intent(context, ReVideoPlayerActivity::class.java)
             intent.putExtra("class", ref)

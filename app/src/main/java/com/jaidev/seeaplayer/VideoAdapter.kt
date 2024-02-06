@@ -40,6 +40,15 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     private lateinit var dialogRF: androidx.appcompat.app.AlertDialog
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
+    interface VideoDeleteListener {
+        fun onVideoDeleted()
+    }
+
+    private var videoDeleteListener: VideoDeleteListener? = null
+
+    fun setVideoDeleteListener(listener: VideoDeleteListener) {
+        videoDeleteListener = listener
+    }
 
 
     class MyAdapter(binding: VideoViewBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -226,25 +235,29 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                 val alertDialog = alertDialogBuilder.create()
 
                 deleteText.setOnClickListener {
-                   val file = File(videoList[position].path)
+                    val file = File(videoList[position].path)
                     if(file.exists() && file.delete()){
                         MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
                         when{
                             MainActivity.search -> {
                                 MainActivity.dataChanged = true
-                              videoList.removeAt(position)
+                                videoList.removeAt(position)
                                 notifyDataSetChanged()
                             }
                             isFolder -> {
-                                MainActivity.dataChanged = true
-                                FoldersActivity.currentFolderVideos.removeAt(position)
-                                notifyDataSetChanged()
-                            }
-
+                            MainActivity.dataChanged = true
+                                    FoldersActivity.currentFolderVideos.removeAt(position)
+                                    notifyDataSetChanged()
+                                videoDeleteListener?.onVideoDeleted()
+                            //////////////////////////////////////////////
+                            // Notify FoldersActivity to reload videos///////
+                            // //  // // ->  (context as? FoldersActivity)?.reloadVideos()///////
+                            ///////////////////////////////////////////////////////////
                         }
-                    }else{
-                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
                     }
+                } else {
+                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+            }
                     alertDialog.dismiss()
                 }
 
@@ -279,6 +292,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         notifyDataSetChanged()
     }
 
+
     //for requesting android 11 or higher storage permission
     private fun requestPermissionR() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -291,6 +305,3 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         }
     }
 }
-
-
-
