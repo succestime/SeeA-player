@@ -50,7 +50,6 @@ import com.jaidev.seeaplayer.databinding.MoreFeaturesBinding
 import com.jaidev.seeaplayer.databinding.SpeedDialogBinding
 import java.io.File
 import java.text.DecimalFormat
-import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.TimeUnit
@@ -59,13 +58,12 @@ import kotlin.system.exitProcess
 
 
 class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener , GestureDetector.OnGestureListener {
-    lateinit var binding: ActivityRePlayerBinding
+    private lateinit var binding: ActivityRePlayerBinding
     private lateinit var playPauseBtn: ImageButton
     private lateinit var fullScreenBtn: ImageButton
     private lateinit var videoTitle: TextView
-    private var isSubtitle: Boolean = true
     private lateinit var gestureDetectorCompat: GestureDetectorCompat
-//    private val LONG_PRESS_DURATION = 500L // Define the duration for a long press in milliseconds
+    //    private val LONG_PRESS_DURATION = 500L // Define the duration for a long press in milliseconds
 //    private var isLongPress = false
 //    private var longPressStartTime = 0L
     private var isSwipingForward = false
@@ -74,18 +72,16 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     private var initialPosition = 0L
     private lateinit var durationChangeTextView: TextView
     private var isSwipingToChangeDuration = false
-
     private var currentProgress: Int = 0
 
     companion object {
         private var audioManager: AudioManager? = null
         private lateinit var player: ExoPlayer
-        lateinit var recantPlayerList: ArrayList<RecantVideo>
+        lateinit var recantPlayerList : ArrayList<RecantVideo>
         var position: Int = -1
         private var repeat: Boolean = false
         private var isFullscreen: Boolean = false
         private var isLocked: Boolean = false
-
         @SuppressLint("StaticFieldLeak")
         private lateinit var trackSelector: DefaultTrackSelector
         private lateinit var loudnessEnhancer: LoudnessEnhancer
@@ -94,14 +90,15 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         var nowPlayingId: String = ""
         var pipStatus: Int = 0
         private var brightness: Int = 0
+        private var volume: Int = 0
         private const val MAX_DURATION_CHANGE = 10 * 1000L // Maximum duration change in milliseconds
         private const val SWIPE_THRESHOLD = 50 // Swipe threshold in pixels
-        private var volume: Int = 0
         private const val MAX_PROGRESS = 100
 
     }
 
-    @SuppressLint("ObsoleteSdkInt")
+
+    @SuppressLint("ObsoleteSdkInt", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRePlayerBinding.inflate(layoutInflater)
@@ -110,7 +107,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
-        binding = ActivityRePlayerBinding.inflate(layoutInflater)
+
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
 
@@ -129,6 +126,9 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+
+
+
         try {
             if (intent.data?.scheme.contentEquals("content")) {
                 recantPlayerList = ArrayList()
@@ -144,15 +144,9 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     it.moveToFirst()
                     val path = it.getString(it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
                     val file = File(path)
-
                     val video = RecantVideo(
-                        id = "",
-                        title = file.name,
-                        duration = 0L,
-                        artUri = Uri.fromFile(file),
-                        path = path,
-                        timestamp = System.currentTimeMillis(),
-                        size = ""
+                        id = "", title = file.name, duration = 0L,
+                        artUri = Uri.fromFile(file), path = path, size = "", timestamp = System.currentTimeMillis()
                     )
                     recantPlayerList.add(video)
                     cursor.close()
@@ -178,11 +172,11 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 recantPlayerList.addAll(MainActivity.videoRecantList)
                 createPlayer()
             }
-
         }
     }
 
-    @SuppressLint("SetTextI18n", "ObsoleteSdkInt")
+
+    @SuppressLint("SetTextI18n", "SuspiciousIndentation", "ObsoleteSdkInt")
     private fun initializeBinding() {
         findViewById<ImageButton>(R.id.orientationBtn).setOnClickListener {
             requestedOrientation =
@@ -251,60 +245,82 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 .create()
             dialog.show()
 
-            bindingMf.audioTrack.setOnClickListener {
-                dialog.dismiss()
-                playVideo()
-                val audioTrack = ArrayList<String>()
-                // val audioList = ArrayList<String>()
-                for (i in 0 until player.currentTrackGroups.length) {
-                    if (player.currentTrackGroups.get(i)
-                            .getFormat(0).selectionFlags == C.SELECTION_FLAG_DEFAULT
-                    ) {
-                        audioTrack.add(
-                            Locale(
-                                player.currentTrackGroups.get(i).getFormat(0).language.toString()
-                            ).displayLanguage
-                        )
-                    }
-                }
-                val tempTracks = audioTrack.toArray(arrayOfNulls<CharSequence>(audioTrack.size))
-                MaterialAlertDialogBuilder(this, R.style.alertDialog)
-                    .setTitle("Select Language")
-                    .setOnCancelListener { playVideo() }
-                    .setBackground(ColorDrawable(0x803700B3.toInt()))
-
-                    .setItems(tempTracks) { _, position ->
-                        Toast.makeText(this, audioTrack[position] + "Selected", Toast.LENGTH_SHORT)
-                            .show()
-                        trackSelector.setParameters(
-                            trackSelector.buildUponParameters()
-                                .setPreferredAudioLanguage(audioTrack[position])
-                        )
-                    }
-                    .create()
-                    .show()
-            }
-            bindingMf.subtitlesBtn.setOnClickListener {
-
-
-                if (isSubtitle) {
-                    trackSelector.parameters =
-                        DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
-                            C.TRACK_TYPE_VIDEO, true
-                        ).build()
-                    Toast.makeText(this, "Subtitle Off", Toast.LENGTH_SHORT).show()
-                    isSubtitle = false
-                } else {
-                    trackSelector.parameters =
-                        DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
-                            C.TRACK_TYPE_VIDEO, false
-                        ).build()
-                    Toast.makeText(this, "Subtitle On", Toast.LENGTH_SHORT).show()
-                    isSubtitle = true
-                }
-                dialog.dismiss()
-                playVideo()
-            }
+//            bindingMf.audioTrack.setOnClickListener {
+//                dialog.dismiss()
+//                playVideo()
+//                val audioTrack = ArrayList<String>()
+//                val audioList = ArrayList<String>()
+//                for(group in player.currentTracksInfo.trackGroupInfos){
+//                    if(group.trackType == C.TRACK_TYPE_AUDIO){
+//                        val groupInfo = group.trackGroup
+//                        for (i in 0 until groupInfo.length){
+//                            audioTrack.add(groupInfo.getFormat(i).language.toString())
+//                            audioList.add("${audioList.size + 1}. " + Locale(groupInfo.getFormat(i).language.toString()).displayLanguage
+//                                    + " (${groupInfo.getFormat(i).label})")
+//                        }
+//                    }
+//                }
+//
+//                if(audioList[0].contains("null")) audioList[0] = "1. Default Track"
+//
+//                val tempTracks = audioList.toArray(arrayOfNulls<CharSequence>(audioList.size))
+//                val audioDialog = MaterialAlertDialogBuilder(this, R.style.alertDialog)
+//                    .setTitle("Select Language")
+//                    .setOnCancelListener { playVideo() }
+//                    .setPositiveButton("Off Audio"){ self, _ ->
+//                        trackSelector.setParameters(trackSelector.buildUponParameters().setRendererDisabled(
+//                            C.TRACK_TYPE_AUDIO, true
+//                        ))
+//                        self.dismiss()
+//                    }
+//                    .setItems(tempTracks){_, position ->
+//                        Snackbar.make(binding.root, audioList[position] + " Selected", 3000).show()
+//                        trackSelector.setParameters(trackSelector.buildUponParameters()
+//                            .setRendererDisabled(C.TRACK_TYPE_AUDIO, false)
+//                            .setPreferredAudioLanguage(audioTrack[position]))
+//                    }
+//                    .create()
+//                audioDialog.show()
+//                audioDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.WHITE)
+//                audioDialog.window?.setBackgroundDrawable(ColorDrawable(0x99000000.toInt()))
+//            }
+//            bindingMf.subtitlesBtn.setOnClickListener {
+//                dialog.dismiss()
+//                playVideo()
+//                val subtitles = ArrayList<String>()
+//                val subtitlesList = ArrayList<String>()
+//                for(group in player.currentTracksInfo.trackGroupInfos){
+//                    if(group.trackType == C.TRACK_TYPE_TEXT){
+//                        val groupInfo = group.trackGroup
+//                        for (i in 0 until groupInfo.length){
+//                            subtitles.add(groupInfo.getFormat(i).language.toString())
+//                            subtitlesList.add("${subtitlesList.size + 1}. " + Locale(groupInfo.getFormat(i).language.toString()).displayLanguage
+//                                    + " (${groupInfo.getFormat(i).label})")
+//                        }
+//                    }
+//                }
+//
+//                val tempTracks = subtitlesList.toArray(arrayOfNulls<CharSequence>(subtitlesList.size))
+//                val sDialog = MaterialAlertDialogBuilder(this, R.style.alertDialog)
+//                    .setTitle("Select Subtitles")
+//                    .setOnCancelListener { playVideo() }
+//                    .setPositiveButton("Off Subtitles"){ self, _ ->
+//                        trackSelector.setParameters(trackSelector.buildUponParameters().setRendererDisabled(
+//                            C.TRACK_TYPE_VIDEO, true
+//                        ))
+//                        self.dismiss()
+//                    }
+//                    .setItems(tempTracks){_, position ->
+//                        Snackbar.make(binding.root, subtitlesList[position] + " Selected", 3000).show()
+//                        trackSelector.setParameters(trackSelector.buildUponParameters()
+//                            .setRendererDisabled(C.TRACK_TYPE_VIDEO, false)
+//                            .setPreferredTextLanguage(subtitles[position]))
+//                    }
+//                    .create()
+//                sDialog.show()
+//                sDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.WHITE)
+//                sDialog.window?.setBackgroundDrawable(ColorDrawable(0x99000000.toInt()))
+//            }
             bindingMf.audioBooster.setOnClickListener {
                 dialog.dismiss()
                 val customDialogB =
@@ -439,6 +455,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         doubleTapEnable()
         setupSwipeGesture()
+
         val mediaItem = MediaItem.fromUri(recantPlayerList[position].artUri)
         player.setMediaItem(mediaItem)
         player.prepare()
@@ -479,6 +496,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         nowPlayingId = recantPlayerList[position].id
         player.play()
     }
+
 
     private fun pauseVideo() {
         playPauseBtn.setImageResource(R.drawable.ic_play_icon)
@@ -538,15 +556,17 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             val intent = Intent(this, ReVideoPlayerActivity::class.java)
             when(pipStatus){
                 1 -> intent.putExtra("class","RecantVideo")
+
             }
             startActivity(intent)
         }
         if(!isInPictureInPictureMode) pauseVideo()
     }
+
     override fun onDestroy() {
         super.onDestroy()
         player.pause()
-        audioManager?.abandonAudioFocus(this)
+  audioManager?.abandonAudioFocus(this)
 
     }
 
@@ -565,9 +585,9 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun doubleTapEnable(){
+    private fun doubleTapEnable() {
         binding.playerView.player = player
-        binding.ytOverlay.performListener(object: YouTubeOverlay.PerformListener{
+        binding.ytOverlay.performListener(object : YouTubeOverlay.PerformListener {
             override fun onAnimationEnd() {
                 binding.ytOverlay.visibility = View.GONE
             }
@@ -577,25 +597,31 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             }
         })
         binding.ytOverlay.player(player)
+
         binding.playerView.setOnTouchListener { _, motionEvent ->
             binding.playerView.isDoubleTapEnabled = false
-            if(!isLocked){
+
+            if (!isLocked) {
                 binding.playerView.isDoubleTapEnabled = true
                 gestureDetectorCompat.onTouchEvent(motionEvent)
-                if(motionEvent.action == MotionEvent.ACTION_UP) {
+                if (motionEvent.action == MotionEvent.ACTION_UP) {
 
-                    //for immersive mode
+
+                    // for immersive mode
                     WindowCompat.setDecorFitsSystemWindows(window, false)
                     WindowInsetsControllerCompat(window, binding.root).let { controller ->
                         controller.hide(WindowInsetsCompat.Type.systemBars())
-                        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        controller.systemBarsBehavior =
+                            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                     }
                 }
             }
+
+
+
+
             return@setOnTouchListener false
         }
-
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -615,19 +641,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                         currentSwipeX = motionEvent.x
                         currentSwipeY = motionEvent.y
                         initialPosition = player.currentPosition
-                        binding.volumeIcon.visibility = View.GONE
+
                         isSwipingToChangeDuration = false
-                        // Check for a long press (2 seconds or more)
-//                        if (!isLongPress && System.currentTimeMillis() - longPressStartTime >= 3000) {
-//                            isLongPress = true
-//                            Toast.makeText(this, "2x Speed", Toast.LENGTH_LONG).show()
-//
-//                            // Implement the logic for playing the video in 2x speed
-//                         player.playbackParameters = PlaybackParameters(2f, 1f)
-//                        }
-//
-//                        // Update the long press start time
-//                        longPressStartTime = System.currentTimeMillis()
                     }
                     MotionEvent.ACTION_MOVE -> {
                         // Calculate the swipe distances
@@ -639,7 +654,6 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                             // User is swiping horizontally for duration change
                             isSwipingToChangeDuration = true
                             hideProgressBars()
-
                             // Determine the direction of the swipe
                             isSwipingForward = deltaX > 0
 
@@ -654,33 +668,28 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                             isSwipingToChangeDuration = false
                             showProgressBars(motionEvent.x, deltaY)
 
-                            // Determine whether it's brightness or volume change
                             if (motionEvent.x < binding.root.width / 2) {
                                 val increase = deltaY > 0
                                 val newValue = if (increase) brightness - 1 else brightness + 1
                                 if (newValue in 0..15) brightness = newValue
                                 setScreenBrightness(brightness)
                             } else {
+                                // For volume change
                                 val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                                 val increase = deltaY > 0
                                 val newValue = if (increase) volume - 1 else volume + 1
                                 if (newValue in 0..maxVolume) volume = newValue
-                              audioManager!!.setStreamVolume(
-                                    AudioManager.STREAM_MUSIC,
-                                  volume,
-                                    0
-                                )
+                                audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
                             }
+
+
+
                         }
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-//                        if (isLongPress) {
-//                            // Long-press released, reset the playback speed to normal
-//                           player.playbackParameters = PlaybackParameters(1f, 1f)
-//                            isLongPress = false
-//                        } else
-                            if (isSwipingToChangeDuration) {
+
+                        if (isSwipingToChangeDuration) {
                             // Get the displayed duration text from the TextView
                             val displayedText = durationChangeTextView.text.toString()
 
@@ -696,7 +705,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                             if (isSwipingForward) {
                                 player.seekTo(initialPosition + durationChangeMillis)
                             } else {
-                              player.seekTo(initialPosition - durationChangeMillis)
+                                player.seekTo(initialPosition - durationChangeMillis)
                             }
 
                             // Hide the duration TextView
@@ -704,8 +713,10 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
 
                             // Reset the flag
                             isSwipingToChangeDuration = false
+
                         }
                         hideProgressBars()
+
 
                     }
 
@@ -713,7 +724,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
 
             }
 
-            // Return true if the touch event is consumed
+
             isSwipingToChangeDuration
         }
     }
@@ -749,22 +760,6 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         binding.volProgressContainer.visibility = View.GONE
         binding.brtProgressContainer.visibility = View.GONE
     }
-    private fun parseDurationTextToMillis(durationText: String?): Long {
-        if (durationText == null) {
-            return 0
-        }
-
-        // Assuming the format is "mm:ss"
-        val parts = durationText.split(":")
-        if (parts.size == 2) {
-            val minutes = parts[0].toLong()
-            val seconds = parts[1].toLong()
-            return TimeUnit.MINUTES.toMillis(minutes) + TimeUnit.SECONDS.toMillis(seconds)
-        }
-
-        return 0
-    }
-
     private fun updateDurationTextView(durationChange: Float, isForward: Boolean) {
         val actualDurationMinSec = getMinSecFormat(player.duration)
         val changingDurationSecMillisec = getSecMillisecFormat(durationChange)
@@ -806,12 +801,25 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             String.format("%02d:%02d", minutes, seconds)
         }
     }
-
-
     private fun getSecMillisecFormat(durationChange: Float): String {
         val minutes = durationChange.toLong() / 60000
         val seconds = (durationChange.toLong() % 60000) / 1000
         return String.format("%02d:%02d", minutes, seconds)
+    }
+    private fun parseDurationTextToMillis(durationText: String?): Long {
+        if (durationText == null) {
+            return 0
+        }
+
+        // Assuming the format is "mm:ss"
+        val parts = durationText.split(":")
+        if (parts.size == 2) {
+            val minutes = parts[0].toLong()
+            val seconds = parts[1].toLong()
+            return TimeUnit.MINUTES.toMillis(minutes) + TimeUnit.SECONDS.toMillis(seconds)
+        }
+
+        return 0
     }
 
 
@@ -832,21 +840,24 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
 
         })
 
+
     override fun onDown(p0: MotionEvent): Boolean = false
     override fun onShowPress(p0: MotionEvent) = Unit
     override fun onSingleTapUp(p0: MotionEvent): Boolean = false
     override fun onLongPress(p0: MotionEvent) = Unit
-    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean = false
-
-    @SuppressLint("SuspiciousIndentation")
-    override fun onScroll(event: MotionEvent?, event1: MotionEvent, distanceX: Float,
-                          distanceY: Float): Boolean {
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent, velocityX: Float, velocityY: Float): Boolean = false
+    override fun onScroll(
+        e1: MotionEvent?,
+        event: MotionEvent,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
 
         val sWidth = Resources.getSystem().displayMetrics.widthPixels
-        val sHeight = Resources.getSystem().displayMetrics.widthPixels
+        val sHeight = Resources.getSystem().displayMetrics.heightPixels
 
         val border = 100 * Resources.getSystem().displayMetrics.density.toInt()
-        if (event!!.x < border || event.y < border || event.x > sWidth - border || event.y > sHeight - border)
+        if (event.x < border || event.y < border || event.x > sWidth - border || event.y > sHeight - border)
             return false
 
         if(abs(distanceX) < abs(distanceY)){
@@ -860,16 +871,17 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 val increase = distanceY > 0
                 val newValue = if (increase) volume + 1 else volume - 1
                 if (newValue in 0..maxVolume) volume = newValue
-                   audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+                audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
             }
+
             return true
         }
         return false
     }
 
 
-    private fun setScreenBrightness(value: Int) {
-        val d = 0.5f / 15
+    private fun setScreenBrightness(value: Int){
+        val d = 1.0f/15
         val lp = this.window.attributes
         lp.screenBrightness = d * value
         this.window.attributes = lp

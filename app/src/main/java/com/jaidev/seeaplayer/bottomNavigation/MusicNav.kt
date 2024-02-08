@@ -22,7 +22,7 @@ import com.jaidev.seeaplayer.MainActivity.Companion.search
 import com.jaidev.seeaplayer.databinding.FragmentMusicNavBinding
 
 
-class musicNav : Fragment() {
+class musicNav : Fragment(),VideoAdapter.VideoDeleteListener  {
 
     private lateinit var binding: FragmentMusicNavBinding
   lateinit var adapter: MusicAdapter
@@ -79,8 +79,14 @@ class musicNav : Fragment() {
 
         return view
     }
-
-
+    @SuppressLint("SetTextI18n")
+    override fun onVideoDeleted() {
+        // Reload audios in RecyclerView
+        val mainActivity = requireActivity() as MainActivity
+        val tempList = mainActivity.getAllAudios()
+        adapter.updateMusicList(tempList)
+        binding.TotalMusics.text = "Total Musics : ${tempList.size}"
+    }
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_music_view, menu)

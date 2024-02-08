@@ -15,7 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.MainActivity.Companion.videoRecantList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.RecentVideoAdapter
 import com.jaidev.seeaplayer.dataClass.RecantVideo
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 class DaysDownload : Fragment() {
     private lateinit var binding: FragmentDaysDownloadBinding
     lateinit var adapter: RecentVideoAdapter
-    private var videoRecantList = ArrayList<RecantVideo>()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,12 +35,12 @@ class DaysDownload : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_days_download, container, false)
         binding = FragmentDaysDownloadBinding.bind(view)
-
-
-        adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true)
+        binding.DownloadRV.setHasFixedSize(true)
+        binding.DownloadRV.setItemViewCacheSize(13)
         binding.DownloadRV.layoutManager = LinearLayoutManager(requireContext())
+        adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true)
         binding.DownloadRV.adapter = adapter
-
+        binding.daysTotalVideos.text = "Total Videos : 0"
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
                 if (isGranted) {
@@ -57,8 +57,8 @@ class DaysDownload : Fragment() {
         ) {
             loadRecentVideos()
         } else {
-            if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            }
+//            if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//            }
             requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
 
@@ -76,8 +76,8 @@ class DaysDownload : Fragment() {
     private fun loadRecentVideos(){
         val recantVideos = getAllRecantVideos(requireContext())
         val sevenDaysAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)
-        val recentVideos = recantVideos.filter { it.timestamp >= sevenDaysAgo }
-        val sortedRecentVideos = recentVideos.sortedByDescending { it.timestamp }
+        val sortedRecentVideos = recantVideos.filter { it.timestamp >= sevenDaysAgo }
+        recantVideos.sortedByDescending { it.timestamp }
 
         adapter.updateRecentVideos(sortedRecentVideos)
         binding.daysTotalVideos.text = "Total Musics : ${sortedRecentVideos.size}"
@@ -132,11 +132,11 @@ class DaysDownload : Fragment() {
         return recantVList
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onResume() {
-        super.onResume()
-        if (MainActivity.dataChanged) adapter.notifyDataSetChanged()
-        MainActivity.dataChanged = false
-    }
+//    @SuppressLint("NotifyDataSetChanged")
+//    override fun onResume() {
+//        super.onResume()
+//        if (MainActivity.dataChanged) adapter.notifyDataSetChanged()
+//        MainActivity.dataChanged = false
+//    }
 
 }

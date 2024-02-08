@@ -41,7 +41,6 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.TimeBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityPlayerBinding
 import com.jaidev.seeaplayer.databinding.BoosterBinding
@@ -76,7 +75,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     companion object {
         private var audioManager: AudioManager? = null
         private lateinit var player: ExoPlayer
-        lateinit var recantPlayerList: ArrayList<RecantVideo>
         var position: Int = -1
         private var repeat: Boolean = false
         private var isFullscreen: Boolean = false

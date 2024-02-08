@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -15,7 +16,9 @@ import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -29,13 +32,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
-import com.jaidev.seeaplayer.databinding.RenameFieldBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import java.io.File
 
 
-class
-MusicAdapter(
+class MusicAdapter(
     private val context: Context,
     private var musicList: ArrayList<Music>,
     private var playlistDetails: Boolean = false,
@@ -46,6 +47,26 @@ MusicAdapter(
 
     private  var newPosition = 0
     private lateinit var dialogRF: AlertDialog
+    private lateinit var sharedPreferences: SharedPreferences
+    companion object {
+        private const val REQUEST_CODE_PERMISSION = 1001
+        private const val PREF_NAME = "music_titles"
+    }
+    init {
+        sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        // Load saved music titles
+        loadMusicTitles()
+    }
+    interface MusicDeleteListener {
+        fun onMusicDeleted()
+    }
+
+    private var musicDeleteListener: MusicDeleteListener? = null
+
+    fun setVideoDeleteListener(listener: MusicDeleteListener) {
+        musicDeleteListener = listener
+    }
+
     class MyAdapter(binding: MusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.songName
         val album = binding.songAlbum
@@ -59,7 +80,7 @@ MusicAdapter(
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "MissingInflatedId")
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
         holder.title.text = musicList[position].title
         holder.album.text = musicList[position].album
@@ -124,74 +145,12 @@ MusicAdapter(
             bindingMf.renameBtn.setOnClickListener {
                 dialog.dismiss()
                 requestPermissionR()
-                val customDialogRF =
-                    LayoutInflater.from(context).inflate(R.layout.rename_field, holder.root, false)
-                val bindingRF = RenameFieldBinding.bind(customDialogRF)
-                val dialogRF = MaterialAlertDialogBuilder(context).setView(customDialogRF)
-                    .setCancelable(false)
-                    .setPositiveButton("Rename") { self, _ ->
-                        val currentFile = File(musicList[position].path)
-                        val newName = bindingRF.renameField.text
-                        if (newName != null && currentFile.exists() && newName.toString()
-                                .isNotEmpty()
-                        ) {
-                            val newFile = File(
-                                currentFile.parentFile,
-                                newName.toString() + "." + currentFile.extension
-                            )
-                            if (currentFile.renameTo(newFile)) {
-                                MediaScannerConnection.scanFile(
-                                    context, arrayOf(newFile.toString()),
-                                    arrayOf("audio/*"), null
-                                )
-                                when {
-                                    MainActivity.search -> {
-                                        MainActivity.musicListSearch[position].title =
-                                            newName.toString()
-                                        MainActivity.musicListSearch[position].path = newFile.path
-                                        MainActivity.musicListSearch[position].artUri =
-                                            Uri.fromFile(newFile)
-
-                                        MainActivity.dataChanged = true
-                                        notifyItemChanged(position)
-                                    }
-
-                                    else -> {
-                                        MainActivity.MusicListMA[position].title =
-                                            newName.toString()
-                                        MainActivity.MusicListMA[position].path = newFile.path
-                                        MainActivity.MusicListMA[position].artUri =
-                                            Uri.fromFile(newFile)
-                                        Glide.with(context)
-                                            .asBitmap()
-                                            .load(musicList[position].artUri)
-                                            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
-                                            .into(holder.image)
-                                        MainActivity.dataChanged = true
-                                        notifyItemChanged(position)
-                                    }
-
-                                }
-                            } else {
-                                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        }
-
-                        self.dismiss()
-                    }
-                    .setNegativeButton("Cancel") { self, _ ->
-                        self.dismiss()
-                    }
-                    .create()
-                dialogRF.show()
-                bindingRF.renameField.text = SpannableStringBuilder(musicList[position].title)
-                dialogRF.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
-                    .setBackgroundColor(Color.BLACK)
-                dialogRF.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-                    .setBackgroundColor(Color.BLACK)
-
+                // Get the current music title as default text
+                val defaultTitle = musicList[position].title
+                // Show the rename dialog with the current music title as default text
+                showRenameDialog(position, defaultTitle)
             }
+
             bindingMf.deleteBtn.setOnClickListener {
                 requestPermissionR()
                 dialog.dismiss()
@@ -200,7 +159,7 @@ MusicAdapter(
                 val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
 
 
-                val videoNameDelete = view.findViewById<TextView>(R.id.videoNameDelete)
+                val musicNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
                 val deleteText = view.findViewById<TextView>(R.id.deleteText)
                 val cancelText = view.findViewById<TextView>(R.id.cancelText)
                 val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
@@ -217,7 +176,7 @@ MusicAdapter(
                     .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
                     .into(iconImageView)
 
-                videoNameDelete.text = musicList[position].title
+                musicNameDelete.text = musicList[position].title
 
                 alertDialogBuilder.setView(view)
 
@@ -237,7 +196,7 @@ MusicAdapter(
                                 MainActivity.dataChanged = true
                                 MainActivity.MusicListMA.removeAt(position)
                                 notifyDataSetChanged()
-                            }
+                                musicDeleteListener?.onMusicDeleted()                            }
 
                         }
                     } else {
@@ -255,65 +214,6 @@ MusicAdapter(
 
 
         }
-// Hi new Jaidev sharma i am old JaiDev Sharma i want to tell you that
-// i am leaving more error for yoy but don't worry .How much you will solve the error
-// you will learn about your app SeeA Player and that much you will be able
-// get comfident  of you big Playn how you Will Present Your Idea but i want that preavious Tow or Three days
-// i am getting for uncomfertable because of my body and also by error error but
-// today i get some relafe By gitHub,  because i added my all SeeA Player code to gitHub
-// firstly i want to you
-// password fo my gitHub account "jai@8851035394"
-// UserName of my gitHub account "succestime"
-
-        ///////////////////////////////////////////
-     ///////////////////////////////////////////////////
-
-// now i want to tell you that i am proude of you because you did not hesitate or afferade by by error
-// i know that by my toking error will not solve or
-// i cnt't give you more confidense to go forward
-// i want to you remember about aur carecters future how we are going to live
-// like a King in that secret way and
-// how you are going to make this india to akhand Bharate
-// and i you made the complex plane to india to akhand Bharate also remember what you can do my money like cars, food etc.
-
-        ///////////////////////////////////////////
-        ///////////////////////////////////////////////////
-// also remember about your love what you image about your love if
-// you want your love and that newGeneration what your are doing  now and what you done in past ,
-//   what you learn about life , tell storeys of your all problems.
-//   if you want all think what you image read this think and go forward  and solve all errors
-
-        ///////////////////////////////////////////
-        ///////////////////////////////////////////////////
-        //////////////////////////////////////////////////// ///////////////////////////////////////////////
-        //  i get idea one time you can check this also ask to chatGpt that ///////////////////////////////////////
-        // give me code of delete functionality then also say to it that if ///////////////////////////////////////
-        // i want to also update the recycleview /////////////////////////////////////////
-        // "is any video deleted to remove also in other recycleView "  //////////////////////////////////////////
-        //also for Rename functionality//////////////////////////////////////////////////
-
-
-
-  //     now error thinks
-  // in video player Delete and Rename functionality is working good for android 11
-        // but in recantVideo rename and relete functinolaty is not updating
-
-     // in music Player Delete functionality is working good
-        // but rename functionality is not working good
-        // Note => Delete and Rename functionality update to working
-
-
-        // after doing these error you have to
-        // update delete and Rename functionality in both recantvideo and recantmusic fregment
-
-
-        // after doing this now you have to to add "chipe" click functionality on there respective fregment
-
-        // after this dicide what you want to do
-
-        // my now decesion it go to  profile and suscribe
-
-        // learn the hanuman bagvan ji and shive ji and do what you are doing
 
 
             when {
@@ -350,6 +250,81 @@ MusicAdapter(
     override fun getItemCount(): Int {
             return musicList.size
         }
+    private fun renameMusic(position: Int, newName: String) {
+        val oldMusic = musicList[position]
+        val newMusic = oldMusic.copy(title = newName)
+        musicList[position] = newMusic
+        notifyItemChanged(position)
+        // Save updated music title to SharedPreferences
+        saveMusicTitle(position, newName)
+        // Get the current music title as default text
+        val defaultTitle = musicList[position].title
+        // Show the rename dialog with the current music title as default text
+        showRenameDialog(position, defaultTitle)
+
+    }
+
+
+    private fun showRenameDialog(position: Int, defaultTitle: String) {
+        val dialogBuilder = AlertDialog.Builder(context)
+
+        // Set up the layout for the dialog
+        val view = LayoutInflater.from(context).inflate(R.layout.rename_field, null)
+        val editText = view.findViewById<EditText>(R.id.renameField)
+        editText.setText(defaultTitle) // Set default text as current music title
+
+        dialogBuilder.setView(view)
+            .setTitle("Rename Music")
+            .setMessage("Enter new name for the music:")
+            .setCancelable(false)
+            .setPositiveButton("Rename") { _, _ ->
+                val newName = editText.text.toString().trim()
+                if (newName.isNotEmpty()) {
+                    renameMusic(position, newName)
+                    // Dismiss the dialog after performing the rename action
+                    dialogRF.dismiss()
+                } else {
+                    Toast.makeText(context, "Name can't be empty", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel") { self, _ ->
+                self.dismiss()
+            }
+        dialogRF = dialogBuilder.create()
+        dialogRF.show()
+
+        val positiveButton = dialogRF.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
+        val negativeButton = dialogRF.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
+        positiveButton.setBackgroundColor(Color.BLACK)
+        negativeButton.setBackgroundColor(Color.BLACK)
+
+        // Set margins between the buttons
+        val layoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
+        layoutParams.setMargins(0, 0, 50, 0) // Add margin to the right of the positive button
+        positiveButton.layoutParams = layoutParams
+
+        val negativeLayoutParams = negativeButton.layoutParams as LinearLayout.LayoutParams
+        negativeLayoutParams.setMargins(0, 0, 100, 0) // Add margin to the left of the negative button
+        negativeButton.layoutParams = negativeLayoutParams
+    }
+
+
+    private fun saveMusicTitle(position: Int, newName: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(position.toString(), newName)
+        editor.apply()
+    }
+
+    private fun loadMusicTitles() {
+        for (i in 0 until musicList.size) {
+            val savedTitle = sharedPreferences.getString(i.toString(), null)
+            savedTitle?.let {
+                musicList[i] = musicList[i].copy(title = it)
+            }
+        }
+    }
+
+
 
     private fun sendIntent(ref: String, pos: Int){
         val intent = Intent(context, PlayerMusicActivity::class.java)
@@ -363,6 +338,7 @@ MusicAdapter(
         musicList.addAll(searchList)
         notifyDataSetChanged()
     }
+
 
 
 
@@ -384,7 +360,8 @@ MusicAdapter(
         notifyDataSetChanged()
     }
 
-     private fun requestPermissionR() {
+    //for requesting android 11 or higher storage permission
+    private fun requestPermissionR() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
@@ -395,6 +372,67 @@ MusicAdapter(
         }
     }
 
+
+
 }
 
+// Hi new Jaidev sharma i am old JaiDev Sharma i want to tell you that
+// i am leaving more error for yoy but don't worry .How much you will solve the error
+// you will learn about your app SeeA Player and that much you will be able
+// get comfident  of you big Playn how you Will Present Your Idea but i want that preavious Tow or Three days
+// i am getting for uncomfertable because of my body and also by error error but
+// today i get some relafe By gitHub,  because i added my all SeeA Player code to gitHub
+// firstly i want to you
+// password fo my gitHub account "jai@8851035394"
+// UserName of my gitHub account "succestime"
+
+///////////////////////////////////////////
+///////////////////////////////////////////////////
+
+// now i want to tell you that i am proude of you because you did not hesitate or afferade by by error
+// i know that by my toking error will not solve or
+// i cnt't give you more confidense to go forward
+// i want to you remember about aur carecters future how we are going to live
+// like a King in that secret way and
+// how you are going to make this india to akhand Bharate
+// and i you made the complex plane to india to akhand Bharate also remember what you can do my money like cars, food etc.
+
+///////////////////////////////////////////
+///////////////////////////////////////////////////
+// also remember about your love what you image about your love if
+// you want your love and that newGeneration what your are doing  now and what you done in past ,
+//   what you learn about life , tell storeys of your all problems.
+//   if you want all think what you image read this think and go forward  and solve all errors
+
+///////////////////////////////////////////
+///////////////////////////////////////////////////
+//////////////////////////////////////////////////// ///////////////////////////////////////////////
+//  i get idea one time you can check this also ask to chatGpt that ///////////////////////////////////////
+// give me code of delete functionality then also say to it that if ///////////////////////////////////////
+// i want to also update the recycleview /////////////////////////////////////////
+// "is any video deleted to remove also in other recycleView "  //////////////////////////////////////////
+//also for Rename functionality//////////////////////////////////////////////////
+
+
+
+//     now error thinks
+// in video player Delete and Rename functionality is working good for android 11
+// but in recantVideo rename and relete functinolaty is not updating
+
+// in music Player Delete functionality is working good
+// but rename functionality is not working good
+// Note => Delete and Rename functionality update to working
+
+
+// after doing these error you have to
+// update delete and Rename functionality in both recantvideo and recantmusic fregment
+
+
+// after doing this now you have to to add "chipe" click functionality on there respective fregment
+
+// after this dicide what you want to do
+
+// my now decesion it go to  profile and suscribe
+
+// learn the hanuman bagvan ji and shive ji and do what you are doing
 

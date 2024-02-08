@@ -223,9 +223,4 @@ private lateinit var adapter: VideoAdapter
         onBackPressed()
         return true
     }
-//    @Deprecated("Deprecated in Java")
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        adapter.onResult(requestCode, resultCode)
-//    }
 }
