@@ -49,7 +49,6 @@ class MusicAdapter(
     private lateinit var dialogRF: AlertDialog
     private lateinit var sharedPreferences: SharedPreferences
     companion object {
-        private const val REQUEST_CODE_PERMISSION = 1001
         private const val PREF_NAME = "music_titles"
     }
     init {
@@ -63,7 +62,7 @@ class MusicAdapter(
 
     private var musicDeleteListener: MusicDeleteListener? = null
 
-    fun setVideoDeleteListener(listener: MusicDeleteListener) {
+    fun setMusicDeleteListener(listener: MusicDeleteListener) {
         musicDeleteListener = listener
     }
 
@@ -250,19 +249,27 @@ class MusicAdapter(
     override fun getItemCount(): Int {
             return musicList.size
         }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun deleteMusic(position: Int) {
+        // Delete music at the specified position
+        musicList.removeAt(position)
+        notifyDataSetChanged()
+        musicDeleteListener?.onMusicDeleted()
+    }
+
     private fun renameMusic(position: Int, newName: String) {
-        val oldMusic = musicList[position]
-        val newMusic = oldMusic.copy(title = newName)
-        musicList[position] = newMusic
+        val music = musicList[position]
+        val uniqueIdentifier = music.id // or music.path, depending on what is unique
+        music.path = newName
         notifyItemChanged(position)
-        // Save updated music title to SharedPreferences
-        saveMusicTitle(position, newName)
-        // Get the current music title as default text
-        val defaultTitle = musicList[position].title
-        // Show the rename dialog with the current music title as default text
+        saveMusicTitle(uniqueIdentifier, newName)
+        val defaultTitle = music.title
         showRenameDialog(position, defaultTitle)
+        musicDeleteListener?.onMusicDeleted()
 
     }
+
 
 
     private fun showRenameDialog(position: Int, defaultTitle: String) {
@@ -309,17 +316,18 @@ class MusicAdapter(
     }
 
 
-    private fun saveMusicTitle(position: Int, newName: String) {
+    private fun saveMusicTitle(uniqueIdentifier: String, newName: String) {
         val editor = sharedPreferences.edit()
-        editor.putString(position.toString(), newName)
+        editor.putString(uniqueIdentifier, newName)
         editor.apply()
     }
 
+
     private fun loadMusicTitles() {
-        for (i in 0 until musicList.size) {
-            val savedTitle = sharedPreferences.getString(i.toString(), null)
+        for (music in musicList) {
+            val savedTitle = sharedPreferences.getString(music.id, null)
             savedTitle?.let {
-                musicList[i] = musicList[i].copy(title = it)
+                music.title = it
             }
         }
     }

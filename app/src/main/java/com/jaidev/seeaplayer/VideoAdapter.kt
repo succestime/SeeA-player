@@ -242,17 +242,12 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     }
 
     private fun renameMusic(position: Int, newName: String) {
-        val oldMusic = videoList[position]
-        val newMusic = oldMusic.copy(title = newName)
-        videoList[position] = newMusic
+        val music = videoList[position]
+        val uniqueIdentifier = music.id // or music.path, depending on what is unique
+        music.path = newName
         notifyItemChanged(position)
-        // Save updated music title to SharedPreferences
-        saveVideoTitle(position, newName)
-
-        // Get the current music title as default text
-        val defaultTitle = videoList[position].title
-
-        // Show the rename dialog with the current music title as default text
+        saveMusicTitle(uniqueIdentifier, newName)
+        val defaultTitle = music.title
         showRenameDialog(position, defaultTitle)
 
     }
@@ -299,16 +294,18 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         negativeLayoutParams.setMargins(0, 0, 100, 0) // Add margin to the left of the negative button
         negativeButton.layoutParams = negativeLayoutParams
     }
-    private fun saveVideoTitle(position: Int, newName: String) {
+    private fun saveMusicTitle(uniqueIdentifier: String, newName: String) {
         val editor = sharedPreferences.edit()
-        editor.putString(position.toString(), newName)
+        editor.putString(uniqueIdentifier, newName)
         editor.apply()
     }
+
+
     private fun loadVideoTitles() {
-        for (i in 0 until videoList.size) {
-            val savedTitle = sharedPreferences.getString(i.toString(), null)
+        for (music in videoList) {
+            val savedTitle = sharedPreferences.getString(music.id, null)
             savedTitle?.let {
-                videoList[i] = videoList[i].copy(title = it)
+                music.title = it
             }
         }
     }
