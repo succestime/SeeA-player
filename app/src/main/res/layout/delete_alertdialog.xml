@@ -15,7 +15,7 @@
            android:layout_marginVertical="10dp"
            />
 <LinearLayout
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="40dp"
     android:background="@color/light_black"
@@ -35,8 +35,8 @@
 
                 <TextView
                     android:id="@+id/videmusicNameDelete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:text="video title"
                     android:layout_marginVertical="2dp"
                     android:layout_marginStart="20dp"

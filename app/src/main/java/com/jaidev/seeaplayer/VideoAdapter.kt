@@ -18,7 +18,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -52,10 +51,9 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
     interface VideoDeleteListener {
-        fun onVideoDeleted()
-
+        fun
+                onVideoDeleted()
     }
-
     private var videoDeleteListener: VideoDeleteListener? = null
 
     fun setVideoDeleteListener(listener: VideoDeleteListener) {
@@ -249,9 +247,9 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         saveMusicTitle(uniqueIdentifier, newName)
         val defaultTitle = music.title
         showRenameDialog(position, defaultTitle)
-
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun showRenameDialog(position: Int, defaultTitle: String) {
         val dialogBuilder = AlertDialog.Builder(context)
 
@@ -265,10 +263,52 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .setMessage("Enter new name for the music:")
             .setCancelable(false)
             .setPositiveButton("Rename") { _, _ ->
+                //val newName = editText.text.toString().trim()
+                val currentFile = File(videoList[position].path)
                 val newName = editText.text.toString().trim()
                 if (newName.isNotEmpty()) {
                     renameMusic(position, newName)
-                    // Dismiss the dialog after performing the rename action
+
+                    if (currentFile.exists() && newName.toString().isNotEmpty()) {
+                        val newFile = File(
+                            currentFile.parentFile,
+                            newName.toString() + "." + currentFile.extension
+                        )
+                        if (currentFile.renameTo(newFile)) {
+                            MediaScannerConnection.scanFile(context, arrayOf(newFile.toString()),
+                                arrayOf("video/*"), null)
+                            when {
+//                                MainActivity.search -> {
+//                                    MainActivity.searchList[position].title = newName.toString()
+//                                    MainActivity.searchList[position].path = newFile.path
+//                                    MainActivity.searchList[position].artUri = Uri.fromFile(newFile)
+//                                    MainActivity.dataChanged = true
+//                                    videoDeleteListener?.onVideoDeleted()
+//                                    notifyItemChanged(position)
+//                                }
+                                isFolder -> {
+                                    FoldersActivity.currentFolderVideos[position].title = newName.toString()
+                                    FoldersActivity.currentFolderVideos[position].path = newFile.path
+                                    FoldersActivity.currentFolderVideos[position].artUri = Uri.fromFile(newFile)
+                                    MainActivity.dataChanged = true
+                                    videoDeleteListener?.onVideoDeleted()
+                                    notifyItemChanged(position)
+                                }
+                                else -> {
+                                    MainActivity.videoList[position].title = newName.toString()
+                                    MainActivity.videoList[position].path = newFile.path
+                                    MainActivity.videoList[position].artUri = Uri.fromFile(newFile)
+                                    MainActivity.dataChanged = true
+                                    videoDeleteListener?.onVideoDeleted()
+                                    notifyItemChanged(position)
+                                }
+                            }
+                        } else {
+                            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+
                     dialogRF.dismiss()
                 } else {
                     Toast.makeText(context, "Name can't be empty", Toast.LENGTH_SHORT).show()
@@ -285,14 +325,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         positiveButton.setBackgroundColor(Color.BLACK)
         negativeButton.setBackgroundColor(Color.BLACK)
 
-        // Set margins between the buttons
-        val layoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
-        layoutParams.setMargins(0, 0, 50, 0) // Add margin to the right of the positive button
-        positiveButton.layoutParams = layoutParams
-
-        val negativeLayoutParams = negativeButton.layoutParams as LinearLayout.LayoutParams
-        negativeLayoutParams.setMargins(0, 0, 100, 0) // Add margin to the left of the negative button
-        negativeButton.layoutParams = negativeLayoutParams
     }
     private fun saveMusicTitle(uniqueIdentifier: String, newName: String) {
         val editor = sharedPreferences.edit()
@@ -317,6 +349,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         startActivity(context, intent, null)
 
     }
+
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(searchList: ArrayList<VideoData>) {

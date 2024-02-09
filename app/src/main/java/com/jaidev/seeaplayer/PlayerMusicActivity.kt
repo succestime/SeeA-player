@@ -29,13 +29,15 @@ import com.jaidev.seeaplayer.databinding.ActivityPlayerMusicBinding
 
 class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer.OnCompletionListener {
     companion object {
+        private const val CHECK_INTERVAL = 5000L // Check every 5 seconds
+
         lateinit var musicListPA: ArrayList<Music>
         var songPosition: Int = 0
         var isPlaying: Boolean = false
         var min15: Boolean = false
         var min30: Boolean = false
         var min60: Boolean = false
-         var isFavourite : Boolean = false
+        var isFavourite : Boolean = false
         var fIndex : Int = -1
         var musicService: MusicService? = null
         const val FAVOURITES_PREF_KEY = "FavouriteSongs"
@@ -169,9 +171,9 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             }
             "NowPlaying" ->{
                 setLayout()
-               binding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-               binding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
-            binding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
+                binding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+                binding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+                binding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
                 binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
                 if(isPlaying) binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
                 else binding.playPauseBtnPA.setIconResource(R.drawable.play_music_icon)
@@ -269,6 +271,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
             nowMusicPlayingId = musicListPA[songPosition].id
+
         } catch (e: Exception) {
             return
         }
@@ -280,6 +283,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         musicService!!.mediaPlayer!!.start()
         binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
         musicService!!.showNotification(R.drawable.ic_pause_icon)
+
     }
 
     private fun pauseMusic() {
@@ -302,10 +306,9 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
     }
 
-
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as MusicService.MyBinder
-            musicService = binder.currentService()
+        val binder = service as MusicService.MyBinder
+        musicService = binder.currentService()
 //            musicService!!.audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 //            musicService!!.audioManager.requestAudioFocus(musicService, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
 //        }
@@ -321,19 +324,33 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
 
     override fun onCompletion(mp: MediaPlayer?) {
+        if (musicListPA.isNotEmpty()) {
+            // Check if the currently playing music has been deleted
+            val deletedMusic = musicListPA[songPosition]
+            if (deletedMusic.id != PlayerMusicActivity.nowMusicPlayingId) {
+                // The currently playing music has been deleted, adjust the song position
+
+                createMediaPlayer()
+                setLayout()
+                return
+            }
+        }
+
+        // Proceed with normal behavior
         setSongPosition(increment = true)
         createMediaPlayer()
         setLayout()
 
-        //for refreshing now playing image & text on song completion
+        // Refresh now playing image & text on song completion
         NowPlaying.binding.songNameNP.isSelected = true
         Glide.with(applicationContext)
             .load(musicListPA[songPosition].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker
-            ).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
             .into(NowPlaying.binding.songImgNP)
         NowPlaying.binding.songNameNP.text = musicListPA[songPosition].title
     }
+
+
 
 
     @Deprecated("Deprecated in Java")
@@ -378,5 +395,9 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             dialog.dismiss()
         }
     }
-}
 
+
+
+
+
+}

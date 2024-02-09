@@ -66,6 +66,7 @@ class MusicAdapter(
         musicDeleteListener = listener
     }
 
+
     class MyAdapter(binding: MusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.songName
         val album = binding.songAlbum
@@ -189,15 +190,18 @@ class MusicAdapter(
                                 MainActivity.dataChanged = true
                                 musicList.removeAt(position)
                                 notifyDataSetChanged()
+                                musicDeleteListener?.onMusicDeleted()
                             }
 
-                            else -> {
+                            isMusic -> {
                                 MainActivity.dataChanged = true
                                 MainActivity.MusicListMA.removeAt(position)
                                 notifyDataSetChanged()
-                                musicDeleteListener?.onMusicDeleted()                            }
+                                musicDeleteListener?.onMusicDeleted()
+                            }
 
                         }
+
                     } else {
                         Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
                     }
@@ -213,7 +217,6 @@ class MusicAdapter(
 
 
         }
-
 
             when {
             playlistDetails -> {
@@ -250,25 +253,15 @@ class MusicAdapter(
             return musicList.size
         }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun deleteMusic(position: Int) {
-        // Delete music at the specified position
-        musicList.removeAt(position)
-        notifyDataSetChanged()
-        musicDeleteListener?.onMusicDeleted()
-    }
 
     private fun renameMusic(position: Int, newName: String) {
         val music = musicList[position]
-        val uniqueIdentifier = music.id // or music.path, depending on what is unique
-        music.path = newName
+        music.title = newName
         notifyItemChanged(position)
-        saveMusicTitle(uniqueIdentifier, newName)
-        val defaultTitle = music.title
-        showRenameDialog(position, defaultTitle)
-        musicDeleteListener?.onMusicDeleted()
+        saveMusicTitle(music.id, newName)
 
     }
+
 
 
 

@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var currentFragment: Fragment
     private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var adapter: VideoAdapter
 private  var runnable : Runnable? = null
 
     companion object {
@@ -546,7 +547,10 @@ private  var runnable : Runnable? = null
 
         return tempList
     }
-
+    fun reloadVideos() {
+        videoList = getAllVideos() // Implement this method to get all videos
+        adapter.updateList(videoList)
+    }
 
 
     override fun onDestroy() {

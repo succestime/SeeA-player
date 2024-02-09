@@ -41,7 +41,7 @@ private lateinit var adapter: VideoAdapter
         binding.videoRVFA.setHasFixedSize(true)
         binding.videoRVFA.setItemViewCacheSize(10)
         binding.videoRVFA.layoutManager = LinearLayoutManager(this@FoldersActivity)
-        adapter = VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true,)
+        adapter = VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true)
         binding.videoRVFA.adapter = adapter
         binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
 
@@ -78,14 +78,8 @@ private lateinit var adapter: VideoAdapter
         adapter.updateList(currentFolderVideos)
         binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
     }
-//////////////////////////////////
-//    @SuppressLint("SetTextI18n")/////////
-//    fun reloadVideos() {      ///////////////
-//        val position = intent.getIntExtra("position", 0)  /////////////////
-//        currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)   ////////////
-//        adapter.updateList(currentFolderVideos)   ///////////////////////
-//        binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"  //////////////
-//    } ////////////////////////////////////////////////
+
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
@@ -223,4 +217,6 @@ private lateinit var adapter: VideoAdapter
         onBackPressed()
         return true
     }
+
+
 }

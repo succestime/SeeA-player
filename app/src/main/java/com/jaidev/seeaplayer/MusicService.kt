@@ -143,6 +143,8 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
                         mediaPlayer!!.start()
                         showNotification(R.drawable.ic_pause_icon)
                     }
+                    // Update notification
+                    showNotification(if (PlayerMusicActivity.isPlaying) R.drawable.ic_pause_icon else R.drawable.play_icon)
                     return super.onMediaButtonEvent(mediaButtonEvent)
                 }
                 override fun onSeekTo(pos: Long) {
@@ -153,6 +155,7 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
                         .setActions(PlaybackStateCompat.ACTION_SEEK_TO)
                         .build()
                     mediaSession.setPlaybackState(playBackStateNew)
+                    showNotification(if (PlayerMusicActivity.isPlaying) R.drawable.ic_pause_icon else R.drawable.play_icon)
                 }
             })
         }
@@ -205,4 +208,6 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
     override fun onAudioFocusChange(focusChange: Int) {
         TODO("Not yet implemented")
     }
+
+
 }
