@@ -5,6 +5,7 @@ import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var adapter: VideoAdapter
 private  var runnable : Runnable? = null
-
+//private lateinit var navController : NavController
     companion object {
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
@@ -108,10 +109,18 @@ private  var runnable : Runnable? = null
             setFragment(homeNav())
           MusicListMA = getAllAudios()
         }
+// Check if the service needs to be started
+        if (shouldStartService()) {
+            startMediaScanService()
+        }
 
 
 
-        binding.bottomNav.setOnItemSelectedListener {
+
+
+
+
+binding.bottomNav.setOnItemSelectedListener {
 
             try {
                 when (it.itemId) {
@@ -255,6 +264,30 @@ private  var runnable : Runnable? = null
 
     }
 
+//    override fun onSupportNavigateUp(): Boolean {
+//        navController = findNavController(R.id.navHostFragmentContainerView)
+//        return navController.navigateUp() || super.onSupportNavigateUp()
+//    }
+    private fun shouldStartService(): Boolean {
+        val lastScanTime = getLastScanTime()
+        val currentTime = System.currentTimeMillis()
+        val scanInterval = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+
+        // Check if the last scan time is not set or if the interval has passed since the last scan
+        return lastScanTime == null || currentTime - lastScanTime >= scanInterval
+    }
+
+    private fun getLastScanTime(): Long? {
+        // Retrieve the last scan time from SharedPreferences
+        val sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        return sharedPreferences.getLong("lastScanTime", 0)
+    }
+
+    private fun startMediaScanService() {
+        val serviceIntent = Intent(this, FolderDetectionService::class.java)
+        startService(serviceIntent)
+    }
+
 
     private fun setFragment(fragment: Fragment) {
         currentFragment = fragment
@@ -347,9 +380,13 @@ private  var runnable : Runnable? = null
         }
     }
 
+
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
+        // Find the item you want to hide
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
+
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
             // Handle the click event here
             when (item.itemId) {

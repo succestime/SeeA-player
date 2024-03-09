@@ -62,6 +62,7 @@ class DaysDownload : Fragment() {
             requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
 
+
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
             binding.swipeRefreshVideo.isRefreshing = false // Hide the refresh indicator
@@ -82,7 +83,11 @@ class DaysDownload : Fragment() {
         adapter.updateRecentVideos(sortedRecentVideos)
         binding.daysTotalVideos.text = "Total Musics : ${sortedRecentVideos.size}"
 
-
+        if (videoRecantList.isEmpty()) {
+            binding.emptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.emptyStateLayout.visibility = View.GONE
+        }
     }
 
 

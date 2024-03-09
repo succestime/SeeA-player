@@ -218,7 +218,7 @@ class MusicAdapter(
 
         }
 
-            when {
+        when {
             playlistDetails -> {
                 holder.root.setOnClickListener {
                     sendIntent(ref = "PlaylistDetailsAdapter", pos = position)
@@ -238,7 +238,7 @@ class MusicAdapter(
                     when {
                         MainActivity.search -> sendIntent(ref = "MusicAdapterSearch", pos = position)
 
-                       musicList[position].id == PlayerMusicActivity.nowMusicPlayingId ->
+                        musicList[position].id == PlayerMusicActivity.nowMusicPlayingId ->
                             sendIntent(ref = "NowPlaying", pos = PlayerMusicActivity.songPosition)
 
                         else -> sendIntent(ref = "MusicAdapter", pos = position)
@@ -250,8 +250,8 @@ class MusicAdapter(
     }
 
     override fun getItemCount(): Int {
-            return musicList.size
-        }
+        return musicList.size
+    }
 
 
     private fun renameMusic(position: Int, newName: String) {
@@ -356,7 +356,7 @@ class MusicAdapter(
     }
     @SuppressLint("NotifyDataSetChanged")
     fun refreshPlaylist(){
-       musicList = ArrayList()
+        musicList = ArrayList()
         musicList = PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist
         notifyDataSetChanged()
     }
@@ -436,4 +436,3 @@ class MusicAdapter(
 // my now decesion it go to  profile and suscribe
 
 // learn the hanuman bagvan ji and shive ji and do what you are doing
-

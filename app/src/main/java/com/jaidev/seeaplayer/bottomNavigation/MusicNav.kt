@@ -25,7 +25,7 @@ import com.jaidev.seeaplayer.databinding.FragmentMusicNavBinding
 class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
 
     private lateinit var binding: FragmentMusicNavBinding
-  lateinit var adapter: MusicAdapter
+    lateinit var adapter: MusicAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +44,15 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
-
+//        FavouriteActivity.favouriteSongs = ArrayList()
+//        val editor = requireContext().getSharedPreferences("FAVOURITES", MODE_PRIVATE)
+//        val jsonString = editor.getString("FavouriteSongs", null)
+//        val typeToken = object : TypeToken<ArrayList<Music>>(){}.type
+//        if(jsonString != null) {
+//            val data: ArrayList<Music> = GsonBuilder().create().fromJson(jsonString, typeToken)
+//            FavouriteActivity.favouriteSongs.addAll(data)
+//            FavoritesManager.saveFavorites(requireContext())
+//        }
         FavoritesManager.loadFavorites(requireContext())
         binding.musicRV.setHasFixedSize(true)
         binding.musicRV.setItemViewCacheSize(10)
@@ -63,7 +71,11 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
         }, 2000) // 2000 milliseconds (2 seconds)
 
 
-
+        if (MusicListMA.isEmpty()) {
+            binding.musicemptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.musicemptyStateLayout.visibility = View.GONE
+        }
 
         binding.shuffleBtn.setOnClickListener {
             val intent = Intent(requireContext() , PlayerMusicActivity::class.java)
@@ -123,18 +135,9 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
         MainActivity.adapterChanged= false
 
 
-
     }
-    override fun onDestroy() {
-        super.onDestroy()
 
-        FavoritesManager.saveFavorites(requireContext())
-    }
 
 
 
 }
-
-
-
-

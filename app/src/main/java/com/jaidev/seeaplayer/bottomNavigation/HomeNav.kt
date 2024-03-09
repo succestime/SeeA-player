@@ -101,8 +101,12 @@ class homeNav : Fragment() {
             val intent = Intent(requireContext(), LinkTubeActivity::class.java)
             startActivity(intent)
         }
-        binding.chip.setOnClickListener {
-        }
+//        binding.chip.setOnClickListener {
+//           it.findNavController().navigate(R.id.action_homeNav_to_daysDownload)
+//        }
+//        binding.chip5.setOnClickListener {
+//           it.findNavController().navigate(R.id.action_homeNav_to_musicNav)
+//        }
         return binding.root
     }
     @Deprecated("Deprecated in Java")

@@ -69,6 +69,11 @@ class DaysMusic : Fragment() {
             intent.putExtra("class" , "DaysMusic")
             startActivity(intent)
         }
+        if (musicRecantList.isEmpty()) {
+            binding.shuffleBtn.visibility = View.GONE
+        } else {
+            binding.shuffleBtn.visibility = View.VISIBLE
+        }
         return view
     }
     @SuppressLint("SetTextI18n")
@@ -81,6 +86,12 @@ class DaysMusic : Fragment() {
 
         // Update the total music count text
         binding.daysTotalMusics.text = "Total Musics : ${reMusics.size}"
+
+        if (musicRecantList.isEmpty()) {
+            binding.emptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.emptyStateLayout.visibility = View.GONE
+        }
 
     }
 

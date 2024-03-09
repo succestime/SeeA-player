@@ -19,6 +19,15 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         android:text="Recant Videos :" />
+
+
+        <ViewStub
+            android:id="@+id/emptyStateLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/download_empty_state_layout"
+            android:foregroundGravity="center"
+            android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/DownloadRV"
         android:layout_marginStart="2dp"

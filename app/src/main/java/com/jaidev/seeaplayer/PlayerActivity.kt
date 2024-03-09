@@ -31,6 +31,8 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -41,6 +43,8 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.TimeBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.allAdapters.PlaybackIconsAdapter
+import com.jaidev.seeaplayer.dataClass.IconModel
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityPlayerBinding
 import com.jaidev.seeaplayer.databinding.BoosterBinding
@@ -72,6 +76,17 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private var isSwipingToChangeDuration = false
     private var currentProgress: Int = 0
 
+    // horizontal recyclerView variables
+    private val iconModelArrayList = ArrayList<IconModel>()
+    private lateinit var playbackIconsAdapter: PlaybackIconsAdapter
+    private lateinit var recyclerViewIcons: RecyclerView
+    var expand = false
+    var nightMode: View? = null
+    var dark: Boolean = false
+    var mute: Boolean = false
+
+    // horizontal recyclerView variables
+
     companion object {
         private var audioManager: AudioManager? = null
         private lateinit var player: ExoPlayer
@@ -96,7 +111,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     }
 
 
-    @SuppressLint("ObsoleteSdkInt", "SuspiciousIndentation")
+    @SuppressLint("ObsoleteSdkInt", "SuspiciousIndentation", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -114,6 +129,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         durationChangeTextView = findViewById(R.id.durationChangeTextView)
         durationChangeTextView.visibility = View.GONE
 
+        nightMode = findViewById(R.id.night_mode)
+        recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
      gestureDetectorCompat = GestureDetectorCompat(this, this)
 
         // for immersive mode
@@ -124,6 +141,81 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
+        iconModelArrayList.add(IconModel(R.drawable.next_icon,"", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.night_mode,"Night Mode", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.mute,"Mute", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.orientation_icon,"Rotate", android.R.color.white))
+
+
+        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this)
+        val layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, true)
+        recyclerViewIcons.layoutManager = layoutManager
+        recyclerViewIcons.adapter = playbackIconsAdapter
+        playbackIconsAdapter.notifyDataSetChanged()
+        playbackIconsAdapter.setOnItemClickListener(object : PlaybackIconsAdapter.OnItemClickListener {
+            @SuppressLint("Range")
+            override fun onItemClick(position: Int) {
+                when (position) {
+                        0 -> {
+                            if (expand) {
+                                iconModelArrayList.clear()
+                                iconModelArrayList.add(IconModel(R.drawable.next_icon,"", android.R.color.white))
+                                iconModelArrayList.add(IconModel(R.drawable.night_mode,"Night Mode", android.R.color.white))
+                                iconModelArrayList.add(IconModel(R.drawable.mute,"Mute", android.R.color.white))
+                                iconModelArrayList.add(IconModel(R.drawable.orientation_icon,"Rotate", android.R.color.white))
+
+                                playbackIconsAdapter.notifyDataSetChanged()
+                                expand = false
+                            } else {
+
+                                if (iconModelArrayList.size == 4) {
+                                    iconModelArrayList.add(IconModel(R.drawable.ic_timer_icon, "Sleep Timer", android.R.color.white))
+                                    iconModelArrayList.add(IconModel(R.drawable.ic_speed_icon, "Speed", android.R.color.white))
+                                    iconModelArrayList.add(IconModel(R.drawable.ic_booster_icon, "Booster", android.R.color.white))
+                                    iconModelArrayList.add(IconModel(R.drawable.ic_picture_in_picture_icon, "PIP Mode", android.R.color.white))
+                                    iconModelArrayList.add(IconModel(R.drawable.equalizer_icon, "Equalizer", android.R.color.white))
+                                }
+                                iconModelArrayList[position] = IconModel(R.drawable.ic_back_icon, "")
+                                playbackIconsAdapter.notifyDataSetChanged()
+                                expand = true
+                            }
+                        }
+                    1 -> {
+                        if (dark) {
+                            nightMode?.visibility = View.GONE
+                            iconModelArrayList[position] = IconModel(R.drawable.night_mode, "Night")
+                            playbackIconsAdapter.notifyDataSetChanged()
+                            dark = false
+                        } else {
+                            nightMode?.visibility = View.VISIBLE
+                            iconModelArrayList[position] = IconModel(R.drawable.night_mode, "Day")
+                            playbackIconsAdapter.notifyDataSetChanged()
+                            dark = true
+                        }
+
+                    }
+                    2 -> {
+                        if (mute) {
+                            player.setVolume(100F)
+                            iconModelArrayList[position] = IconModel(R.drawable.mute, "Mute")
+                            playbackIconsAdapter.notifyDataSetChanged()
+                            mute = false
+                        } else {
+                            player.setVolume(0F)
+                            iconModelArrayList[position] = IconModel(R.drawable.volume_icon, "Unmute")
+                            playbackIconsAdapter.notifyDataSetChanged()
+                            mute = true
+                        }
+
+                    }
+                    3 -> Toast.makeText(this@PlayerActivity, "Fourth", Toast.LENGTH_SHORT).show()
+
+                    else -> {
+                        // Handle any other positions if needed
+                    }
+                }
+            }
+        })
 
 
         try {

@@ -112,6 +112,7 @@
         </activity>
 
         <service android:name=".MusicService" />
+        <service android:name=".FolderDetectionService" />
 
         <receiver
             android:name=".musicActivity.NotificationReceiver"

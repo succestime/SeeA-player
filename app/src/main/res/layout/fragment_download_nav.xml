@@ -18,6 +18,7 @@
         app:tabIndicatorColor="@color/cool_blue"
         app:tabTextColor="@color/black"
         app:tabSelectedTextColor="@color/cool_blue"
+        app:tabTextAppearance="@style/TabTextAppearance"
     app:layout_constraintTop_toTopOf="parent">
 
     </com.google.android.material.tabs.TabLayout>

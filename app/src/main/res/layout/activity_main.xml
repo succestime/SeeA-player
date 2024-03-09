@@ -33,6 +33,23 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content">-->
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="?attr/actionBarSize"-->
+<!--        app:title="SeeA Player"-->
+<!--        android:id="@+id/toolbar"-->
+<!--        app:menu="@menu/sort_view"-->
+<!--        app:titleTextColor="@color/white"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/bottomNav"-->
+<!--        android:background="@color/cool_blue"-->
+<!--        tools:ignore="NotSibling" />-->
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
@@ -44,4 +61,27 @@
         app:headerLayout="@layout/nav_header"
         app:itemTextColor="@color/black"
         app:itemIconTint="@color/cool_blue"/>
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:orientation="vertical"-->
+<!--        >-->
+
+<!--        <androidx.fragment.app.FragmentContainerView-->
+<!--            android:id="@+id/navHostFragmentContainerView"-->
+<!--            android:name="androidx.navigation.fragment.NavHostFragment"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="1220dp"-->
+<!--            android:layout_marginStart="1dp"-->
+<!--            android:layout_marginTop="1dp"-->
+<!--            android:layout_marginEnd="1dp"-->
+<!--            android:layout_marginBottom="1dp"-->
+<!--            app:defaultNavHost="true"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/bottomNav"-->
+<!--            app:layout_constraintEnd_toStartOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/frameLayout"-->
+<!--            app:navGraph="@navigation/nav_chip_graph" />-->
+
+<!--    </LinearLayout>-->
 </androidx.drawerlayout.widget.DrawerLayout>

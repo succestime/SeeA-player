@@ -32,6 +32,12 @@
                 app:yt_playerView="@id/playerView" />
         </com.github.vkay94.dtpv.DoubleTapPlayerView>
 
+        <View
+            android:id="@+id/night_mode"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/light_dark"
+            android:visibility="gone"/>
     </FrameLayout>
 
 
@@ -51,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textColor="#FFFFFF"
+        android:textColor="#DCD7D7"
         android:textSize="24sp"
         android:textStyle="bold"
         android:text="@string/durationChangeTextView"
