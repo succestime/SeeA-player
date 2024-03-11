@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -64,12 +62,10 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
         binding.TotalMusics.text = "Total Musics : ${MusicListMA.size}"
 
 
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-
-            binding.swipeRefreshMusic.isRefreshing = false // Hide the refresh indicator
-        }, 2000) // 2000 milliseconds (2 seconds)
-
+        binding.swipeRefreshMusic.setOnRefreshListener {
+            // Perform the refresh action here
+            refreshMusic()
+        }
 
         if (MusicListMA.isEmpty()) {
             binding.musicemptyStateLayout.visibility = View.VISIBLE
@@ -93,6 +89,16 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
         }
 
         return view
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun refreshMusic() {
+        binding.swipeRefreshMusic.isRefreshing = false
+
+
+
+        adapter.notifyDataSetChanged()
     }
     @SuppressLint("SetTextI18n")
     override fun onMusicDeleted() {

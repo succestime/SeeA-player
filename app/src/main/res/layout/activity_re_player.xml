@@ -20,15 +20,32 @@
             android:keepScreenOn="true"
             app:controller_layout_id="@layout/custom_control_view"
             app:dtpv_controller="@id/ytOverlay"
-            app:show_buffering="always" />
+            app:show_buffering="always" >
 
-        <com.github.vkay94.dtpv.youtube.YouTubeOverlay
-            android:id="@+id/ytOverlay"
+            <com.github.vkay94.dtpv.youtube.YouTubeOverlay
+                android:id="@+id/ytOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#77000000"
+                android:visibility="invisible"
+                app:yt_playerView="@id/playerView" />
+        </com.github.vkay94.dtpv.DoubleTapPlayerView>
+
+        <View
+            android:id="@+id/night_mode"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#77000000"
-            android:visibility="invisible"
-            app:yt_playerView="@id/playerView" />
+            android:background="@color/light_dark"
+            android:visibility="gone"/>
+
+        <FrameLayout
+            android:id="@+id/eqFrame"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            tools:ignore="ObsoleteLayoutParam" />
 
     </FrameLayout>
 
@@ -44,52 +61,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
 
-    <Button
-        android:id="@+id/brightnessIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:drawableLeft="@drawable/brightness_icon"
-        android:text="@string/O"
-        tools:ignore="RtlHardcoded"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:background="#42000000"
-        android:visibility="gone"/>
-
-    <Button
-        android:id="@+id/volumeIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:drawableLeft="@drawable/volume_icon"
-        android:text="@string/O"
-        tools:ignore="RtlHardcoded"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:background="#42000000"
-        android:visibility="gone"/>
-
     <TextView
         android:id="@+id/durationChangeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textColor="#FFFFFF"
+        android:textColor="#DCD7D7"
         android:textSize="24sp"
-        android:visibility="gone"
         android:textStyle="bold"
-        tools:ignore="MissingConstraints" />
+        android:text="@string/durationChangeTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
-    <!-- CardView for Volume SeekBar -->
+
+<!--    CardView for Volume SeekBar-->
     <LinearLayout
         android:id="@+id/volProgressContainer"
         android:layout_width="wrap_content"
@@ -125,6 +112,8 @@
             android:src="@drawable/volume_icon"
             android:layout_gravity="center"
             android:contentDescription="@string/vol_icon" />
+
+
     </LinearLayout>
 
 

@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -88,6 +89,10 @@ private  var runnable : Runnable? = null
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
+        bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
+
 
         if (requestRuntimePermission()) {
             folderList = ArrayList()
@@ -475,7 +480,9 @@ binding.bottomNav.setOnItemSelectedListener {
                         val durationC =
                             cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
                                 .toLong()
-                        try {
+                       val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
+
+                       try {
                             val file = File(pathC)
                             val artUriC = Uri.fromFile(file)
                             val video = VideoData(
@@ -485,8 +492,10 @@ binding.bottomNav.setOnItemSelectedListener {
                                 duration = durationC,
                                 size = sizeC,
                                 path = pathC,
-                                artUri = artUriC
+                                artUri = artUriC, dateAdded = dateAddedMillis
                             )
+
+
                             if (file.exists()) tempList.add(video)
 
                         } catch (_: Exception) {
@@ -570,6 +579,8 @@ binding.bottomNav.setOnItemSelectedListener {
                             albumId = albumIdMC,
                             size = sizeMC
                         )
+
+
                         if (file.exists()) {
                             tempList.add(music)
                         }

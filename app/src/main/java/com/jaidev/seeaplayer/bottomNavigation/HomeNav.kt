@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -59,11 +57,10 @@ class homeNav : Fragment() {
 
         binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
 
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-            binding.swipeRefreshFolder.isRefreshing = false // Hide the refresh indicator
-        }, 2000) // 2000 milliseconds (2 seconds)
-
+        binding.swipeRefreshFolder.setOnRefreshListener {
+            // Perform the refresh action here
+            refreshFolders()
+        }
 
         binding.searchBackBtn.setOnClickListener {
             binding.searchRecyclerView.visibility = View.GONE
@@ -108,6 +105,12 @@ class homeNav : Fragment() {
 //           it.findNavController().navigate(R.id.action_homeNav_to_musicNav)
 //        }
         return binding.root
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun refreshFolders() {
+        binding.swipeRefreshFolder.isRefreshing = false
+        foldersAdapter.notifyDataSetChanged()
     }
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

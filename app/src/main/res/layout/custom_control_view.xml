@@ -27,17 +27,7 @@
             android:src="@drawable/ic_back_icon"
             app:tint="@color/white"/>
 
-        <ImageButton
-            android:id="@+id/orientationBtn"
-            android:layout_width="80dp"
-            android:layout_height="65dp"
-            android:layout_marginStart="40dp"
-            android:background="?android:selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/orientation"
-            android:focusable="true"
-            android:src="@drawable/orientation_icon"
-            app:tint="@color/white" />
+
 
         <TextView
             android:id="@+id/videoTitle"
@@ -51,17 +41,7 @@
             android:singleLine="true"
             android:marqueeRepeatLimit="marquee_forever"
             android:ellipsize="marquee"/>
-        <ImageButton
-            android:id="@+id/moreFeaturesBtn"
-            android:layout_width="50dp"
-            android:layout_height="65dp"
-            android:src="@drawable/ic_menu_icon"
-            app:tint="@color/white"
-            android:layout_marginEnd="60dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:selectableItemBackground"
-            />
+
     </LinearLayout>
 <RelativeLayout
     android:id="@+id/root_layout"
@@ -79,6 +59,8 @@
         android:layout_marginTop="70dp">
 
     </androidx.recyclerview.widget.RecyclerView>
+
+<!--    <include layout="@layout/swipe_zoom_design"/>-->
 
 </RelativeLayout>
 

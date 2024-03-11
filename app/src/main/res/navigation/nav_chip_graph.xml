@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_chip_graph"
+    app:startDestination="@id/homeNav">
+
+    <fragment
+        android:id="@+id/homeNav"
+        android:name="com.jaidev.seeaplayer.bottomNavigation.homeNav"
+        android:label="fragment_home_nav"
+        tools:layout="@layout/fragment_home_nav" >
+        <action
+            android:id="@+id/action_homeNav_to_daysDownload"
+            app:destination="@id/daysDownload" />
+        <action
+            android:id="@+id/action_homeNav_to_musicNav"
+            app:destination="@id/musicNav" />
+    </fragment>
+    <fragment
+        android:id="@+id/daysDownload"
+        android:name="com.jaidev.seeaplayer.recantFragment.DaysDownload"
+        android:label="fragment_days_download"
+        tools:layout="@layout/fragment_days_download" />
+    <fragment
+        android:id="@+id/musicNav"
+        android:name="com.jaidev.seeaplayer.musicNav"
+        android:label="fragment_music_nav"
+        tools:layout="@layout/fragment_music_nav" />
+</navigation>

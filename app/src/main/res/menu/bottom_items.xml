@@ -15,10 +15,10 @@
 
  <item android:id="@+id/linkTube"
   android:title="@string/link_tube"
-  android:icon="@drawable/link_tube_icon"/>
+  android:icon="@drawable/search_link_tube"/>
 
  <item android:id="@+id/more"
      android:title="@string/more"
-     android:icon="@drawable/more_icon"/>
+     android:icon="@drawable/user_svgrepo_com"/>
 
 </menu>

@@ -53,13 +53,14 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     interface VideoDeleteListener {
         fun
                 onVideoDeleted()
+
+
     }
     private var videoDeleteListener: VideoDeleteListener? = null
 
     fun setVideoDeleteListener(listener: VideoDeleteListener) {
         videoDeleteListener = listener
     }
-
 
     class MyAdapter(binding: VideoViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -68,6 +69,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         val image = binding.videoImage
         val root = binding.root
         val more = binding.MoreChoose
+
 
     }
 
@@ -80,6 +82,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         "MissingInflatedId"
     )
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
+
         holder.title.text = videoList[position].title
         holder.duration.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
         Glide.with(context)
@@ -87,6 +90,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .load(videoList[position].artUri)
             .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
             .into(holder.image)
+
+
 
         holder.root.setOnClickListener {
             when {
@@ -207,19 +212,19 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                 notifyDataSetChanged()
                             }
                             isFolder -> {
-                            MainActivity.dataChanged = true
-                                    FoldersActivity.currentFolderVideos.removeAt(position)
-                                    notifyDataSetChanged()
+                                MainActivity.dataChanged = true
+                                FoldersActivity.currentFolderVideos.removeAt(position)
+                                notifyDataSetChanged()
                                 videoDeleteListener?.onVideoDeleted()
-                            //////////////////////////////////////////////
-                            // Notify FoldersActivity to reload videos///////
-                            // //  // // ->  (context as? FoldersActivity)?.reloadVideos()///////
-                            ///////////////////////////////////////////////////////////
+                                //////////////////////////////////////////////
+                                // Notify FoldersActivity to reload videos///////
+                                // //  // // ->  (context as? FoldersActivity)?.reloadVideos()///////
+                                ///////////////////////////////////////////////////////////
+                            }
                         }
+                    } else {
+                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-            }
                     alertDialog.dismiss()
                 }
 
@@ -238,6 +243,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     override fun getItemCount(): Int {
         return videoList.size
     }
+
+
 
     private fun renameMusic(position: Int, newName: String) {
         val music = videoList[position]

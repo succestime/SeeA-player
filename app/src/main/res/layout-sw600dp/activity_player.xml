@@ -43,6 +43,16 @@
             android:layout_height="match_parent"
             android:background="@color/light_dark"
             android:visibility="gone"/>
+
+
+        <FrameLayout
+            android:id="@+id/eqFrame"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            tools:ignore="ObsoleteLayoutParam" />
     </FrameLayout>
 
 
@@ -111,7 +121,7 @@
         tools:ignore="MissingConstraints" />
 
 
-    <!-- CardView for Volume SeekBar -->
+<!--     CardView for Volume SeekBar -->
     <LinearLayout
         android:id="@+id/volProgressContainer"
         android:layout_width="wrap_content"

@@ -17,7 +17,7 @@ import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityFoldersBinding
 import java.io.File
 
-class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener  {
+class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     private lateinit var binding: ActivityFoldersBinding
 private lateinit var adapter: VideoAdapter
     private var isSearchViewClicked = false
@@ -45,6 +45,7 @@ private lateinit var adapter: VideoAdapter
         binding.videoRVFA.adapter = adapter
         binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
 
+
         adapter = VideoAdapter(this@FoldersActivity, MainActivity.videoList)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(10)
@@ -53,7 +54,7 @@ private lateinit var adapter: VideoAdapter
         binding.recyclerView.adapter = adapter
 
         binding.swipeRefreshFolder.setOnRefreshListener {
-            // This block of code will be executed when the user swipes to refresh
+
             currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
             adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true)
             binding.videoRVFA.adapter = adapter
@@ -61,6 +62,7 @@ private lateinit var adapter: VideoAdapter
             binding.swipeRefreshFolder.isRefreshing = false // Hide the refresh indicator
 
         }
+
         binding.nowPlayingBtn.setOnClickListener {
             val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
             intent.putExtra("class", "NowPlaying")
@@ -69,7 +71,10 @@ private lateinit var adapter: VideoAdapter
         binding.searchBackBtn.setOnClickListener {
             binding.recyclerView.visibility = View.GONE
         }
+
     }
+
+
     @SuppressLint("SetTextI18n")
     override fun onVideoDeleted() {
         // Reload videos in RecyclerView
@@ -185,14 +190,18 @@ private lateinit var adapter: VideoAdapter
                     val durationC =
                         cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
                             .toLong()
+                    val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
+
 
                     try {
                         val file = File(pathC)
                         val artUriC = Uri.fromFile(file)
                         val video = VideoData(
                             title = titleC, id = idC, folderName = folderC, duration = durationC,
-                            path = pathC, size = sizeC, artUri = artUriC
+                            path = pathC, size = sizeC, artUri = artUriC, dateAdded = dateAddedMillis
                         )
+
+
                         if (file.exists()) tempList.add(video)
 
                     } catch (_: Exception) {

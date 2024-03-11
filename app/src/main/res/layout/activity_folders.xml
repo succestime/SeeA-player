@@ -63,17 +63,13 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/videoRVFA"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
+            android:paddingBottom="30dp"
             android:scrollbars="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/linearLayoutFa"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/totalVideo"
-            app:layout_constraintVertical_bias="0.027" />
+           />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/nowPlayingBtn"
