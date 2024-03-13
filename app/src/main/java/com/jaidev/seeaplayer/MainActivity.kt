@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -46,13 +47,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var currentFragment: Fragment
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var adapter: VideoAdapter
-private  var runnable : Runnable? = null
-//private lateinit var navController : NavController
+    private  var runnable : Runnable? = null
+    //private lateinit var navController : NavController
     companion object {
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
         lateinit var videoList: ArrayList<VideoData>
-   lateinit var MusicListMA: ArrayList<Music>
+        lateinit var MusicListMA: ArrayList<Music>
         lateinit var musicListSearch: ArrayList<Music>
         var search: Boolean = false
         lateinit var searchList: ArrayList<VideoData>
@@ -112,7 +113,7 @@ private  var runnable : Runnable? = null
             folderList = ArrayList()
             videoList = ArrayList()
             setFragment(homeNav())
-          MusicListMA = getAllAudios()
+            MusicListMA = getAllAudios()
         }
 // Check if the service needs to be started
         if (shouldStartService()) {
@@ -125,7 +126,7 @@ private  var runnable : Runnable? = null
 
 
 
-binding.bottomNav.setOnItemSelectedListener {
+        binding.bottomNav.setOnItemSelectedListener {
 
             try {
                 when (it.itemId) {
@@ -269,7 +270,7 @@ binding.bottomNav.setOnItemSelectedListener {
 
     }
 
-//    override fun onSupportNavigateUp(): Boolean {
+    //    override fun onSupportNavigateUp(): Boolean {
 //        navController = findNavController(R.id.navHostFragmentContainerView)
 //        return navController.navigateUp() || super.onSupportNavigateUp()
 //    }
@@ -298,7 +299,7 @@ binding.bottomNav.setOnItemSelectedListener {
         currentFragment = fragment
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frameLayout, fragment)
-      transaction.disallowAddToBackStack()
+        transaction.disallowAddToBackStack()
         transaction.commit()
     }
 
@@ -360,7 +361,7 @@ binding.bottomNav.setOnItemSelectedListener {
                 folderList = ArrayList()
                 videoList = getAllVideos()
                 setFragment(homeNav())
-              MusicListMA = getAllAudios()
+                MusicListMA = getAllAudios()
             } else Snackbar.make(binding.root, "Storage Permission Needed!!", 5000)
                 .setAction("OK") {
                     ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 13)
@@ -441,7 +442,7 @@ binding.bottomNav.setOnItemSelectedListener {
     }
 
     @SuppressLint("Range")
-  fun getAllVideos(): ArrayList<VideoData> {
+    fun getAllVideos(): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
         sortValue = sortEditor.getInt("sortValue", 0)
 
@@ -464,7 +465,7 @@ binding.bottomNav.setOnItemSelectedListener {
         if (cursor != null)
             if (cursor.moveToFirst()) {
                 do {
-                   try {
+                    try {
                         val titleC =
                             cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE))
                         val idC =
@@ -480,11 +481,14 @@ binding.bottomNav.setOnItemSelectedListener {
                         val durationC =
                             cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
                                 .toLong()
-                       val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
+                        val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
 
-                       try {
+                        try {
                             val file = File(pathC)
                             val artUriC = Uri.fromFile(file)
+                            val currentTimestamp = System.currentTimeMillis()
+                            val isNewVideo = currentTimestamp - dateAddedMillis <= DateUtils.DAY_IN_MILLIS
+
                             val video = VideoData(
                                 title = titleC,
                                 id = idC,
@@ -492,7 +496,7 @@ binding.bottomNav.setOnItemSelectedListener {
                                 duration = durationC,
                                 size = sizeC,
                                 path = pathC,
-                                artUri = artUriC, dateAdded = dateAddedMillis
+                                artUri = artUriC, dateAdded = dateAddedMillis, isNew =isNewVideo
                             )
 
 
@@ -611,9 +615,3 @@ binding.bottomNav.setOnItemSelectedListener {
 
 
 }
-
-
-
-
-
-

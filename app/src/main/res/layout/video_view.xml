@@ -1,62 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="horizontal"
     android:layout_height="75dp"
     android:layout_marginTop="2dp"
-    android:padding="2dp"
+    android:id="@+id/multyLayout"
     android:clickable="true"
     android:focusable="true"
     android:background="?attr/selectableItemBackground">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/videoImage"
-        android:layout_width="80dp"
-        android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center"
-        android:layout_marginBottom="3dp"
-        android:contentDescription="video_image"
-        android:src="@mipmap/ic_logo_o"
-        app:shapeAppearanceOverlay="@style/curved" />
-
-    <TextView
-        android:id="@+id/newIndicator"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="NEW"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        android:layout_gravity="center"
-        android:background="@drawable/background_new_indicator"
-        android:padding="4dp"
-       android:layout_marginStart="7dp"
-        android:layout_alignParentTop="true"
-        android:visibility="gone"/>
+        >
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/videoImage"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
+            android:contentDescription="video_image"
+            android:src="@mipmap/ic_logo_o"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/curved" />
+
+
+        <Button
+            android:id="@+id/multiIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/complete_svgrepo_com"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:visibility="gone">
+
+        </Button>
+
+        <TextView
+            android:id="@+id/newIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/background_new_indicator"
+            android:padding="4dp"
+            android:text="NEW"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_toEndOf="@id/videoImage"
-        android:layout_toRightOf="@id/videoImage"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
-        android:paddingHorizontal="5dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="2dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/videoName"
-            android:layout_width="670dp"
+            android:layout_width="wrap_content"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="video title"
-            android:layout_marginStart="5dp"
             android:gravity="center_vertical"
             android:maxLines="2"
             android:textColor="@color/black"
             android:layout_gravity="center_vertical"/>
-
 
         <TextView
             android:id="@+id/duration"
@@ -66,23 +91,23 @@
             android:textStyle="bold"
             android:layout_marginStart="5dp"
             android:text="00:00"/>
-
     </LinearLayout>
+
+
+
 
     <ImageButton
         android:id="@+id/MoreChoose"
         android:layout_width="25dp"
         android:layout_height="30dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="center"
         android:layout_marginVertical="15dp"
         android:layout_marginStart="3dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="3dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="35dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_more_icon" />
+        android:src="@drawable/ic_more_icon"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+</LinearLayout>
+

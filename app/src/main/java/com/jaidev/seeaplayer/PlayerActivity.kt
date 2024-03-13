@@ -68,14 +68,14 @@ import kotlin.system.exitProcess
 
 
 class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener
-  , GestureDetector.OnGestureListener
+    , GestureDetector.OnGestureListener
 {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var playPauseBtn: ImageButton
     private lateinit var fullScreenBtn: ImageButton
     private lateinit var videoTitle: TextView
     private lateinit var gestureDetectorCompat: GestureDetectorCompat
-//    private val LONG_PRESS_DURATION = 500L // Define the duration for a long press in milliseconds
+    //    private val LONG_PRESS_DURATION = 500L // Define the duration for a long press in milliseconds
 //    private var isLongPress = false
 //    private var longPressStartTime = 0L
     private var isSwipingForward = false
@@ -166,7 +166,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         nightMode = findViewById(R.id.night_mode)
         recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
         eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
-     gestureDetectorCompat = GestureDetectorCompat(this, this)
+        gestureDetectorCompat = GestureDetectorCompat(this, this)
 
         // for immersive mode
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -562,7 +562,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
     @SuppressLint("SetTextI18n")
     fun setupBoosterDialog() {
-       // dialog.dismiss()
+        // dialog.dismiss()
         val customDialogB =
             LayoutInflater.from(this).inflate(R.layout.booster, binding.root, false)
         val bindingB = BoosterBinding.bind(customDialogB)
@@ -571,7 +571,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             .setPositiveButton("Done") { _, _ ->
                 loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress * 100)
                 playVideo()
-               // dialog.dismiss()
+                // dialog.dismiss()
             }
             .setBackground(ColorDrawable(0x803700B3.toInt()))
             .create()
@@ -600,7 +600,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (status) {
                 this.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
-               // dialog.dismiss()
+                // dialog.dismiss()
                 binding.playerView.hideController()
                 playVideo()
                 pipStatus = 0
@@ -613,7 +613,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             }
         } else {
             Toast.makeText(this, "Feature Not Supported!!", Toast.LENGTH_SHORT).show()
-           // dialog.dismiss()
+            // dialog.dismiss()
             playVideo()
         }
     }
@@ -710,7 +710,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         videoTitle.text = playerList[position].title
         player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         doubleTapEnable()
-      setupSwipeGesture()
+        setupSwipeGesture()
 
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
         player.setMediaItem(mediaItem)
@@ -848,15 +848,15 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         super.onResume()
         if (audioManager == null) audioManager =
             getSystemService(Context.AUDIO_SERVICE) as AudioManager
-       audioManager!!.requestAudioFocus(
+        audioManager!!.requestAudioFocus(
             this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN
         )
-     if (brightness != 0) setScreenBrightness(brightness)
+        if (brightness != 0) setScreenBrightness(brightness)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun doubleTapEnable() {
-    binding.playerView.player = player
+        binding.playerView.player = player
         binding.ytOverlay.performListener(object : YouTubeOverlay.PerformListener {
             override fun onAnimationEnd() {
                 binding.ytOverlay.visibility = View.GONE
@@ -900,7 +900,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             if (view.id != R.id.playerView) {
                 // Touch event is outside the DoubleTapPlayerView, skip duration change logic
                 isSwipingToChangeDuration = false
-              hideProgressBars()
+                hideProgressBars()
                 return@setOnTouchListener false
             }
 
@@ -923,7 +923,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                         if (abs(deltaX) > SWIPE_THRESHOLD) {
                             // User is swiping horizontally for duration change
                             isSwipingToChangeDuration = true
-                           hideProgressBars()
+                            hideProgressBars()
                             // Determine the direction of the swipe
                             isSwipingForward = deltaX > 0
 
@@ -936,16 +936,16 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                         } else if (abs(deltaY) > SWIPE_THRESHOLD) {
                             // User is swiping vertically for volume or brightness change
                             isSwipingToChangeDuration = false
-                          showProgressBars(motionEvent.x, deltaY)
+                            showProgressBars(motionEvent.x, deltaY)
 
                             if (motionEvent.x < binding.root.width / 2) {
                                 val increase = deltaY > 0
                                 val newValue = if (increase) brightness - 1 else brightness + 1
                                 if (newValue in 0..15) brightness = newValue
-                             setScreenBrightness(brightness)
+                                setScreenBrightness(brightness)
                             } else {
                                 // For volume change
-                             val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                                val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                                 val increase = deltaY > 0
                                 val newValue = if (increase) volume - 1 else volume + 1
                                 if (newValue in 0..maxVolume) volume = newValue
@@ -975,7 +975,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                             if (isSwipingForward) {
                                 player.seekTo(initialPosition + durationChangeMillis)
                             } else {
-                               player.seekTo(initialPosition - durationChangeMillis)
+                                player.seekTo(initialPosition - durationChangeMillis)
                             }
 
                             // Hide the duration TextView
@@ -985,7 +985,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                             isSwipingToChangeDuration = false
 
                         }
-                    hideProgressBars()
+                        hideProgressBars()
 
 
                     }
@@ -1135,13 +1135,13 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 val increase = distanceY > 0
                 val newValue = if (increase) brightness + 1 else brightness - 1
                 if (newValue in 0..15) brightness = newValue
-              //  setScreenBrightness(brightness)
+                //  setScreenBrightness(brightness)
             } else {
                 val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                 val increase = distanceY > 0
                 val newValue = if (increase) volume + 1 else volume - 1
                 if (newValue in 0..maxVolume) volume = newValue
-                 audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+                audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
             }
 
             return true

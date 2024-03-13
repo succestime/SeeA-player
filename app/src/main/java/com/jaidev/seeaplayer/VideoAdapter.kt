@@ -14,13 +14,18 @@ import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
+import android.view.ActionMode
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.text.bold
@@ -40,6 +45,9 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     private var newPosition = 0
     private lateinit var dialogRF: AlertDialog
     private lateinit var sharedPreferences: SharedPreferences
+    // Tracks selected items
+    private val selectedItems = HashSet<Int>()
+    private var actionMode: ActionMode? = null
     companion object {
         private const val PREF_NAME = "video_titles"
     }
@@ -70,6 +78,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         val root = binding.root
         val more = binding.MoreChoose
 
+        val button = binding.multiIcon
 
     }
 
@@ -91,26 +100,49 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
             .into(holder.image)
 
-
+        holder.root.setOnLongClickListener {
+            toggleSelection(position)
+            true
+        }
 
         holder.root.setOnClickListener {
-            when {
-                isFolder -> {
-                    PlayerActivity.pipStatus = 1
-                    sendIntent(pos = position, ref = "FoldersActivity")
-                }
+            if (actionMode != null) {
+                // If action mode is active, toggle selection as usual
+                toggleSelection(position)
+            } else {
+                // If action mode is not active, add the next video to the selection
+                if (selectedItems.isNotEmpty()) {
+                    val lastSelectedItem = selectedItems.last()
+                    val start = minOf(lastSelectedItem, position)
+                    val end = maxOf(lastSelectedItem, position)
+                    for (i in start..end) {
+                        selectedItems.add(i)
+                    }
+                    startActionMode()
+                } else {
 
-                MainActivity.search -> {
-                    PlayerActivity.pipStatus = 2
-                    sendIntent(pos = position, ref = "SearchVideos")
+                    when {
+                        isFolder -> {
+                            PlayerActivity.pipStatus = 1
+                            sendIntent(pos = position, ref = "FoldersActivity")
+                        }
+                        MainActivity.search -> {
+                            PlayerActivity.pipStatus = 2
+                            sendIntent(pos = position, ref = "SearchVideos")
+                        }
+                        videoList[position].id == PlayerActivity.nowPlayingId -> {
+                            sendIntent(pos = position, ref = "NowPlaying")
+                        }
+                    }
+                    // If no item was previously selected, start action mode with the current item
+                    toggleSelection(position)
                 }
-
-                videoList[position].id == PlayerActivity.nowPlayingId -> {
-                    sendIntent(pos = position, ref = "NowPlaying")
-                }
-
             }
         }
+
+        // Show/hide multi-select icon based on selection
+        holder.button.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
+
 
         holder.more.setOnClickListener {
 
@@ -216,10 +248,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                 FoldersActivity.currentFolderVideos.removeAt(position)
                                 notifyDataSetChanged()
                                 videoDeleteListener?.onVideoDeleted()
-                                //////////////////////////////////////////////
-                                // Notify FoldersActivity to reload videos///////
-                                // //  // // ->  (context as? FoldersActivity)?.reloadVideos()///////
-                                ///////////////////////////////////////////////////////////
+
                             }
                         }
                     } else {
@@ -240,11 +269,126 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
     }
 
+
     override fun getItemCount(): Int {
         return videoList.size
     }
 
 
+
+    // Toggle selection for multi-select
+    // Toggle selection for multi-select
+    @SuppressLint("NotifyDataSetChanged")
+    private fun toggleSelection(position: Int) {
+        if (selectedItems.contains(position)) {
+            selectedItems.remove(position)
+        } else {
+            selectedItems.add(position)
+        }
+
+        // Start or finish action mode based on selection
+        if (selectedItems.isEmpty()) {
+            actionMode?.finish()
+        } else {
+            startActionMode()
+        }
+
+        // Update selected items
+        notifyDataSetChanged()
+    }
+
+
+    // Start action mode for multi-select
+    private fun startActionMode() {
+        if (actionMode == null) {
+            actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
+        }
+        actionMode?.title = "${selectedItems.size} selected"
+    }
+
+    // Action mode callback
+    private val actionModeCallback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            // Inflate action mode menu
+            mode?.menuInflater?.inflate(R.menu.multiple_select_menu, menu)
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            // Handle action mode menu items
+         //   val actionMode = mode
+            when (item?.itemId) {
+                R.id.menu_delete -> {
+                    // Implement delete action
+                 //   deleteSelectedVideos(actionMode)
+                    return true
+                }
+                // Add more action mode items as needed
+            }
+            return false
+        }
+        @SuppressLint("NotifyDataSetChanged")
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            // Clear selection and action mode
+            selectedItems.clear()
+            actionMode = null
+            notifyDataSetChanged()
+        }
+    }
+//    private fun deleteSelectedVideos(actionMode: ActionMode?) {
+//        val selectedPositions = ArrayList(selectedItems)
+//        val deleteDialogBuilder = AlertDialog.Builder(context)
+//        val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
+//
+//        val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
+//        val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
+//
+//        // Set the delete text color to red
+//        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+//
+//        // Set the cancel text color to black
+//        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+//
+//        deleteDialogBuilder.setView(deleteView)
+//
+//        val deleteDialog = deleteDialogBuilder.create()
+//
+//        deleteText.setOnClickListener {
+//            for (position in selectedPositions) {
+//                val file = File(videoList[position].path)
+//                if (file.exists() && file.delete()) {
+//                    MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+//                    when {
+//                        MainActivity.search -> {
+//                            MainActivity.dataChanged = true
+//                            videoList.removeAt(position)
+//                            notifyItemRemoved(position)
+//                        }
+//                        isFolder -> {
+//                            MainActivity.dataChanged = true
+//                            FoldersActivity.currentFolderVideos.removeAt(position)
+//                            notifyItemRemoved(position)
+//                            videoDeleteListener?.onVideoDeleted()
+//                        }
+//                    }
+//                } else {
+//                    Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//            deleteDialog.dismiss()
+//            actionMode?.finish()
+//        }
+//
+//        cancelText.setOnClickListener {
+//            // Handle cancel action here
+//            deleteDialog.dismiss()
+//        }
+//        deleteDialog.show()
+//    }
 
     private fun renameMusic(position: Int, newName: String) {
         val music = videoList[position]

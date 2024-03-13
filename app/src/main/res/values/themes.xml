@@ -3,7 +3,7 @@
     //Theme for Activities
     <style name="coolBlueNav" parent="Theme.MaterialComponents.Light">
 
-        <item name="colorPrimary">#397FF3</item>
+        <item name="colorPrimary">@color/cool_blue</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="colorOnPrimary">@color/black</item>
         <item name="colorSecondary">@color/teal_200</item>

@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.format.DateUtils
 import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -19,7 +20,7 @@ import java.io.File
 
 class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     private lateinit var binding: ActivityFoldersBinding
-private lateinit var adapter: VideoAdapter
+    private lateinit var adapter: VideoAdapter
     private var isSearchViewClicked = false
     companion object {
         lateinit var currentFolderVideos: ArrayList<VideoData>
@@ -71,6 +72,7 @@ private lateinit var adapter: VideoAdapter
         binding.searchBackBtn.setOnClickListener {
             binding.recyclerView.visibility = View.GONE
         }
+
 
     }
 
@@ -196,9 +198,12 @@ private lateinit var adapter: VideoAdapter
                     try {
                         val file = File(pathC)
                         val artUriC = Uri.fromFile(file)
+                        val currentTimestamp = System.currentTimeMillis()
+                        val isNewVideo = currentTimestamp - dateAddedMillis <= DateUtils.DAY_IN_MILLIS
+
                         val video = VideoData(
                             title = titleC, id = idC, folderName = folderC, duration = durationC,
-                            path = pathC, size = sizeC, artUri = artUriC, dateAdded = dateAddedMillis
+                            path = pathC, size = sizeC, artUri = artUriC, dateAdded = dateAddedMillis, isNew =isNewVideo
                         )
 
 
