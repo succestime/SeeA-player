@@ -31,12 +31,13 @@
             app:shapeAppearanceOverlay="@style/curved" />
 
 
-        <Button
+        <ImageView
             android:id="@+id/multiIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/complete_svgrepo_com"
             android:gravity="center"
+            android:backgroundTint="@color/red"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +45,7 @@
 
             android:visibility="gone">
 
-        </Button>
+        </ImageView>
 
         <TextView
             android:id="@+id/newIndicator"
@@ -80,7 +81,7 @@
             android:text="video title"
             android:gravity="center_vertical"
             android:maxLines="2"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_gravity="center_vertical"/>
 
         <TextView
@@ -101,13 +102,15 @@
         android:layout_width="25dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
+        android:tint="@color/white"
         android:layout_marginVertical="15dp"
         android:layout_marginStart="3dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="35dp"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_more_icon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UseAppTint" />
 
 </LinearLayout>
 

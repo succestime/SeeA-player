@@ -25,6 +25,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -32,7 +33,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jaidev.seeaplayer.bottomNavigation.downloadNav
 import com.jaidev.seeaplayer.bottomNavigation.homeNav
-import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.dataClass.Folder
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.RecantMusic
@@ -79,21 +79,32 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    @SuppressLint("SuspiciousIndentation")
+    @SuppressLint("SuspiciousIndentation", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.coolBlueNav)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
 
+        supportActionBar?.apply {
+
+            setBackgroundDrawable(ContextCompat.getDrawable(this@MainActivity, R.drawable.background_actionbar))
+        }
+
+
+        // Set the title for the action bar
+        supportActionBar?.title = "SeeA Player"
 
         if (requestRuntimePermission()) {
             folderList = ArrayList()
@@ -148,7 +159,8 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.more -> {
-                        setFragment(moreNav())
+                        val intent = Intent(this@MainActivity, More::class.java)
+                        startActivity(intent)
                     }
 
                 }
@@ -438,6 +450,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (toggle.onOptionsItemSelected(item))
             return true
+
+
         return super.onOptionsItemSelected(item)
     }
 

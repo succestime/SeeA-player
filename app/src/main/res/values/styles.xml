@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="CustomActionBar" parent="@android:style/Widget.ActionBar">
+        <item name="android:background">@drawable/background_actionbar</item>
+    </style>
 
-    <style name="alertDialog">AlertDialog</style>
 </resources>
+
+

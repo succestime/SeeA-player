@@ -265,7 +265,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     val dateAddedMillis = it.getLong(it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED))
                     val video = VideoData(
                         id = "", title = file.name, duration = 0L,
-                        artUri = Uri.fromFile(file), path = path, size = "", folderName = "", dateAdded =dateAddedMillis
+                        artUri = Uri.fromFile(file), path = path, size = "", folderName = "", dateAdded =dateAddedMillis, isNew = true
                     )
                     playerList.add(video)
                     cursor.close()

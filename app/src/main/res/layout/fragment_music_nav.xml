@@ -11,6 +11,7 @@
    <androidx.constraintlayout.widget.ConstraintLayout
        android:layout_width="match_parent"
        android:layout_height="match_parent"
+       android:background="#012030"
        tools:ignore="ExtraText">
 
        <LinearLayout
@@ -33,9 +34,10 @@
                    android:layout_weight="1"
                    android:contentDescription="@string/shuffle_btn"
                    android:drawableTop="@drawable/shuffle_icon"
+                   android:drawableTint="@color/white"
                    android:text="@string/shuffle_btn"
                    android:textAllCaps="false"
-                   android:textColor="@color/black" />
+                   android:textColor="@color/white" />
 
                <Button
 
@@ -48,7 +50,7 @@
                    android:drawableTop="@drawable/playlist_icon"
                    android:text="@string/playlist_btn"
                    android:textAllCaps="false"
-                   android:textColor="@color/black" />
+                   android:textColor="@color/white" />
 
                <Button
                    android:id="@+id/favouriteBtn"
@@ -61,7 +63,7 @@
                    android:text="@string/favourites_btn"
                    android:textAllCaps="false"
 
-                   android:textColor="@color/black" />
+                   android:textColor="@color/white" />
 
 
            </LinearLayout>
@@ -79,7 +81,7 @@
                    android:layout_marginStart="10dp"
                    android:layout_marginTop="10dp"
                    android:text="@string/total_songs"
-                   android:textColor="@color/black"
+                   android:textColor="@color/white"
                    android:textSize="15sp"
                    android:textStyle="bold" />
 

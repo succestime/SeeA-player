@@ -9,7 +9,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#012030">
     <TextView
        android:id="@+id/daysTotalMusics"
         android:layout_width="match_parent"
@@ -18,7 +19,7 @@
         android:layout_marginTop="69dp"
         android:layout_marginStart="10dp"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:text="Recant Musics :" />
         <ViewStub
             android:id="@+id/emptyStateLayout"

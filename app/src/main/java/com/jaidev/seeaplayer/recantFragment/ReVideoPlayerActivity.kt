@@ -201,8 +201,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     @SuppressLint("NotifyDataSetChanged")
     private fun horizontalIconList() {
         iconModelArrayList.add(IconModel(R.drawable.next_icon,"", android.R.color.white))
-        iconModelArrayList.add(IconModel(R.drawable.night_mode,"Night Mode", android.R.color.white))
-        iconModelArrayList.add(IconModel(R.drawable.mute,"Mute", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.night_mode,"Night", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.muit2_round,"Mute", android.R.color.white))
         iconModelArrayList.add(IconModel(R.drawable.orientation_icon,"Rotate", android.R.color.white))
 
 
@@ -228,13 +228,13 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                             iconModelArrayList.add(
                                 IconModel(
                                     R.drawable.night_mode,
-                                    "Night Mode",
+                                    "Night",
                                     android.R.color.white
                                 )
                             )
                             iconModelArrayList.add(
                                 IconModel(
-                                    R.drawable.mute,
+                                    R.drawable.muit2_round,
                                     "Mute",
                                     android.R.color.white
                                 )
@@ -322,7 +322,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     2 -> {
                         if (mute) {
                             player.setVolume(100F)
-                            iconModelArrayList[position] = IconModel(R.drawable.mute, "Mute")
+                            iconModelArrayList[position] = IconModel(R.drawable.muit2_round, "Mute")
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = false
                         } else {

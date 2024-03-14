@@ -5,9 +5,16 @@
     <item
         android:id="@+id/searchView"
         android:title="@string/enter_video_name"
+        android:iconTint="@color/white"
         android:icon="@drawable/search_icon"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
 
+    <item
+        android:id="@+id/account_circle"
+        android:title="User Account"
 
+        android:icon="@drawable/sharp_account_circle_24"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
 </menu>

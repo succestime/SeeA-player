@@ -42,15 +42,6 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
-//        FavouriteActivity.favouriteSongs = ArrayList()
-//        val editor = requireContext().getSharedPreferences("FAVOURITES", MODE_PRIVATE)
-//        val jsonString = editor.getString("FavouriteSongs", null)
-//        val typeToken = object : TypeToken<ArrayList<Music>>(){}.type
-//        if(jsonString != null) {
-//            val data: ArrayList<Music> = GsonBuilder().create().fromJson(jsonString, typeToken)
-//            FavouriteActivity.favouriteSongs.addAll(data)
-//            FavoritesManager.saveFavorites(requireContext())
-//        }
         FavoritesManager.loadFavorites(requireContext())
         binding.musicRV.setHasFixedSize(true)
         binding.musicRV.setItemViewCacheSize(10)

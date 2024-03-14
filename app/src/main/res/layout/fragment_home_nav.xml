@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
+  android:background="#012030"
     android:id="@+id/swipeRefreshFolder"
     tools:context=".bottomNavigation.homeNav">
 
@@ -26,6 +27,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Music"
+                android:backgroundTint="#424242"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -33,6 +36,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Playlist"
+                android:backgroundTint="#424242"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -40,6 +45,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Theme"
+                android:backgroundTint="#424242"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -47,6 +54,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Link Tube"
+                android:backgroundTint="#424242"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -54,6 +63,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Downloads"
+                android:backgroundTint="#424242"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
         </com.google.android.material.chip.ChipGroup>
 
@@ -77,10 +88,12 @@
                 android:layout_width="25dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:tint="@color/white"
                 android:contentDescription="@string/searchbackbtn"
                 android:src="@drawable/search_back_btn"
                 app:layout_constraintEnd_toEndOf="@+id/recycler_view"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseAppTint" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/searchRecyclerView"
@@ -98,7 +111,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="80dp"
             android:text="@string/total_folders"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="15sp"
 
             android:textStyle="bold"
@@ -114,6 +127,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="25dp"
             android:scrollbars="vertical"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/linearLayout2"
             app:layout_constraintHorizontal_bias="0.009"

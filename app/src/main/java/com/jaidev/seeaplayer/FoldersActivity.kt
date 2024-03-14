@@ -12,6 +12,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.VideoData
@@ -36,6 +37,9 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
 
         val position = intent.getIntExtra("position", 0)
 
+        supportActionBar?.apply {
+            setBackgroundDrawable(ContextCompat.getDrawable(this@FoldersActivity, R.drawable.background_actionbar))
+        }
         currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = MainActivity.folderList[position].folderName
@@ -79,12 +83,13 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
 
     @SuppressLint("SetTextI18n")
     override fun onVideoDeleted() {
-        // Reload videos in RecyclerView
+
         val position = intent.getIntExtra("position", 0)
         currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
         adapter.updateList(currentFolderVideos)
         binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
     }
+
 
 
 

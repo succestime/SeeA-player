@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#011B29"
     android:orientation="vertical"
     tools:context=".recantFragment.ReMusicPlayerActivity">
 
@@ -25,13 +26,13 @@
             android:background="?attr/selectableItemBackground"
             android:layout_marginStart="5dp"
             android:contentDescription="@string/back_btn"
-            app:tint="?colorOnPrimary"
+            app:tint="@color/white"
             android:padding="10dp" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:textColor="?colorOnPrimary"
+            android:textColor="@color/white"
             android:text="@string/world_of_music"
             android:textSize="20sp"
             android:gravity="center"
@@ -73,7 +74,7 @@
         android:layout_marginHorizontal="20dp"
         android:text="@string/song_name"
         android:textSize="18sp"
-        android:textColor="?colorOnPrimary"
+        android:textColor="@color/white"
         android:gravity="center"
 
 

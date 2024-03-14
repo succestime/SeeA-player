@@ -70,15 +70,17 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         videoDeleteListener = listener
     }
 
+
+
     class MyAdapter(binding: VideoViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
         var title = binding.videoName
         var duration = binding.duration
         val image = binding.videoImage
         val root = binding.root
-        val more = binding.MoreChoose
-
         val button = binding.multiIcon
+        val more = binding.MoreChoose
+        val newIndicator = binding.newIndicator
 
     }
 
@@ -100,6 +102,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
             .into(holder.image)
 
+
         holder.root.setOnLongClickListener {
             toggleSelection(position)
             true
@@ -110,35 +113,27 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                 // If action mode is active, toggle selection as usual
                 toggleSelection(position)
             } else {
-                // If action mode is not active, add the next video to the selection
-                if (selectedItems.isNotEmpty()) {
-                    val lastSelectedItem = selectedItems.last()
-                    val start = minOf(lastSelectedItem, position)
-                    val end = maxOf(lastSelectedItem, position)
-                    for (i in start..end) {
-                        selectedItems.add(i)
+                // Otherwise, play the video without enabling selection
+                when {
+                    isFolder -> {
+                        PlayerActivity.pipStatus = 1
+                        sendIntent(pos = position, ref = "FoldersActivity")
                     }
-                    startActionMode()
-                } else {
-
-                    when {
-                        isFolder -> {
-                            PlayerActivity.pipStatus = 1
-                            sendIntent(pos = position, ref = "FoldersActivity")
-                        }
-                        MainActivity.search -> {
-                            PlayerActivity.pipStatus = 2
-                            sendIntent(pos = position, ref = "SearchVideos")
-                        }
-                        videoList[position].id == PlayerActivity.nowPlayingId -> {
-                            sendIntent(pos = position, ref = "NowPlaying")
-                        }
+                    MainActivity.search -> {
+                        PlayerActivity.pipStatus = 2
+                        sendIntent(pos = position, ref = "SearchVideos")
                     }
-                    // If no item was previously selected, start action mode with the current item
-                    toggleSelection(position)
+                    videoList[position].id == PlayerActivity.nowPlayingId -> {
+                        sendIntent(pos = position, ref = "NowPlaying")
+                    }
+                    else -> {
+                        // Only play the video without enabling selection
+                        sendIntent(pos = position, ref = "NormalClick")
+                    }
                 }
             }
         }
+
 
         // Show/hide multi-select icon based on selection
         holder.button.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
@@ -276,6 +271,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
 
 
+
+
     // Toggle selection for multi-select
     // Toggle selection for multi-select
     @SuppressLint("NotifyDataSetChanged")
@@ -295,6 +292,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
         // Update selected items
         notifyDataSetChanged()
+        actionMode?.invalidate()
     }
 
 
@@ -315,16 +313,31 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            return false
+            // Hide the menu_rename item if more than one item is selected
+            val renameItem = menu?.findItem(R.id.menu_rename)
+            renameItem?.isVisible = selectedItems.size == 1
+
+            return true
         }
+
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             // Handle action mode menu items
-         //   val actionMode = mode
+            val actionMode = mode
             when (item?.itemId) {
                 R.id.menu_delete -> {
-                    // Implement delete action
-                 //   deleteSelectedVideos(actionMode)
+                    deleteSelectedVideos(actionMode)
+                    return true
+                }
+                R.id.menu_rename -> {
+// Call the showRenameDialog method here
+                    if (selectedItems.size == 1) {
+                        val selectedPosition = selectedItems.first()
+                        val defaultName = videoList[selectedPosition].title
+                        showRenameDialog(selectedPosition, defaultName)
+                    } else {
+                        Toast.makeText(context, "Please select only one video to rename", Toast.LENGTH_SHORT).show()
+                    }
                     return true
                 }
                 // Add more action mode items as needed
@@ -339,56 +352,72 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             notifyDataSetChanged()
         }
     }
-//    private fun deleteSelectedVideos(actionMode: ActionMode?) {
-//        val selectedPositions = ArrayList(selectedItems)
-//        val deleteDialogBuilder = AlertDialog.Builder(context)
-//        val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-//
-//        val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
-//        val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
-//
-//        // Set the delete text color to red
-//        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-//
-//        // Set the cancel text color to black
-//        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-//
-//        deleteDialogBuilder.setView(deleteView)
-//
-//        val deleteDialog = deleteDialogBuilder.create()
-//
-//        deleteText.setOnClickListener {
-//            for (position in selectedPositions) {
-//                val file = File(videoList[position].path)
-//                if (file.exists() && file.delete()) {
-//                    MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-//                    when {
-//                        MainActivity.search -> {
-//                            MainActivity.dataChanged = true
-//                            videoList.removeAt(position)
-//                            notifyItemRemoved(position)
-//                        }
-//                        isFolder -> {
-//                            MainActivity.dataChanged = true
-//                            FoldersActivity.currentFolderVideos.removeAt(position)
-//                            notifyItemRemoved(position)
-//                            videoDeleteListener?.onVideoDeleted()
-//                        }
-//                    }
-//                } else {
-//                    Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//            deleteDialog.dismiss()
-//            actionMode?.finish()
-//        }
-//
-//        cancelText.setOnClickListener {
-//            // Handle cancel action here
-//            deleteDialog.dismiss()
-//        }
-//        deleteDialog.show()
-//    }
+    private fun deleteSelectedVideos(actionMode: ActionMode?) {
+        val selectedPositions = ArrayList(selectedItems)
+        val deleteDialogBuilder = AlertDialog.Builder(context)
+        val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
+
+        val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
+        val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
+        val iconImageView = deleteView.findViewById<ImageView>(R.id.videoImage)
+        val videoNameDelete = deleteView.findViewById<TextView>(R.id.videmusicNameDelete)
+
+        // Set the delete text color to red
+        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+
+        // Set the cancel text color to black
+        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+
+        // Load video image into iconImageView using Glide
+        Glide.with(context)
+            .asBitmap()
+            .load(videoList[selectedPositions.first()].artUri) // Assuming only one item is selected
+            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+            .into(iconImageView)
+
+        // Set the video name
+        videoNameDelete.text = videoList[selectedPositions.first()].title // Assuming only one item is selected
+
+        deleteDialogBuilder.setView(deleteView)
+
+        val deleteDialog = deleteDialogBuilder.create()
+
+        deleteText.setOnClickListener {
+            for (position in selectedPositions) {
+                val file = File(videoList[position].path)
+                if (file.exists() && file.delete()) {
+                    MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                    when {
+                        MainActivity.search -> {
+                            MainActivity.dataChanged = true
+                            videoList.removeAt(position)
+                            notifyItemRemoved(position)
+                        }
+                        isFolder -> {
+                            MainActivity.dataChanged = true
+                            FoldersActivity.currentFolderVideos.removeAt(position)
+                            notifyItemRemoved(position)
+                            videoDeleteListener?.onVideoDeleted()
+                        }
+                    }
+                } else {
+                    Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            deleteDialog.dismiss()
+            actionMode?.finish()
+            // You might want to call updateTotalVideoCount() here to refresh the total video count
+        }
+
+        cancelText.setOnClickListener {
+            // Handle cancel action here
+            deleteDialog.dismiss()
+        }
+        deleteDialog.show()
+    }
+
+
+    // Update the total video count interface method
 
     private fun renameMusic(position: Int, newName: String) {
         val music = videoList[position]

@@ -4,7 +4,10 @@
 
     <item android:id="@+id/sortOrder"
         android:title="@string/sort_order"
+        android:iconTint="@color/white"
         android:icon="@drawable/sort_icon"
         app:showAsAction="ifRoom"
         />
+
+
 </menu>

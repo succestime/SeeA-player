@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".bottomNavigation.downloadNav">
 
 
@@ -14,9 +15,10 @@
         android:layout_height="50dp"
         app:tabGravity="fill"
         app:tabMode="fixed"
+        android:background="#012030"
         app:tabIndicatorAnimationMode="elastic"
         app:tabIndicatorColor="@color/cool_blue"
-        app:tabTextColor="@color/black"
+        app:tabTextColor="@color/white"
         app:tabSelectedTextColor="@color/cool_blue"
         app:tabTextAppearance="@style/TabTextAppearance"
     app:layout_constraintTop_toTopOf="parent">

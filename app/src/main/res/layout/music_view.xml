@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:layout_marginBottom="1dp"
     android:clickable="true"
     android:focusable="true"
     android:background="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
 
 
  <com.google.android.material.imageview.ShapeableImageView
@@ -16,8 +22,26 @@
      android:layout_margin="2dp"
      android:src="@drawable/speaker"
      android:layout_marginStart="5dp"
-     app:shapeAppearanceOverlay="@style/curved"/>
+     app:shapeAppearanceOverlay="@style/curved"
+     tools:ignore="MissingConstraints" />
 
+        <ImageView
+            android:id="@+id/multiIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/complete_svgrepo_com"
+            android:gravity="center"
+            android:backgroundTint="@color/red"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:visibility="gone">
+
+        </ImageView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="68dp"
@@ -29,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="38dp"
         android:text="Song Name "
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:maxLines="1"
         android:layout_gravity="center_vertical"
         android:layout_toEndOf="@+id/musicViewImage"
@@ -40,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:text="Song Album "
-        android:textColor="@color/light_black"
+        android:textColor="#F5F5F5"
         android:layout_marginStart="5dp"/>
 
 
@@ -50,9 +74,11 @@
        android:id="@+id/MoreChoose2"
        android:layout_width="wrap_content"
        android:layout_height="30dp"
+       android:tint="@color/white"
        android:src="@drawable/ic_more_icon"
        android:layout_marginVertical="18dp"
-       android:background="@android:color/transparent">
+       android:background="@android:color/transparent"
+       tools:ignore="UseAppTint">
 
    </ImageButton>
 
