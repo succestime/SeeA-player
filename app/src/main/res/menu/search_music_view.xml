@@ -4,7 +4,6 @@
 
     <item android:id="@+id/searchMusicView"
         android:title="@string/search"
-        android:iconTint="@color/white"
         android:icon="@drawable/search_icon"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"

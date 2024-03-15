@@ -443,6 +443,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+//        // Find the account item and handle its click event
+//        menuInflater.inflate(R.menu.search_view_menu, menu)
+//        val accountItem = menu.findItem(R.id.account_circle)
+//        accountItem.setOnMenuItemClickListener { menuItem ->
+//            when (menuItem.itemId) {
+//                R.id.account_circle -> {
+//                    // Handle click on account icon
+//                    // Open your desired fragment here
+//                    val fragmentManager = supportFragmentManager // Local variable declaration
+//                    val fragment = SinIn_Fragment() // Replace YourFragment() with the fragment you want to open
+//                    fragmentManager.beginTransaction()
+//                        .replace(R.id.frameLayout, fragment)
+//                        .addToBackStack(null) // This line allows the user to navigate back to the previous fragment
+//                        .commit()
+//                    true
+//                }
+//                else -> false
+//            }
+//        }
+
         return true
     }
 

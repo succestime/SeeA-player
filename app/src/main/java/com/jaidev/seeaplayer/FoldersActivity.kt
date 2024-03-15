@@ -90,13 +90,11 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
         binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
     }
 
-
-
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
-        menuInflater.inflate(R.menu.search_view_menu, menu)
-        val searchItem = menu.findItem(R.id.searchView)
+        menuInflater.inflate(R.menu.search_music_view, menu)
+        val searchItem = menu.findItem(R.id.searchMusicView)
+
         val searchView = searchItem?.actionView as SearchView
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
@@ -137,6 +135,11 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
                 else -> false
             }
         }
+        searchView.setOnCloseListener {
+            isSearchViewClicked = false
+            binding.recyclerView.visibility = View.GONE
+            false
+        }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
 
@@ -154,11 +157,9 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
                 return true
             }
         })
-        searchView.setOnCloseListener {
-            isSearchViewClicked = false
-            binding.recyclerView.visibility = View.GONE
-            false
-        }
+
+
+
         return true
     }
 

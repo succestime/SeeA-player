@@ -1,22 +1,41 @@
 package com.jaidev.seeaplayer
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.jaidev.seeaplayer.databinding.ActivityMoreBinding
 
-class More : AppCompatActivity() {
+class More : AppCompatActivity(){
 
 private lateinit var binding : ActivityMoreBinding
-    private lateinit var navController: NavController
+
+    companion object{
+        lateinit var auth : FirebaseAuth
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMoreBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
 
+
+       auth = FirebaseAuth.getInstance()
+
+        binding.goToSignin.setOnClickListener {
+                startActivity(Intent(this, FoldersActivity::class.java))
+        }
+if(auth.currentUser == null ){
+    startActivity(Intent(this, signin::class.java))
+    finish()
+}
+
+        binding.signOut.setOnClickListener{
+            auth.signOut()
+            binding.userDetails.text = updateData()
+        }
         supportActionBar?.apply {
 
             setBackgroundDrawable(ContextCompat.getDrawable(this@More, R.drawable.background_actionbar))
@@ -24,9 +43,19 @@ private lateinit var binding : ActivityMoreBinding
 
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        navController = findNavController(R.id.navHostFragmentContainerView)
+    override fun onResume() {
+        super.onResume()
+        binding.userDetails.text = updateData()
 
-        return navController.navigateUp() || super.onSupportNavigateUp()
+
     }
+    private fun updateData(): String {
+
+        return "Name : ${auth.currentUser?.displayName}"
+
+    }
+
+
+
+
 }

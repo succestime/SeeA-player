@@ -20,7 +20,6 @@ import com.jaidev.seeaplayer.FoldersAdapter
 import com.jaidev.seeaplayer.LinkTubeActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.SinIn_Fragment
 import com.jaidev.seeaplayer.VideoAdapter
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
 
@@ -162,26 +161,28 @@ class homeNav : Fragment() {
             }
         })
 
-        // Find the account item and handle its click event
-        val accountItem = menu.findItem(R.id.account_circle)
-        accountItem.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.account_circle -> {
-                    // Handle click on account icon
-                    // Open your desired fragment here
-                    val fragmentManager = requireActivity().supportFragmentManager // Local variable declaration
-                    val fragment = SinIn_Fragment() // Replace YourFragment() with the fragment you want to open
-                    fragmentManager.beginTransaction()
-                        .replace(R.id.frameLayout, fragment)
-                        .addToBackStack(null) // This line allows the user to navigate back to the previous fragment
-                        .commit()
-                    true
-                }
-                else -> false
-            }
-        }
+//        // Find the account item and handle its click event
+//        val accountItem = menu.findItem(R.id.account_circle)
+//        accountItem.setOnMenuItemClickListener { menuItem ->
+//            when (menuItem.itemId) {
+//                R.id.account_circle -> {
+//
+//                    val fragmentManager = requireActivity().supportFragmentManager // Local variable declaration
+//                    val fragment = profile() // Replace YourFragment() with the fragment you want to open
+//                    fragmentManager.beginTransaction()
+//                        .replace(R.id.frameLayout, fragment)
+//                        .addToBackStack(null) // This line allows the user to navigate back to the previous fragment
+//                        .commit()
+//                    true
+//                }
+//                else -> false
+//            }
+//        }
         super.onCreateOptionsMenu(menu, inflater)
     }
+
+
+
     private fun toggleSearchRecyclerViewVisibility(show: Boolean) {
 
         // Check if the search view is explicitly clicked or if it is expanded

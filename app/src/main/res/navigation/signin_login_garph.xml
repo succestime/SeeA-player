@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/signin_login_garph"
+    app:startDestination="@id/moreNav">
+
+    <fragment
+        android:id="@+id/moreNav"
+        android:name="com.jaidev.seeaplayer.bottomNavigation.moreNav"
+        android:label="fragment_more_nav"
+        tools:layout="@layout/fragment_more_nav" >
+        <action
+            android:id="@+id/action_moreNav_to_sinIn_Fragment2"
+            app:destination="@id/sinIn_Fragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/logIn_fragment"
+        android:name="com.jaidev.seeaplayer.logIn_fragment"
+        android:label="fragment_log_in_fragment"
+        tools:layout="@layout/fragment_log_in_fragment" >
+        <action
+            android:id="@+id/action_logIn_fragment_to_sinIn_Fragment"
+            app:destination="@id/sinIn_Fragment"
+            app:enterAnim="@anim/from_left"
+            app:exitAnim="@anim/to_right"
+            app:popEnterAnim="@anim/from_right"
+            app:popExitAnim="@anim/to_left" />
+    </fragment>
+    <fragment
+        android:id="@+id/sinIn_Fragment"
+        android:name="com.jaidev.seeaplayer.SinIn_Fragment"
+        android:label="fragment_sin_in_"
+        tools:layout="@layout/fragment_sin_in_" >
+        <action
+            android:id="@+id/action_sinIn_Fragment_to_logIn_fragment"
+            app:destination="@id/logIn_fragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+        <action
+            android:id="@+id/action_sinIn_Fragment_to_homeNav3"
+            app:destination="@id/homeNav3" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeNav3"
+        android:name="com.jaidev.seeaplayer.bottomNavigation.homeNav"
+        android:label="fragment_home_nav"
+        tools:layout="@layout/fragment_home_nav" />
+</navigation>
