@@ -30,8 +30,8 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     @SuppressLint("SetTextI18n", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        setTheme(More.themesList[More.themeIndex])
         binding = ActivityFoldersBinding.inflate(layoutInflater)
-        setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
 
 

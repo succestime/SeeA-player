@@ -86,7 +86,7 @@
             android:paddingBottom="30dp"
             android:scrollbars="vertical"
             app:layout_constraintTop_toTopOf="@id/totalVideo"
-           />
+            />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/nowPlayingBtn"
@@ -114,4 +114,4 @@
 
 
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

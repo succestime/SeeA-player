@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SuspiciousIndentation", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(R.style.coolBlueNav)
+//        setTheme(More.themesList[More.themeIndex])
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding = ActivityMainBinding.inflate(layoutInflater)
 

@@ -24,6 +24,7 @@ class PlaylistActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        setTheme(More.themesList[More.themeIndex])
         binding = ActivityPlaylistBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()

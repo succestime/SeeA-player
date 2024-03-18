@@ -31,6 +31,7 @@ class DaysMusic : Fragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+//        requireContext().theme.applyStyle(More.themesList[More.themeIndex], true)
    val view =  inflater.inflate(R.layout.fragment_days_music, container, false)
         binding = FragmentDaysMusicBinding.bind(view)
        binding.MusicRV.setHasFixedSize(true)

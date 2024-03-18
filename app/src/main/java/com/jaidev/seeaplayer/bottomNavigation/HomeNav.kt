@@ -40,6 +40,7 @@ class homeNav : Fragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+//        requireContext().theme.applyStyle(More.themesList[More.themeIndex], true)
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
         adapter = VideoAdapter(requireContext(), MainActivity.videoList)
 

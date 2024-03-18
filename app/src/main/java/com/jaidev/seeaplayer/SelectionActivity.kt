@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.jaidev.seeaplayer.MusicAdapter
 import com.jaidev.seeaplayer.databinding.ActivitySelectionBinding
 
 class SelectionActivity : AppCompatActivity() {
@@ -13,7 +12,7 @@ class SelectionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySelectionBinding.inflate(layoutInflater)
-        setTheme(R.style.coolBlueNav)
+//        setTheme(More.themesList[More.themeIndex])
         setContentView(binding.root)
         supportActionBar?.hide()
         binding.selectionRV.setHasFixedSize(true)

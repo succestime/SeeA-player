@@ -23,6 +23,7 @@ class FavouriteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        setTheme(More.themesList[More.themeIndex])
         binding = ActivityFavouriteBinding.inflate(layoutInflater)
         setContentView(binding.root)
         FavoritesManager.loadFavorites(this)

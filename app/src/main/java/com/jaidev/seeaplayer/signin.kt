@@ -15,6 +15,7 @@ import com.jaidev.seeaplayer.databinding.ActivitySigninBinding
 class signin : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        setTheme(More.themesList[More.themeIndex])
         val binding = ActivitySigninBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.title= "Register"

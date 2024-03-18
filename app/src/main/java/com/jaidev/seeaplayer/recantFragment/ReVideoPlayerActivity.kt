@@ -53,6 +53,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.RecentVideoAdapter
 import com.jaidev.seeaplayer.allAdapters.PlaybackIconsAdapter
 import com.jaidev.seeaplayer.dataClass.IconModel
 import com.jaidev.seeaplayer.dataClass.RecantVideo
@@ -74,6 +75,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     private lateinit var fullScreenBtn: ImageButton
     private lateinit var videoTitle: TextView
     private lateinit var gestureDetectorCompat: GestureDetectorCompat
+    private lateinit var adapter: RecentVideoAdapter
     //    private val LONG_PRESS_DURATION = 500L // Define the duration for a long press in milliseconds
 //    private var isLongPress = false
 //    private var longPressStartTime = 0L
@@ -531,11 +533,12 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             playVideo()
         }
     }
+
     private fun initializeLayout() {
         when (intent.getStringExtra("class")) {
             "RecantVideo" -> {
                 recantPlayerList = ArrayList()
-                recantPlayerList.addAll(MainActivity.videoRecantList)
+         recantPlayerList.addAll(MainActivity.videoRecantList)
                 createPlayer()
             }
         }
@@ -855,6 +858,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
         nowPlayingId = recantPlayerList[position].id
         player.play()
+
+
     }
 
 

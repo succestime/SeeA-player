@@ -17,10 +17,7 @@
         android:title="@string/sort_order"
         android:icon="@drawable/short_order_icon"
         />
-    <item android:id="@+id/aboutNav"
-        android:title="@string/about"
-        android:icon="@drawable/about_icon"
-        />
+
     <item android:id="@+id/exitNav"
         android:title="@string/exit"
         android:icon="@drawable/exit_icon"

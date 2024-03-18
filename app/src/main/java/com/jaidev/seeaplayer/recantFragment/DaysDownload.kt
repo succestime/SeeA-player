@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.recantFragment
 
 import android.annotation.SuppressLint
@@ -33,6 +34,7 @@ class DaysDownload : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+//        requireContext().theme.applyStyle(More.themesList[More.themeIndex], true)
         val view = inflater.inflate(R.layout.fragment_days_download, container, false)
         binding = FragmentDaysDownloadBinding.bind(view)
         binding.DownloadRV.setHasFixedSize(true)
@@ -99,7 +101,7 @@ class DaysDownload : Fragment() {
             MediaStore.Video.Media.DURATION,
             MediaStore.Video.Media.DATE_ADDED,
             MediaStore.Video.Media.DATA,
-           MediaStore.Video.Media.SIZE
+            MediaStore.Video.Media.SIZE
         )
 
         val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"

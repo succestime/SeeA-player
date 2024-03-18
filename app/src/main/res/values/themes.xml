@@ -1,3 +1,4 @@
+
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     //Theme for Activities
@@ -33,12 +34,12 @@
         </item>
     </style>
 
-<!--    &lt;!&ndash;  Custom ActionBar Style &ndash;&gt;-->
-<!--    <style name="CustomActionBar" parent="Widget.AppCompat.ActionBar">-->
-<!--        <item name="background">@drawable/background_actionbar</item>-->
+    <!--    &lt;!&ndash;  Custom ActionBar Style &ndash;&gt;-->
+    <!--    <style name="CustomActionBar" parent="Widget.AppCompat.ActionBar">-->
+    <!--        <item name="background">@drawable/background_actionbar</item>-->
 
-<!--        &lt;!&ndash; Add other customizations here if needed &ndash;&gt;-->
-<!--    </style>-->
+    <!--        &lt;!&ndash; Add other customizations here if needed &ndash;&gt;-->
+    <!--    </style>-->
 
     <style name="shape">
         <item name="cornerFamily">rounded</item>

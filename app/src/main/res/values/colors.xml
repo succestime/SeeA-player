@@ -15,6 +15,8 @@
     <color name="blue">#FF0000FF</color>
     <color name="yellow">#FFFFFF00</color>
     <color name="gray">#FF808080</color>
+    <color name="colorStart">#002A40</color>
+    <color name="colorEnd">#011B29</color>
     <color name="light_black">#FF7F7F7F</color>
     <color name="light_white">#FFFEFEFE</color>
     <color name="light_red">#FFFF7F7F</color>

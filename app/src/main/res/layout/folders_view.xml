@@ -14,30 +14,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
-    <com.google.android.material.imageview.ShapeableImageView
-        android:layout_width="75dp"
-        android:layout_height="70dp"
-        android:src="@drawable/folder_icon"
-        android:contentDescription="folder"
-        android:tint="#424242"
-        android:layout_marginStart="5dp"
-        tools:ignore="MissingConstraints" />
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="75dp"
+            android:layout_height="70dp"
+            android:src="@drawable/folder_icon"
+            android:contentDescription="folder"
+            android:tint="#424242"
+            android:layout_marginStart="5dp"
+            tools:ignore="MissingConstraints" />
 
-    <ImageView
-        android:id="@+id/multiIcon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@drawable/complete_svgrepo_com"
-        android:gravity="center"
-        android:backgroundTint="@color/red"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        <ImageView
+            android:id="@+id/multiIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/complete_svgrepo_com"
+            android:gravity="center"
+            android:backgroundTint="@color/red"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
 
-        android:visibility="gone">
+            android:visibility="gone">
 
-    </ImageView>
+        </ImageView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -52,7 +52,7 @@
         android:textSize="18dp"
         android:layout_marginStart="10dp"
         android:layout_marginHorizontal="5dp"
-      />
+        />
 
 
 </LinearLayout>

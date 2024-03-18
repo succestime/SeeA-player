@@ -8,6 +8,7 @@ import com.jaidev.seeaplayer.databinding.ActivityBookmarkBinding
 class BookmarkActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        setTheme(More.themesList[More.themeIndex])
         val binding = ActivityBookmarkBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()

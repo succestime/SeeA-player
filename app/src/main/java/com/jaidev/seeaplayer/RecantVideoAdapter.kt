@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
@@ -130,29 +131,28 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
 
         }
 
-        }
+    }
 
-        override fun getItemCount(): Int {
-            return videoReList.size
-        }
+    override fun getItemCount(): Int {
+        return videoReList.size
+    }
 
 
     @SuppressLint("NotifyDataSetChanged")
-        fun updateRecentVideos(recentVideos: List<RecantVideo>) {
-            videoReList.clear()
-            videoReList.addAll(recentVideos)
-            notifyDataSetChanged()
-        }
+    fun updateRecentVideos(recentVideos: List<RecantVideo>) {
+        videoReList.clear()
+        videoReList.addAll(recentVideos)
+        notifyDataSetChanged()
+    }
 
 
     private fun sendIntent(pos: Int, ref: String) {
-            ReVideoPlayerActivity.position = pos
-            val intent = Intent(context, ReVideoPlayerActivity::class.java)
-            intent.putExtra("class", ref)
-            ContextCompat.startActivity(context, intent, null)
+        ReVideoPlayerActivity.position = pos
+        val intent = Intent(context, ReVideoPlayerActivity::class.java)
+        intent.putExtra("class", ref)
+        ContextCompat.startActivity(context, intent, null)
 
-        }
+    }
 
 
 }
-

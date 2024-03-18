@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.content.Intent
@@ -9,7 +10,7 @@ import com.jaidev.seeaplayer.databinding.ActivityMoreBinding
 
 class More : AppCompatActivity(){
 
-private lateinit var binding : ActivityMoreBinding
+    private lateinit var binding : ActivityMoreBinding
 
     companion object{
         lateinit var auth : FirebaseAuth
@@ -22,22 +23,26 @@ private lateinit var binding : ActivityMoreBinding
         setContentView(binding.root)
 
 
-       auth = FirebaseAuth.getInstance()
+        auth = FirebaseAuth.getInstance()
 
         binding.goToSignin.setOnClickListener {
-                startActivity(Intent(this, FoldersActivity::class.java))
+            startActivity(Intent(this, FoldersActivity::class.java))
         }
-if(auth.currentUser == null ){
-    startActivity(Intent(this, signin::class.java))
-    finish()
-}
+        if(auth.currentUser == null ){
+            startActivity(Intent(this, signin::class.java))
+            finish()
+        }
 
         binding.signOut.setOnClickListener{
             auth.signOut()
             binding.userDetails.text = updateData()
         }
-        supportActionBar?.apply {
 
+        binding.linearLayout10.setOnClickListener {
+            startActivity(Intent(this, SeeAOne::class.java))
+
+        }
+        supportActionBar?.apply {
             setBackgroundDrawable(ContextCompat.getDrawable(this@More, R.drawable.background_actionbar))
         }
 

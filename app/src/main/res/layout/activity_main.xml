@@ -14,21 +14,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-       android:layout_weight="1">
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </FrameLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:itemTextColor="@color/light_gray"
-        app:menu="@menu/bottom_items"
-        android:background="#002A40"
-        app:labelVisibilityMode="labeled"/>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:itemTextColor="@color/light_gray"
+            app:menu="@menu/bottom_items"
+            android:background="#002A40"
+            app:labelVisibilityMode="labeled"/>
 
 
 

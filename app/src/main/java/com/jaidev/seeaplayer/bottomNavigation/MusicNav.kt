@@ -40,6 +40,7 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+//        requireContext().theme.applyStyle(More.themesList[More.themeIndex], true)
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
         FavoritesManager.loadFavorites(requireContext())
