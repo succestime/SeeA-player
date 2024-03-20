@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.MainActivity.Companion.musicRecantList
 import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.dataClass.RecantMusic
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit
 class DaysMusic : Fragment() {
     private lateinit var binding: FragmentDaysMusicBinding
     private lateinit var adapter: RecantMusicAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
 
     @SuppressLint("SetTextI18n")
@@ -75,8 +77,31 @@ class DaysMusic : Fragment() {
         } else {
             binding.shuffleBtn.visibility = View.VISIBLE
         }
+
+        swipeRefreshLayout = binding.swipeRefreshMusic
+
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
+
+
         return view
     }
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
+
+
     @SuppressLint("SetTextI18n")
     private fun loadRecentMusics() {
         val recantMusics = getAllRecantMusics(requireContext())

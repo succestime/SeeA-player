@@ -1,8 +1,8 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    //Theme for Activities
-    <style name="coolBlueNav" parent="Theme.MaterialComponents.DayNight">
+    //Theme for Activities light
+    <style name="coolBlueNav" parent="Theme.MaterialComponents.Light">
 
         <item name="colorPrimary">@color/cool_blue</item>
         <item name="colorPrimaryVariant">@color/white</item>
@@ -10,9 +10,11 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:statusBarColor" >#002A40</item>
+        <item name="android:statusBarColor" >#8ACDF3</item>
         <item name="android:actionBarStyle">@style/CustomActionBar</item>
+
     </style>
+
     // theme for Navigation Drawer
     <style name="coolPinkNav" parent="Theme.MaterialComponents.Light.NoActionBar">
 

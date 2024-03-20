@@ -9,6 +9,10 @@
     <color name="teal_700">#004D40</color>
     <color name="cool_blue">#4285F4</color>
     <color name="cool_green">#00C853</color>
+    <color name="textColor">#fff</color>
+    <color name="titleColor">#fff</color>
+
+    <color name="colorPrimary">#1b272c</color>
     <color name="cool_pink">#E91E63</color>
     <color name="red">#FFFF0000</color>
     <color name="green">#FF00FF00</color>
@@ -32,6 +36,9 @@
     <color name="dark_blue">#FF00007F</color>
     <color name="dark_yellow">#FF7F7F00</color>
     <color name="light_dark">#74000000</color>
+    <color name="dark_cool_blue">#012030</color>
+    <color name="green_primary">#00FF00</color> <!-- Change this to your desired green color -->
+
 
 
     <integer-array name="myColors">
@@ -40,6 +47,7 @@
         <item>@color/black</item>
         <item>@color/cool_blue</item>
         <item>@color/purple_500</item>
+
     </integer-array>
 
 </resources>

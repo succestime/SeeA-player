@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#011B29"
+    android:id="@+id/PlayerMusicLayout"
     android:orientation="vertical"
     tools:context=".PlayerMusicActivity">
 
@@ -28,7 +28,6 @@
             android:layout_marginStart="20dp"
             android:layout_gravity="center"
             android:contentDescription="@string/back_btn"
-            app:tint="@color/white"
             android:padding="10dp" />
 
         <TextView
@@ -135,7 +134,6 @@
             android:id="@+id/tvSeekBarStart"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textColor="?colorOnPrimary"
             android:textSize="15sp"
             android:text="@string/start_tv"
             android:gravity="center"/>
@@ -152,7 +150,6 @@
             android:id="@+id/tvSeekBarEnd"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textColor="?colorOnPrimary"
             android:textSize="15sp"
             android:text="@string/end_tv"
             android:gravity="center"/>

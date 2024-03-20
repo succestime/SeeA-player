@@ -29,7 +29,6 @@
         android:layout_width="wrap_content"
         android:layout_height="38dp"
         android:text="Song Name "
-        android:textColor="@color/white"
         android:layout_toEndOf="@+id/musicViewImage"
         android:layout_marginStart="5dp"/>
 
@@ -38,7 +37,6 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:text="Song Album "
-        android:textColor="#F5F5F5"
         android:layout_marginStart="5dp"/>
 
     </LinearLayout>
@@ -46,7 +44,6 @@
         android:id="@+id/MoreChoose"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:tint="@color/white"
         android:src="@drawable/ic_more_icon"
         android:layout_marginVertical="15dp"
         android:layout_marginEnd="3dp"

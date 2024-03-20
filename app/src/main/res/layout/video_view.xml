@@ -81,7 +81,6 @@
             android:text="video title"
             android:gravity="center_vertical"
             android:maxLines="2"
-            android:textColor="@color/white"
             android:layout_gravity="center_vertical"/>
 
         <TextView
@@ -102,7 +101,6 @@
         android:layout_width="25dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
-        android:tint="@color/white"
         android:layout_marginVertical="15dp"
         android:layout_marginStart="3dp"
         android:layout_marginTop="16dp"

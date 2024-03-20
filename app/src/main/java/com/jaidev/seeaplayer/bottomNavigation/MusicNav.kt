@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.MainActivity.Companion.MusicListMA
 import com.jaidev.seeaplayer.MainActivity.Companion.musicListSearch
 import com.jaidev.seeaplayer.MainActivity.Companion.search
@@ -24,6 +25,7 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
 
     private lateinit var binding: FragmentMusicNavBinding
     lateinit var adapter: MusicAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,9 +82,28 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
             startActivity(Intent(requireContext(), PlaylistActivity::class.java))
         }
 
+        swipeRefreshLayout = binding.swipeRefreshMusic
+
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
+
+
         return view
     }
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
 
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun refreshMusic() {

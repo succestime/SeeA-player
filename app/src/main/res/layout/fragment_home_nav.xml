@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-  android:background="#012030"
     android:id="@+id/swipeRefreshFolder"
     tools:context=".bottomNavigation.homeNav">
 
@@ -27,8 +26,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Music"
-                android:backgroundTint="#424242"
-                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -36,8 +33,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Playlist"
-                android:backgroundTint="#424242"
-                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -45,8 +40,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Theme"
-                android:backgroundTint="#424242"
-                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -54,8 +47,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Link Tube"
-                android:backgroundTint="#424242"
-                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <com.google.android.material.chip.Chip
@@ -63,8 +54,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Downloads"
-                android:backgroundTint="#424242"
-                android:textColor="@color/white"
                 android:textStyle="bold"/>
         </com.google.android.material.chip.ChipGroup>
 
@@ -111,9 +100,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="80dp"
             android:text="@string/total_folders"
-            android:textColor="@color/white"
             android:textSize="15sp"
-
             android:textStyle="bold"
             app:layout_constraintHorizontal_bias="0.043"
             app:layout_constraintStart_toStartOf="parent"
@@ -159,8 +146,6 @@
         android:layout_height="wrap_content"
         app:menu="@menu/bottom_items"
         app:itemIconTint="@color/cool_blue"
-        app:itemTextColor="@color/white"
-        android:backgroundTint="@color/white"
         app:itemActiveIndicatorStyle="@color/light_gray"
 
         />

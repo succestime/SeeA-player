@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -10,11 +9,5 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
 
-<!--    <item-->
-<!--        android:id="@+id/account_circle"-->
-<!--        android:title="User Account"-->
 
-<!--        android:icon="@drawable/sharp_account_circle_24"-->
-<!--        app:actionViewClass="androidx.appcompat.widget.SearchView"-->
-<!--        app:showAsAction="ifRoom|collapseActionView" />-->
 </menu>

@@ -11,9 +11,11 @@ import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityFoldersBinding
@@ -23,6 +25,8 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     private lateinit var binding: ActivityFoldersBinding
     private lateinit var adapter: VideoAdapter
     private var isSearchViewClicked = false
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     companion object {
         lateinit var currentFolderVideos: ArrayList<VideoData>
     }
@@ -76,10 +80,27 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
         binding.searchBackBtn.setOnClickListener {
             binding.recyclerView.visibility = View.GONE
         }
+        setActionBarGradient()
+        swipeRefreshLayout = binding.swipeRefreshFolder
 
-
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
     }
 
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onVideoDeleted() {
@@ -237,6 +258,19 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
         onBackPressed()
         return true
     }
-
+    private fun setActionBarGradient() {
+        // Check if light mode is applied
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Set gradient background for action bar
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@FoldersActivity,
+                        R.drawable.background_actionbar_light
+                    )
+                )
+            }
+        }
+    }
 
 }

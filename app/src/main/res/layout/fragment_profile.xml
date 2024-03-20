@@ -52,7 +52,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/textView6"
+                        android:id="@+id/userName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
@@ -65,15 +65,15 @@
                         app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
                     <TextView
-                        android:id="@+id/textView7"
+                        android:id="@+id/userEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TextView"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        app:layout_constraintEnd_toEndOf="@+id/textView6"
-                        app:layout_constraintStart_toStartOf="@+id/textView6"
-                        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+                        app:layout_constraintEnd_toEndOf="@+id/userName"
+                        app:layout_constraintStart_toStartOf="@+id/userName"
+                        app:layout_constraintTop_toBottomOf="@+id/userName" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -87,7 +87,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView7">
+                        app:layout_constraintTop_toBottomOf="@+id/userEmail">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -100,16 +100,19 @@
                                 android:orientation="vertical">
 
                                 <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/theme_fragment"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content">
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/profile_circle_background"
+
+                                    android:layout_margin="40dp">
 
                                     <ImageView
                                         android:id="@+id/imageView3"
                                         android:layout_width="60dp"
                                         android:layout_height="60dp"
                                         android:layout_margin="12dp"
-                                        android:background="@drawable/profile_circle_background"
-                                        android:src="@drawable/rupee_currency"
+                                        android:src="@drawable/theme_svgrepo_com"
                                         app:layout_constraintBottom_toBottomOf="parent"
                                         app:layout_constraintEnd_toEndOf="parent"
                                         app:layout_constraintHorizontal_bias="0.0"
@@ -121,11 +124,16 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:gravity="center"
-                                        android:text="Plane"
-                                        android:textColor="@color/white"
-                                        app:layout_constraintEnd_toEndOf="@+id/imageView3"
-                                        app:layout_constraintStart_toStartOf="@+id/imageView3"
-                                        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+                                        android:text="Theme"
+                                        android:textStyle="bold"
+                                        android:textSize="20dp"
+                                        android:layout_margin="30dp"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintHorizontal_bias="0.029"
+                                        app:layout_constraintStart_toEndOf="@+id/imageView3"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        app:layout_constraintVertical_bias="0.507" />
                                 </androidx.constraintlayout.widget.ConstraintLayout>
                             </LinearLayout>
                         </LinearLayout>

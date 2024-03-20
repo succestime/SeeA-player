@@ -28,6 +28,9 @@ import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.ActivityPlayerMusicBinding
 
 class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer.OnCompletionListener {
+
+    private lateinit var playerMusicLayout: LinearLayout
+
     companion object {
         private const val CHECK_INTERVAL = 5000L // Check every 5 seconds
 
@@ -154,9 +157,27 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
             }
         }
+
+        playerMusicLayout = binding.PlayerMusicLayout
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setMusicLayoutBackgroundColor()
+
     }
 
+    private fun   setMusicLayoutBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
 
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            playerMusicLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            playerMusicLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
 
     private fun initializeLayout() {
         songPosition = intent.getIntExtra("index", 0)

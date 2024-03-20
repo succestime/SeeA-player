@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.MainActivity.Companion.videoRecantList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.RecentVideoAdapter
@@ -27,8 +28,9 @@ import java.util.concurrent.TimeUnit
 class DaysDownload : Fragment() {
     private lateinit var binding: FragmentDaysDownloadBinding
     lateinit var adapter: RecentVideoAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
-
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -71,10 +73,28 @@ class DaysDownload : Fragment() {
         }, 2000) // 2000 milliseconds (2 seconds)
 
 
+        swipeRefreshLayout = binding.swipeRefreshVideo
+
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
         return view
     }
 
 
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
     @SuppressLint("SetTextI18n")
     private fun loadRecentVideos(){
         val recantVideos = getAllRecantVideos(requireContext())

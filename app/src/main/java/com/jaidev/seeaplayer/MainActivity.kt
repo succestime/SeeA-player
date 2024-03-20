@@ -26,7 +26,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -48,7 +50,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var adapter: VideoAdapter
     private  var runnable : Runnable? = null
-    //private lateinit var navController : NavController
+    private lateinit var drawerLayout: DrawerLayout
+    private var checkedItem: Int = 0
+    private var selected: String = ""
+    private val CHECKED_ITEM = "checked_item"
+    private lateinit var navController : NavController
     companion object {
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
@@ -83,6 +89,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        setTheme(More.themesList[More.themeIndex])
+        val sharedPreferences = this.getSharedPreferences("themes", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.apply()
+
+        // Apply the selected theme
+        when (getCheckedItem()) {
+            0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -93,16 +110,21 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
 
-
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
+
+
 
         supportActionBar?.apply {
 
             setBackgroundDrawable(ContextCompat.getDrawable(this@MainActivity, R.drawable.background_actionbar))
         }
 
+        setActionBarGradient()
+        drawerLayout = binding.drawerLayoutMA
 
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setDrawerLayoutBackgroundColor()
         // Set the title for the action bar
         supportActionBar?.title = "SeeA Player"
 
@@ -286,6 +308,26 @@ class MainActivity : AppCompatActivity() {
 //        navController = findNavController(R.id.navHostFragmentContainerView)
 //        return navController.navigateUp() || super.onSupportNavigateUp()
 //    }
+
+    private fun getCheckedItem(): Int {
+        return this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
+            .getInt(CHECKED_ITEM, checkedItem)
+    }
+
+    private fun setDrawerLayoutBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            drawerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            drawerLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
     private fun shouldStartService(): Boolean {
         val lastScanTime = getLastScanTime()
         val currentTime = System.currentTimeMillis()
@@ -405,6 +447,7 @@ class MainActivity : AppCompatActivity() {
         // Find the item you want to hide
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
 
+
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
             // Handle the click event here
             when (item.itemId) {
@@ -439,9 +482,16 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
+
+
                 else -> false
             }
         }
+
+
+
+
+
 
 //        // Find the account item and handle its click event
 //        menuInflater.inflate(R.menu.search_view_menu, menu)
@@ -466,14 +516,16 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         if (toggle.onOptionsItemSelected(item))
             return true
 
 
-        return super.onOptionsItemSelected(item)
-    }
+            // Handle other menu items if needed
+             return super.onOptionsItemSelected(item)
+        }
+
 
     @SuppressLint("Range")
     fun getAllVideos(): ArrayList<VideoData> {
@@ -639,12 +691,27 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     override fun onDestroy() {
         super.onDestroy()
         if (!PlayerMusicActivity.isPlaying && PlayerMusicActivity.musicService != null) {
             exitApplication()
         }
 
+    }
+    private fun setActionBarGradient() {
+        // Check if light mode is applied
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Set gradient background for action bar
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@MainActivity,
+                        R.drawable.background_actionbar_light
+                    )
+                )
+            }
+        }
     }
 
 

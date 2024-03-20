@@ -3,7 +3,6 @@ package com.jaidev.seeaplayer.bottomNavigation
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -16,12 +15,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.FoldersAdapter
 import com.jaidev.seeaplayer.LinkTubeActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.VideoAdapter
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
+import com.jaidev.seeaplayer.profile
 
 class homeNav : Fragment() {
     lateinit var adapter: VideoAdapter
@@ -30,11 +31,11 @@ class homeNav : Fragment() {
     private lateinit var binding: FragmentHomeNavBinding
     private var isSearchViewClicked = false
     private lateinit var searchView: SearchView
-
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        requireActivity().setTheme(R.style.coolBlueNav)
+
 
     }
 
@@ -68,6 +69,7 @@ class homeNav : Fragment() {
             binding.searchRecyclerView.visibility = View.GONE
         }
 
+
         binding.chip5.setOnClickListener {
             val alertDialogBuilder = AlertDialog.Builder(requireContext())
             val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
@@ -100,13 +102,32 @@ class homeNav : Fragment() {
             val intent = Intent(requireContext(), LinkTubeActivity::class.java)
             startActivity(intent)
         }
-//        binding.chip.setOnClickListener {
-//           it.findNavController().navigate(R.id.action_homeNav_to_daysDownload)
-//        }
-//        binding.chip5.setOnClickListener {
-//           it.findNavController().navigate(R.id.action_homeNav_to_musicNav)
-//        }
+
+
+        swipeRefreshLayout = binding.swipeRefreshFolder
+
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
+
+
+
         return binding.root
+    }
+
+
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -118,11 +139,13 @@ class homeNav : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_view_menu, menu)
         val searchItem = menu.findItem(R.id.searchView)
-        searchView = searchItem?.actionView as SearchView
 
-
-        val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
-        searchIcon.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.white), PorterDuff.Mode.SRC_ATOP)
+       searchView = searchItem?.actionView as SearchView
+        inflater.inflate(R.menu.account_circle, menu)
+       //  Find the item you want to hide
+       val account_image = menu.findItem(R.id.account_circle)
+//        val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
+//        searchIcon.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.white), PorterDuff.Mode.SRC_ATOP)
         // Set an expand listener to track whether the search view is explicitly clicked
         searchView.setOnSearchClickListener {
             isSearchViewClicked = true
@@ -162,25 +185,31 @@ class homeNav : Fragment() {
             }
         })
 
-//        // Find the account item and handle its click event
-//        val accountItem = menu.findItem(R.id.account_circle)
-//        accountItem.setOnMenuItemClickListener { menuItem ->
-//            when (menuItem.itemId) {
-//                R.id.account_circle -> {
-//
-//                    val fragmentManager = requireActivity().supportFragmentManager // Local variable declaration
-//                    val fragment = profile() // Replace YourFragment() with the fragment you want to open
-//                    fragmentManager.beginTransaction()
-//                        .replace(R.id.frameLayout, fragment)
-//                        .addToBackStack(null) // This line allows the user to navigate back to the previous fragment
-//                        .commit()
-//                    true
-//                }
-//                else -> false
-//            }
-//        }
+
+        account_image.setOnMenuItemClickListener {item ->
+            // Handle the click event here
+            when (item.itemId) {
+                R.id.account_circle -> {
+                    // Open the profile fragment
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    val fragment = profile() // Replace `profile()` with the fragment you want to open
+                    fragmentManager.beginTransaction()
+                        .replace(R.id.frameLayout, fragment)
+                        .addToBackStack(null) // Allow the user to navigate back to the previous fragment
+                        .commit()
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+
+
         super.onCreateOptionsMenu(menu, inflater)
     }
+
+
 
 
 

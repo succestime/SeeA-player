@@ -5,13 +5,11 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshMusic"
-
     tools:context=".musicNav">
 
    <androidx.constraintlayout.widget.ConstraintLayout
        android:layout_width="match_parent"
        android:layout_height="match_parent"
-       android:background="#012030"
        tools:ignore="ExtraText">
 
        <LinearLayout
@@ -34,10 +32,10 @@
                    android:layout_weight="1"
                    android:contentDescription="@string/shuffle_btn"
                    android:drawableTop="@drawable/shuffle_icon"
-                   android:drawableTint="@color/white"
+
                    android:text="@string/shuffle_btn"
                    android:textAllCaps="false"
-                   android:textColor="@color/white" />
+            />
 
                <Button
 

@@ -117,4 +117,11 @@
 
     <string name="client_id">338471719238-qq2m11b9538i70gduokf68apssqjd9lq.apps.googleusercontent.com</string>
 
+    <string-array name="theme">
+
+        <item>System Default</item>
+        <item>Dark</item>
+        <item>Light</item>
+
+    </string-array>
 </resources>

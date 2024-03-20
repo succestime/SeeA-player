@@ -98,7 +98,6 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/settings_btn"
         android:src="@drawable/search_setting"
-        app:backgroundTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.9"
