@@ -28,7 +28,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -54,7 +53,6 @@ class MainActivity : AppCompatActivity() {
     private var checkedItem: Int = 0
     private var selected: String = ""
     private val CHECKED_ITEM = "checked_item"
-    private lateinit var navController : NavController
     companion object {
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
@@ -88,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SuspiciousIndentation", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setTheme(More.themesList[More.themeIndex])
         val sharedPreferences = this.getSharedPreferences("themes", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.apply()
@@ -304,11 +301,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    //    override fun onSupportNavigateUp(): Boolean {
-//        navController = findNavController(R.id.navHostFragmentContainerView)
-//        return navController.navigateUp() || super.onSupportNavigateUp()
-//    }
-
     private fun getCheckedItem(): Int {
         return this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
             .getInt(CHECKED_ITEM, checkedItem)
@@ -446,8 +438,6 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.sort_view, menu)
         // Find the item you want to hide
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
-
-
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
             // Handle the click event here
             when (item.itemId) {
@@ -487,31 +477,6 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-
-
-
-
-
-//        // Find the account item and handle its click event
-//        menuInflater.inflate(R.menu.search_view_menu, menu)
-//        val accountItem = menu.findItem(R.id.account_circle)
-//        accountItem.setOnMenuItemClickListener { menuItem ->
-//            when (menuItem.itemId) {
-//                R.id.account_circle -> {
-//                    // Handle click on account icon
-//                    // Open your desired fragment here
-//                    val fragmentManager = supportFragmentManager // Local variable declaration
-//                    val fragment = SinIn_Fragment() // Replace YourFragment() with the fragment you want to open
-//                    fragmentManager.beginTransaction()
-//                        .replace(R.id.frameLayout, fragment)
-//                        .addToBackStack(null) // This line allows the user to navigate back to the previous fragment
-//                        .commit()
-//                    true
-//                }
-//                else -> false
-//            }
-//        }
 
         return true
     }

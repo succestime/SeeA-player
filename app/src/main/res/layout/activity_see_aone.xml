@@ -40,9 +40,9 @@ android:id="@+id/SeeAeduActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:text="SeeA"
+                android:text="@string/seeA"
                 android:textColor="@color/white"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textStyle="italic"
 
                 android:paddingTop="20dp"
@@ -57,9 +57,9 @@ android:id="@+id/SeeAeduActivity"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="2dp"
-                android:text="Edu."
+                android:text="@string/edu"
                 android:textColor="#FFCF00"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textStyle="bold"
                 android:paddingTop="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -73,32 +73,26 @@ android:id="@+id/SeeAeduActivity"
                 android:id="@+id/onehundradforthynine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="520dp"
-                android:text="₹140"
+                android:layout_marginStart="480dp"
+                android:text="@string/_299"
                 android:layout_marginTop="2dp"
                 android:textColor="@color/white"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textStyle="bold"
                 android:paddingTop="20dp"
                 app:layout_constraintStart_toEndOf="@+id/textView11"
-
                 tools:ignore="MissingConstraints" />
 
             <TextView
                 android:id="@+id/yeartext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="/ year"
+                android:text="@string/year"
                 android:paddingTop="20dp"
-
                 android:textColor="@color/white"
                 android:layout_marginTop="10dp"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-
-
-
-
                 app:layout_constraintStart_toEndOf="@+id/onehundradforthynine"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -123,12 +117,10 @@ android:id="@+id/SeeAeduActivity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-
-                    android:text="SeeA"
+                    android:text="@string/seeA_2"
                     android:textColor="@color/white"
-                    android:textSize="30dp"
+                    android:textSize="30sp"
                     android:textStyle="italic"
-
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -139,9 +131,9 @@ android:id="@+id/SeeAeduActivity"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="2dp"
-                    android:text="1NE"
+                    android:text="@string/_1ne_2"
                     android:textColor="#FFCF00"
-                    android:textSize="30dp"
+                    android:textSize="30sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -184,7 +176,7 @@ android:id="@+id/SeeAeduActivity"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="25dp"
                         android:textColor="@color/white"
-                        android:text="Best for users who like to play video and music on mobile and tablet"
+                        android:text="@string/best_for_users_who_like_to_play_video_and_music_on_mobile_and_tablet"
                         android:textSize="15sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -218,12 +210,13 @@ android:id="@+id/SeeAeduActivity"
                     app:layout_constraintBottom_toBottomOf="parent"
 
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="RtlSymmetry">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Monthly\n₹19"
+                        android:text="@string/monthly_n_15"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
 
@@ -255,13 +248,14 @@ android:id="@+id/SeeAeduActivity"
                     app:layout_constraintBottom_toBottomOf="parent"
 
                     app:layout_constraintStart_toEndOf="@+id/monthlyBox"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="RtlSymmetry">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:text="Quarterly\n₹75"
+                        android:text="@string/quarterly_n_75"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
 
@@ -290,13 +284,14 @@ android:id="@+id/SeeAeduActivity"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/quarterly_Box"
 
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="RtlSymmetry">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:text="Annual\n₹149"
+                        android:text="@string/annual_n_149"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
                     <ImageView
@@ -322,9 +317,9 @@ android:id="@+id/SeeAeduActivity"
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="or"
+                android:text="@string/or"
                 android:textColor="@color/red"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:layout_gravity="center"/>
         </androidx.cardview.widget.CardView>
         <RelativeLayout
@@ -366,10 +361,10 @@ android:id="@+id/SeeAeduActivity"
                 android:layout_marginEnd="40dp"
                 android:layout_toEndOf="@+id/imageView6"
                 android:gravity="center_vertical"
-                android:hint=" Apply SeeA1NE Membership code"
+                android:hint="@string/apply_seea1ne_membership_code"
                 android:textColorHint="@color/white"
                 android:textColor="@color/white"
-                android:textSize="20dp" />
+                android:textSize="15sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -386,7 +381,7 @@ android:id="@+id/SeeAeduActivity"
             android:id="@+id/subscribe_btn"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:text="Subscribe Now"
+            android:text="@string/seea_subscribe_now"
             android:paddingBottom="10dp"
             android:backgroundTint="#E3B52A"
             android:layout_marginEnd="30dp"

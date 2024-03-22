@@ -33,7 +33,6 @@ class DaysMusic : Fragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        requireContext().theme.applyStyle(More.themesList[More.themeIndex], true)
    val view =  inflater.inflate(R.layout.fragment_days_music, container, false)
         binding = FragmentDaysMusicBinding.bind(view)
        binding.MusicRV.setHasFixedSize(true)
@@ -54,9 +53,7 @@ class DaysMusic : Fragment() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             loadRecentMusics()
         } else {
-//            if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//                // Show rationale if needed
-//            }
+
             requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
 
@@ -100,7 +97,6 @@ class DaysMusic : Fragment() {
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun loadRecentMusics() {

@@ -33,11 +33,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:textColor="@color/white"
             android:text="@string/world_of_music"
             android:textSize="20sp"
             android:gravity="center"
-
             tools:ignore="NestedWeights"
             android:layout_weight="1"
             android:textStyle="bold"/>
@@ -75,7 +73,6 @@
         android:layout_marginHorizontal="20dp"
         android:text="@string/song_name"
         android:textSize="18sp"
-        android:textColor="@color/white"
         android:gravity="center"
 
 

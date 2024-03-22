@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -17,6 +20,7 @@ import com.jaidev.seeaplayer.databinding.ActivityPlatylistDetailsBinding
 class PlaylistDetails : AppCompatActivity() {
     lateinit var binding: ActivityPlatylistDetailsBinding
     lateinit var adapter: MusicAdapter
+    private lateinit var playlistdetailsLayout: ConstraintLayout
 
     companion object {
         var currentPlaylistPos: Int = -1
@@ -25,7 +29,7 @@ class PlaylistDetails : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.coolBlueNav)
-        supportActionBar?.hide()
+        supportActionBar?.title = "Playlist Album"
         binding = ActivityPlatylistDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         currentPlaylistPos = intent.extras?.get("index") as Int
@@ -36,7 +40,6 @@ class PlaylistDetails : AppCompatActivity() {
         binding.playlistDetailsRV.layoutManager = LinearLayoutManager(this,)
         adapter = MusicAdapter(this, PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist,  playlistDetails = true)
         binding.playlistDetailsRV.adapter = adapter
-binding.backBtnPD.setOnClickListener { finish() }
 
         binding.shuffleBtnPD.setOnClickListener {
             val intent = Intent(this, PlayerMusicActivity::class.java)
@@ -66,16 +69,56 @@ binding.removeAllPD.setOnClickListener {
     customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
     customDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.GREEN)
 
+         }
+
+        supportActionBar?.apply {
+            setBackgroundDrawable(
+                ContextCompat.getDrawable(
+                    this@PlaylistDetails,
+                    R.drawable.background_actionbar
+                )
+            )
+        }
+        setActionBarGradient()
+        playlistdetailsLayout = binding.playlistDetailsLayout
+
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
 }
-}
 
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
 
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            playlistdetailsLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            playlistdetailsLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
 
+    private fun setActionBarGradient() {
+        // Check if light mode is applied
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Set gradient background for action bar
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@PlaylistDetails,
+                        R.drawable.background_actionbar_light
+                    )
+                )
+            }
+        }
+    }
 
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
-        binding.playlistNamePD.text = PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].name
         binding.moreInfoPD.text = "Total ${adapter.itemCount} Songs.\n\n" +
                 "Created On: ${PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].createdOn}\n\n" +
                 "  -- ${PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].createdBy}"

@@ -4,22 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/allBookmarkLayout"
     tools:context=".BookmarkActivity">
-
-    <TextView
-        android:id="@+id/allBookmarks"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:singleLine="true"
-        android:text="@string/all_bookmarks"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/cool_blue"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBookmarks"
@@ -28,5 +14,5 @@
         android:layout_margin="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/allBookmarks" />
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -458,14 +458,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                             MediaScannerConnection.scanFile(context, arrayOf(newFile.toString()),
                                 arrayOf("video/*"), null)
                             when {
-//                                MainActivity.search -> {
-//                                    MainActivity.searchList[position].title = newName.toString()
-//                                    MainActivity.searchList[position].path = newFile.path
-//                                    MainActivity.searchList[position].artUri = Uri.fromFile(newFile)
-//                                    MainActivity.dataChanged = true
-//                                    videoDeleteListener?.onVideoDeleted()
-//                                    notifyItemChanged(position)
-//                                }
+
                                 isFolder -> {
                                     FoldersActivity.currentFolderVideos[position].title = newName.toString()
                                     FoldersActivity.currentFolderVideos[position].path = newFile.path

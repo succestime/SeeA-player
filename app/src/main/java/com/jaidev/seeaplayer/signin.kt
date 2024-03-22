@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivitySigninBinding
 
 class signin : AppCompatActivity() {
@@ -42,9 +43,9 @@ class signin : AppCompatActivity() {
             val password = binding.passwordResister.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty() && name.isNotEmpty()) {
-                More.auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { createUserTask ->
+                moreNav.auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { createUserTask ->
                         if (createUserTask.isSuccessful) {
-                            val user = More.auth.currentUser
+                            val user = moreNav.auth.currentUser
                             val profileUpdates = UserProfileChangeRequest.Builder()
                                 .setDisplayName(name)
                                 .build()
@@ -90,7 +91,7 @@ class signin : AppCompatActivity() {
     }
 private fun firebaseAuthWithGoogle(idToken : String){
     val credential = GoogleAuthProvider.getCredential(idToken , null)
-    More.auth.signInWithCredential(credential)
+    moreNav.auth.signInWithCredential(credential)
         .addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
                 startActivity(Intent(this , MainActivity::class.java))

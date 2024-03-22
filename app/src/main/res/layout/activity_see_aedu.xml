@@ -7,11 +7,11 @@
     android:background="@color/black"
     tools:context=".SeeAEdu">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
 
         <ImageView
             android:id="@+id/seeA_edu"
@@ -40,9 +40,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:text="SeeA"
+                android:text="@string/seea_edus_seea"
                 android:textColor="@color/white"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textStyle="italic"
 
                 android:paddingTop="20dp"
@@ -57,9 +57,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="2dp"
-                android:text="1NE"
+                android:text="@string/seeaedu_1ne"
                 android:textColor="#FFCF00"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textStyle="bold"
                 android:paddingTop="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -73,11 +73,11 @@
                 android:id="@+id/onehundradforthynine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="520dp"
-                android:text="₹140"
+                android:layout_marginStart="480dp"
+                android:text="@string/_140"
                 android:layout_marginTop="2dp"
                 android:textColor="@color/white"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textStyle="bold"
                 android:paddingTop="20dp"
                 app:layout_constraintStart_toEndOf="@+id/textView11"
@@ -88,12 +88,12 @@
                 android:id="@+id/yeartext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="/ year"
+                android:text="@string/seeaedu_year"
                 android:paddingTop="20dp"
 
                 android:textColor="@color/white"
                 android:layout_marginTop="10dp"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:textStyle="bold"
 
 
@@ -106,16 +106,18 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/seeAEdu"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="400dp"
+
 
             >
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
 
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="400dp"
                 android:background="#616060"
-                >
+              >
 
 
                 <TextView
@@ -123,12 +125,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-
-                    android:text="SeeA"
+                    android:layout_marginBottom="100dp"
+                    android:text="@string/seeaedu_seea"
                     android:textColor="@color/white"
-                    android:textSize="30dp"
+                    android:textSize="30sp"
                     android:textStyle="italic"
-
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -139,9 +140,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="2dp"
-                    android:text="Edu."
+                    android:layout_marginBottom="100dp"
+                    android:text="@string/seeaedu_edu"
                     android:textColor="#FFCF00"
-                    android:textSize="30dp"
+                    android:textSize="30sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -151,16 +153,34 @@
                     app:layout_constraintVertical_bias="0.1" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="170dp"
+              android:layout_marginEnd="5dp"
+              android:layout_marginStart="5dp"
 
 
+                />
 
+            <me.relex.circleindicator.CircleIndicator3
+                android:id="@+id/dotIndictor"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginTop="160dp"
+                android:padding="16dp"
+                android:visibility="visible"
+                />
 
             <androidx.cardview.widget.CardView
 
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:layout_marginTop="80dp"
                 app:cardCornerRadius="20dp"
                 app:cardBackgroundColor="#214D97">
@@ -175,17 +195,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="30dp"
+                        android:layout_marginStart="10dp"
                         android:src="@drawable/search_link_tube" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="25dp"
+                        android:layout_marginStart="15dp"
                         android:textColor="@color/white"
-                        android:text="Best for those who wants to provide SeeA Player in group , a institute , or want to add in any course
-"
+                        android:text="@string/best_for_those_who_wants_to_provide_seea_player_in_group_a_institute_or_want_to_add_in_any_course"
                         android:textSize="15sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -194,125 +213,26 @@
             </androidx.cardview.widget.CardView>
 
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
 
-                >
-
-                <LinearLayout
-                    android:id="@+id/monthlyBox"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/square_box_bg_selector"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="horizontal"
-                    android:paddingBottom="10dp"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-
-                    android:layout_marginTop="150dp"
-                    android:layout_marginStart="50dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Monthly\n₹19"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp" />
-
-                    <ImageView
-                        android:id="@+id/monthly_select"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:layout_marginStart="5dp"
-                        android:visibility="gone"
-                        android:src="@drawable/complete_svgrepo_com"/>
-
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/quarterly_Box"
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="150dp"
-                    android:background="@drawable/square_box_bg_selector"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="horizontal"
-                    android:paddingBottom="10dp"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-
-                    app:layout_constraintStart_toEndOf="@+id/monthlyBox"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:text="Quarterly\n₹75"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp" />
-
-                    <ImageView
-                        android:id="@+id/quarterly_select"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:layout_marginStart="5dp"
-                        android:visibility="gone"
-                        android:src="@drawable/complete_svgrepo_com"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/annual_Box"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="150dp"
-                    android:background="@drawable/square_box_bg_selector"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="horizontal"
-                    android:paddingBottom="10dp"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/quarterly_Box"
-
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:text="Annual\n₹149"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp" />
-                    <ImageView
-                        android:id="@+id/annual_select"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:layout_marginStart="15dp"
-                        android:visibility="gone"
-                        android:src="@drawable/complete_svgrepo_com"/>
-                </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
 
-
-
+        <Button
+            android:id="@+id/subscribe_btn"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:paddingBottom="10dp"
+            android:backgroundTint="#E3B52A"
+            android:layout_marginEnd="30dp"
+            android:layout_marginStart="30dp"
+            android:text="@string/start_process"
+            android:layout_marginTop="150dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </LinearLayout>
+
+
+
 
 </LinearLayout>

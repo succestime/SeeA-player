@@ -35,6 +35,7 @@ class SeeAOne : AppCompatActivity() {
 
         binding.SeeAeduActivity.setOnClickListener {
             startActivity(Intent(this, SeeAEdu::class.java))
+            finish()
         }
     }
 

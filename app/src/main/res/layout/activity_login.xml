@@ -25,7 +25,7 @@
         android:layout_marginTop="92dp"
         android:background="@drawable/curver"
         android:ems="10"
-        android:hint="Enter your Email"
+        android:hint="@string/enter_your_email"
         android:textColorHint="@color/gray"
         android:textColor="@color/white"
         android:inputType="text"
@@ -35,7 +35,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.479"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/passwordLogin"
@@ -46,16 +47,16 @@
         android:layout_marginEnd="40dp"
         android:background="@drawable/curver"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/password"
         android:inputType="text"
-        android:paddingStart="5dp"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textColorHint="@color/gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.479"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/emailLogin"
+        tools:ignore="TextFields" />
 
     <Button
         android:id="@+id/loginBtn"
@@ -65,7 +66,7 @@
         android:layout_marginTop="76dp"
         android:layout_marginRight="100dp"
         android:background="@drawable/curver"
-        android:text="Login"
+        android:text="@string/login"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/passwordLogin"
         app:layout_constraintStart_toStartOf="@+id/passwordLogin"
@@ -78,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="264dp"
         android:layout_marginTop="204dp"
-        android:text=" If you want to SinIn by another ID  click hare "
+        android:text="@string/if_you_want_to_sinin_by_another_id_click_hare"
         android:textColor="@color/gray"
 
         android:textStyle="italic"
@@ -90,7 +91,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="204dp"
-        android:text="SignIn ?"
+        android:text="@string/signin"
         android:textColor="@color/cool_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.01"

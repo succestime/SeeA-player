@@ -24,7 +24,7 @@
         android:layout_marginTop="80dp"
         android:background="@drawable/curver"
         android:ems="10"
-        android:hint="UserName"
+        android:hint="@string/username"
         android:textColorHint="@color/gray"
         android:textColor="@color/white"
         android:inputType="text"
@@ -44,7 +44,7 @@
         android:layout_marginTop="80dp"
         android:background="@drawable/curver"
         android:ems="10"
-        android:hint="Enter your Email"
+        android:hint="@string/enter_your_signin_email"
         android:textColorHint="@color/gray"
         android:textColor="@color/white"
         android:inputType="text"
@@ -54,7 +54,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.479"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userName" />
+        app:layout_constraintTop_toBottomOf="@+id/userName"
+        tools:ignore="TextFields"
+        android:autofillHints="@string/enter_your_signin_email" />
 
     <EditText
         android:id="@+id/passwordResister"
@@ -65,16 +67,17 @@
         android:layout_marginEnd="40dp"
         android:background="@drawable/curver"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/signIn_password"
         android:inputType="text"
-        android:paddingStart="5dp"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textColorHint="@color/gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.479"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailResister" />
+        app:layout_constraintTop_toBottomOf="@+id/emailResister"
+        tools:ignore="TextFields"
+        android:autofillHints="@string/signIn_password" />
 
     <Button
         android:id="@+id/createAccountBtn"
@@ -84,7 +87,7 @@
         android:layout_marginTop="76dp"
         android:layout_marginRight="100dp"
         android:background="@drawable/curver"
-        android:text="SignIn"
+        android:text="@string/activity_signin"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/passwordResister"
         app:layout_constraintStart_toStartOf="@+id/passwordResister"
@@ -97,7 +100,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="324dp"
         android:layout_marginTop="204dp"
-        android:text="Already LogIn chick here"
+        android:text="@string/already_login_chick_here"
         android:textColor="@color/gray"
 
         android:textStyle="italic"
@@ -109,7 +112,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="204dp"
-        android:text="LogIN?"
+        android:text="@string/activity_signIn_login"
         android:textColor="@color/cool_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.01"

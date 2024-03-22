@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivityLoginBinding
 
 class login : AppCompatActivity() {
@@ -29,7 +30,7 @@ class login : AppCompatActivity() {
             val password = binding.passwordLogin.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty())
-              More.auth.signInWithEmailAndPassword(email , password).addOnCompleteListener {
+              moreNav.auth.signInWithEmailAndPassword(email , password).addOnCompleteListener {
                     if (it.isSuccessful){
                         startActivity(Intent(this,MainActivity::class.java))
                     }

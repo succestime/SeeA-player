@@ -44,9 +44,6 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
         val intent = Intent(baseContext, MainActivity::class.java)
         val contentIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
-//        val reIntent = Intent(baseContext, DaysMusic::class.java)
-//        val reContentIntent = PendingIntent.getActivity(this, 0, intent, 0)
-
         val prevIntent = Intent(
             baseContext,
             NotificationReceiver::class.java

@@ -249,9 +249,6 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
         if(PlayerActivity.position != -1) binding.nowPlayingBtn.visibility = View.VISIBLE
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged= false
-
-
-
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3"
         android:queryHint="@string/search"
-        android:background="@drawable/custom_brower_design"
+        android:background="@drawable/custom_brower_home"
         android:layout_marginHorizontal="24dp"
         android:iconifiedByDefault="false"/>
 

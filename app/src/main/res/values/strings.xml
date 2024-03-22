@@ -114,8 +114,58 @@
     <string name="link_tube">Link Tube</string>
     <string name="more">More</string>
 
+    // seeAEduProcess
+    <string name="item_label">Membership duration</string>
+    <string name="time_label">Membership days</string>
+    <string name="quantity_label"> Quantity Memberships</string>
+
 
     <string name="client_id">338471719238-qq2m11b9538i70gduokf68apssqjd9lq.apps.googleusercontent.com</string>
+    <string name="recant_videos">Recant Videos :</string>
+    <string name="recant_musics">Recant Musics :</string>
+    <string name="login_or_signin">Login or SignIn</string>
+    <string name="seea">SeeA</string>
+    <string name="_1ne">1NE</string>
+    <string name="be_the_member_of_seea_player">Be the member of SeeA Player</string>
+    <string name="subscribe_now">Subscribe Now</string>
+    <string name="app_theme">App Theme</string>
+    <string name="subscriptions_plan">Subscriptions Plan</string>
+    <string name="more_nav_settings">Settings</string>
+    <string name="my_subscriptions">My Subscriptions</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="enter_your_email">Enter your Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="if_you_want_to_sinin_by_another_id_click_hare">If you want to SinIn by another ID click hare</string>
+    <string name="signin">SignIn ?</string>
+    <string name="username">UserName</string>
+    <string name="enter_your_signin_email">Enter your Email</string>
+    <string name="signIn_password">Password</string>
+    <string name="activity_signin">SignIn</string>
+    <string name="already_login_chick_here">Already LogIn chick here</string>
+    <string name="activity_signIn_login">LogIN?</string>
+    <string name="seeA">SeeA</string>
+    <string name="edu">Edu.</string>
+    <string name="_140">₹ 140</string>
+    <string name="year"> / year</string>
+    <string name="seeA_2">SeeA</string>
+    <string name="_1ne_2">1NE</string>
+    <string name="best_for_users_who_like_to_play_video_and_music_on_mobile_and_tablet">Best for users who like to play video and music on mobile and tablet</string>
+    <string name="monthly_n_15">Monthly\n₹15</string>
+    <string name="quarterly_n_75">Quarterly\n₹75</string>
+    <string name="annual_n_149">Annual\n₹149</string>
+    <string name="or">or</string>
+    <string name="apply_seea1ne_membership_code">Apply SeeA1NE Membership code</string>
+    <string name="seea_subscribe_now">Subscribe Now</string>
+    <string name="seea_edus_seea">SeeA</string>
+    <string name="seeaedu_1ne">1NE</string>
+    <string name="_299">₹ 299</string>
+    <string name="seeaedu_year">  / year</string>
+    <string name="seeaedu_seea">SeeA</string>
+    <string name="seeaedu_edu">Edu.</string>
+    <string name="best_for_those_who_wants_to_provide_seea_player_in_group_a_institute_or_want_to_add_in_any_course">Best for those who wants to provide SeeA Player in group , a institute or want to add in any course .</string>
+    <string name="start_process">Start Process</string>
+
 
     <string-array name="theme">
 

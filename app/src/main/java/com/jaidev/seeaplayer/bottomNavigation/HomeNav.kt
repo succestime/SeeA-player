@@ -1,7 +1,7 @@
+
 package com.jaidev.seeaplayer.bottomNavigation
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,10 +9,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -22,11 +19,9 @@ import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.VideoAdapter
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
-import com.jaidev.seeaplayer.profile
 
 class homeNav : Fragment() {
     lateinit var adapter: VideoAdapter
-    private lateinit var currentFragment: Fragment
     private lateinit var foldersAdapter: FoldersAdapter
     private lateinit var binding: FragmentHomeNavBinding
     private var isSearchViewClicked = false
@@ -41,7 +36,6 @@ class homeNav : Fragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        requireContext().theme.applyStyle(More.themesList[More.themeIndex], true)
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
         adapter = VideoAdapter(requireContext(), MainActivity.videoList)
 
@@ -71,33 +65,8 @@ class homeNav : Fragment() {
 
 
         binding.chip5.setOnClickListener {
-            val alertDialogBuilder = AlertDialog.Builder(requireContext())
-            val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-
-            val deleteText = view.findViewById<TextView>(R.id.deleteText)
-            val cancelText = view.findViewById<TextView>(R.id.cancelText)
-            val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
-
-            // Set the delete text color to red
-            deleteText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-
-            // Set the cancel text color to black
-            cancelText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
-            alertDialogBuilder.setView(view)
-
-            val alertDialog = alertDialogBuilder.create()
-
-            deleteText.setOnClickListener {
-
-            }
-
-            cancelText.setOnClickListener {
-                // Handle cancel action here
-                alertDialog.dismiss()
-            }
-            alertDialog.show()
         }
+
         binding.chip2.setOnClickListener {
             val intent = Intent(requireContext(), LinkTubeActivity::class.java)
             startActivity(intent)
@@ -140,12 +109,8 @@ class homeNav : Fragment() {
         inflater.inflate(R.menu.search_view_menu, menu)
         val searchItem = menu.findItem(R.id.searchView)
 
-       searchView = searchItem?.actionView as SearchView
-        inflater.inflate(R.menu.account_circle, menu)
-       //  Find the item you want to hide
-       val account_image = menu.findItem(R.id.account_circle)
-//        val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
-//        searchIcon.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.white), PorterDuff.Mode.SRC_ATOP)
+        searchView = searchItem?.actionView as SearchView
+
         // Set an expand listener to track whether the search view is explicitly clicked
         searchView.setOnSearchClickListener {
             isSearchViewClicked = true
@@ -185,27 +150,6 @@ class homeNav : Fragment() {
             }
         })
 
-
-        account_image.setOnMenuItemClickListener {item ->
-            // Handle the click event here
-            when (item.itemId) {
-                R.id.account_circle -> {
-                    // Open the profile fragment
-                    val fragmentManager = requireActivity().supportFragmentManager
-                    val fragment = profile() // Replace `profile()` with the fragment you want to open
-                    fragmentManager.beginTransaction()
-                        .replace(R.id.frameLayout, fragment)
-                        .addToBackStack(null) // Allow the user to navigate back to the previous fragment
-                        .commit()
-                    true
-                }
-
-                else -> false
-            }
-        }
-
-
-
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -224,7 +168,5 @@ class homeNav : Fragment() {
             binding.searchRecyclerView.visibility = View.GONE
         }
     }
-
-
 
 }
