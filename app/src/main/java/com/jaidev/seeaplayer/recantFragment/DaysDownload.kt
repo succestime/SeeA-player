@@ -1,4 +1,5 @@
 
+
 package com.jaidev.seeaplayer.recantFragment
 
 import android.annotation.SuppressLint
@@ -43,7 +44,7 @@ class DaysDownload : Fragment() {
         binding.DownloadRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true)
         binding.DownloadRV.adapter = adapter
-        binding.daysTotalVideos.text = "Total Videos : 0"
+        binding.daysTotalVideos.text = "Recant Videos : 0"
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
                 if (isGranted) {
@@ -158,11 +159,5 @@ class DaysDownload : Fragment() {
         return recantVList
     }
 
-//    @SuppressLint("NotifyDataSetChanged")
-//    override fun onResume() {
-//        super.onResume()
-//        if (MainActivity.dataChanged) adapter.notifyDataSetChanged()
-//        MainActivity.dataChanged = false
-//    }
 
 }

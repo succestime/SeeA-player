@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.dataClass
 
 import android.media.MediaMetadataRetriever
@@ -10,7 +11,7 @@ import kotlin.system.exitProcess
 
 
 data class Music(val id : String, var title : String, val album : String,val artist : String, val duration : Long = 0 , var path : String,val size : String
-, var artUri : Uri, val albumId : String
+                 , var artUri : Uri, val albumId : String
 ) {
 
 }
@@ -28,7 +29,7 @@ class MusicPlaylist {
 fun formatDuration(duration: Long):String{
     val minutes = TimeUnit.MINUTES.convert(duration , TimeUnit.MILLISECONDS)
     val seconds = (TimeUnit.SECONDS.convert(duration , TimeUnit.MILLISECONDS) -
-    minutes*TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES))
+            minutes*TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES))
     return String.format("%02d:%02d" , minutes , seconds)
 
 }
@@ -42,22 +43,22 @@ fun getImgArt(path: String): ByteArray? {
 //
 fun setSongPosition(increment: Boolean) {
 
-       if(!PlayerMusicActivity.repeat){
-           if (increment) {
-               if (PlayerMusicActivity.musicListPA.size - 1 == PlayerMusicActivity.songPosition)
-                   PlayerMusicActivity.songPosition = 0
-               else ++PlayerMusicActivity.songPosition
-           } else {
-               if (0 == PlayerMusicActivity.songPosition)
-                   PlayerMusicActivity.songPosition = PlayerMusicActivity.musicListPA.size - 1
-               else --PlayerMusicActivity.songPosition
-           }
+    if(!PlayerMusicActivity.repeat){
+        if (increment) {
+            if (PlayerMusicActivity.musicListPA.size - 1 == PlayerMusicActivity.songPosition)
+                PlayerMusicActivity.songPosition = 0
+            else ++PlayerMusicActivity.songPosition
+        } else {
+            if (0 == PlayerMusicActivity.songPosition)
+                PlayerMusicActivity.songPosition = PlayerMusicActivity.musicListPA.size - 1
+            else --PlayerMusicActivity.songPosition
+        }
 
-       }
+    }
 }
 fun exitApplication() {
     if (PlayerMusicActivity.musicService != null) {
-     //  PlayerMusicActivity.musicService!!.audioManager.abandonAudioFocus(PlayerMusicActivity.musicService)
+        //  PlayerMusicActivity.musicService!!.audioManager.abandonAudioFocus(PlayerMusicActivity.musicService)
         PlayerMusicActivity.musicService!!.stopForeground(true)
         PlayerMusicActivity.musicService!!.mediaPlayer!!.release()
         PlayerMusicActivity.musicService = null
@@ -76,11 +77,11 @@ fun favouriteChecker(id : String) : Int {
     return  -1
 }
 
-    fun checkPlaylist(playlist: ArrayList<Music>) : ArrayList<Music>{
-        playlist.forEachIndexed { index, music ->
-            val file = File(music.path)
-            if (!file.exists())
-                playlist.removeAt(index)
-        }
-        return playlist
+fun checkPlaylist(playlist: ArrayList<Music>) : ArrayList<Music>{
+    playlist.forEachIndexed { index, music ->
+        val file = File(music.path)
+        if (!file.exists())
+            playlist.removeAt(index)
     }
+    return playlist
+}

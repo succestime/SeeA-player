@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.musicActivity
 
 import android.annotation.SuppressLint
@@ -22,7 +23,7 @@ class NotificationReceiver:BroadcastReceiver() {
             ApplicationClass.PLAY -> if(PlayerMusicActivity.isPlaying) pauseMusic() else playMusic()
             ApplicationClass.NEXT -> prevNextSong(increment = true, context = context!!)
             ApplicationClass.EXIT -> {
-           exitApplication()
+                exitApplication()
             }
         }
     }
@@ -46,7 +47,7 @@ class NotificationReceiver:BroadcastReceiver() {
     @SuppressLint("SuspiciousIndentation")
     private fun prevNextSong(increment: Boolean, context: Context){
         setSongPosition(increment = increment)
-       PlayerMusicActivity.musicService!!.createMediaPlayer()
+        PlayerMusicActivity.musicService!!.createMediaPlayer()
         Glide.with(context)
             .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
             .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())

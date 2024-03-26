@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.allAdapters
 
 import android.annotation.SuppressLint
@@ -30,7 +31,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
     override fun onBindViewHolder(holder: MyAdapter, position: Int) {
 
 
-             holder.name.text = musicList[position].title
+        holder.name.text = musicList[position].title
         Glide.with(context)
             .load(musicList[position].artUri)
             .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())

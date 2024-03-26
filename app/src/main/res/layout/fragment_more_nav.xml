@@ -64,7 +64,7 @@
                                 android:orientation="horizontal">
 
                                 <ImageView
-                                    android:layout_width="40dp"
+                                    android:layout_width="35dp"
                                     android:layout_height="match_parent"
                                     android:layout_gravity="center_horizontal"
                                     android:layout_marginStart="25dp"
@@ -79,16 +79,10 @@
                                     android:gravity="center_vertical"
                                     android:text="@string/login_or_signin"
                                     android:textColor="@color/white"
-                                    android:textSize="40sp" />
+                                    android:textSize="20sp" />
 
 
 
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center_vertical"
-                                    android:layout_marginStart="330dp"
-                                    android:src="@drawable/next_more_icon" />
 
 
                             </LinearLayout>
@@ -145,7 +139,7 @@
 
                                 <androidx.cardview.widget.CardView
                                     android:id="@+id/seeA1ne"
-                                    android:layout_width="200dp"
+                                    android:layout_width="170dp"
                                     android:layout_height="60dp"
                                     android:backgroundTint="#8A4D0B"
                                     android:layout_marginTop="20dp"
@@ -154,15 +148,16 @@
                                     >
                                     <androidx.constraintlayout.widget.ConstraintLayout
                                         android:layout_width="match_parent"
-                                        android:layout_height="match_parent">
+                                        android:layout_height="match_parent"
+                                        >
 
                                         <TextView
                                             android:id="@+id/SeeA"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_gravity="center_vertical"
-                                            android:layout_marginStart="35dp"
-                                            android:gravity="center"
+                                            android:layout_gravity="center"
+                                            android:layout_marginStart="22dp"
+
                                             android:text="@string/seea"
                                             android:textColor="@color/white"
                                             android:textSize="30sp"
@@ -171,7 +166,7 @@
                                             app:layout_constraintBottom_toBottomOf="parent"
                                             app:layout_constraintStart_toStartOf="parent"
                                             app:layout_constraintTop_toTopOf="parent"
-                                            app:layout_constraintVertical_bias="0.526" />
+                                             />
 
                                         <TextView
                                             android:layout_width="wrap_content"
@@ -201,8 +196,9 @@
                                     android:text="@string/be_the_member_of_seea_player"
                                     android:textColor="@color/white"
                                     android:textStyle="bold"
-                                    android:layout_marginTop="25dp"
-                                    android:layout_marginStart="25dp"/>
+                                    android:textSize="10sp"
+                                    android:layout_marginTop="30dp"
+                                    android:layout_marginStart="15dp"/>
 
 
 
@@ -225,10 +221,10 @@
 
                         <androidx.cardview.widget.CardView
 
-                            android:layout_width="210dp"
-                            android:layout_height="70dp"
+                            android:layout_width="120dp"
+                            android:layout_height="50dp"
                             android:layout_marginEnd="15dp"
-                            android:layout_marginTop="30dp"
+                            android:layout_marginTop="15dp"
                             app:cardCornerRadius="5dp"
                             android:backgroundTint="#FFCF00">
 
@@ -239,7 +235,7 @@
                                 android:layout_gravity="center"
                                 android:text="@string/subscribe_now"
                                 android:textColor="#585757"
-                                android:textSize="25sp"
+                                android:textSize="15sp"
                                 android:textStyle="italic" />
 
 
@@ -287,7 +283,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="35dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="25dp"
@@ -297,19 +293,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-
+android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/app_theme"
                     android:textColor="@color/white"
-                    android:textSize="40sp" />
+                    android:textSize="20sp" />
 
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="426dp"
-                    android:src="@drawable/next_more_icon" />
+
 
 
             </LinearLayout>
@@ -345,7 +336,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="35dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="25dp"
@@ -355,19 +346,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-
+android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/more_nav_settings"
                     android:textColor="@color/white"
-                    android:textSize="40sp" />
+                    android:textSize="20sp" />
 
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="485dp"
-                    android:src="@drawable/next_more_icon" />
 
 
             </LinearLayout>
@@ -403,7 +387,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="35dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="25dp"
                     android:layout_gravity="center_horizontal"
@@ -417,14 +401,8 @@
                     android:gravity="center_vertical"
                     android:text="@string/my_subscriptions"
                     android:textColor="@color/white"
-                    android:textSize="40sp" />
+                    android:textSize="15sp" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="315dp"
-                    android:src="@drawable/next_more_icon" />
 
             </LinearLayout>
 
@@ -459,7 +437,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="35dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="25dp"
                     android:tint="@color/white"
@@ -476,15 +454,9 @@
                     android:gravity="center_vertical"
                     android:text="@string/sign_out"
                     android:textColor="@color/white"
-                    android:textSize="40sp" />
+                    android:textSize="20sp" />
 
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="475dp"
-                    android:src="@drawable/next_more_icon" />
 
 
             </LinearLayout>

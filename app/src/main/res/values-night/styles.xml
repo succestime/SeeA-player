@@ -10,7 +10,7 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:statusBarColor" >#002A40</item>
+        <item name="android:statusBarColor" >#0F4D6C</item>
         <item name="android:actionBarStyle">@style/CustomActionBar</item>
 
     </style>

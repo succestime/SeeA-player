@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#011B29"
     android:orientation="vertical"
     tools:context=".recantFragment.ReMusicPlayerActivity">
 
@@ -23,20 +22,19 @@
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:src="@drawable/back_icon"
+        android:layout_gravity="center"
             android:background="?attr/selectableItemBackground"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="20dp"
             android:contentDescription="@string/back_btn"
-            app:tint="@color/white"
             android:padding="10dp" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:textColor="@color/white"
-            android:text="@string/world_of_music"
+            android:text="@string/seea_music_player"
+            android:textColor="@color/cool_blue"
             android:textSize="20sp"
             android:gravity="center"
-
             tools:ignore="NestedWeights"
             android:layout_weight="1"
             android:textStyle="bold"/>
@@ -56,15 +54,15 @@
     <!--    Current Song Image-->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/songImgPA"
-        android:layout_width="500dp"
-        android:layout_height="400dp"
+        android:layout_width="300dp"
+        android:layout_height="280dp"
         android:layout_margin="10dp"
         android:padding="5dp"
         android:layout_gravity="center"
         android:src="@drawable/speaker"
         app:shapeAppearanceOverlay="@style/curved"
         app:strokeColor="@color/cool_blue"
-        app:strokeWidth="5dp"/>
+        app:strokeWidth="2dp"/>
 
     <!--    Current Song Name-->
     <TextView
@@ -74,7 +72,6 @@
         android:layout_marginHorizontal="20dp"
         android:text="@string/song_name"
         android:textSize="18sp"
-        android:textColor="@color/white"
         android:gravity="center"
 
 
@@ -83,7 +80,7 @@
     <!--    Floating Buttons for Previous, Pause & Next-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:orientation="horizontal"
         android:layout_margin="10dp"
         android:gravity="center"
@@ -133,7 +130,6 @@
             android:id="@+id/tvSeekBarStart1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textColor="?colorOnPrimary"
             android:textSize="15sp"
             android:text="@string/start_tv"
             android:gravity="center"/>
@@ -150,7 +146,6 @@
             android:id="@+id/tvSeekBarEnd2"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textColor="?colorOnPrimary"
             android:textSize="15sp"
             android:text="@string/end_tv"
             android:gravity="center"/>

@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 
@@ -6,6 +7,7 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -31,7 +33,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jaidev.seeaplayer.bottomNavigation.downloadNav
 import com.jaidev.seeaplayer.bottomNavigation.homeNav
 import com.jaidev.seeaplayer.dataClass.Folder
@@ -90,6 +91,14 @@ class MainActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.apply()
 
+
+//        val preferences = this.getSharedPreferences("FAVOURITES", MODE_PRIVATE)
+//        val jsonString = preferences.getString("FavouriteSongs", null)
+//        val typeToken = object : TypeToken<ArrayList<Music>>(){}.type
+//        if(jsonString != null){
+//            val data: ArrayList<Music> = GsonBuilder().create().fromJson(jsonString, typeToken)
+//            FavouriteActivity.favouriteSongs.addAll(data)
+//        }
         // Apply the selected theme
         when (getCheckedItem()) {
             0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
@@ -119,7 +128,6 @@ class MainActivity : AppCompatActivity() {
 
         setActionBarGradient()
         drawerLayout = binding.drawerLayoutMA
-
         // Set the background color of SwipeRefreshLayout based on app theme
         setDrawerLayoutBackgroundColor()
         // Set the title for the action bar
@@ -130,6 +138,8 @@ class MainActivity : AppCompatActivity() {
             videoList = getAllVideos()
             setFragment(homeNav())
             MusicListMA = getAllAudios()
+
+//            FavoritesManager.loadFavorites(this@MainActivity)
 
             runnable = Runnable {
                 if(dataChanged){
@@ -192,59 +202,42 @@ class MainActivity : AppCompatActivity() {
         binding.navView.setNavigationItemSelectedListener {
 
             when (it.itemId) {
-                R.id.feedbackNav -> Toast.makeText(baseContext, "feedback", Toast.LENGTH_SHORT)
-                    .show()
-
-                R.id.settingsNav -> Toast.makeText(baseContext, "feedback2", Toast.LENGTH_SHORT)
-                    .show()
-
+                R.id.settingsNav -> {
+                    val intent = Intent(this@MainActivity, More::class.java)
+                    startActivity(intent) }
                 R.id.themesNav -> {
-
-                    val currentThemeMode = AppCompatDelegate.getDefaultNightMode()
-
-                    // Inflate the custom layout for the dialog
-                    val dialogView = layoutInflater.inflate(R.layout.theme_dialoge, null)
-                    val switchTheme = dialogView.findViewById<SwitchMaterial>(R.id.switchTheme)
-
-                    // Set the switch state based on the current theme mode
-                    switchTheme.isChecked = currentThemeMode == AppCompatDelegate.MODE_NIGHT_YES
-
-                    // Set up the switch change listener
-                    switchTheme.setOnCheckedChangeListener { _, isChecked ->
-                        // Dynamically change the theme mode based on switch state
-                        val newThemeMode =
-                            if (isChecked) AppCompatDelegate.MODE_NIGHT_YES
-                            else AppCompatDelegate.MODE_NIGHT_NO
-
-                        // Set the new theme mode
-                        AppCompatDelegate.setDefaultNightMode(newThemeMode)
-
-                        // Restart the activity to apply the new theme
-                        finish()
-                        startActivity(intent)
+                    val themes = resources.getStringArray(R.array.theme)
+                    val builder = MaterialAlertDialogBuilder(this)
+                    builder.setTitle("Select Theme")
+                    builder.setSingleChoiceItems(
+                        R.array.theme,
+                        getCheckedItem()
+                    ) { dialogInterface: DialogInterface, i: Int ->
+                        selected = themes[i]
+                        checkedItem = i
                     }
 
-                    // Create a custom dialog
-                    val dialog = MaterialAlertDialogBuilder(this)
-                        .setTitle("Select Theme")
-                        .setPositiveButton("Apply") { _, _ ->
-                            // Apply the selected theme when the "Apply" button is clicked
-                            // (Handled by the setOnCheckedChangeListener)
+                    builder.setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int ->
+                        if (selected == null) {
+                            selected = themes[i]
+                            checkedItem = i
                         }
-                        .setNegativeButton("Cancel") { dialog, _ ->
-                            // Dismiss the dialog when the "Cancel" button is clicked
-                            dialog.dismiss()
-                        }
-                        .setView(dialogView)
-                        .create()
 
-                    // Show the custom dialog
+                        when (selected) {
+                            "System Default" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                            "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                            "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+                        }
+                        setCheckedItem(checkedItem)
+                    }
+
+                    builder.setNegativeButton("Cancel") { dialogInterface: DialogInterface, i: Int ->
+                        dialogInterface.dismiss()
+                    }
+
+                    val dialog = builder.create()
                     dialog.show()
-
-                    // Set custom dialog button colors
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.GREEN)
-
 
                 }
 
@@ -305,6 +298,13 @@ class MainActivity : AppCompatActivity() {
         return this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
             .getInt(CHECKED_ITEM, checkedItem)
     }
+    private fun setCheckedItem(i: Int) {
+        this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
+            .edit()
+            .putInt(CHECKED_ITEM, i)
+            .apply()
+    }
+
 
     private fun setDrawerLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -487,9 +487,9 @@ class MainActivity : AppCompatActivity() {
             return true
 
 
-            // Handle other menu items if needed
-             return super.onOptionsItemSelected(item)
-        }
+        // Handle other menu items if needed
+        return super.onOptionsItemSelected(item)
+    }
 
 
     @SuppressLint("Range")
@@ -678,6 +678,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
+    override fun onResume() {
+        super.onResume()
 
+    }
 
 }

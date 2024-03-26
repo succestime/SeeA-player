@@ -22,7 +22,6 @@
         android:gravity="center_vertical"
         android:singleLine="true"
         android:text="@string/bookmark"
-        android:textColor="@color/black"
         android:layout_marginHorizontal="60dp"/>
 
     <com.google.android.material.imageview.ShapeableImageView

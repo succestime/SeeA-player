@@ -2,7 +2,6 @@
 package com.jaidev.seeaplayer.bottomNavigation
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -14,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.FoldersAdapter
-import com.jaidev.seeaplayer.LinkTubeActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.VideoAdapter
@@ -61,15 +59,6 @@ class homeNav : Fragment() {
 
         binding.searchBackBtn.setOnClickListener {
             binding.searchRecyclerView.visibility = View.GONE
-        }
-
-
-        binding.chip5.setOnClickListener {
-        }
-
-        binding.chip2.setOnClickListener {
-            val intent = Intent(requireContext(), LinkTubeActivity::class.java)
-            startActivity(intent)
         }
 
 

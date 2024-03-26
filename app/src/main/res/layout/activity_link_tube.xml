@@ -27,6 +27,7 @@
                 android:layout_width="25dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="1dp"
+                android:tint="@color/gray"
                 android:src="@drawable/search_icon" />
 
             <com.google.android.material.textfield.TextInputEditText

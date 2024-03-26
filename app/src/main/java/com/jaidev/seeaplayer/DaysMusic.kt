@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.Manifest
@@ -33,14 +34,14 @@ class DaysMusic : Fragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-   val view =  inflater.inflate(R.layout.fragment_days_music, container, false)
+        val view =  inflater.inflate(R.layout.fragment_days_music, container, false)
         binding = FragmentDaysMusicBinding.bind(view)
-       binding.MusicRV.setHasFixedSize(true)
+        binding.MusicRV.setHasFixedSize(true)
         binding.MusicRV.setItemViewCacheSize(13)
         binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = RecantMusicAdapter(requireContext(), musicRecantList , isReMusic = true)
         binding.MusicRV.adapter = adapter
-        binding.daysTotalMusics.text = "Total Musics : 0"
+        binding.daysTotalMusics.text = "Recant Musics : 0"
         val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 loadRecentMusics()

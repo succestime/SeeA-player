@@ -15,7 +15,7 @@
         android:id="@+id/emptyStateLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout="@layout/recant_empty_state_layout"
+        android:layout="@layout/favoueite_empty_state_layout"
         android:foregroundGravity="center"
         android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView

@@ -1,14 +1,18 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.jaidev.seeaplayer.allAdapters.FavouriteAdapter
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.checkPlaylist
@@ -22,8 +26,9 @@ class FavouriteActivity : AppCompatActivity() {
 
 
     companion object{
-        var favouriteSongs: ArrayList<Music> = ArrayList()
         var favouritesChanged: Boolean = false
+        var favouriteSongs: ArrayList<Music> = ArrayList()
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,9 +36,9 @@ class FavouriteActivity : AppCompatActivity() {
         binding = ActivityFavouriteBinding.inflate(layoutInflater)
         supportActionBar?.title = "Favourite"
         setContentView(binding.root)
-        FavoritesManager.loadFavorites(this)
 
         favouriteSongs = checkPlaylist(favouriteSongs)
+
 
         binding.favouriteRV.setHasFixedSize(true)
         binding.favouriteRV.setItemViewCacheSize(13)
@@ -55,7 +60,7 @@ class FavouriteActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setBackgroundDrawable(
                 ContextCompat.getDrawable(
-                   this@FavouriteActivity,
+                    this@FavouriteActivity,
                     R.drawable.background_actionbar
                 )
             )
@@ -72,7 +77,7 @@ class FavouriteActivity : AppCompatActivity() {
         } else {
             binding.emptyStateLayout.visibility = View.GONE
         }
-
+        loadFavouriteSongs()
     }
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -108,22 +113,46 @@ class FavouriteActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // ... other code
-
-        if (FavoritesManager.favouriteSongs.size < 1) {
-            binding.shuffleBtnFA.visibility = View.INVISIBLE
+        if (favouritesChanged) {
+            // Update the adapter with the new list of favourite songs
+            adapter.updateFavourites(favouriteSongs)
+            // Reset the flag
+            favouritesChanged = false
+            // Save favourite songs to SharedPreferences
+            saveFavouriteSongs()
         }
 
-        binding.shuffleBtnFA.setOnClickListener {
-            val intent = Intent(this, PlayerActivity::class.java)
-            intent.putExtra("index", 0)
-            intent.putExtra("class", "FavouriteShuffle")
-            startActivity(intent)
+            binding.shuffleBtnFA.setOnClickListener {
+                val intent = Intent(this, PlayerActivity::class.java)
+                intent.putExtra("index", 0)
+                intent.putExtra("class", "FavouriteShuffle")
+                startActivity(intent)
+            }
+
+    }
+    private fun saveFavouriteSongs() {
+        val editor = getSharedPreferences("FAVOURITES", AppCompatActivity.MODE_PRIVATE).edit()
+        val jsonString = GsonBuilder().create().toJson(favouriteSongs)
+        Log.d("SaveFavourite", "Saving favourite songs: $jsonString")
+        editor.putString("FavouriteAdapter", jsonString)
+        editor.apply()
+    }
+
+    private fun loadFavouriteSongs() {
+        val sharedPreferences = getSharedPreferences("FAVOURITES", AppCompatActivity.MODE_PRIVATE)
+        val jsonString = sharedPreferences.getString("FavouriteAdapter", null)
+        jsonString?.let {
+            Log.d("LoadFavourite", "Loaded favourite songs: $jsonString")
+            try {
+                val type = object : TypeToken<ArrayList<Music>>() {}.type
+                favouriteSongs = GsonBuilder().create().fromJson(it, type)
+                // Update the adapter with loaded favorite songs
+                adapter.updateFavourites(favouriteSongs)
+            } catch (e: Exception) {
+                Log.e("ParsingException", "Error parsing JSON: ${e.message}", e)
+            }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        FavoritesManager.saveFavorites(this)
-    }
 
 }

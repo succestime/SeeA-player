@@ -21,7 +21,7 @@
         android:gravity="center_horizontal"
         android:text="NO Music Found!"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-        android:textColor="@color/black" />
+       />
 
 
     <TextView
@@ -34,6 +34,6 @@
         android:gravity="center_horizontal"
         android:text="There are no music here firstly download any music"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:textColor="@color/black" />
+   />
 
 </RelativeLayout>

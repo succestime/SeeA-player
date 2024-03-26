@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
@@ -113,8 +114,8 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
             val playbackSpeed = if(PlayerMusicActivity.isPlaying) 1F else 0F
             mediaSession.setMetadata(
                 MediaMetadataCompat.Builder()
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mediaPlayer!!.duration.toLong())
-                .build())
+                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mediaPlayer!!.duration.toLong())
+                    .build())
             val playBackState = PlaybackStateCompat.Builder()
                 .setState(PlaybackStateCompat.STATE_PLAYING, mediaPlayer!!.currentPosition.toLong(), playbackSpeed)
                 .setActions(PlaybackStateCompat.ACTION_SEEK_TO)
@@ -160,27 +161,27 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
 
-        fun createMediaPlayer() {
-            try {
-                if (PlayerMusicActivity.musicService!!.mediaPlayer == null) PlayerMusicActivity.musicService!!.mediaPlayer =
-                    MediaPlayer()
-                PlayerMusicActivity.musicService!!.mediaPlayer!!.reset()
-                PlayerMusicActivity.musicService!!.mediaPlayer!!.setDataSource(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path)
-                PlayerMusicActivity.musicService!!.mediaPlayer!!.prepare()
-                PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-                PlayerMusicActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
-                PlayerMusicActivity.binding.tvSeekBarStart.text =
-                    formatDuration(mediaPlayer!!.currentPosition.toLong())
-                PlayerMusicActivity.binding.tvSeekBarEnd.text =
-                    formatDuration(mediaPlayer!!.duration.toLong())
-                PlayerMusicActivity.binding.seekBarPA.progress = 0
-                PlayerMusicActivity.binding.seekBarPA.max = mediaPlayer!!.duration
-                PlayerMusicActivity.nowMusicPlayingId = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].id
-            } catch (e: Exception) {
-                return
-            }
-
+    fun createMediaPlayer() {
+        try {
+            if (PlayerMusicActivity.musicService!!.mediaPlayer == null) PlayerMusicActivity.musicService!!.mediaPlayer =
+                MediaPlayer()
+            PlayerMusicActivity.musicService!!.mediaPlayer!!.reset()
+            PlayerMusicActivity.musicService!!.mediaPlayer!!.setDataSource(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path)
+            PlayerMusicActivity.musicService!!.mediaPlayer!!.prepare()
+            PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+            PlayerMusicActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
+            PlayerMusicActivity.binding.tvSeekBarStart.text =
+                formatDuration(mediaPlayer!!.currentPosition.toLong())
+            PlayerMusicActivity.binding.tvSeekBarEnd.text =
+                formatDuration(mediaPlayer!!.duration.toLong())
+            PlayerMusicActivity.binding.seekBarPA.progress = 0
+            PlayerMusicActivity.binding.seekBarPA.max = mediaPlayer!!.duration
+            PlayerMusicActivity.nowMusicPlayingId = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].id
+        } catch (e: Exception) {
+            return
         }
+
+    }
 
     fun seekBarSetup(){
         runnable = Runnable {

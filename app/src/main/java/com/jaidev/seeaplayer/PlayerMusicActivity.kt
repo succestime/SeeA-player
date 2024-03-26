@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
@@ -41,7 +42,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         var min30: Boolean = false
         var min60: Boolean = false
         var isFavourite : Boolean = false
-        var fIndex : Int = -1
+        var fIndex : Int = 0
         var musicService: MusicService? = null
         const val FAVOURITES_PREF_KEY = "FavouriteSongs"
         var nowMusicPlayingId : String = ""
@@ -154,7 +155,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             } else{
                 isFavourite = true
                 binding.favouriteBtnPA.setImageResource(R.drawable.favorite_icon)
-                FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
+           FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
             }
         }
 
