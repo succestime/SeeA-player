@@ -11,7 +11,7 @@
         android:id="@+id/textView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/circle"
         android:src="@mipmap/ic_logo_o"
         app:layout_constraintEnd_toEndOf="parent"
@@ -59,28 +59,29 @@
         app:layout_constraintTop_toBottomOf="@+id/emailLogin"
         tools:ignore="TextFields" />
 
+
     <Button
         android:id="@+id/loginBtn"
         android:layout_width="200dp"
         android:layout_height="50dp"
         android:layout_marginLeft="100dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="52dp"
         android:layout_marginRight="100dp"
         android:background="@drawable/curver"
         android:text="@string/login"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/passwordLogin"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="@+id/passwordLogin"
         app:layout_constraintTop_toBottomOf="@+id/passwordLogin" />
-
 
     <TextView
         android:id="@+id/clickSinin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="100dp"
-        android:text="@string/if_you_want_to_sinin_by_another_id_click_hare"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="64dp"
+        android:text="want to SignIn click here"
         android:textColor="@color/gray"
 
         android:textStyle="italic"
@@ -91,12 +92,12 @@
         android:id="@+id/Signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="64dp"
         android:text="@string/signin"
-        android:layout_marginStart="3dp"
         android:textColor="@color/cool_blue"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.138"
         app:layout_constraintStart_toEndOf="@id/clickSinin"
         app:layout_constraintTop_toBottomOf="@+id/loginBtn" />
 

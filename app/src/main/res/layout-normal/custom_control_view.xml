@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#42000000"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/topController"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="#42000000"
+        >
+
+
+        <ImageButton
+            android:id="@+id/backBtn"
+            android:layout_width="50dp"
+            android:layout_height="65dp"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/ic_back_icon"
+            app:tint="@color/white"/>
+
+
+
+        <TextView
+            android:id="@+id/videoTitle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Text Title"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="50dp"
+            android:textColor="@color/white"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:ellipsize="marquee"/>
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/root_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="@+id/bottomController"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/horizontalRecyclerview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+
+            android:layout_marginTop="70dp">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <!--    <include layout="@layout/swipe_zoom_design"/>-->
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomController"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <ImageButton
+            android:id="@+id/prevBtn"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="390dp"
+            android:layout_marginEnd="20dp"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/prev_btn"
+            android:focusable="true"
+            android:src="@drawable/ic_previous_icon"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/playPauseBtn"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginEnd="20dp"
+
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/play_btn"
+            android:focusable="true"
+            android:src="@drawable/ic_play_icon"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/nextBtn"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginEnd="150dp"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/next_btn"
+            android:focusable="true"
+            android:src="@drawable/ic_next_icon"
+            app:tint="@color/white" />
+
+
+        <ImageButton
+            android:id="@+id/fullScreenBtn"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="10dp"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/fullscreen_btn"
+            android:focusable="true"
+            android:src="@drawable/ic_fullscreen_icon"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/repeatBtn"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/repeat_btn"
+            android:focusable="true"
+            android:src="@drawable/ic_repeat_off_icon"
+            app:tint="@color/white" />
+
+    </LinearLayout>
+
+    <com.google.android.exoplayer2.ui.DefaultTimeBar
+        android:id="@+id/exo_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomController"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:played_color="@color/cool_blue"
+        app:scrubber_color="@color/cool_blue"
+        app:scrubber_disabled_size="10dp"
+        app:scrubber_enabled_size="15dp"
+        app:unplayed_color="#80FFFFFF">
+
+    </com.google.android.exoplayer2.ui.DefaultTimeBar>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+       android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@id/exo_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/duration"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginVertical="10dp"
+            android:text="@string/semi_colon"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@id/exo_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/loading"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -40,6 +40,8 @@
     <color name="green_primary">#00FF00</color> <!-- Change this to your desired green color -->
 
 
+    <color name="icon_light_color">#000000</color> <!-- Black color for light mode -->
+    <color name="icon_dark_color">#FFFFFF</color> <!-- White color for dark mode -->
 
     <integer-array name="myColors">
         <item>@color/light_yellow</item>

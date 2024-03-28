@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,10 +16,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.MainActivity.Companion.musicRecantList
 import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.dataClass.RecantMusic
@@ -42,21 +45,13 @@ class DaysMusic : Fragment() {
         adapter = RecantMusicAdapter(requireContext(), musicRecantList , isReMusic = true)
         binding.MusicRV.adapter = adapter
         binding.daysTotalMusics.text = "Recant Musics : 0"
-        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                loadRecentMusics()
-            } else {
-
-                // Handle permission denial
-            }
+        if (!requestRuntimePermission()) {
+            // Permission not granted yet
+            return view
         }
 
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            loadRecentMusics()
-        } else {
-
-            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
+        // Permission already granted, load recent videos
+        loadRecentMusics()
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
@@ -84,6 +79,83 @@ class DaysMusic : Fragment() {
 
         return view
     }
+
+    private fun requestRuntimePermission(): Boolean {
+        // Check for permission based on Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_MEDIA_VIDEO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.READ_MEDIA_VIDEO),
+                    13
+                )
+                return false
+            }
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    13
+                )
+                return false
+            }
+        } else {
+            // For Android versions >= Q (API 29)
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    14
+                )
+                return false
+            }
+        }
+        return true
+    }
+
+    // Handle permission request results
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 13) {
+            // Handle WRITE_EXTERNAL_STORAGE or READ_MEDIA_VIDEO permission request result
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, load recent videos
+                loadRecentMusics()
+            } else {
+                // Permission denied, show a message or retry request
+                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
+            }
+        } else if (requestCode == 14) {
+            // Handle READ_EXTERNAL_STORAGE permission request result
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, load recent videos
+                loadRecentMusics()
+            } else {
+                // Permission denied, show a message or retry request
+                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+
+
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true

@@ -30,6 +30,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -54,6 +58,9 @@ class MainActivity : AppCompatActivity() {
     private var checkedItem: Int = 0
     private var selected: String = ""
     private val CHECKED_ITEM = "checked_item"
+
+    private var mInterstitialAd: InterstitialAd? = null
+
     companion object {
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
@@ -91,15 +98,6 @@ class MainActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.apply()
 
-
-//        val preferences = this.getSharedPreferences("FAVOURITES", MODE_PRIVATE)
-//        val jsonString = preferences.getString("FavouriteSongs", null)
-//        val typeToken = object : TypeToken<ArrayList<Music>>(){}.type
-//        if(jsonString != null){
-//            val data: ArrayList<Music> = GsonBuilder().create().fromJson(jsonString, typeToken)
-//            FavouriteActivity.favouriteSongs.addAll(data)
-//        }
-        // Apply the selected theme
         when (getCheckedItem()) {
             0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -162,7 +160,10 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
+        binding.drawerLayoutMA.setOnClickListener {
+            loadAd()
+            mInterstitialAd?.show(this)
+        }
 
 
 
@@ -355,13 +356,13 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(
                     this,
-                    Manifest.permission.READ_MEDIA_VIDEO
+                  Manifest.permission.READ_MEDIA_VIDEO
                 )
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(Manifest.permission.READ_MEDIA_VIDEO),
+                    arrayOf(Manifest.permission.READ_MEDIA_VIDEO , Manifest.permission.READ_MEDIA_AUDIO),
                     13
                 )
                 return false
@@ -682,6 +683,25 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+    }
+
+    fun loadAd() {
+        val adRequest = AdRequest.Builder().build()
+
+
+        InterstitialAd.load(
+            this,
+            "ca-app-pub-4270893888625106/2835817173",
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    mInterstitialAd = null
+                }
+
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    mInterstitialAd = interstitialAd
+                }
+            })
     }
 
 }

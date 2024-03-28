@@ -15,7 +15,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="#B6B6B6"
+        android:backgroundTint="#425A68"
         android:orientation="vertical"
         app:cardCornerRadius="20dp">
 

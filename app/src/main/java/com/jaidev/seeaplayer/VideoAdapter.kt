@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -26,8 +27,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -102,7 +105,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
             .into(holder.image)
 
-
+        setIconTint(holder.more)
         holder.root.setOnLongClickListener {
             toggleSelection(position)
             true
@@ -542,5 +545,26 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                 ContextCompat.startActivity(context, intent, null)
             }
         }
+    }
+
+    private fun setIconTint(imageView: ImageView) {
+        // Get the drawable
+
+     val drawable: Drawable? = ContextCompat.getDrawable(context, R.drawable.icon_dark)
+
+        // Get the theme color for the icon tint
+        val iconTint = if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            ContextCompat.getColor(context, R.color.white)
+        } else {
+            ContextCompat.getColor(context, R.color.black)
+        }
+
+        // Set the tint for the drawable
+        drawable?.let {
+            DrawableCompat.setTint(it, iconTint)
+        }
+
+        // Set the modified drawable to your ImageView or wherever you're using it
+        imageView.setImageDrawable(drawable)
     }
 }

@@ -2,10 +2,12 @@
 
 package com.jaidev.seeaplayer.recantFragment
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,11 +15,11 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.MainActivity.Companion.videoRecantList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.RecentVideoAdapter
@@ -45,27 +47,13 @@ class DaysDownload : Fragment() {
         adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true)
         binding.DownloadRV.adapter = adapter
         binding.daysTotalVideos.text = "Recant Videos : 0"
-        val requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    loadRecentVideos()
-                } else {
-                    // Handle permission denial
-                }
-            }
-
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            loadRecentVideos()
-        } else {
-//            if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//            }
-            requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (!requestRuntimePermission()) {
+            // Permission not granted yet
+            return view
         }
 
+        // Permission already granted, load recent videos
+        loadRecentVideos()
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
@@ -79,7 +67,79 @@ class DaysDownload : Fragment() {
         setSwipeRefreshBackgroundColor()
         return view
     }
+    private fun requestRuntimePermission(): Boolean {
+        // Check for permission based on Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_MEDIA_VIDEO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.READ_MEDIA_VIDEO),
+                    13
+                )
+                return false
+            }
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    13
+                )
+                return false
+            }
+        } else {
+            // For Android versions >= Q (API 29)
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    14
+                )
+                return false
+            }
+        }
+        return true
+    }
 
+    // Handle permission request results
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 13) {
+            // Handle WRITE_EXTERNAL_STORAGE or READ_MEDIA_VIDEO permission request result
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, load recent videos
+                loadRecentVideos()
+            } else {
+                // Permission denied, show a message or retry request
+                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
+            }
+        } else if (requestCode == 14) {
+            // Handle READ_EXTERNAL_STORAGE permission request result
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, load recent videos
+                loadRecentVideos()
+            } else {
+                // Permission denied, show a message or retry request
+                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -103,7 +163,7 @@ class DaysDownload : Fragment() {
         recantVideos.sortedByDescending { it.timestamp }
 
         adapter.updateRecentVideos(sortedRecentVideos)
-        binding.daysTotalVideos.text = "Total Musics : ${sortedRecentVideos.size}"
+        binding.daysTotalVideos.text = "Total Videos : ${sortedRecentVideos.size}"
 
         if (videoRecantList.isEmpty()) {
             binding.emptyStateLayout.visibility = View.VISIBLE

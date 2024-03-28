@@ -77,7 +77,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     musicService!!.mediaPlayer!!.seekTo(progress)
-                    musicService!!.showNotification(if (isPlaying) R.drawable.ic_pause_icon else R.drawable.play_icon)
+                 musicService!!.showNotification(if (isPlaying) R.drawable.ic_pause_icon else R.drawable.play_icon)
                 }
             }
 
@@ -284,7 +284,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             musicService!!.mediaPlayer!!.start()
             isPlaying = true
             binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-            musicService!!.showNotification(R.drawable.ic_pause_icon)
+          musicService!!.showNotification(R.drawable.ic_pause_icon)
             binding.tvSeekBarStart.text =
                 formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
             binding.tvSeekBarEnd.text =
@@ -302,9 +302,9 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
     private fun playMusic() {
         isPlaying = true
-        musicService!!.mediaPlayer!!.start()
+      musicService!!.mediaPlayer!!.start()
         binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-        musicService!!.showNotification(R.drawable.ic_pause_icon)
+       musicService!!.showNotification(R.drawable.ic_pause_icon)
 
     }
 
@@ -312,7 +312,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         isPlaying = false
         binding.playPauseBtnPA.setIconResource(R.drawable.play_music_icon)
         musicService!!.showNotification(R.drawable.play_music_icon)
-        musicService!!.mediaPlayer!!.pause()
+     musicService!!.mediaPlayer!!.pause()
 
     }
 

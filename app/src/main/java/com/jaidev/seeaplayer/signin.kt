@@ -19,7 +19,7 @@ class signin : AppCompatActivity() {
 //        setTheme(More.themesList[More.themeIndex])
         val binding = ActivitySigninBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.title= "Register"
+        supportActionBar?.hide()
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.client_id))

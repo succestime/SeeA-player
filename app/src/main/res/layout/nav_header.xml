@@ -3,8 +3,8 @@
     android:id="@+id/linearLayoutNav"
     android:layout_width="match_parent"
     android:layout_height="170dp"
+    android:layout_marginTop="80dp"
     android:orientation="vertical"
-    android:layout_marginTop="100dp"
     android:background="@color/cool_blue">
 
 

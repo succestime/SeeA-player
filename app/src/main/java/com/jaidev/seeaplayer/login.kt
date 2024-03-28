@@ -13,7 +13,8 @@ class login : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.title= "LogIn"
+        supportActionBar?.hide()
+
 
         binding.Signin.setOnClickListener {
             startActivity(Intent(this , signin::class.java))

@@ -146,13 +146,14 @@
     <string name="activity_signIn_login">LogIN?</string>
     <string name="seeA">SeeA</string>
     <string name="edu">Edu.</string>
-    <string name="_140">₹ 140</string>
+    <string name="_140">₹ 149</string>
     <string name="year"> / year</string>
     <string name="seeA_2">SeeA</string>
     <string name="_1ne_2">1NE</string>
     <string name="best_for_users_who_like_to_play_video_and_music_on_mobile_and_tablet">Best for users who like to play video and music on mobile and tablet</string>
     <string name="monthly_n_15">Monthly\n₹15</string>
     <string name="quarterly_n_75">Quarterly\n₹75</string>
+    <string name="biennial_n_599">Quarterly\n₹599</string>
     <string name="annual_n_149">Annual\n₹149</string>
     <string name="or">or</string>
     <string name="apply_seea1ne_membership_code">Apply SeeA1NE Membership code</string>

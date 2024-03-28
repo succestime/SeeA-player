@@ -12,6 +12,7 @@
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:statusBarColor" >#8ACDF3</item>
         <item name="android:actionBarStyle">@style/CustomActionBar</item>
+        <item name="android:textColor">@color/black</item>
 
     </style>
 
@@ -36,12 +37,7 @@
         </item>
     </style>
 
-    <!--    &lt;!&ndash;  Custom ActionBar Style &ndash;&gt;-->
-    <!--    <style name="CustomActionBar" parent="Widget.AppCompat.ActionBar">-->
-    <!--        <item name="background">@drawable/background_actionbar</item>-->
 
-    <!--        &lt;!&ndash; Add other customizations here if needed &ndash;&gt;-->
-    <!--    </style>-->
 
     <style name="shape">
         <item name="cornerFamily">rounded</item>

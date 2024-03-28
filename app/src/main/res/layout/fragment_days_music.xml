@@ -29,7 +29,7 @@
             android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/MusicRV"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="35dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

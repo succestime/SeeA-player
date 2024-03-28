@@ -21,8 +21,8 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="80dp"
             android:orientation="vertical"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -35,6 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:contentDescription="@string/searchbackbtn"
+                app:tint="?android:attr/textColorPrimary"
                 android:src="@drawable/search_back_btn"
                 app:layout_constraintEnd_toEndOf="@+id/recycler_view"
                 app:layout_constraintTop_toTopOf="parent"
@@ -68,14 +69,12 @@
             android:layout_height="0dp"
             android:layout_marginTop="25dp"
             android:scrollbars="vertical"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/linearLayout2"
-            app:layout_constraintHorizontal_bias="0.009"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/totalFolder"
-            app:layout_constraintVertical_bias="0.027" />
+            app:layout_constraintVertical_weight="1" />
 
 
 

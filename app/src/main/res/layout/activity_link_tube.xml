@@ -27,7 +27,7 @@
                 android:layout_width="25dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="1dp"
-                android:tint="@color/gray"
+                app:tint="?android:attr/textColorPrimary"
                 android:src="@drawable/search_icon" />
 
             <com.google.android.material.textfield.TextInputEditText
@@ -58,6 +58,7 @@
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
+                app:tint="?android:attr/textColorPrimary"
                 android:src="@drawable/ic_refresh"
                 tools:ignore="RedundantDescriptionCheck" />
 
@@ -67,6 +68,7 @@
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/go_btn"
+                android:fillColor="?android:attr/textColorPrimary"
                 android:src="@drawable/ic_foreward"
                 tools:ignore="RedundantDescriptionCheck" />
 

@@ -106,7 +106,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="35dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_more_icon"
+        android:src="@drawable/icon_dark"
+        app:tint="?android:attr/textColorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="UseAppTint" />
 

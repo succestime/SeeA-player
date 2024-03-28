@@ -1,0 +1,40 @@
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/empty_state_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/empty_state_image"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/empty" />
+
+    <TextView
+        android:id="@+id/empty_state_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/empty_state_image"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:gravity="center_horizontal"
+        android:text="NO Favourite Music Found!"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+     />
+
+
+    <TextView
+        android:id="@+id/empty_state_description"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/empty_state_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:gravity="center_horizontal"
+        android:text="There are no favourite music here firstly add any music"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+       />
+
+</RelativeLayout>
