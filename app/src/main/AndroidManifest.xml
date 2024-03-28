@@ -148,8 +148,7 @@
         </activity>
 
         <service android:name=".MusicService"
-            android:enabled="true"
-            android:exported="false" />
+            android:foregroundServiceType="mediaPlayback"/>
 
         <service android:name=".FolderDetectionService" />
 

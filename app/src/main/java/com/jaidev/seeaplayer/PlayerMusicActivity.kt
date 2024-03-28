@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.media.audiofx.AudioEffect
+import android.media.audiofx.LoudnessEnhancer
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
@@ -25,6 +26,7 @@ import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.dataClass.favouriteChecker
 import com.jaidev.seeaplayer.dataClass.formatDuration
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.ActivityPlayerMusicBinding
 
@@ -49,6 +51,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: ActivityPlayerMusicBinding
         var repeat: Boolean = false
+        lateinit var loudnessEnhancer: LoudnessEnhancer
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,9 +59,20 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         binding = ActivityPlayerMusicBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-        //For Starting Service
-
-        initializeLayout()
+        if(intent.data?.scheme.contentEquals("content")){
+            songPosition = 0
+            val intentService = Intent(this, MusicService::class.java)
+            bindService(intentService, this, BIND_AUTO_CREATE)
+            startService(intentService)
+            musicListPA = ArrayList()
+//            musicListPA.add(getMusicDetails(intent.data!!))
+            Glide.with(this)
+                .load(getImgArt(musicListPA[songPosition].path))
+                .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+                .into(binding.songImgPA)
+            binding.songNamePA.text = musicListPA[songPosition].title
+        }
+        else initializeLayout()
 
         binding.backBtnPA.setOnClickListener { finish() }
         binding.playPauseBtnPA.setOnClickListener {
@@ -275,6 +289,9 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         else binding.favouriteBtnPA.setImageResource(R.drawable.favorite_empty_icon)
 
     }
+
+
+
     private fun createMediaPlayer() {
         try {
             if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
@@ -293,7 +310,8 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
             nowMusicPlayingId = musicListPA[songPosition].id
-
+            loudnessEnhancer = LoudnessEnhancer(musicService!!.mediaPlayer!!.audioSessionId)
+            loudnessEnhancer.enabled = true
         } catch (e: Exception) {
             return
         }
@@ -329,11 +347,12 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        val binder = service as MusicService.MyBinder
-        musicService = binder.currentService()
+        if(musicService == null){
+            val binder = service as MusicService.MyBinder
+            musicService = binder.currentService()
 //            musicService!!.audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 //            musicService!!.audioManager.requestAudioFocus(musicService, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
-//        }
+        }
         createMediaPlayer()
         musicService!!.seekBarSetup()
 
@@ -418,7 +437,16 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
     }
 
-
+//    private fun initServiceAndPlaylist(playlist: ArrayList<Music>, shuffle: Boolean, playNext: Boolean = false){
+//        val intent = Intent(this, MusicService::class.java)
+//        bindService(intent, this, BIND_AUTO_CREATE)
+//        startService(intent)
+//        musicListPA = ArrayList()
+//        musicListPA.addAll(playlist)
+//        if(shuffle) musicListPA.shuffle()
+//        setLayout()
+//       if(!playNext) PlayNext.playNextList = ArrayList()
+//    }
 
 
 

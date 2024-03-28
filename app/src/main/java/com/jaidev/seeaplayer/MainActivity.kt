@@ -305,8 +305,6 @@ class MainActivity : AppCompatActivity() {
             .putInt(CHECKED_ITEM, i)
             .apply()
     }
-
-
     private fun setDrawerLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -353,16 +351,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestRuntimePermission(): Boolean {
         //android 13 permission request
+        //android 13 permission request
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(
                     this,
-                  Manifest.permission.READ_MEDIA_VIDEO
+                    Manifest.permission.READ_MEDIA_VIDEO
+                )
+                != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_MEDIA_AUDIO
                 )
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(Manifest.permission.READ_MEDIA_VIDEO , Manifest.permission.READ_MEDIA_AUDIO),
+                    arrayOf(
+                        Manifest.permission.READ_MEDIA_VIDEO,
+                        Manifest.permission.READ_MEDIA_AUDIO
+                    ),
                     13
                 )
                 return false
