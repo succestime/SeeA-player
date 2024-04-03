@@ -17,7 +17,7 @@
         <ImageView
             android:id="@+id/seeA_one"
             android:layout_width="match_parent"
-            android:layout_height="270dp"
+            android:layout_height="300dp"
             android:layout_marginTop="5dp"
             android:layout_gravity="center"
             android:background="@drawable/curver"
@@ -30,7 +30,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/SeeAeduActivity"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:background="#332B2B"
             android:layout_marginTop="5dp"
             >
@@ -73,7 +73,7 @@
                 android:id="@+id/onehundradforthynine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="155dp"
+                android:layout_marginStart="162dp"
                 android:text="@string/_299"
                 android:layout_marginTop="2dp"
                 android:textColor="@color/white"
@@ -187,21 +187,21 @@
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="190dp"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
 
                 >
 
                 <LinearLayout
                     android:id="@+id/monthlyBox"
-                    android:layout_width="90dp"
+                    android:layout_width="85dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/square_box_bg_selector"
                     android:clickable="true"
                     android:focusable="true"
                     android:orientation="horizontal"
                     android:paddingBottom="10dp"
-                    android:paddingStart="5dp"
+                    android:paddingStart="10dp"
                     android:paddingTop="10dp"
 
                     android:layout_marginTop="100dp"
@@ -217,13 +217,13 @@
                         android:layout_height="wrap_content"
                         android:text="@string/monthly_n_15"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp" />
+                        android:textSize="14sp" />
 
                     <ImageView
                         android:id="@+id/monthly_select"
                         android:layout_width="15dp"
                         android:layout_height="15dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="10dp"
                         android:visibility="gone"
                         android:src="@drawable/complete_svgrepo_com"/>
 
@@ -233,9 +233,9 @@
 
                 <LinearLayout
                     android:id="@+id/quarterly_Box"
-                    android:layout_width="100dp"
+                    android:layout_width="90dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="100dp"
                     android:background="@drawable/square_box_bg_selector"
                     android:clickable="true"
@@ -256,28 +256,27 @@
 
                         android:text="@string/quarterly_n_75"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp" />
+                        android:textSize="14sp" />
 
                     <ImageView
                         android:id="@+id/quarterly_select"
                         android:layout_width="15dp"
                         android:layout_height="15dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="10dp"
                         android:visibility="gone"
                         android:src="@drawable/complete_svgrepo_com"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/annual_Box"
-                    android:layout_width="100dp"
+                    android:layout_width="85dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="100dp"
                     android:background="@drawable/square_box_bg_selector"
                     android:clickable="true"
                     android:focusable="true"
                     android:orientation="horizontal"
-                    android:layout_marginEnd="20dp"
                     android:paddingBottom="10dp"
                     android:paddingStart="10dp"
                     android:paddingTop="10dp"
@@ -292,9 +291,45 @@
 
                         android:text="@string/annual_n_149"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp" />
+                        android:textSize="14sp" />
                     <ImageView
                         android:id="@+id/annual_select"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginStart="15dp"
+                        android:visibility="gone"
+                        android:src="@drawable/complete_svgrepo_com"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/biennial_Box"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="100dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/square_box_bg_selector"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/annual_Box"
+
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="RtlSymmetry">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/biennial_n_599"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+                    <ImageView
+                        android:id="@+id/biennial_select"
                         android:layout_width="15dp"
                         android:layout_height="15dp"
                         android:layout_marginStart="15dp"
@@ -325,20 +360,20 @@
         <RelativeLayout
             android:id="@+id/fakeCodeNumber"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:background="@android:color/transparent"
+            android:padding="10dp"
             >
 
             <View
                 android:id="@+id/view"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="70dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginStart="2dp"
-                android:layout_marginBottom="6dp"
                 android:background="@drawable/dashed_border" />
 
             <ImageView
@@ -346,9 +381,9 @@
                 android:layout_width="30dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="15dp"
                 android:tint="@color/gray"
-                android:src="@drawable/discount"
+                android:src="@drawable/offer_icon"
                 tools:ignore="UseAppTint" />
 
             <TextView
@@ -356,13 +391,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="23dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginEnd="40dp"
                 android:layout_toEndOf="@+id/imageView6"
                 android:hint="@string/apply_seea1ne_membership_code"
                 android:textColorHint="@color/white"
                 android:textColor="@color/white"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -370,7 +405,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="50dp"
                 android:layout_alignEnd="@+id/view"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
 
                 android:src="@drawable/next_more_icon" />
         </RelativeLayout>

@@ -25,6 +25,8 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     private lateinit var binding: ActivityFoldersBinding
     private lateinit var adapter: VideoAdapter
     private var isSearchViewClicked = false
+    private lateinit var searchView: SearchView
+
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     companion object {
@@ -34,16 +36,11 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     @SuppressLint("SetTextI18n", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setTheme(More.themesList[More.themeIndex])
         binding = ActivityFoldersBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
 
         val position = intent.getIntExtra("position", 0)
-
-        supportActionBar?.apply {
-            setBackgroundDrawable(ContextCompat.getDrawable(this@FoldersActivity, R.drawable.background_actionbar))
-        }
         currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = MainActivity.folderList[position].folderName
@@ -77,9 +74,11 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
             intent.putExtra("class", "NowPlaying")
             startActivity( intent )
         }
-        binding.searchBackBtn.setOnClickListener {
-            binding.recyclerView.visibility = View.GONE
-        }
+
+//        binding.searchBackBtn.setOnClickListener {
+//            binding.recyclerView.visibility = View.GONE
+//            binding.searchBackBtn.visibility = View.GONE
+//        }
         setActionBarGradient()
         swipeRefreshLayout = binding.swipeRefreshFolder
 
@@ -159,31 +158,47 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
         searchView.setOnCloseListener {
             isSearchViewClicked = false
             binding.recyclerView.visibility = View.GONE
+//            binding.searchBackBtn.visibility = View.GONE
+
             false
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                MainActivity.searchList = ArrayList()
                 if (newText != null) {
-                    MainActivity.searchList = ArrayList()
+
+                    val queryText = newText.lowercase()
                     for (video in MainActivity.videoList) {
-                        if (video.title.lowercase().contains(newText.lowercase()))
+                        // Filter videos based on the user's input
+                        if (video.title.lowercase().contains(queryText)) {
                             MainActivity.searchList.add(video)
+//                            binding.searchBackBtn.visibility = View.VISIBLE
+                        }
+
                     }
                     MainActivity.search = true
                     adapter.updateList(searchList = MainActivity.searchList)
+
                 }
-                binding.recyclerView.visibility =  if (MainActivity.searchList.isNotEmpty()) View.VISIBLE else View.GONE
+                // Check if the search view is clicked or if there is text in the search view
+                if (isSearchViewClicked || newText?.isNotEmpty() == true) {
+                    binding.recyclerView.visibility = View.VISIBLE
+//                    binding.searchBackBtn.visibility = View.VISIBLE
+
+                } else {
+                    binding.recyclerView.visibility = View.GONE
+//                    binding.searchBackBtn.visibility = View.GONE
+
+                }
+
                 return true
             }
         })
 
-
-
         return true
     }
-
 
     @SuppressLint("Range")
     fun getAllVideos(folderId: String): ArrayList<VideoData> {
@@ -243,31 +258,43 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
         return tempList
     }
 
-    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
-    override fun onResume() {
-        super.onResume()
-        if(PlayerActivity.position != -1) binding.nowPlayingBtn.visibility = View.VISIBLE
-        if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
-        MainActivity.adapterChanged= false
-    }
+
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
     private fun setActionBarGradient() {
-        // Check if light mode is applied
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Set gradient background for action bar
+        // Check the current night mode
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Light mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
-                        this@FoldersActivity,
+                       this@FoldersActivity,
                         R.drawable.background_actionbar_light
+                    )
+                )
+            }
+        } else {
+            // Dark mode is applied or the mode is set to follow system
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                       this@FoldersActivity,
+                        R.drawable.background_actionbar
                     )
                 )
             }
         }
     }
-
+    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
+    override fun onResume() {
+        super.onResume()
+        setActionBarGradient()
+        if(PlayerActivity.position != -1) binding.nowPlayingBtn.visibility = View.VISIBLE
+        if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
+        MainActivity.adapterChanged= false
+    }
 }

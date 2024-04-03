@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.BookmarkActivity
 import com.jaidev.seeaplayer.BookmarkAdapter
 import com.jaidev.seeaplayer.LinkTubeActivity
@@ -53,8 +53,8 @@ class HomeFragment : Fragment() {
              if (checkForInternet(requireContext()))
                  changeTab(result!!, BrowseFragment(result))
                 else
-                    Snackbar.make(binding.root , "Internet Not Connected\uD83D\uDE03" , 3000).show()
-             return true
+                 Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean = false
@@ -66,8 +66,7 @@ class HomeFragment : Fragment() {
                     BrowseFragment(linkTubeRef.binding.topSearchBar.text.toString())
                 )
             else
-                Snackbar.make(binding.root, "Internet Not Connected\uD83D\uDE03", 3000).show()
-        }
+                Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()          }
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(5)

@@ -23,7 +23,6 @@
         android:layout_height="40dp"
         android:text="@string/playlist_name"
         android:contentDescription="@string/playlist_name"
-        android:textColor="@color/black"
         android:textSize="18sp"
         android:gravity="center"
         android:ellipsize="marquee"

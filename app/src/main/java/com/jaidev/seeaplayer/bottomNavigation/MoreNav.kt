@@ -1,13 +1,17 @@
+
 package com.jaidev.seeaplayer.bottomNavigation
 
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -20,15 +24,15 @@ import com.jaidev.seeaplayer.databinding.FragmentMoreNavBinding
 import com.jaidev.seeaplayer.signin
 
 class moreNav : Fragment() {
-private lateinit var binding : FragmentMoreNavBinding
+    private lateinit var binding : FragmentMoreNavBinding
     private lateinit var relativeLayout: RelativeLayout
     private var checkedItem: Int = 0
     private var selected: String = ""
     private val CHECKED_ITEM = "checked_item"
-
-companion object{
-    lateinit var auth : FirebaseAuth
-}
+    // Define your variable here
+    companion object{
+        lateinit var auth : FirebaseAuth
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_more_nav, container, false)
@@ -37,9 +41,10 @@ companion object{
 
         auth = FirebaseAuth.getInstance()
 
-        binding.goToSignin.setOnClickListener {
-           it.findNavController().navigate(R.id.action_moreNav_to_profile)
-        }
+//        binding.goToSignin.setOnClickListener {
+//            it.findNavController().navigate(R.id.action_moreNav_to_profile)
+//        }
+
         if (auth.currentUser == null) {
             startActivity(Intent(requireContext(), signin::class.java))
             requireActivity().finish()
@@ -51,18 +56,16 @@ companion object{
         }
 
         binding.subscribePlans.setOnClickListener {
-            it.findNavController().navigate(R.id.action_moreNav_to_seeAOne)
-
+            if (checkConnection(requireContext())) {
+                // Internet is connected, navigate to the desired destination
+                it.findNavController().navigate(R.id.action_moreNav_to_seeAOne)
+            } else {
+                // Internet is not connected, show a toast message
+                Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setBackgroundDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.background_actionbar
-                )
-            )
-        }
+
 
         binding.appThemelayout.setOnClickListener {
             showDialog()
@@ -78,6 +81,14 @@ companion object{
         return view
     }
 
+
+    private fun checkConnection(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
     private fun setRelativeLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -92,17 +103,15 @@ companion object{
             relativeLayout.setBackgroundColor(resources.getColor(android.R.color.white))
         }
     }
-    override fun onResume() {
-        super.onResume()
-        binding.userDetails.text = updateData()
 
-    }
 
     private fun updateData(): String {
 
         return "Name : ${auth.currentUser?.displayName}"
 
     }
+
+
     fun showDialog() {
         val themes = resources.getStringArray(R.array.theme)
         val builder = MaterialAlertDialogBuilder(requireContext())
@@ -150,9 +159,10 @@ companion object{
     }
 
     private fun setActionBarGradient() {
-        // Check if light mode is applied
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Set gradient background for action bar
+        // Check the current night mode
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Light mode is applied
             (activity as AppCompatActivity).supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -161,8 +171,21 @@ companion object{
                     )
                 )
             }
-
+        } else {
+            // Dark mode is applied or the mode is set to follow system
+            (activity as AppCompatActivity).supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.background_actionbar
+                    )
+                )
+            }
         }
     }
-
+    override fun onResume() {
+        super.onResume()
+        binding.userDetails.text = updateData()
+        setActionBarGradient()
+    }
 }

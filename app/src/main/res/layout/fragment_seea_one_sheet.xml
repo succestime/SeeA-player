@@ -27,11 +27,12 @@
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="19dp"
         android:background="@drawable/dashed_border"
-        android:hint="Enter SeeA1NE Membership code"
+        android:hint="@string/enter_seea1ne_membership_code"
         android:padding="8dp"
         android:paddingStart="20dp"
         android:textColor="#000000"
-        android:textSize="16sp" />
+        android:textSize="14sp"
+        tools:ignore="RtlSymmetry" />
 
 
     <TextView
@@ -40,9 +41,9 @@
         android:layout_height="wrap_content"
         android:text="Apply"
         android:gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="15sp"
 
-        android:textColor="@color/black"
+        android:textColor="@color/cool_green"
         android:layout_alignBottom="@id/editText"
         android:layout_alignTop="@id/editText"
         android:layout_alignEnd="@id/editText"

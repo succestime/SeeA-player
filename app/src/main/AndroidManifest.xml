@@ -13,7 +13,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:name=".ApplicationClass"
@@ -36,7 +35,9 @@
 
         <activity
             android:name=".SeeaEduProcess"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".SeeAOne"
             android:exported="false"
@@ -119,6 +120,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
+            android:screenOrientation="landscape"
             android:supportsPictureInPicture="true"
             tools:ignore="ObsoleteSdkInt"
             tools:targetApi="n">
@@ -148,7 +150,7 @@
         </activity>
 
         <service android:name=".MusicService"
-            android:foregroundServiceType="mediaPlayback"/>
+            />
 
         <service android:name=".FolderDetectionService" />
 

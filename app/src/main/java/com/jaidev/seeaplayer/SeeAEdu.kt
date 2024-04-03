@@ -1,8 +1,12 @@
 package com.jaidev.seeaplayer
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.jaidev.seeaplayer.databinding.ActivitySeeAeduBinding
@@ -16,8 +20,8 @@ class SeeAEdu : AppCompatActivity() {
         setContentView(binding.root)
 
 
-val items = listOf(Model(R.drawable.seea_monthly),Model(R.drawable.seea_quarterly)
-    ,Model(R.drawable.seea_annualy),Model(R.drawable.seea_biennial))
+val items = listOf(Model(R.drawable.seea_quarterly),Model(R.drawable.seea_half_yearly)
+    ,Model(R.drawable.seea_annual),Model(R.drawable.seea_biennial))
 
         val adapter = MyDotAdapter(items)
         binding.viewPager.adapter = adapter
@@ -38,10 +42,22 @@ val items = listOf(Model(R.drawable.seea_monthly),Model(R.drawable.seea_quarterl
         }
 
         binding.subscribeBtn.setOnClickListener {
-            startActivity(Intent(this, SeeaEduProcess::class.java))
+            if (checkConnection(this)) {
+                startActivity(Intent(this, SeeaEduProcess::class.java))
+            }else {
+                // Internet is not connected, show a toast message
+                Toast.makeText(this, "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+            }
+
         }
     }
+    private fun checkConnection(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+        val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
     private fun createDotIndictor(count : Int){
         for(i in 0 until count){
             val dot = ImageView(this)

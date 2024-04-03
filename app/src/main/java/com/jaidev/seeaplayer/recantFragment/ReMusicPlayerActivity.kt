@@ -33,6 +33,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
     , ServiceConnection, MediaPlayer.OnCompletionListener
 {
 
+    private lateinit var reMusicPlayerLayout: LinearLayout
 
     companion object {
         // of PlayerActivity of this reMusicActivity
@@ -49,13 +50,20 @@ class ReMusicPlayerActivity : AppCompatActivity()
 @SuppressLint("StaticFieldLeak")
 lateinit var binding: ActivityReMusicPlayerBinding
         var repeat: Boolean = false
+
+        fun updateNextMusicTitle() {
+            val nextSongPosition = if (songPosition + 1 < MainActivity.musicRecantList.size) songPosition + 1 else 0 // Assuming looping back to the first song after reaching the end
+            val nextMusicTitle = MainActivity.musicRecantList[nextSongPosition].title
+            binding.nextMusicTitle.text = nextMusicTitle
+
+        }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityReMusicPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-
+       updateNextMusicTitle()
         initializeLayout()
 
        binding.backBtnPA.setOnClickListener { finish() }
@@ -141,7 +149,29 @@ lateinit var binding: ActivityReMusicPlayerBinding
             startActivity(Intent.createChooser(shareIntent, "Sharing Music File!!"))
 
         }
+
+        reMusicPlayerLayout = binding.ReMusicPlayerLayout!!
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setMusicLayoutBackgroundColor()
     }
+
+    private fun   setMusicLayoutBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            reMusicPlayerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            reMusicPlayerLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
+
+
+
     private fun setLayout(){
         Glide.with(this)
             .asBitmap()
@@ -171,6 +201,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
                   binding.seekBarRPA.progress = 0
                    binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
                    binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+                 updateNextMusicTitle()
                    musicService!!.mediaPlayer!!.setOnCompletionListener(this)
                }catch (e : Exception){return}
            }

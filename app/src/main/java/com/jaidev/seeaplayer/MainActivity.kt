@@ -1,4 +1,5 @@
 
+
 package com.jaidev.seeaplayer
 
 
@@ -11,6 +12,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,13 +21,17 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.text.format.DateUtils
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -49,6 +55,7 @@ import com.jaidev.seeaplayer.databinding.ActivityMainBinding
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
+
     lateinit var binding: ActivityMainBinding
     private lateinit var currentFragment: Fragment
     private lateinit var toggle: ActionBarDrawerToggle
@@ -60,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     private val CHECKED_ITEM = "checked_item"
 
     private var mInterstitialAd: InterstitialAd? = null
-
+    private var doubleBackToExitPressedOnce = false
     companion object {
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
@@ -105,9 +112,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding = ActivityMainBinding.inflate(layoutInflater)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setupActionBar()
+
+        // Check internet connectivity and show/hide the "Subscribe" TextView
+        checkInternetConnection()
+
 
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
@@ -119,17 +132,13 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        supportActionBar?.apply {
-
-            setBackgroundDrawable(ContextCompat.getDrawable(this@MainActivity, R.drawable.background_actionbar))
-        }
 
         setActionBarGradient()
         drawerLayout = binding.drawerLayoutMA
         // Set the background color of SwipeRefreshLayout based on app theme
         setDrawerLayoutBackgroundColor()
         // Set the title for the action bar
-        supportActionBar?.title = "SeeA Player"
+//        supportActionBar?.title = "SeeA Player"
 
         if (requestRuntimePermission()) {
             folderList = ArrayList()
@@ -294,6 +303,36 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+    private fun setupActionBar() {
+        supportActionBar?.setDisplayShowCustomEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        val inflater = LayoutInflater.from(this)
+        val customActionBarView = inflater.inflate(R.layout.custom_action_bar_layout, null)
+
+        val titleTextView = customActionBarView.findViewById<TextView>(R.id.titleTextView)
+        titleTextView.text = "SeeA Player"
+
+        val subscribeTextView = customActionBarView.findViewById<TextView>(R.id.subscribe)
+        subscribeTextView.setOnClickListener {
+            startActivity(Intent(this, SeeAOne::class.java))
+
+        }
+
+        supportActionBar?.customView = customActionBarView
+    }
+    private fun checkInternetConnection() {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        val isInternetConnected = networkInfo != null && networkInfo.isConnected
+
+        val subscribeTextView = supportActionBar?.customView?.findViewById<CardView>(R.id.connectivityCardView)
+        if (isInternetConnected) {
+            subscribeTextView?.visibility = View.VISIBLE
+        } else {
+            subscribeTextView?.visibility = View.GONE
+        }
+    }
 
     private fun getCheckedItem(): Int {
         return this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
@@ -368,7 +407,8 @@ class MainActivity : AppCompatActivity() {
                     this,
                     arrayOf(
                         Manifest.permission.READ_MEDIA_VIDEO,
-                        Manifest.permission.READ_MEDIA_AUDIO
+                        Manifest.permission.READ_MEDIA_AUDIO ,
+                        Manifest.permission.POST_NOTIFICATIONS ,
                     ),
                     13
                 )
@@ -673,9 +713,10 @@ class MainActivity : AppCompatActivity() {
 
     }
     private fun setActionBarGradient() {
-        // Check if light mode is applied
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Set gradient background for action bar
+        // Check the current night mode
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Light mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -684,12 +725,28 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
+        } else {
+            // Dark mode is applied or the mode is set to follow system
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@MainActivity,
+                        R.drawable.background_actionbar
+                    )
+                )
+            }
         }
     }
+
+
+
+
+
+
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
     override fun onResume() {
         super.onResume()
-
+        setActionBarGradient()
     }
 
     fun loadAd() {
@@ -710,5 +767,15 @@ class MainActivity : AppCompatActivity() {
                 }
             })
     }
+    override fun onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed()
+            return
+        }
 
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "Tap again to exit", Toast.LENGTH_SHORT).show()
+
+        Handler(Looper.getMainLooper()).postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
+    }
 }

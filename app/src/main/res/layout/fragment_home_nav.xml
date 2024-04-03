@@ -29,17 +29,18 @@
             app:layout_constraintVertical_bias="0.0">
 
 
-            <ImageView
-                android:id="@+id/searchBackBtn"
-                android:layout_width="25dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="@string/searchbackbtn"
-                app:tint="?android:attr/textColorPrimary"
-                android:src="@drawable/search_back_btn"
-                app:layout_constraintEnd_toEndOf="@+id/recycler_view"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="UseAppTint" />
+<!--            <ImageView-->
+<!--                android:id="@+id/searchBackBtn"-->
+<!--                android:layout_width="25dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:contentDescription="@string/searchbackbtn"-->
+<!--                app:tint="?android:attr/textColorPrimary"-->
+<!--                android:src="@drawable/search_back_btn"-->
+<!--                app:layout_constraintEnd_toEndOf="@+id/recycler_view"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                android:visibility="visible"-->
+<!--                tools:ignore="UseAppTint" />-->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/searchRecyclerView"

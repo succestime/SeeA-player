@@ -3,7 +3,6 @@ package com.jaidev.seeaplayer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -147,9 +146,6 @@ class LinkTubeActivity : AppCompatActivity() {
 
             pBtn.isAllCaps = false
             nBtn.isAllCaps = false
-
-            pBtn.setTextColor(Color.BLACK)
-            nBtn.setTextColor(Color.BLACK)
 
             pBtn.setCompoundDrawablesWithIntrinsicBounds( ResourcesCompat.getDrawable(resources, R.drawable.home_browse, theme)
                 , null, null, null)

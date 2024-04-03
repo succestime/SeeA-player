@@ -56,7 +56,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
             when {
                 URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
                 urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
-                else -> loadUrl("https://www.google.com/search?q=$urlNew")
+                else -> loadUrl("https://search.brave.com/search?q=$urlNew")
             }
 
         }
@@ -119,11 +119,11 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     super.onPageStarted(view, url, favicon)
                     linkRef.binding.progressBar.progress = 0
                     linkRef.binding.progressBar.visibility = View.VISIBLE
-                    if (url!!.contains(
-                            "you",
-                            ignoreCase = false
-                        )
-                    ) linkRef.binding.root.transitionToEnd()
+//                    if (url!!.contains(
+//                            "you",
+//                            ignoreCase = false
+//                        )
+//                    )
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
@@ -132,7 +132,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     binding.webView.zoomOut()
 
                 }
-            }
+          }
             webChromeClient = object : WebChromeClient() {
                 override fun onReceivedIcon(view: WebView?, icon: Bitmap?) {
                     super.onReceivedIcon(view, icon)
@@ -156,7 +156,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     binding.webView.visibility = View.GONE
                     binding.customView.visibility = View.VISIBLE
                     binding.customView.addView(view)
-                    linkRef.binding.root.transitionToEnd()
+
                 }
 
                 override fun onHideCustomView() {
@@ -189,13 +189,13 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
         // for clearing all  webView data
         binding.webView.apply {
             clearMatches()
-            clearHistory()
+        clearHistory()
             clearFormData()
             clearSslPreferences()
             clearCache(true)
 
             CookieManager.getInstance().removeAllCookies(null)
-            WebStorage.getInstance().deleteAllData()
+           WebStorage.getInstance().deleteAllData()
         }
     }
 

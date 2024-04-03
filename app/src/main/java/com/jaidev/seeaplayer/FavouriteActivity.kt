@@ -57,14 +57,7 @@ class FavouriteActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        supportActionBar?.apply {
-            setBackgroundDrawable(
-                ContextCompat.getDrawable(
-                    this@FavouriteActivity,
-                    R.drawable.background_actionbar
-                )
-            )
-        }
+
         setActionBarGradient()
         favouritelayout = binding.favouriteLayout
 
@@ -94,14 +87,25 @@ class FavouriteActivity : AppCompatActivity() {
     }
 
     private fun setActionBarGradient() {
-        // Check if light mode is applied
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Set gradient background for action bar
-            supportActionBar?.apply {
+        // Check the current night mode
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Light mode is applied
+           supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         this@FavouriteActivity,
                         R.drawable.background_actionbar_light
+                    )
+                )
+            }
+        } else {
+            // Dark mode is applied or the mode is set to follow system
+           supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@FavouriteActivity,
+                        R.drawable.background_actionbar
                     )
                 )
             }

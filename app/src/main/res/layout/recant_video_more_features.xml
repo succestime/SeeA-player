@@ -13,7 +13,6 @@ android:orientation="vertical"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:text="Choose"
-            android:textColor="@color/black"
             android:textSize="25sp"
             android:textStyle="bold"
             android:layout_marginTop="5dp"/>

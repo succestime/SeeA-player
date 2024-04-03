@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -32,10 +33,7 @@ class signin : AppCompatActivity() {
             startActivity(Intent(this , login::class.java))
             finish()
         }
-        supportActionBar?.apply {
-
-            setBackgroundDrawable(ContextCompat.getDrawable(this@signin, R.drawable.background_actionbar))
-        }
+        setActionBarGradient()
 
         binding.createAccountBtn.setOnClickListener {
             val name = binding.userName.text.toString()
@@ -101,4 +99,30 @@ private fun firebaseAuthWithGoogle(idToken : String){
             Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()
         }
 }
+
+    private fun setActionBarGradient() {
+        // Check the current night mode
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Light mode is applied
+       supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                       this@signin,
+                        R.drawable.background_actionbar_light
+                    )
+                )
+            }
+        } else {
+            // Dark mode is applied or the mode is set to follow system
+          supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                     this@signin,
+                        R.drawable.background_actionbar
+                    )
+                )
+            }
+        }
+    }
 }

@@ -14,8 +14,8 @@
         android:id="@+id/musicViewImage"
         android:layout_width="70dp"
         android:layout_height="65dp"
+        android:layout_margin="2dp"
         android:src="@drawable/speaker"
-        android:layout_marginStart="5dp"
         app:shapeAppearanceOverlay="@style/curved"/>
 
     <LinearLayout

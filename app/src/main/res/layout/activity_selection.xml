@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/selectionConstraintlayout"
     tools:context=".SelectionActivity">
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -22,7 +23,7 @@
             android:src="@drawable/back_icon"
             android:contentDescription="@string/back_btn"
             android:backgroundTint="@android:color/transparent"
-            app:tint="@color/black"
+            app:tint="?android:attr/textColorPrimary"
             android:layout_margin="5dp"/>
 
         <androidx.appcompat.widget.SearchView

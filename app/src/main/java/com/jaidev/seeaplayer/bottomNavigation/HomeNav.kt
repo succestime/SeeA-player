@@ -1,4 +1,5 @@
 
+
 package com.jaidev.seeaplayer.bottomNavigation
 
 import android.annotation.SuppressLint
@@ -25,6 +26,7 @@ class homeNav : Fragment() {
     private var isSearchViewClicked = false
     private lateinit var searchView: SearchView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -57,9 +59,10 @@ class homeNav : Fragment() {
             refreshFolders()
         }
 
-        binding.searchBackBtn.setOnClickListener {
-            binding.searchRecyclerView.visibility = View.GONE
-        }
+//        binding.searchBackBtn.setOnClickListener {
+//            binding.searchRecyclerView.visibility = View.GONE
+//            binding.searchBackBtn.visibility = View.GONE
+//        }
 
 
         swipeRefreshLayout = binding.swipeRefreshFolder
@@ -100,15 +103,16 @@ class homeNav : Fragment() {
 
         searchView = searchItem?.actionView as SearchView
 
-        // Set an expand listener to track whether the search view is explicitly clicked
-        searchView.setOnSearchClickListener {
-            isSearchViewClicked = true
-        }
+//        // Set an expand listener to track whether the search view is explicitly clicked
+//        searchView.setOnSearchClickListener {
+//            isSearchViewClicked = true
+//        }
 
         // Set a collapse listener to track when the search view is closed
         searchView.setOnCloseListener {
             isSearchViewClicked = false
-            toggleSearchRecyclerViewVisibility(false)
+            binding.searchRecyclerView.visibility = View.GONE
+//            binding.searchBackBtn.visibility = View.GONE
             false
         }
 
@@ -123,6 +127,8 @@ class homeNav : Fragment() {
                         // Filter videos based on the user's input
                         if (video.title.lowercase().contains(queryText)) {
                             MainActivity.searchList.add(video)
+//                            binding.searchBackBtn.visibility = View.VISIBLE
+
                         }
                     }
                     MainActivity.search = true
@@ -131,9 +137,11 @@ class homeNav : Fragment() {
 
                 // Check if the search view is clicked or if there is text in the search view
                 if (isSearchViewClicked || newText?.isNotEmpty() == true) {
-                    toggleSearchRecyclerViewVisibility(true)
+                  binding.searchRecyclerView.visibility = View.VISIBLE
+//                   binding.searchBackBtn.visibility = View.VISIBLE
                 } else {
-                    toggleSearchRecyclerViewVisibility(false)
+                    binding.searchRecyclerView.visibility = View.GONE
+//                    binding.searchBackBtn.visibility = View.GONE
                 }
                 return true
             }
@@ -145,17 +153,5 @@ class homeNav : Fragment() {
 
 
 
-
-    private fun toggleSearchRecyclerViewVisibility(show: Boolean) {
-
-        // Check if the search view is explicitly clicked or if it is expanded
-        if (isSearchViewClicked || searchView.isIconified) {
-            binding.searchRecyclerView.visibility =
-                if (show && MainActivity.searchList.isNotEmpty()) View.VISIBLE else View.GONE
-        } else {
-            // If the search view is not clicked and not expanded, hide the searchRecyclerView
-            binding.searchRecyclerView.visibility = View.GONE
-        }
-    }
 
 }

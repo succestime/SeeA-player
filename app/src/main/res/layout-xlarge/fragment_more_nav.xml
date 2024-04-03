@@ -55,17 +55,17 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
 
-                            app:cardCornerRadius="10dp">
+                          >
 
                             <LinearLayout
                                 android:id="@+id/goToSignin"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="#022C42"
+
                                 android:orientation="horizontal">
 
                                 <ImageView
-                                    android:layout_width="40dp"
+                                    android:layout_width="30dp"
                                     android:layout_height="match_parent"
                                     android:layout_gravity="center_horizontal"
                                     android:layout_marginStart="25dp"
@@ -79,8 +79,7 @@
                                     android:layout_marginStart="10dp"
                                     android:gravity="center_vertical"
                                     android:text="@string/login_or_signin"
-                                    android:textColor="@color/white"
-                                    android:textSize="30sp" />
+                                    android:textSize="25sp" />
 
 
 
@@ -111,7 +110,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
 
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="130dp"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
                     android:layout_marginBottom="10dp"
@@ -123,6 +122,8 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:ignore="MissingConstraints">
 
@@ -140,13 +141,13 @@
 
                                 <androidx.cardview.widget.CardView
                                     android:id="@+id/seeA1ne"
-                                    android:layout_width="200dp"
+                                    android:layout_width="180dp"
                                     android:layout_height="60dp"
-                                    android:backgroundTint="#8A4D0B"
-                                    android:layout_marginTop="20dp"
                                     android:layout_marginStart="10dp"
-                                    app:cardCornerRadius="25dp"
-                                    >
+                                    android:layout_marginTop="20dp"
+                                    android:backgroundTint="#8A4D0B"
+                                   >
+
                                     <androidx.constraintlayout.widget.ConstraintLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent">
@@ -155,9 +156,7 @@
                                             android:id="@+id/SeeA"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_gravity="center_vertical"
-                                            android:layout_marginStart="35dp"
-                                            android:gravity="center"
+                                            android:layout_marginStart="25dp"
                                             android:text="@string/seea"
                                             android:textColor="@color/white"
                                             android:textSize="30sp"
@@ -166,7 +165,7 @@
                                             app:layout_constraintBottom_toBottomOf="parent"
                                             app:layout_constraintStart_toStartOf="parent"
                                             app:layout_constraintTop_toTopOf="parent"
-                                            app:layout_constraintVertical_bias="0.526" />
+                                            />
 
                                         <TextView
                                             android:layout_width="wrap_content"
@@ -181,10 +180,9 @@
                                             app:layout_constraintHorizontal_bias="0.0"
                                             app:layout_constraintStart_toEndOf="@+id/SeeA"
                                             app:layout_constraintTop_toTopOf="parent"
-                                            app:layout_constraintVertical_bias="0.526" />
+                                          />
 
                                     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
                                 </androidx.cardview.widget.CardView>
@@ -193,12 +191,11 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="25dp"
+                                    android:layout_marginTop="25dp"
                                     android:text="@string/be_the_member_of_seea_player"
                                     android:textColor="@color/white"
-                                    android:textStyle="bold"
-                                    android:layout_marginTop="25dp"
-                                    android:layout_marginStart="25dp"/>
-
+                                    android:textStyle="bold" />
 
 
                             </LinearLayout>
@@ -220,10 +217,10 @@
 
                         <androidx.cardview.widget.CardView
 
-                            android:layout_width="210dp"
-                            android:layout_height="70dp"
+                            android:layout_width="180dp"
+                            android:layout_height="50dp"
                             android:layout_marginEnd="15dp"
-                            android:layout_marginTop="30dp"
+                            android:layout_gravity="center"
                             app:cardCornerRadius="5dp"
                             android:backgroundTint="#FFCF00">
 
@@ -270,8 +267,6 @@
             android:id="@+id/theme_activity"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cardCornerRadius="10dp"
-
 
             >
 
@@ -282,7 +277,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="30dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="25dp"
@@ -296,7 +291,7 @@ android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/app_theme"
                     android:textColor="@color/white"
-                    android:textSize="30sp" />
+                    android:textSize="25sp" />
 
 
 
@@ -314,9 +309,7 @@ android:layout_marginStart="10dp"
         android:layout_height="70dp"
         android:layout_below="@+id/appThemelayout"
         android:layout_alignParentStart="true"
-
         android:layout_marginStart="25dp"
-        android:layout_marginTop="30dp"
         android:layout_marginEnd="25dp"
         android:background="@drawable/curver"
         android:orientation="vertical">
@@ -324,8 +317,7 @@ android:layout_marginStart="10dp"
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
-            app:cardCornerRadius="10dp">
+          >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -334,7 +326,7 @@ android:layout_marginStart="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="30dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="25dp"
@@ -349,7 +341,7 @@ android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/more_nav_settings"
                     android:textColor="@color/white"
-                    android:textSize="30sp" />
+                    android:textSize="25sp" />
 
 
 
@@ -369,7 +361,7 @@ android:layout_marginStart="10dp"
         android:layout_alignStart="@+id/appThemelayout"
         android:layout_alignParentEnd="true"
 
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="25dp"
         android:background="@drawable/curver"
         android:orientation="vertical">
@@ -378,7 +370,7 @@ android:layout_marginStart="10dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 
-            app:cardCornerRadius="10dp">
+            app:cardCornerRadius="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -387,7 +379,7 @@ android:layout_marginStart="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="30dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="25dp"
                     android:layout_gravity="center_horizontal"
@@ -402,7 +394,7 @@ android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/my_subscriptions"
                     android:textColor="@color/white"
-                    android:textSize="30sp" />
+                    android:textSize="25sp" />
 
 
 
@@ -421,7 +413,7 @@ android:layout_marginStart="10dp"
         android:layout_alignStart="@+id/appThemelayout"
         android:layout_alignParentEnd="true"
 
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="25dp"
         android:background="@drawable/curver"
         android:orientation="vertical">
@@ -430,7 +422,7 @@ android:layout_marginStart="10dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 
-            app:cardCornerRadius="10dp">
+            app:cardCornerRadius="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -439,7 +431,7 @@ android:layout_marginStart="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:layout_width="30dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="25dp"
                     android:tint="@color/white"
@@ -456,7 +448,7 @@ android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/sign_out"
                     android:textColor="@color/white"
-                    android:textSize="30sp" />
+                    android:textSize="25sp" />
 
 
 

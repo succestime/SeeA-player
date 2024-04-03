@@ -32,6 +32,7 @@
         android:layout_gravity="center_vertical|end"
         android:layout_marginHorizontal="10dp"
         android:padding="5dp"
+        app:tint="?android:attr/textColorPrimary"
         />
 
 </com.google.android.material.card.MaterialCardView>

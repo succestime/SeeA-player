@@ -30,17 +30,20 @@
             android:layout_marginStart="10dp"
             android:contentDescription="@string/back_btn"
             />
-
         <TextView
+            android:id="@+id/nextMusicTitle"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:text="@string/seea_music_player"
             android:textColor="@color/cool_blue"
             android:textSize="20sp"
             android:gravity="center"
-            tools:ignore="NestedWeights"
+            android:textStyle="italic"
             android:layout_weight="1"
-            android:textStyle="bold"/>
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"/>
+
 
         <ImageButton
             android:id="@+id/favouriteBtnPA"

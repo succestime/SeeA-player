@@ -8,8 +8,6 @@
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginTop="10dp"
-        android:layout_gravity="center"
-        android:src="@drawable/seea_monthly"/>
+        android:src="@drawable/seea_quarterly"/>
 
 </LinearLayout>

@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/playlistDetailsLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/playlistDetailsLayout"
     tools:context=".PlaylistDetails">
 
 
@@ -12,7 +12,6 @@
         android:id="@+id/linearLayoutDetails"
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:background="@color/cool_blue"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,13 +33,23 @@
             android:textSize="16sp" />
     </LinearLayout>
 
+    <!-- Horizontal line -->
+    <View
+        android:id="@+id/horizontalLine"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/cool_blue"
+        app:layout_constraintTop_toBottomOf="@id/linearLayoutDetails"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlistDetailsRV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linearLayoutDetails"
+        app:layout_constraintTop_toBottomOf="@id/horizontalLine"
         android:scrollbarThumbVertical="@drawable/scroll_bar_icon"
         android:scrollbars="vertical"
         android:paddingBottom="330dp"
@@ -84,7 +93,8 @@
             android:drawableTop="@drawable/add_music_icon"
             android:text="@string/add_song"
             android:textAllCaps="false"
-          />
+            android:textColor="?attr/colorPrimary"
+            />
 
         <!--Remove Button-->
         <Button
@@ -97,6 +107,7 @@
             android:drawableTop="@drawable/remove_icon"
             android:text="@string/remove_all"
             android:textAllCaps="false"
+            android:textColor="?attr/colorPrimary"
 
             />
 

@@ -52,6 +52,15 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         lateinit var binding: ActivityPlayerMusicBinding
         var repeat: Boolean = false
         lateinit var loudnessEnhancer: LoudnessEnhancer
+
+
+        fun updateNextMusicTitle() {
+            val nextSongPosition = if (songPosition + 1 < MainActivity.MusicListMA.size) songPosition + 1 else 0 // Assuming looping back to the first song after reaching the end
+            val nextMusicTitle = MainActivity.MusicListMA[nextSongPosition].title
+            binding.nextMusicTitle.text = nextMusicTitle
+
+
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +68,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         binding = ActivityPlayerMusicBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+        updateNextMusicTitle()
         if(intent.data?.scheme.contentEquals("content")){
             songPosition = 0
             val intentService = Intent(this, MusicService::class.java)
@@ -302,11 +312,13 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             isPlaying = true
             binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
           musicService!!.showNotification(R.drawable.ic_pause_icon)
+            updateNextMusicTitle()
             binding.tvSeekBarStart.text =
                 formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
             binding.tvSeekBarEnd.text =
                 formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
             binding.seekBarPA.progress = 0
+      binding.seekBarPA.max = 100 // Or any smaller value you desire
             binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
             nowMusicPlayingId = musicListPA[songPosition].id

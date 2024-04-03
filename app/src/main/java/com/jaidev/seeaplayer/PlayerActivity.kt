@@ -183,68 +183,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         filePickerDialog.setPositiveBtnName("OK")
         filePickerDialog.setNegativeBtnName("Cancel")
 
-//        val displayMetrics = DisplayMetrics()
-//        windowManager.defaultDisplay.getMetrics(displayMetrics)
-//        deviceWidth = displayMetrics.widthPixels
-//       deviceHeight = displayMetrics.heightPixels
-//
-//
-//        binding.playerView.setOnTouchListener(object : OnSwipeTouchListener(this@PlayerActivity) {
-//            @SuppressLint("ClickableViewAccessibility")
-//            override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
-//                when (motionEvent.action) {
-//                    MotionEvent.ACTION_DOWN -> {
-//                        start = true
-//
-//                        left = motionEvent.x < (deviceWidth / 2)
-//                        right = motionEvent.x > (deviceWidth / 2)
-//
-//                        baseX = motionEvent.x
-//                        baseY = motionEvent.y
-//                    }
-//
-//                    MotionEvent.ACTION_MOVE -> {
-//
-//                        swipe_move = true
-//                        diffX = motionEvent.x.toLong() - baseX.toLong()
-//                        diffY = motionEvent.y.toLong() - baseY.toLong()
-//
-//                        if (abs(diffY) > MINIMUM_DISTANCE) {
-//                            start = true
-//                            if (abs(diffY) > abs(diffX)) {
-//                                val value = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                                    android.provider.Settings.System.canWrite(applicationContext)
-//                                } else {
-//                                    false
-//                                }
-//                                if (value) {
-//                                    if (left) {
-//                                        Toast.makeText(applicationContext, "left swipe", Toast.LENGTH_SHORT).show()
-//                                    } else if (right) {
-//                                        Toast.makeText(applicationContext, "right swipe", Toast.LENGTH_SHORT).show()
-//                                    }
-//                                    success = true
-//                                } else {
-//                                    Toast.makeText(applicationContext, "Allow write setting for swipe controls", Toast.LENGTH_SHORT).show()
-//                                    val intent = Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS)
-//                                    intent.data = Uri.parse("package:$packageName")
-//                                    startActivityForResult(intent, 111)
-//                                }
-//                            }
-//                        }
-//                        // Your code ends here
-//                    }
-//
-//                    MotionEvent.ACTION_UP -> {
-//                        swipe_move = false
-//                        start = false
-//                    }
-//
-//                }
-//                return super.onTouch(view, motionEvent)
-//            }
-//        })
-//
 
         horizontalIconList()
         try {
@@ -600,7 +538,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (status) {
                 this.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
-                // dialog.dismiss()
                 binding.playerView.hideController()
                 playVideo()
                 pipStatus = 0
@@ -807,7 +744,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
     private fun changeSpeed(isIncrement: Boolean) {
         if (isIncrement) {
-            if (speed < 3.9f) {
+            if (speed < 2.9f) {
                 speed += 0.10f  // speed = speed + 0.10f
             }
         } else {

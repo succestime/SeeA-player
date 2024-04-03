@@ -30,9 +30,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginStart="16dp">
+                android:layout_margin="16dp">
                 <AutoCompleteTextView
                     android:id="@+id/auto_complete"
                     android:layout_width="match_parent"
@@ -49,7 +47,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="180dp"
+            android:layout_marginTop="90dp"
             android:focusableInTouchMode="true"
             android:orientation="vertical">
 
@@ -73,7 +71,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="330dp"
+            android:layout_marginTop="180dp"
             android:focusableInTouchMode="true"
             android:orientation="vertical">
 
@@ -96,15 +94,15 @@
 
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="450dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
             android:focusableInTouchMode="true"
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
-                android:layout_width="300dp"
-                android:layout_height="60dp"
+                android:layout_width="230dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="100dp"
                 app:cardCornerRadius="20dp">
@@ -114,7 +112,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total"
-                    android:layout_marginStart="40dp"
+                    android:layout_marginStart="15dp"
                     android:layout_gravity="center_vertical"
                     android:textStyle="bold"
                     android:textColor="@color/black"
@@ -124,7 +122,7 @@
                     android:id="@+id/totalAmount"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="150dp"
+                    android:layout_marginStart="110dp"
                     android:gravity="center"
                     android:text="₹ 0"
                     android:textSize="25dp" />
@@ -138,12 +136,12 @@
             android:layout_height="match_parent">
 
             <Button
-             android:id="@+id/payButton"
+                android:id="@+id/payButton"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="50dp"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
-                android:layout_marginTop="350dp"
+                android:layout_marginTop="300dp"
                 android:backgroundTint="#E3B52A"
                 android:paddingBottom="10dp"
                 android:text="Pay Now "

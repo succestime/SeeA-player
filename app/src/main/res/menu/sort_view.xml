@@ -5,7 +5,7 @@
     <item android:id="@+id/sortOrder"
         android:title="@string/sort_order"
         app:tint="?android:attr/textColorPrimary"
-        android:icon="@drawable/sort_icon"
+        android:icon="@drawable/short_order_icon"
         app:showAsAction="ifRoom"
         />
 

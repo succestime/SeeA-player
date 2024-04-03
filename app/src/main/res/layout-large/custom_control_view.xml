@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     xmlns:tools="http://schemas.android.com/tools"
@@ -69,83 +68,142 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
+
         <!--    <include layout="@layout/swipe_zoom_design"/>-->
 
     </RelativeLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomController"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        >
 
+
+        <TextView
+            android:id="@id/exo_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            android:text="@string/duration"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_toEndOf="@+id/exo_position"
+            android:text="@string/semi_colon"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/exo_position"
+            app:layout_constraintEnd_toStartOf="@+id/exo_duration"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@id/exo_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/loading"
+            android:textColor="@color/white"
+            android:layout_margin="10dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView6"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/prevBtn"
-            android:layout_width="80dp"
+            android:layout_width="85dp"
             android:layout_height="65dp"
-            android:layout_marginStart="300dp"
-            android:layout_marginEnd="10dp"
             android:background="?android:selectableItemBackground"
             android:clickable="true"
-            android:contentDescription="@string/prev_btn"
+            android:layout_marginEnd="20dp"
+            android:contentDescription="@string/next_btn"
             android:focusable="true"
             android:src="@drawable/ic_previous_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/nextBtn"
+            app:layout_constraintStart_toEndOf="@id/exo_duration"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
         <ImageButton
             android:id="@+id/playPauseBtn"
-            android:layout_width="80dp"
+            android:layout_width="85dp"
             android:layout_height="65dp"
-            android:layout_marginEnd="10dp"
             android:background="?android:selectableItemBackground"
             android:clickable="true"
             android:contentDescription="@string/play_btn"
             android:focusable="true"
             android:src="@drawable/ic_play_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/nextBtn"
+            app:layout_constraintStart_toEndOf="@+id/prevBtn"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
         <ImageButton
             android:id="@+id/nextBtn"
-            android:layout_width="80dp"
+            android:layout_width="85dp"
             android:layout_height="65dp"
-            android:layout_marginEnd="50dp"
             android:background="?android:selectableItemBackground"
             android:clickable="true"
-            android:contentDescription="@string/next_btn"
+            android:layout_marginStart="20dp"
+            android:contentDescription="@string/prev_btn"
             android:focusable="true"
             android:src="@drawable/ic_next_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/fullScreenBtn"
+            app:layout_constraintStart_toEndOf="@+id/prevBtn"
+
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
+
 
 
         <ImageButton
             android:id="@+id/fullScreenBtn"
-            android:layout_width="80dp"
+            android:layout_width="65dp"
             android:layout_height="65dp"
-            android:layout_marginStart="20dp"
             android:background="?android:selectableItemBackground"
             android:clickable="true"
             android:contentDescription="@string/fullscreen_btn"
             android:focusable="true"
             android:src="@drawable/ic_fullscreen_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/repeatBtn"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
         <ImageButton
             android:id="@+id/repeatBtn"
-            android:layout_width="80dp"
+            android:layout_width="65dp"
             android:layout_height="65dp"
-            android:layout_marginStart="10dp"
             android:background="?android:selectableItemBackground"
             android:clickable="true"
             android:contentDescription="@string/repeat_btn"
             android:focusable="true"
             android:src="@drawable/ic_repeat_off_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.exoplayer2.ui.DefaultTimeBar
         android:id="@+id/exo_progress"
@@ -164,46 +222,20 @@
     </com.google.android.exoplayer2.ui.DefaultTimeBar>
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="25dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:id="@+id/durationLayout"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginBottom="25dp"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/bottomController"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/exo_progress">-->
 
-        <TextView
-            android:id="@id/exo_position"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/duration"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+    <!--      -->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_marginVertical="10dp"
-            android:text="@string/semi_colon"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-
-        <TextView
-            android:id="@id/exo_duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/loading"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
+    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
 
 
 

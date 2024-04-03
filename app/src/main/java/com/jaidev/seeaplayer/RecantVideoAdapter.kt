@@ -21,7 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantDownloadViewBinding
-import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
+import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.recantFragment.ReVideoPlayerActivity
 
 class RecentVideoAdapter(private val context: Context, private var videoReList: ArrayList<RecantVideo> ,private val isRecantVideo: Boolean = false ) :
@@ -73,8 +73,8 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             newPosition = position
 
             val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.video_more_features, holder.root, false)
-            val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
+                .inflate(R.layout.recant_video_more_features, holder.root, false)
+            val bindingMf = RecantVideoMoreFeaturesBinding.bind(customDialog)
             val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
                 .create()
             dialog.show()

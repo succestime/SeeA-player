@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/ReMusicPlayerLayout"
     android:orientation="vertical"
     tools:context=".recantFragment.ReMusicPlayerActivity">
 
@@ -29,14 +30,18 @@
             android:padding="10dp" />
 
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/nextMusicTitle"
+            android:layout_width="match_parent"
             android:layout_height="80dp"
             android:text="@string/seea_music_player"
             android:textColor="@color/cool_blue"            android:textSize="20sp"
             android:gravity="center"
+            android:layout_marginEnd="70dp"
             tools:ignore="NestedWeights"
-            android:layout_weight="1"
-            android:textStyle="bold"/>
+            android:textStyle="italic"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:ellipsize="marquee"/>
 
 <!--        &lt;!&ndash;        Favourite Button&ndash;&gt;-->
 <!--        <ImageButton-->
