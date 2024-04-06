@@ -1,0 +1,30 @@
+<!-- notification_layout.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/notification_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/notification_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Artist"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/notification_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/music_icon"
+        android:scaleType="centerCrop" />
+
+</LinearLayout>

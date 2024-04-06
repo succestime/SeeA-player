@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_margin="10dp"
+       />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/connectivityCardView"
+        android:layout_width="60dp"
+        android:layout_height="20dp"
+        android:backgroundTint="@color/cool_green"
+        app:cardCornerRadius="10dp"
+        android:visibility="gone"
+        >
+        <TextView
+            android:id="@+id/subscribe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Subscribe"
+            android:textSize="10sp"
+            android:textStyle="bold"/>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

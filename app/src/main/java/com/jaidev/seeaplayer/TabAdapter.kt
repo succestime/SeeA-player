@@ -1,12 +1,13 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.databinding.TabBinding
 
 class TabAdapter(private val context: Context, private val dialog: AlertDialog
@@ -36,12 +37,12 @@ class TabAdapter(private val context: Context, private val dialog: AlertDialog
 
         holder.cancelBtn.setOnClickListener{
             if(LinkTubeActivity.tabsList.size == 1 || position == LinkTubeActivity.myPager.currentItem)
-                Snackbar.make(LinkTubeActivity.myPager, "Can't Remove this tab" , 3000).show()
-           else{
-            LinkTubeActivity.tabsList.removeAt(position)
-            notifyDataSetChanged()
-            LinkTubeActivity.myPager.adapter?.notifyItemRemoved(position)
-        }
+                Toast.makeText(context, "Can't Remove this tab", Toast.LENGTH_SHORT).show()
+            else{
+                LinkTubeActivity.tabsList.removeAt(position)
+                notifyDataSetChanged()
+                LinkTubeActivity.myPager.adapter?.notifyItemRemoved(position)
+            }
 
         }
     }

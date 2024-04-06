@@ -43,6 +43,13 @@
     <color name="icon_light_color">#000000</color> <!-- Black color for light mode -->
     <color name="icon_dark_color">#FFFFFF</color> <!-- White color for dark mode -->
 
+    <color name="chrome_dark_primary">#1E1E1E</color> <!-- Dark gray background -->
+    <color name="chrome_dark_primary_dark">#121212</color> <!-- Darker gray background -->
+    <color name="chrome_dark_accent">#4A90E2</color> <!-- Blue accent color -->
+    <color name="chrome_dark_toolbar">#212121</color> <!-- Dark toolbar color -->
+    <color name="chrome_dark_text_primary">#FFFFFF</color> <!-- White text color -->
+    <color name="chrome_dark_text_secondary">#CCCCCC</color> <!-- Light gray text color -->
+
     <integer-array name="myColors">
         <item>@color/light_yellow</item>
         <item>@color/cool_pink</item>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".seea_one_sheet">
+
+
+    <TextView
+        android:id="@+id/textView9"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Apply Membership code"
+        android:textSize="30sp" />
+
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_below="@+id/textView9"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="19dp"
+        android:background="@drawable/dashed_border"
+        android:hint="@string/enter_seea1ne_membership_code"
+        android:padding="8dp"
+        android:paddingStart="20dp"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        tools:ignore="RtlSymmetry" />
+
+
+    <TextView
+        android:id="@+id/applyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        android:gravity="center_vertical"
+        android:textSize="15sp"
+
+        android:textColor="@color/cool_green"
+        android:layout_alignBottom="@id/editText"
+        android:layout_alignTop="@id/editText"
+        android:layout_alignEnd="@id/editText"
+        android:layout_marginEnd="15dp"
+        android:visibility="visible"/>
+
+</RelativeLayout>

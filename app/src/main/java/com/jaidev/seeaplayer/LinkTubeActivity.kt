@@ -1,21 +1,30 @@
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.print.PrintAttributes
 import android.print.PrintJob
 import android.print.PrintManager
+import android.speech.RecognizerIntent
 import android.view.Gravity
 import android.view.WindowManager
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
+import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowCompat
@@ -39,6 +48,7 @@ import com.jaidev.seeaplayer.browseFregment.BrowseFragment
 import com.jaidev.seeaplayer.browseFregment.HomeFragment
 import com.jaidev.seeaplayer.dataClass.Bookmark
 import com.jaidev.seeaplayer.dataClass.Tab
+import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.databinding.ActivityLinkTubeBinding
 import com.jaidev.seeaplayer.databinding.BookmarkDialogBinding
 import com.jaidev.seeaplayer.databinding.MoreBrowseFeaturesSettingsBinding
@@ -61,6 +71,8 @@ class LinkTubeActivity : AppCompatActivity() {
         var bookmarkIndex : Int = -1
         lateinit var myPager : ViewPager2
         lateinit var tabsBtn : MaterialTextView
+        private const val REQUEST_CODE_SPEECH_INPUT = 2000
+        private var desktopModesValue = 0
     }
 
     @SuppressLint("ObsoleteSdkInt")
@@ -75,14 +87,485 @@ class LinkTubeActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         getAllBookmarks()
-        tabsList.add(Tab("Home",HomeFragment()))
+        tabsList.add(Tab("Home",HomeFragment(), LinkTubeActivity()))
         binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
         binding.myPager.isUserInputEnabled = false
         myPager = binding.myPager
         tabsBtn = binding.tabBtn
         initializeView()
         changeFullscreen(enable = true)
+        binding.googleMicBtn.setOnClickListener {
+            speak()
+        }
 
+        binding.moreBtn.setOnClickListener {
+            val popupMenu = PopupMenu(this@LinkTubeActivity, binding.moreBtn)
+            popupMenu.menuInflater.inflate(R.menu.browser_menu, popupMenu.menu)
+
+
+// Set icons to be visible
+            try {
+                val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+                fieldPopup.isAccessible = true
+                val popup = fieldPopup.get(popupMenu)
+                popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                    .invoke(popup, true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            popupMenu.setOnMenuItemClickListener { item ->
+                var frag: BrowseFragment? = null
+                try {
+                    frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
+                } catch (_: Exception) {
+                }
+                when (item.itemId) {
+                    R.id.newTab -> {
+                        changeTab("Home", HomeFragment())
+                    }
+
+                    R.id.history -> {
+
+                    }
+
+                    R.id.download -> Toast.makeText(
+                        this@LinkTubeActivity,
+                        "lkfldjfoirf",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    R.id.save -> {
+                        if (frag != null)
+                            saveAsPdf(web = frag.binding.webView)
+                        else Snackbar.make(binding.root, "First Open A WebPage\uD83D\uDE03", 3000)
+                            .show()
+                    }
+
+                    R.id.bookmark -> {
+                        frag?.let {
+                            if (bookmarkIndex == -1) {
+                                val viewB = layoutInflater.inflate(
+                                    R.layout.bookmark_dialog,
+                                    binding.root,
+                                    false
+                                )
+                                val bBinding = BookmarkDialogBinding.bind(viewB)
+
+                                val dialogB = MaterialAlertDialogBuilder(this@LinkTubeActivity)
+                                    .setTitle("Add Bookmark")
+                                    .setMessage("Url: ${it.binding.webView.url}")
+                                    .setPositiveButton("Add") { dialog, _ ->
+                                        try {
+                                            val array = ByteArrayOutputStream()
+                                            it.webIcon?.compress(
+                                                Bitmap.CompressFormat.PNG,
+                                                100,
+                                                array
+                                            )
+                                            bookmarkList.add(
+                                                Bookmark(
+                                                    name = bBinding.bookmarkTitle.text.toString(),
+                                                    url = it.binding.webView.url!!,
+                                                    image = array.toByteArray()
+                                                )
+                                            )
+                                            Toast.makeText(
+                                                this@LinkTubeActivity,
+                                                "Bookmark added successfully",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } catch (e: Exception) {
+                                            Toast.makeText(
+                                                this@LinkTubeActivity,
+                                                "Bookmark failed",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                        dialog.dismiss()
+                                    }
+                                    .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                                    .setView(viewB)
+                                    .create()
+                                dialogB.show()
+                                bBinding.bookmarkTitle.setText(it.binding.webView.title)
+                            } else {
+                                val dialogB = MaterialAlertDialogBuilder(this@LinkTubeActivity)
+                                    .setTitle("Remove Bookmark")
+                                    .setMessage("Url: ${it.binding.webView.url}")
+                                    .setPositiveButton("Remove") { dialog, _ ->
+                                        bookmarkList.removeAt(bookmarkIndex)
+                                        Toast.makeText(
+                                            this@LinkTubeActivity,
+                                            "Bookmark removed successfully",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        dialog.dismiss()
+                                    }
+                                    .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                                    .create()
+                                dialogB.show()
+                            }
+                        }
+                    }
+
+                    R.id.recantTabs -> {
+
+                    }
+
+                    R.id.desktop -> {
+                        val webView = frag?.binding?.webView
+
+                        // Check if WebView is available
+                        if (webView != null) {
+                            if (webView.settings.userAgentString.contains("Windows NT")) {
+                                // Desktop mode is currently enabled, so disable it
+                                webView.settings.userAgentString = ""
+                                webView.settings.useWideViewPort = false
+                                webView.settings.loadWithOverviewMode = false
+
+                                // Reload WebView to apply changes
+                                webView.reload()
+
+                                // Show toast indicating desktop mode is disabled
+                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled", Toast.LENGTH_SHORT).show()
+                            } else {
+                                // Desktop mode is currently disabled, so enable it
+                                webView.settings.apply {
+                                    userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                                            "(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                                    useWideViewPort = true
+                                    loadWithOverviewMode = true
+                                }
+
+                                // Reload WebView to apply changes
+                                webView.reload()
+
+                                // Show toast indicating desktop mode is enabled
+                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+
+                    R.id.share -> {
+                        var frag: BrowseFragment? = null
+                        try {
+                            frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
+                        } catch (_: Exception) {
+                        }
+                        val message = Handler().obtainMessage()
+                        frag?.binding?.webView?.requestFocusNodeHref(message)
+                        val url = message.data.getString("url")
+
+                        if (url != null) {
+                            ShareCompat.IntentBuilder(this@LinkTubeActivity)
+                                .setChooserTitle("Share URL")
+                                .setType("text/plain")
+                                .setText(url)
+                                .startChooser()
+                        } else {
+                            Snackbar.make(
+                                binding.root,
+                                "No URL available to share",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+
+                    R.id.setting -> {
+
+                    }
+
+                    R.id.exit -> {
+                        val builder = MaterialAlertDialogBuilder(this)
+                        builder.setTitle("Exit")
+                            .setMessage("Do you want to exit the app?")
+                            .setPositiveButton("Yes") { _, _ ->
+                                exitApplication()
+                            }
+                            .setNegativeButton("No") { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                        val customDialog = builder.create()
+                        customDialog.show()
+
+                        customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+                        customDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                            .setTextColor(Color.GREEN)
+                    }
+                }
+                true
+            }
+
+            popupMenu.show()
+
+        }
+        binding.bottomMoreBrowser.setOnClickListener {
+            val popupMenu = PopupMenu(this@LinkTubeActivity, binding.bottomMoreBrowser)
+            popupMenu.menuInflater.inflate(R.menu.browser_menu, popupMenu.menu)
+
+// Set icons to be visible
+            try {
+                val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+                fieldPopup.isAccessible = true
+                val popup = fieldPopup.get(popupMenu)
+                popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                    .invoke(popup, true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            popupMenu.setOnMenuItemClickListener { item ->
+                var frag: BrowseFragment? = null
+                try {
+                    frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
+                } catch (_: Exception) {
+                }
+                when (item.itemId) {
+                    R.id.newTab -> {
+                        changeTab("Home", HomeFragment())
+                    }
+
+                    R.id.history -> {
+
+                    }
+
+                    R.id.download -> Toast.makeText(
+                        this@LinkTubeActivity,
+                        "lkfldjfoirf",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    R.id.save -> {
+                        if (frag != null)
+                            saveAsPdf(web = frag!!.binding.webView)
+                        else Snackbar.make(binding.root, "First Open A WebPage\uD83D\uDE03", 3000)
+                            .show()
+                    }
+
+                    R.id.bookmark -> {
+                        frag?.let {
+                            if (bookmarkIndex == -1) {
+                                val viewB = layoutInflater.inflate(
+                                    R.layout.bookmark_dialog,
+                                    binding.root,
+                                    false
+                                )
+                                val bBinding = BookmarkDialogBinding.bind(viewB)
+
+                                val dialogB = MaterialAlertDialogBuilder(this@LinkTubeActivity)
+                                    .setTitle("Add Bookmark")
+                                    .setMessage("Url: ${it.binding.webView.url}")
+                                    .setPositiveButton("Add") { dialog, _ ->
+                                        try {
+                                            val array = ByteArrayOutputStream()
+                                            it.webIcon?.compress(
+                                                Bitmap.CompressFormat.PNG,
+                                                100,
+                                                array
+                                            )
+                                            bookmarkList.add(
+                                                Bookmark(
+                                                    name = bBinding.bookmarkTitle.text.toString(),
+                                                    url = it.binding.webView.url!!,
+                                                    image = array.toByteArray()
+                                                )
+                                            )
+                                            Toast.makeText(
+                                                this@LinkTubeActivity,
+                                                "Bookmark added successfully",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } catch (e: Exception) {
+                                            Toast.makeText(
+                                                this@LinkTubeActivity,
+                                                "Bookmark failed",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                        dialog.dismiss()
+                                    }
+                                    .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                                    .setView(viewB)
+                                    .create()
+                                dialogB.show()
+                                bBinding.bookmarkTitle.setText(it.binding.webView.title)
+                            } else {
+                                val dialogB = MaterialAlertDialogBuilder(this@LinkTubeActivity)
+                                    .setTitle("Remove Bookmark")
+                                    .setMessage("Url: ${it.binding.webView.url}")
+                                    .setPositiveButton("Remove") { dialog, _ ->
+                                        bookmarkList.removeAt(bookmarkIndex)
+                                        Toast.makeText(
+                                            this@LinkTubeActivity,
+                                            "Bookmark removed successfully",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        dialog.dismiss()
+                                    }
+                                    .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                                    .create()
+                                dialogB.show()
+                            }
+                        }
+                    }
+
+                    R.id.recantTabs -> {
+
+                    }
+
+                    R.id.desktop -> {
+                        val webView = frag?.binding?.webView
+
+                        // Check if WebView is available
+                        if (webView != null) {
+                            if (webView.settings.userAgentString.contains("Windows NT")) {
+                                // Desktop mode is currently enabled, so disable it
+                                webView.settings.userAgentString = ""
+                                webView.settings.useWideViewPort = false
+                                webView.settings.loadWithOverviewMode = false
+
+                                // Reload WebView to apply changes
+                                webView.reload()
+
+                                // Show toast indicating desktop mode is disabled
+                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled", Toast.LENGTH_SHORT).show()
+                            } else {
+                                // Desktop mode is currently disabled, so enable it
+                                webView.settings.apply {
+                                    userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                                            "(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                                    useWideViewPort = true
+                                    loadWithOverviewMode = true
+                                }
+
+                                // Reload WebView to apply changes
+                                webView.reload()
+
+                                // Show toast indicating desktop mode is enabled
+                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+                    R.id.share -> {
+                        var frag: BrowseFragment? = null
+                        try {
+                            frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
+                        } catch (_: Exception) {
+                        }
+                        val message = Handler().obtainMessage()
+                        frag?.binding?.webView?.requestFocusNodeHref(message)
+                        val url = message.data.getString("url")
+
+                        if (url != null) {
+                            ShareCompat.IntentBuilder(this@LinkTubeActivity)
+                                .setChooserTitle("Share URL")
+                                .setType("text/plain")
+                                .setText(url)
+                                .startChooser()
+                        } else {
+                            Snackbar.make(
+                                binding.root,
+                                "No URL available to share",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+
+                    R.id.setting -> {
+
+                    }
+
+                    R.id.exit -> {
+                        val builder = MaterialAlertDialogBuilder(this)
+                        builder.setTitle("Exit")
+                            .setMessage("Do you want to exit the app?")
+                            .setPositiveButton("Yes") { _, _ ->
+                                exitApplication()
+                            }
+                            .setNegativeButton("No") { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                        val customDialog = builder.create()
+                        customDialog.show()
+
+                        customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+                        customDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                            .setTextColor(Color.GREEN)
+                    }
+                }
+                true
+            }
+
+            popupMenu.show()
+
+
+        }
+
+
+
+
+    }
+
+
+    private fun speak() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+        )
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hi, speak something")
+
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+        } catch (e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_CODE_SPEECH_INPUT -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    val speechInput = result?.get(0)
+                    val currentFragment = tabsList[myPager.currentItem].fragment
+                    val activity = tabsList[myPager.currentItem].activity
+                    if (currentFragment is BrowseFragment) {
+                        val webView = currentFragment.binding.webView
+                        handleSpeechInput(webView, speechInput)
+                    } else if (activity is LinkTubeActivity) {
+                        activity.navigateToBrowserFragment(speechInput ?: "")
+                    } else {
+                        // Handle the case when the current fragment is not a BrowseFragment or LinkTubeActivity
+                    }
+                }
+            }
+        }
+    }
+
+    fun navigateToBrowserFragment(query: String) {
+        val url = "https://search.brave.com/search?q=${Uri.encode(query)}"
+        val browserFragment = BrowseFragment(urlNew = url)
+        changeTab("Brave", browserFragment)
+    }
+
+
+    private fun handleSpeechInput(webView: WebView, speechInput: String?) {
+        if (!speechInput.isNullOrEmpty()) {
+            // Check if the input is a number or a string
+            val searchQuery =
+                if (speechInput.matches(Regex("-?\\d+(\\.\\d+)?"))) { // Check if input is a number
+                    "https://search.brave.com/search?q=$speechInput"
+                } else {
+                    "https://search.brave.com/search?q=${Uri.encode(speechInput)}"
+                }
+            webView.loadUrl(searchQuery)
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -117,6 +600,22 @@ class LinkTubeActivity : AppCompatActivity() {
 
 
     private fun initializeView() {
+        binding.backBrowserBtn.setOnClickListener {
+            onBackPressed()
+        }
+        binding.bottomBackBrowser.setOnClickListener {
+            onBackPressed()
+        }
+        binding.homeBrowserBtn.setOnClickListener {
+            changeTab("Home", HomeFragment())
+        }
+        binding.bottomHomeBrowser.setOnClickListener {
+            changeTab("Home", HomeFragment())
+        }
+        binding.bottomMediaBrowser.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
 
         binding.tabBtn.setOnClickListener {
             val viewTabs =
@@ -124,13 +623,13 @@ class LinkTubeActivity : AppCompatActivity() {
             val bindingTabs = TabViewBinding.bind(viewTabs)
 
             val dialogTabs = MaterialAlertDialogBuilder(this , R.style.roundCornerDialog).setView(viewTabs)
-                 .setTitle("Select Tab")
+                .setTitle("Select Tab")
                 .setPositiveButton("Home"){self, _ ->
-                        changeTab("Home", HomeFragment())
+                    changeTab("Home", HomeFragment())
                     self.dismiss()
                 }
                 .setNeutralButton("Google"){self, _ ->
-                      changeTab("Google", BrowseFragment(urlNew = "www.google.com"))
+                    changeTab("Google", BrowseFragment(urlNew = "www.google.com"))
                     self.dismiss()
                 }
                 .create()
@@ -213,9 +712,9 @@ class LinkTubeActivity : AppCompatActivity() {
 
             dialogBinding.saveBtn.setOnClickListener {
                 dialog.dismiss()
-              if (frag != null)
-                  saveAsPdf(web = frag.binding.webView)
-                  else Snackbar.make(binding.root , "First Open A WebPage\uD83D\uDE03", 3000).show()
+                if (frag != null)
+                    saveAsPdf(web = frag.binding.webView)
+                else Snackbar.make(binding.root , "First Open A WebPage\uD83D\uDE03", 3000).show()
             }
 
             dialogBinding.fullscreenBtn.setOnClickListener {
@@ -235,71 +734,107 @@ class LinkTubeActivity : AppCompatActivity() {
                 }
             }
 
-            dialogBinding.desktopBtn.setOnClickListener {
-                it as MaterialButton
+            dialogBinding.desktopBtn.setOnClickListener { view ->
+                val materialButton = view as MaterialButton
 
                 frag?.binding?.webView?.apply {
-                    isDesktopSite = if (isDesktopSite) {
-                        settings.userAgentString = null
-                        it.setIconTintResource(R.color.black)
-                        it.setTextColor(ContextCompat.getColor(this@LinkTubeActivity, R.color.black))
-                        reload()
-                        false
+                    val isTablet = resources.configuration.smallestScreenWidthDp >= 600
+
+                    if (isTablet) {
+                        // Tablet-specific desktop mode
+                        if (isDesktopSite) {
+                            // Currently in desktop mode on tablet, switch to mobile/desktop mode
+                            settings.userAgentString = null
+                            materialButton.setIconTintResource(R.color.cool_blue)
+                            materialButton.setTextColor(ContextCompat.getColor(this@LinkTubeActivity, R.color.cool_blue))
+                            isDesktopSite = false // Toggle desktop mode state
+                            Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled (Tablet)", Toast.LENGTH_SHORT).show()
+                            reload()
+                        } else {
+                            // Currently in mobile/desktop mode on tablet, switch to tablet-specific desktop mode
+                            settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) AppleWebKit/537.36 " +
+                                    "(KHTML, like Gecko) Chrome/99.0.9999.99 Safari/537.36"
+                            settings.useWideViewPort = true
+                            settings.loadWithOverviewMode = true
+                            evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content', 'width=1200px')", null)
+
+                            materialButton.setIconTintResource(R.color.cool_blue)
+                            materialButton.setTextColor(ContextCompat.getColor(this@LinkTubeActivity, R.color.cool_blue))
+                            isDesktopSite = true // Toggle desktop mode state
+                            Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled (Tablet)", Toast.LENGTH_SHORT).show()
+                            reload()
+                        }
+                    } else {
+                        // Mobile/desktop mode for non-tablet devices
+                        if (isDesktopSite) {
+                            // Currently in desktop mode on mobile, switch to mobile/desktop mode
+                            settings.userAgentString = null
+                            materialButton.setIconTintResource(R.color.cool_blue)
+                            materialButton.setTextColor(ContextCompat.getColor(this@LinkTubeActivity, R.color.cool_blue))
+                            isDesktopSite = false // Toggle desktop mode state
+                            Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled", Toast.LENGTH_SHORT).show()
+                            reload()
+                        } else {
+                            // Currently in mobile mode on mobile, switch to desktop mode
+                            settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0"
+                            settings.useWideViewPort = true
+                            evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content'," +
+                                    " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));", null)
+
+                            materialButton.setIconTintResource(R.color.cool_blue)
+                            materialButton.setTextColor(ContextCompat.getColor(this@LinkTubeActivity, R.color.cool_blue))
+                            isDesktopSite = true // Toggle desktop mode state
+                            Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled", Toast.LENGTH_SHORT).show()
+                            reload()
+                        }
+
                     }
-                    else {
-                        settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0"
-                        settings.useWideViewPort = true
-                        evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content'," +
-                                " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));", null)
-                        reload()
-                        it.setIconTintResource(R.color.cool_blue)
-                        it.setTextColor(ContextCompat.getColor(this@LinkTubeActivity, R.color.cool_blue))
-                        true
-                    }
+
+
                     dialog.dismiss()
                 }
-
             }
+
 
             dialogBinding.bookmarkBtn.setOnClickListener {
-                   frag?.let {
-                if(bookmarkIndex == -1 ){
+                frag?.let {
+                    if(bookmarkIndex == -1 ){
 
-                    val viewB =
-                        layoutInflater.inflate(R.layout.bookmark_dialog, binding.root, false)
-                    val bBinding = BookmarkDialogBinding.bind(viewB)
+                        val viewB =
+                            layoutInflater.inflate(R.layout.bookmark_dialog, binding.root, false)
+                        val bBinding = BookmarkDialogBinding.bind(viewB)
 
-                    val dialogB = MaterialAlertDialogBuilder(this)
-                        .setTitle("Add Bookmark")
-                        .setMessage("Url:${it.binding.webView.url}")
-                        .setPositiveButton("Add"){self, _ ->
-                          try {
-                              val array = ByteArrayOutputStream()
-                              it.webIcon?.compress(Bitmap.CompressFormat.PNG, 100, array)
-                              bookmarkList.add(Bookmark(name = bBinding.bookmarkTitle.text.toString() ,
-                                  url = it.binding.webView.url!!, array.toByteArray()))
-                          }catch (e:Exception){
-                              bookmarkList.add(Bookmark(name = bBinding.bookmarkTitle.text.toString() ,
-                                  url = it.binding.webView.url!!))
-                          }
-                            self.dismiss()}
-                        .setNegativeButton("Cancel"){self, _ -> self.dismiss()}
-                        .setView(viewB).create()
-                    dialogB.show()
-                    bBinding.bookmarkTitle.setText(it.binding.webView.title)
+                        val dialogB = MaterialAlertDialogBuilder(this)
+                            .setTitle("Add Bookmark")
+                            .setMessage("Url:${it.binding.webView.url}")
+                            .setPositiveButton("Add"){self, _ ->
+                                try {
+                                    val array = ByteArrayOutputStream()
+                                    it.webIcon?.compress(Bitmap.CompressFormat.PNG, 100, array)
+                                    bookmarkList.add(Bookmark(name = bBinding.bookmarkTitle.text.toString() ,
+                                        url = it.binding.webView.url!!, array.toByteArray()))
+                                }catch (e:Exception){
+                                    bookmarkList.add(Bookmark(name = bBinding.bookmarkTitle.text.toString() ,
+                                        url = it.binding.webView.url!!))
+                                }
+                                self.dismiss()}
+                            .setNegativeButton("Cancel"){self, _ -> self.dismiss()}
+                            .setView(viewB).create()
+                        dialogB.show()
+                        bBinding.bookmarkTitle.setText(it.binding.webView.title)
+                    }
+                    else{
+                        val dialogB = MaterialAlertDialogBuilder(this)
+                            .setTitle("Remove Bookmark")
+                            .setMessage("Url:\${it.binding.webView.url")
+                            .setPositiveButton("Remove"){self, _ ->
+                                bookmarkList.removeAt(bookmarkIndex)
+                                self.dismiss() }
+                            .setNegativeButton("Cancel"){self, _ -> self.dismiss()}
+                            .create()
+                        dialogB.show()
+                    }
                 }
-                else{
-                    val dialogB = MaterialAlertDialogBuilder(this)
-                        .setTitle("Remove Bookmark")
-                        .setMessage("Url:\${it.binding.webView.url")
-                        .setPositiveButton("Remove"){self, _ ->
-                            bookmarkList.removeAt(bookmarkIndex)
-                            self.dismiss() }
-                        .setNegativeButton("Cancel"){self, _ -> self.dismiss()}
-                        .create()
-                    dialogB.show()
-                }
-            }
 
 
                 dialog.dismiss()
@@ -373,12 +908,14 @@ class LinkTubeActivity : AppCompatActivity() {
 
 @SuppressLint("NotifyDataSetChanged")
 fun changeTab(url: String, fragment: Fragment , isBackground : Boolean = false) {
-    LinkTubeActivity.tabsList.add(Tab(name = url,fragment = fragment))
-   myPager.adapter?.notifyDataSetChanged()
+    LinkTubeActivity.tabsList.add(Tab(name = url,fragment = fragment , activity = Activity()))
+    myPager.adapter?.notifyDataSetChanged()
     tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
     if(!isBackground) myPager.currentItem = LinkTubeActivity.tabsList.size - 1
 
 }
+
+
 
 @SuppressLint("ObsoleteSdkInt")
 fun checkForInternet(context: Context): Boolean {
@@ -401,4 +938,3 @@ fun checkForInternet(context: Context): Boolean {
         return networkInfo.isConnected
     }
 }
-

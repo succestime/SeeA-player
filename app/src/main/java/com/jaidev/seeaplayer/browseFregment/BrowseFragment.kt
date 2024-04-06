@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.browseFregment
 
 import android.annotation.SuppressLint
@@ -30,6 +31,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.LinkTubeActivity
+import com.jaidev.seeaplayer.LinkTubeActivity.Companion.myPager
+import com.jaidev.seeaplayer.LinkTubeActivity.Companion.tabsList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.changeTab
 import com.jaidev.seeaplayer.databinding.FragmentBrowseBinding
@@ -40,7 +43,9 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
     lateinit var binding: FragmentBrowseBinding
     var webIcon: Bitmap? = null
 
+    companion object {
 
+    }
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,9 +73,9 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "ObsoleteSdkInt")
     override fun onResume() {
         super.onResume()
-        LinkTubeActivity.tabsList[LinkTubeActivity.myPager.currentItem].name =
+        tabsList[myPager.currentItem].name =
             binding.webView.url.toString()
-        LinkTubeActivity.tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
+        LinkTubeActivity.tabsBtn.text = tabsList.size.toString()
 
         // for downloading file using external download manager
         binding.webView.setDownloadListener { url, _, _, _, _ ->
@@ -79,10 +84,35 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
 
         val linkRef = requireActivity() as LinkTubeActivity
 
+        var frag: BrowseFragment? = null
+        try {
+            frag = tabsList[linkRef.binding.myPager.currentItem].fragment as BrowseFragment
+        }catch (_:Exception){}
+
+
+        linkRef.binding.bottomForwardBrowser.setOnClickListener {
+            frag?.apply {
+                if (binding.webView.canGoForward())
+                    binding.webView.goForward()
+            }
+        }
+        linkRef.binding.forwardBrowserBtn.setOnClickListener {
+            frag?.apply {
+                if (binding.webView.canGoForward())
+                    binding.webView.goForward()
+            }
+        }
+
         linkRef.binding.refreshBrowserBtn.visibility = View.VISIBLE
         linkRef.binding.refreshBrowserBtn.setOnClickListener {
             binding.webView.reload()
         }
+
+        linkRef.binding.bottomRefreshBrowser.visibility = View.VISIBLE
+        linkRef.binding.bottomRefreshBrowser.setOnClickListener {
+            binding.webView.reload()
+        }
+
 
         binding.webView.apply {
             settings.javaScriptEnabled = true
@@ -94,7 +124,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
 
             webViewClient = object : WebViewClient() {
 
-            override fun onLoadResource(view: WebView?, url: String?) {
+                override fun onLoadResource(view: WebView?, url: String?) {
                     super.onLoadResource(view, url)
                     if (LinkTubeActivity.isDesktopSite)
                         view?.evaluateJavascript(
@@ -110,8 +140,8 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     isReload: Boolean
                 ) {
                     super.doUpdateVisitedHistory(view, url, isReload)
-                    linkRef.binding.topSearchBar.text = SpannableStringBuilder(url)
-                    LinkTubeActivity.tabsList[LinkTubeActivity.myPager.currentItem].name =
+                    linkRef.binding.btnTextUrl.text = SpannableStringBuilder(url)
+                    tabsList[LinkTubeActivity.myPager.currentItem].name =
                         url.toString()
                 }
 
@@ -132,7 +162,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     binding.webView.zoomOut()
 
                 }
-          }
+            }
             webChromeClient = object : WebChromeClient() {
                 override fun onReceivedIcon(view: WebView?, icon: Bitmap?) {
                     super.onReceivedIcon(view, icon)
@@ -180,7 +210,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
 ////////////////////////////// //
             // in video teacher was saying this can make issue so also watch this this
             binding.webView.reload()
-                  }
+        }
     }
 
     override fun onPause() {
@@ -189,13 +219,13 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
         // for clearing all  webView data
         binding.webView.apply {
             clearMatches()
-        clearHistory()
+            clearHistory()
             clearFormData()
             clearSslPreferences()
             clearCache(true)
 
             CookieManager.getInstance().removeAllCookies(null)
-           WebStorage.getInstance().deleteAllData()
+            WebStorage.getInstance().deleteAllData()
         }
     }
 
@@ -321,4 +351,6 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
 
         return super.onContextItemSelected(item)
     }
+
+
 }
