@@ -62,6 +62,9 @@ import java.util.Locale
 class LinkTubeActivity : AppCompatActivity() {
     lateinit var binding: ActivityLinkTubeBinding
     private var printJob : PrintJob? = null
+    // Assuming 'this' is a valid Context from an Activity or Fragment
+    private lateinit var dbHandler: MydbHandler
+
 
     companion object {
         var tabsList: ArrayList<Tab> = ArrayList()
@@ -85,6 +88,11 @@ class LinkTubeActivity : AppCompatActivity() {
         binding = ActivityLinkTubeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+
+
+      dbHandler = MydbHandler(this, null, null, 1)
+
+
 
         getAllBookmarks()
         tabsList.add(Tab("Home",HomeFragment(), LinkTubeActivity()))
@@ -114,19 +122,22 @@ class LinkTubeActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
 
+
+
             popupMenu.setOnMenuItemClickListener { item ->
                 var frag: BrowseFragment? = null
                 try {
                     frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
                 } catch (_: Exception) {
                 }
+
                 when (item.itemId) {
                     R.id.newTab -> {
                         changeTab("Home", HomeFragment())
                     }
 
                     R.id.history -> {
-
+                        startActivity(Intent(this, History::class.java))
                     }
 
                     R.id.download -> Toast.makeText(
@@ -214,39 +225,64 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     R.id.desktop -> {
-                        val webView = frag?.binding?.webView
+                        frag?.binding?.webView?.apply {
+                            val isTablet = resources.configuration.smallestScreenWidthDp >= 600
 
-                        // Check if WebView is available
-                        if (webView != null) {
-                            if (webView.settings.userAgentString.contains("Windows NT")) {
-                                // Desktop mode is currently enabled, so disable it
-                                webView.settings.userAgentString = ""
-                                webView.settings.useWideViewPort = false
-                                webView.settings.loadWithOverviewMode = false
+                            if (isTablet) {
+                                // Tablet-specific desktop mode
+                                if (isDesktopSite) {
+                                    // Currently in desktop mode on tablet, switch to mobile/desktop mode
+                                    settings.userAgentString = null
 
-                                // Reload WebView to apply changes
-                                webView.reload()
-
-                                // Show toast indicating desktop mode is disabled
-                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled", Toast.LENGTH_SHORT).show()
+                                    isDesktopSite = false // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled (Tablet)", Toast.LENGTH_LONG).show()
+                                    reload()
+                                } else {
+                                    // Currently in mobile/desktop mode on tablet, switch to tablet-specific desktop mode
+                                    settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) AppleWebKit/537.36 " +
+                                            "(KHTML, like Gecko) Chrome/99.0.9999.99 Safari/537.36"
+                                    settings.useWideViewPort = true
+                                    settings.loadWithOverviewMode = true
+                                    evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content', 'width=1200px')", null)
+                                    isDesktopSite = true // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled (Tablet)", Toast.LENGTH_LONG).show()
+                                    reload()
+                                }
                             } else {
-                                // Desktop mode is currently disabled, so enable it
-                                webView.settings.apply {
-                                    userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-                                            "(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-                                    useWideViewPort = true
-                                    loadWithOverviewMode = true
+                                // Mobile/desktop mode for non-tablet devices
+                                if (isDesktopSite) {
+                                    // Currently in desktop mode on mobile, switch to mobile/desktop mode
+                                    settings.userAgentString = null
+                                    isDesktopSite = false // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled", Toast.LENGTH_LONG).show()
+                                    reload()
+                                } else {
+                                    // Currently in mobile mode on mobile, switch to desktop mode
+                                    settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0"
+                                    settings.useWideViewPort = true
+                                    evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content'," +
+                                            " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));", null)
+                                    isDesktopSite = true // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled", Toast.LENGTH_LONG).show()
+                                    reload()
                                 }
 
-                                // Reload WebView to apply changes
-                                webView.reload()
-
-                                // Show toast indicating desktop mode is enabled
-                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled", Toast.LENGTH_SHORT).show()
                             }
+
+
+
                         }
                     }
-
+        R.id.fullScreen -> {
+    isFullscreen = if (isFullscreen) {
+        changeFullscreen(enable = false)
+        false
+    }
+    else {
+        changeFullscreen(enable = true)
+        true
+    }
+}
 
                     R.id.share -> {
                         var frag: BrowseFragment? = null
@@ -416,39 +452,62 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     R.id.desktop -> {
-                        val webView = frag?.binding?.webView
+                        frag?.binding?.webView?.apply {
+                            val isTablet = resources.configuration.smallestScreenWidthDp >= 600
 
-                        // Check if WebView is available
-                        if (webView != null) {
-                            if (webView.settings.userAgentString.contains("Windows NT")) {
-                                // Desktop mode is currently enabled, so disable it
-                                webView.settings.userAgentString = ""
-                                webView.settings.useWideViewPort = false
-                                webView.settings.loadWithOverviewMode = false
+                            if (isTablet) {
+                                // Tablet-specific desktop mode
+                                if (isDesktopSite) {
+                                    // Currently in desktop mode on tablet, switch to mobile/desktop mode
+                                    settings.userAgentString = null
 
-                                // Reload WebView to apply changes
-                                webView.reload()
-
-                                // Show toast indicating desktop mode is disabled
-                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled", Toast.LENGTH_SHORT).show()
+                                    isDesktopSite = false // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled (Tablet)", Toast.LENGTH_LONG).show()
+                                    reload()
+                                } else {
+                                    // Currently in mobile/desktop mode on tablet, switch to tablet-specific desktop mode
+                                    settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) AppleWebKit/537.36 " +
+                                            "(KHTML, like Gecko) Chrome/99.0.9999.99 Safari/537.36"
+                                    settings.useWideViewPort = true
+                                    settings.loadWithOverviewMode = true
+                                    evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content', 'width=1200px')", null)
+                                    isDesktopSite = true // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled (Tablet)", Toast.LENGTH_LONG).show()
+                                    reload()
+                                }
                             } else {
-                                // Desktop mode is currently disabled, so enable it
-                                webView.settings.apply {
-                                    userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-                                            "(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-                                    useWideViewPort = true
-                                    loadWithOverviewMode = true
+                                // Mobile/desktop mode for non-tablet devices
+                                if (isDesktopSite) {
+                                    // Currently in desktop mode on mobile, switch to mobile/desktop mode
+                                    settings.userAgentString = null
+                                    isDesktopSite = false // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Disabled", Toast.LENGTH_LONG).show()
+                                    reload()
+                                } else {
+                                    // Currently in mobile mode on mobile, switch to desktop mode
+                                    settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0"
+                                    settings.useWideViewPort = true
+                                    evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content'," +
+                                            " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));", null)
+                                    isDesktopSite = true // Toggle desktop mode state
+                                    Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled", Toast.LENGTH_LONG).show()
+                                    reload()
                                 }
 
-                                // Reload WebView to apply changes
-                                webView.reload()
-
-                                // Show toast indicating desktop mode is enabled
-                                Toast.makeText(this@LinkTubeActivity, "Desktop Mode Enabled", Toast.LENGTH_SHORT).show()
                             }
+
                         }
                     }
-
+                    R.id.fullScreen -> {
+                        isFullscreen = if (isFullscreen) {
+                            changeFullscreen(enable = false)
+                            false
+                        }
+                        else {
+                            changeFullscreen(enable = true)
+                            true
+                        }
+                    }
                     R.id.share -> {
                         var frag: BrowseFragment? = null
                         try {
@@ -509,6 +568,17 @@ class LinkTubeActivity : AppCompatActivity() {
 
     }
 
+
+  //   Assuming 'webView' and 'dbHandler' are properly initialized within the class
+   fun saveData() {
+        var frag: BrowseFragment? = null
+        try {
+            frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
+        } catch (_: Exception) {
+        }
+        val webUrl =  frag?.binding?.webView?.url
+        dbHandler.addUrl(webUrl)
+    }
 
     private fun speak() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -583,6 +653,7 @@ class LinkTubeActivity : AppCompatActivity() {
                 tabsList.removeAt(binding.myPager.currentItem)
                 binding.myPager.adapter!!.notifyDataSetChanged()
                 binding.myPager.currentItem = tabsList.size - 1
+             // saveData()
             }
 
             else -> super.onBackPressed()

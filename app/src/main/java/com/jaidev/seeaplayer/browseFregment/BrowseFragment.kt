@@ -42,9 +42,13 @@ import java.io.ByteArrayOutputStream
 class BrowseFragment(private var urlNew : String) : Fragment() {
     lateinit var binding: FragmentBrowseBinding
     var webIcon: Bitmap? = null
-
+    private var url: String? = null
     companion object {
-
+        fun newInstance(url: String): BrowseFragment {
+            val browserFragment = BrowseFragment(urlNew = url)
+            changeTab("Brave", browserFragment)
+            return browserFragment
+        }
     }
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
@@ -65,7 +69,9 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
             }
 
         }
-
+        arguments?.let {
+            url = it.getString("url")
+        }
         return view
 
     }
@@ -94,12 +100,14 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
             frag?.apply {
                 if (binding.webView.canGoForward())
                     binding.webView.goForward()
+              //  linkRef.saveData()
             }
         }
         linkRef.binding.forwardBrowserBtn.setOnClickListener {
             frag?.apply {
                 if (binding.webView.canGoForward())
                     binding.webView.goForward()
+             //  linkRef.saveData()
             }
         }
 
@@ -149,6 +157,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     super.onPageStarted(view, url, favicon)
                     linkRef.binding.progressBar.progress = 0
                     linkRef.binding.progressBar.visibility = View.VISIBLE
+                    linkRef.saveData()
 //                    if (url!!.contains(
 //                            "you",
 //                            ignoreCase = false
@@ -161,7 +170,9 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     linkRef.binding.progressBar.visibility = View.GONE
                     binding.webView.zoomOut()
 
+
                 }
+
             }
             webChromeClient = object : WebChromeClient() {
                 override fun onReceivedIcon(view: WebView?, icon: Bitmap?) {
@@ -354,3 +365,4 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
 
 
 }
+

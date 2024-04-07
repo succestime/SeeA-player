@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/newTab"
+        android:icon="@drawable/new_tab"
+        android:title="New Tab"
+
+        />
+    <item
+        android:id="@+id/history"
+        android:icon="@drawable/history_browser"
+        android:title="History"
+
+        />
+    <item
+        android:id="@+id/download"
+        android:icon="@drawable/download_browser"
+        android:title="Downloads"
+
+        />
+    <item
+       android:id="@+id/save"
+        android:icon="@drawable/ic_save"
+        android:title="Save"
+
+        />
+    <item
+        android:id="@+id/bookmark"
+        android:icon="@drawable/ic_bookmark"
+        android:title="Bookmarks"
+
+        />
+    <item
+        android:id="@+id/recantTabs"
+        android:icon="@drawable/recant_tab_browser"
+        android:title="Recant Tabs"
+
+        />
+
+        <item
+            android:id="@+id/desktop"
+            android:icon="@drawable/ic_laptop"
+            android:title="Desktop Mode"
+            />
+    <item
+        android:id="@+id/fullScreen"
+        android:icon="@drawable/ic_fullscreen_icon"
+        android:title="FullScreen"
+        />
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_share_icon"
+        android:title="Share"
+
+        />
+
+    <item
+        android:id="@+id/setting"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings"
+
+        />
+
+
+    <item
+        android:id="@+id/exit"
+        android:icon="@drawable/exit_icon"
+        android:title="Exit"
+
+        />
+
+</menu>
