@@ -168,6 +168,10 @@
     <string name="start_process">Start Process</string>
     <string name="seea_music_player">SeeA Music Player</string>
     <string name="enter_seea1ne_membership_code">Enter SeeA1NE Membership code</string>
+    <string name="download_title" />
+    <string name="download_file" />
+    <string name="ok" />
+    <string name="some_Error_Occurred" />
 
 
     <string-array name="theme">

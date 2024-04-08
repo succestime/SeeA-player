@@ -21,7 +21,7 @@
         android:layout_height="20dp"
         android:backgroundTint="@color/cool_green"
         app:cardCornerRadius="10dp"
-        android:visibility="gone"
+        android:visibility="visible"
         >
         <TextView
             android:id="@+id/subscribe"

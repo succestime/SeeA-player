@@ -29,6 +29,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".DownloadWithPauseResumeNew"
+            android:exported="false" />
+        <activity
+            android:name=".Download_browser"
+            android:exported="false" />
+        <activity
             android:name=".History"
             android:exported="false" />
 

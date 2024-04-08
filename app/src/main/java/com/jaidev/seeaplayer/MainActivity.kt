@@ -314,6 +314,7 @@ class MainActivity : AppCompatActivity() {
         titleTextView.text = "SeeA Player"
 
         val subscribeTextView = customActionBarView.findViewById<TextView>(R.id.subscribe)
+
         subscribeTextView.setOnClickListener {
             startActivity(Intent(this, SeeAOne::class.java))
 

@@ -53,6 +53,9 @@ class HomeFragment : Fragment() {
 
         linkTubeRef.binding.refreshBrowserBtn.visibility = View.GONE
         linkTubeRef.binding.googleMicBtn.visibility = View.VISIBLE
+        linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
+
+
         // TextWatcher for btnTextUrl
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -60,17 +63,17 @@ class HomeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.isNullOrEmpty()) {
                     linkTubeRef.binding.googleMicBtn.visibility = View.VISIBLE
+                    linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
                     linkTubeRef.binding.crossBtn.visibility = View.GONE
                 } else {
                     linkTubeRef.binding.googleMicBtn.visibility = View.GONE
+                    linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
                     linkTubeRef.binding.crossBtn.visibility = View.VISIBLE
                 }
             }
-
             override fun afterTextChanged(s: Editable?) {}
         }
-
-        linkTubeRef.binding.btnTextUrl.addTextChangedListener(textWatcher)
+            linkTubeRef.binding.btnTextUrl.addTextChangedListener(textWatcher)
 
         // OnClickListener for crossBtn to clear text
         linkTubeRef.binding.crossBtn.setOnClickListener {
@@ -83,6 +86,7 @@ class HomeFragment : Fragment() {
                 val query =  linkTubeRef.binding.btnTextUrl.text.toString()
                 if (checkForInternet(requireContext())) {
                     changeTab(query, BrowseFragment(query))
+                    linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
                 } else {
                     Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
                 }
@@ -92,25 +96,29 @@ class HomeFragment : Fragment() {
         }
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             android.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(result: String?): Boolean {
-                if (checkForInternet(requireContext()))
-                    changeTab(result!!, BrowseFragment(result))
-                else
-                    Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (!query.isNullOrBlank()) {
+                    performSearch(query)
+                }
                 return true
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean = false
-
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText.isNullOrBlank()) {
+                    // Show voiceSearchButton when search view is empty
+                    binding.voiceSearchButton.visibility = View.VISIBLE
+                } else {
+                    // Hide voiceSearchButton when search view has text
+                    binding.voiceSearchButton.visibility = View.GONE
+                }
+                return true
+            }
         })
-//        linkTubeRef.binding.goBtn.setOnClickListener {
-//            if(checkForInternet(requireContext()))
-//                changeTab(linkTubeRef.binding.btnTextUrl.text.toString(),
-//                    BrowseFragment(linkTubeRef.binding.btnTextUrl.text.toString())
-//                )
-//            else
-//                Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
-//        }
+
+        // Set up click listener for voiceSearchButton
+        binding.voiceSearchButton.setOnClickListener {
+            linkTubeRef.speak()
+        }
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(5)
@@ -125,4 +133,14 @@ class HomeFragment : Fragment() {
 
 
     }
+
+    private fun performSearch(query: String) {
+        if (checkForInternet(requireContext())) {
+            changeTab(query, BrowseFragment(query))
+        } else {
+            Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
 }

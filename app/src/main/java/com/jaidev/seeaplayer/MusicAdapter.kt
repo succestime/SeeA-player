@@ -15,6 +15,7 @@ import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -169,12 +170,21 @@ class MusicAdapter(
 
         holder.more.setOnClickListener {
             newPosition = position
-            val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.video_more_features, holder.root, false)
+            // Inflate the custom dialog layout
+            val customDialog = LayoutInflater.from(context).inflate(R.layout.video_more_features, holder.root, false)
             val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
-            val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
-                .create()
+            // Create the dialog
+            val dialogBuilder = MaterialAlertDialogBuilder(context)
+                .setView(customDialog)
+            val dialog = dialogBuilder.create()
+
+            // Show the dialog
             dialog.show()
+
+            // Get the window attributes of the dialog
+            val window = dialog.window
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
+            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
 
             bindingMf.shareBtn.setOnClickListener {
 

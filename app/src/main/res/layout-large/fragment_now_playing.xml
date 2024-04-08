@@ -5,9 +5,23 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".NowPlaying"
-    android:background="@color/cool_blue">
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="10dp"
+    android:background="@drawable/curved_nowpalying_background">
 
-
+    <!-- Music Disk Image -->
+    <ImageView
+        android:id="@+id/musicDisk"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginBottom="5dp"
+        android:layout_alignStart="@id/songImgNP"
+        android:layout_alignTop="@id/songImgNP"
+        android:layout_alignBottom="@id/songImgNP"
+        android:src="@drawable/music_disc"
+        android:scaleType="fitCenter" />
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/songImgNP"
         android:layout_width="80dp"
@@ -19,27 +33,24 @@
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
        android:id="@+id/nextBtnNP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_alignParentEnd="true"
         app:icon="@drawable/next_icon"
         app:iconTint="@color/white"
         android:backgroundTint="@color/cool_blue"
-
         android:layout_centerVertical="true"
-        app:iconSize="40dp"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginEnd="20dp"/>
 
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/playPauseBtnNP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         app:icon="@drawable/play_music_icon"
         app:iconTint="@color/white"
         android:layout_centerVertical="true"
         android:backgroundTint="@color/cool_blue"
-        app:iconSize="40dp"
         android:layout_toStartOf="@id/nextBtnNP"
         android:layout_marginHorizontal="5dp"
         android:layout_marginEnd="10dp"/>
@@ -55,7 +66,7 @@
         android:gravity="center"
         android:layout_marginEnd="4dp"
         android:layout_toStartOf="@id/playPauseBtnNP"
-        android:layout_toEndOf="@id/songImgNP"
+        android:layout_toEndOf="@id/musicDisk"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:singleLine="true"

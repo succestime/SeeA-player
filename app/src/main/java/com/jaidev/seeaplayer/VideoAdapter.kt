@@ -16,6 +16,7 @@ import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -143,15 +144,25 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
 
         holder.more.setOnClickListener {
-
             newPosition = position
-            val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.video_more_features, holder.root, false)
+
+            // Inflate the custom dialog layout
+            val customDialog = LayoutInflater.from(context).inflate(R.layout.video_more_features, holder.root, false)
             val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
-            val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
-                .create()
+            // Create the dialog
+            val dialogBuilder = MaterialAlertDialogBuilder(context)
+                .setView(customDialog)
+            val dialog = dialogBuilder.create()
+
+            // Show the dialog
             dialog.show()
 
+            // Get the window attributes of the dialog
+            val window = dialog.window
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
+            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
+
+            // Set click listeners for dialog buttons
             bindingMf.shareBtn.setOnClickListener {
                 dialog.dismiss()
                 val shareIntent = Intent()
@@ -163,47 +174,45 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
             bindingMf.infoBtn.setOnClickListener {
                 dialog.dismiss()
-                val customDialogIF =
-                    LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
+                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
                 val bindingIF = DetailsViewBinding.bind(customDialogIF)
-                val dialogIF = MaterialAlertDialogBuilder(context).setView(customDialogIF)
+                val dialogIF = MaterialAlertDialogBuilder(context)
+                    .setView(customDialogIF)
                     .setCancelable(false)
                     .setPositiveButton("OK") { self, _ ->
                         self.dismiss()
                     }
                     .create()
+
+                dialogIF.window?.setGravity(Gravity.BOTTOM) // Set the gravity of the dialog window to bottom
                 dialogIF.show()
+
                 val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
                     .append(videoList[position].title)
                     .bold { append("\n\nDuration : ") }
                     .append(DateUtils.formatElapsedTime(videoList[position].duration / 1000))
                     .bold { append("\n\nFile Size : ") }.append(
-                        Formatter.formatShortFileSize(
-                            context,
-                            videoList[position].size.toLong()
-                        )
+                        Formatter.formatShortFileSize(context, videoList[position].size.toLong())
                     )
                     .bold { append("\n\nLocation : ") }.append(videoList[position].path)
                 bindingIF.detailTV.text = infoText
-
-
             }
 
             bindingMf.renameBtn.setOnClickListener {
                 dialog.dismiss()
-
                 requestPermissionR()
 
-                // Get the current music title as default text
+                // Get the current video title as default text
                 val defaultTitle = videoList[position].title
 
-                // Show the rename dialog with the current music title as default text
+                // Show the rename dialog with the current video title as default text
                 showRenameDialog(position, defaultTitle)
             }
 
             bindingMf.deleteBtn.setOnClickListener {
-                requestPermissionR()
                 dialog.dismiss()
+                requestPermissionR()
+
                 val alertDialogBuilder = AlertDialog.Builder(context)
                 val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
 
@@ -233,9 +242,9 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                 deleteText.setOnClickListener {
                     val file = File(videoList[position].path)
-                    if(file.exists() && file.delete()){
+                    if (file.exists() && file.delete()) {
                         MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                        when{
+                        when {
                             MainActivity.search -> {
                                 MainActivity.dataChanged = true
                                 videoList.removeAt(position)
@@ -246,7 +255,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                 FoldersActivity.currentFolderVideos.removeAt(position)
                                 notifyDataSetChanged()
                                 videoDeleteListener?.onVideoDeleted()
-
                             }
                         }
                     } else {
@@ -261,9 +269,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                 }
                 alertDialog.show()
             }
-
-
         }
+
 
     }
 

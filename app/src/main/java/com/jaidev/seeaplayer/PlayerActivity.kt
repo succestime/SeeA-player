@@ -45,6 +45,7 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
@@ -75,9 +76,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private lateinit var fullScreenBtn: ImageButton
     private lateinit var videoTitle: TextView
     private lateinit var gestureDetectorCompat: GestureDetectorCompat
-    //    private val LONG_PRESS_DURATION = 500L // Define the duration for a long press in milliseconds
-//    private var isLongPress = false
-//    private var longPressStartTime = 0L
     private var isSwipingForward = false
     private var currentSwipeX = 0f
     private var currentSwipeY = 0f
@@ -85,8 +83,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private lateinit var durationChangeTextView: TextView
     private var isSwipingToChangeDuration = false
     private var currentProgress: Int = 0
-
-    // horizontal recyclerView variables
     private val iconModelArrayList = ArrayList<IconModel>()
     private lateinit var playbackIconsAdapter: PlaybackIconsAdapter
     private lateinit var recyclerViewIcons: RecyclerView
@@ -98,24 +94,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     lateinit var filePickerDialog: FilePickerDialog
     lateinit var uriSubtitle: Uri
     private lateinit var eqContainer: FrameLayout
+    private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
+    private lateinit var player: ExoPlayer
 
-    // horizontal recyclerView variables
-
-// swipe and zoom variables
-//private var deviceHeight: Int = 0
-//    private var deviceWidth: Int = 0
-//    val brightnessSpeed = 0.01
-//    var start = false
-//    var left: Boolean = false
-//    var right: Boolean = false
-//    private var baseX: Float = 0.0f
-//    private var baseY: Float = 0.0f
-//    var swipe_move = false
-//    private var diffX: Long = 0
-//    private var diffY: Long = 0
-//    var success = false
-
-// swipe and zoom variables
 
     companion object {
         private var audioManager: AudioManager? = null
@@ -156,7 +137,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
-
+        initializePlayer()
         videoTitle = findViewById(R.id.videoTitle)
         playPauseBtn = findViewById(R.id.playPauseBtn)
         fullScreenBtn = findViewById(R.id.fullScreenBtn)
@@ -226,8 +207,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private fun horizontalIconList() {
         iconModelArrayList.add(IconModel(R.drawable.next_icon,"", android.R.color.white))
         iconModelArrayList.add(IconModel(R.drawable.night_mode,"Night Mode", android.R.color.white))
-        iconModelArrayList.add(IconModel(R.drawable.muit2_round,"Mute", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.ic_speed_icon,"Speed", android.R.color.white))
         iconModelArrayList.add(IconModel(R.drawable.orientation_icon,"Rotate", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.search_link_tube,"Link Tube", android.R.color.white))
 
 
         playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this)
@@ -258,8 +240,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                             )
                             iconModelArrayList.add(
                                 IconModel(
-                                    R.drawable.muit2_round,
-                                    "Mute",
+                                    R.drawable.ic_speed_icon,
+
+                                    "Speed",
                                     android.R.color.white
                                 )
                             )
@@ -270,12 +253,18 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                                     android.R.color.white
                                 )
                             )
-
+                            iconModelArrayList.add(
+                                IconModel(
+                                    R.drawable.search_link_tube,
+                                    "Link Tube",
+                                    android.R.color.white
+                                )
+                            )
                             playbackIconsAdapter.notifyDataSetChanged()
                             expand = false
                         } else {
 
-                            if (iconModelArrayList.size == 4) {
+                            if (iconModelArrayList.size == 5) {
                                 iconModelArrayList.add(
                                     IconModel(
                                         R.drawable.ic_timer_icon,
@@ -285,8 +274,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                                 )
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.ic_speed_icon,
-                                        "Speed",
+                                        R.drawable.muit2_round,
+                                        "Mute",
                                         android.R.color.white
                                     )
                                 )
@@ -344,19 +333,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     }
 
                     2 -> {
-                        if (mute) {
-                            player.setVolume(100F)
-                            iconModelArrayList[position] = IconModel(R.drawable.muit2_round, "Mute")
-                            playbackIconsAdapter.notifyDataSetChanged()
-                            mute = false
-                        } else {
-                            player.setVolume(0F)
-                            iconModelArrayList[position] =
-                                IconModel(R.drawable.volume_icon, "Unmute")
-                            playbackIconsAdapter.notifyDataSetChanged()
-                            mute = true
-                        }
-
+                        setupSpeedDialog()
                     }
                     3 -> {
                         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -369,22 +346,36 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     }
 
                     4 -> {
-                        setupSleepTimer()
-                    }
+                        startActivity(Intent(this@PlayerActivity, LinkTubeActivity::class.java))
+                        finish()
 
-                    5 -> {
-                        setupSpeedDialog()
                     }
+                    5 ->{     setupSleepTimer()   }
 
                     6 -> {
-                        setupBoosterDialog()
+                        if (mute) {
+                            player.setVolume(100F)
+                            iconModelArrayList[position] = IconModel(R.drawable.muit2_round, "Mute")
+                            playbackIconsAdapter.notifyDataSetChanged()
+                            mute = false
+                        } else {
+                            player.setVolume(0F)
+                            iconModelArrayList[position] =
+                                IconModel(R.drawable.volume_icon, "Unmute")
+                            playbackIconsAdapter.notifyDataSetChanged()
+                            mute = true
+                        }
                     }
 
                     7 -> {
+                        setupBoosterDialog()
+                    }
+
+                   8-> {
                         setupPIPMode()
                     }
 
-                    8 -> {
+                   9 -> {
                         dialogProperties.selection_mode = DialogConfigs.SINGLE_MODE
                         dialogProperties.extensions = arrayOf(".srt")
                         dialogProperties.root = File("/storage/emulated/0")
@@ -401,7 +392,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                         filePickerDialog.show()
                     }
 
-                    9 -> {
+                    10 -> {
                         if (eqContainer.visibility == View.GONE) {
                             eqContainer.visibility = View.VISIBLE
                         }
@@ -458,7 +449,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     self.dismiss()
                     playVideo()
                 }
-                .setBackground(ColorDrawable(0x803700B3.toInt()))
+                .setBackground(getSemiTransparentGrayDrawable())
                 .create()
             dialogS.show()
             bindingS.speedText.text = "$sleepTime Min"
@@ -484,7 +475,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             .setPositiveButton("Done") { _, _ ->
 //                dialog.dismiss()
             }
-            .setBackground(ColorDrawable(0x803700B3.toInt()))
+            .setBackground(getSemiTransparentGrayDrawable())
             .create()
         dialogS.show()
         bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
@@ -511,7 +502,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 playVideo()
                 // dialog.dismiss()
             }
-            .setBackground(ColorDrawable(0x803700B3.toInt()))
+            .setBackground(getSemiTransparentGrayDrawable())
             .create()
         dialogB.show()
         bindingB.verticalBar.progress = loudnessEnhancer.targetGain.toInt() / 100
@@ -521,7 +512,10 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             bindingB.progressText.text = "Audio Booster\n\n${it * 10}"
         }
     }
-
+    private fun getSemiTransparentGrayDrawable(): ColorDrawable {
+        val color = Color.parseColor("#011B29")
+        return ColorDrawable(color)
+    }
     @SuppressLint("ObsoleteSdkInt")
     fun setupPIPMode() {
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
@@ -580,7 +574,24 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         }
     }
 
+    private fun initializePlayer() {
+        player = SimpleExoPlayer.Builder(this).build()
+        binding.playerView.player = player
 
+        val mediaItem = MediaItem.fromUri("YOUR_VIDEO_URI_HERE")
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
+    }
+    override fun onPause() {
+        super.onPause()
+        if (player.isPlaying) {
+            isPlayingBeforePause = true
+            player.pause()
+        } else {
+            isPlayingBeforePause = false
+        }
+    }
     @SuppressLint("SetTextI18n", "SuspiciousIndentation", "ObsoleteSdkInt")
     private fun initializeBinding() {
 
@@ -773,6 +784,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     override fun onDestroy() {
         super.onDestroy()
         player.pause()
+        player.release()
         audioManager?.abandonAudioFocus(this)
 
     }
@@ -783,6 +795,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
     override fun onResume() {
         super.onResume()
+        if (isPlayingBeforePause) {
+            player.play()
+        }
         if (audioManager == null) audioManager =
             getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager!!.requestAudioFocus(
@@ -811,9 +826,10 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             if (!isLocked) {
                 binding.playerView.isDoubleTapEnabled = true
                 gestureDetectorCompat.onTouchEvent(motionEvent)
+
                 if (motionEvent.action == MotionEvent.ACTION_UP) {
-
-
+                    binding.brightnessIcon?.visibility = View.GONE
+                    binding.volumeIcon?.visibility = View.GONE
                     // for immersive mode
                     WindowCompat.setDecorFitsSystemWindows(window, false)
                     WindowInsetsControllerCompat(window, binding.root).let { controller ->
@@ -896,6 +912,12 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
 
+                        WindowCompat.setDecorFitsSystemWindows(window, false)
+                        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+                            controller.hide(WindowInsetsCompat.Type.systemBars())
+                            controller.systemBarsBehavior =
+                                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        }
                         if (isSwipingToChangeDuration) {
                             // Get the displayed duration text from the TextView
                             val displayedText = durationChangeTextView.text.toString()
@@ -1063,7 +1085,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         val sWidth = Resources.getSystem().displayMetrics.widthPixels
         val sHeight = Resources.getSystem().displayMetrics.heightPixels
 
-        val border = 100 * Resources.getSystem().displayMetrics.density.toInt()
+        val border = 600 * Resources.getSystem().displayMetrics.density.toInt()
         if (event.x < border || event.y < border || event.x > sWidth - border || event.y > sHeight - border)
             return false
 
@@ -1093,21 +1115,5 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         lp.screenBrightness = d * value
         this.window.attributes = lp
     }
-
-//    @SuppressLint("ObsoleteSdkInt")
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == 111) {
-//            val value: Boolean
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                value = android.provider.Settings.System.canWrite(applicationContext)
-//                if (value) {
-//                    success = true
-//                } else {
-//                    Toast.makeText(applicationContext, "Not Granted", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
-//    }
 
 }
