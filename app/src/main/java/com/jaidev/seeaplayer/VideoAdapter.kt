@@ -63,8 +63,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
     interface VideoDeleteListener {
-        fun
-                onVideoDeleted()
+        fun onVideoDeleted()
 
 
     }
@@ -76,7 +75,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
 
 
-    class MyAdapter(binding: VideoViewBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MyAdapter(binding: VideoViewBinding ) : RecyclerView.ViewHolder(binding.root) {
 
         var title = binding.videoName
         var duration = binding.duration

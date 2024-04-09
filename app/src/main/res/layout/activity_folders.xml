@@ -11,7 +11,24 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
+
+        <!-- Placeholder for List View -->
+        <include
+            android:id="@+id/video_view"
+            layout="@layout/video_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <!-- Placeholder for Grid View -->
+        <include
+            android:id="@+id/grid_video_view"
+            layout="@layout/grid_video_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
         <FrameLayout
             android:id="@+id/frameLayout"
@@ -33,23 +50,10 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:orientation="vertical"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
-
-<!--            <ImageView-->
-<!--                android:id="@+id/searchBackBtn"-->
-<!--                android:layout_width="25dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center"-->
-<!--                app:tint="?android:attr/textColorPrimary"-->
-<!--                android:src="@drawable/search_back_btn"-->
-<!--                app:layout_constraintEnd_toEndOf="@+id/recycler_view"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                android:visibility="visible"-->
-<!--                tools:ignore="UseAppTint" />-->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -78,6 +82,65 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <LinearLayout
+            android:id="@+id/listBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/videoRVFA"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/listImage"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/view_list"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="center"
+                android:text="@string/list"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gridBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/videoRVFA"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <ImageView
+                android:id="@+id/gridImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/view_grid"/>
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="center"
+                android:text="@string/grid"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/videoRVFA"
             android:layout_width="0dp"
@@ -86,14 +149,13 @@
             android:layout_marginTop="30dp"
             android:paddingBottom="30dp"
             android:scrollbars="vertical"
-            app:layout_constraintTop_toTopOf="@id/totalVideo"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/linearLayoutFa"
             app:layout_constraintHorizontal_bias="0.009"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintVertical_bias="0.027"
-            />
+            app:layout_constraintTop_toTopOf="@id/totalVideo"
+            app:layout_constraintVertical_bias="0.027" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/nowPlayingBtn"

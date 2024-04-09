@@ -172,6 +172,8 @@
     <string name="download_file" />
     <string name="ok" />
     <string name="some_Error_Occurred" />
+    <string name="list">List</string>
+    <string name="grid">Grid</string>
 
 
     <string-array name="theme">
