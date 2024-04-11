@@ -1,11 +1,12 @@
 package com.jaidev.seeaplayer
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.jaidev.seeaplayer.browseFregment.BrowseFragment
 
 class History : AppCompatActivity() {
     private lateinit var dbHandler: MydbHandler
@@ -26,14 +27,19 @@ class History : AppCompatActivity() {
             // Set item click listener
             myList.setOnItemClickListener { parent, view, position, id ->
                 val selectedUrl = sites[position]
+                showLoadingToast()
                 openUrlInBrowser(selectedUrl)
             }
         }
     }
 
-    private fun openUrlInBrowser(url: String) {
-        // Open the URL in a web browser
-     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        startActivity(intent)
+    private fun openUrlInBrowser(query: String) {
+        val url = "https://search.brave.com/search?q=${Uri.encode(query)}"
+        val browserFragment = BrowseFragment(urlNew = url)
+        changeTab("Brave", browserFragment)
+    }
+
+    private fun showLoadingToast() {
+        Toast.makeText(this, "Provided link is loading. You can go back.", Toast.LENGTH_LONG).show()
     }
 }

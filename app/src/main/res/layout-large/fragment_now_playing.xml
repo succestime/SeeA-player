@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="60dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".NowPlaying"
     android:layout_marginStart="5dp"
@@ -15,20 +15,20 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginTop="5dp"
-        android:layout_marginStart="35dp"
+        android:layout_marginStart="36dp"
         android:layout_marginBottom="5dp"
         android:layout_alignStart="@id/songImgNP"
         android:layout_alignTop="@id/songImgNP"
         android:layout_alignBottom="@id/songImgNP"
-        android:src="@drawable/music_disc"
+        android:src="@drawable/music_disc_removebg_preview"
         android:scaleType="fitCenter" />
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/songImgNP"
         android:layout_width="80dp"
-        android:layout_height="60dp"
-        android:layout_marginHorizontal="10dp"
+        android:layout_height="55dp"
         android:layout_marginVertical="5dp"
-        app:shapeAppearanceOverlay="@style/curved"
+        android:layout_marginStart="2dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/speaker"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -38,7 +38,7 @@
         android:layout_alignParentEnd="true"
         app:icon="@drawable/next_icon"
         app:iconTint="@color/white"
-        android:backgroundTint="@color/cool_blue"
+        android:backgroundTint="#F2053853"
         android:layout_centerVertical="true"
         android:layout_marginEnd="20dp"/>
 
@@ -50,7 +50,7 @@
         app:icon="@drawable/play_music_icon"
         app:iconTint="@color/white"
         android:layout_centerVertical="true"
-        android:backgroundTint="@color/cool_blue"
+        android:backgroundTint="#F2053853"
         android:layout_toStartOf="@id/nextBtnNP"
         android:layout_marginHorizontal="5dp"
         android:layout_marginEnd="10dp"/>

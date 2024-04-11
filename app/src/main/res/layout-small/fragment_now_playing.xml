@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="60dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".NowPlaying"
     android:background="@drawable/curved_nowpalying_background">
@@ -13,9 +13,9 @@
         android:id="@+id/songImgNP"
         android:layout_width="70dp"
         android:layout_height="50dp"
-        android:layout_marginHorizontal="5dp"
+    android:scaleType="centerCrop"
         android:layout_marginVertical="5dp"
-        app:shapeAppearanceOverlay="@style/curved"
+    android:layout_marginStart="5dp"
         android:src="@drawable/speaker"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

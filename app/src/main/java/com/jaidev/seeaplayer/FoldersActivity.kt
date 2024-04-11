@@ -1,6 +1,5 @@
 package com.jaidev.seeaplayer
 
-import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -11,7 +10,6 @@ import android.provider.MediaStore
 import android.text.format.DateUtils
 import android.view.Menu
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -38,6 +36,7 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     private val PREF_LAYOUT_TYPE = "pref_layout_type"
     private val LAYOUT_TYPE_GRID = "grid"
     private val LAYOUT_TYPE_LIST = "list"
+    private var songImageHeight: Int = 0
     companion object {
         lateinit var currentFolderVideos: ArrayList<VideoData>
     }
@@ -55,13 +54,12 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
         supportActionBar?.title = MainActivity.folderList[position].folderName
         binding.videoRVFA.setHasFixedSize(true)
         binding.videoRVFA.setItemViewCacheSize(10)
-//        binding.videoRVFA.layoutManager = LinearLayoutManager(this@FoldersActivity)
-        adapter = VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true)
+        adapter = VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true )
         binding.videoRVFA.adapter = adapter
         binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
 
 
-        adapter = VideoAdapter(this@FoldersActivity, MainActivity.videoList)
+        adapter = VideoAdapter(this@FoldersActivity, MainActivity.videoList , isFolder = true)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(10)
         binding.recyclerView.layoutManager = LinearLayoutManager(this@FoldersActivity)
@@ -94,14 +92,19 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
             intent.putExtra("class", "NowPlaying")
             startActivity( intent )
         }
+
         binding.gridBtn.setOnClickListener {
+            adapter.enableGridMode(true) // Disable grid mode
+
             setGridLayoutManager()
+
         }
 
         binding.listBtn.setOnClickListener {
+            adapter.enableGridMode(false) // Disable grid mode
             setListLayoutManager()
-        }
 
+        }
 
         toggleLayoutManager()
 
@@ -110,36 +113,22 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
 
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
-        (binding.videoRVFA.parent as? ViewGroup)?.layoutTransition = LayoutTransition()
 
     }
 
     private fun setGridLayoutManager() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         binding.videoRVFA.layoutManager = gridLayoutManager
-
-//        // Show grid_video_view and hide video_view
-//        binding.gridVideoView.visibility = View.VISIBLE
-//        binding.videoView.visibility = View.GONE
-        // Show gridBtn and hide listBtn
         binding.gridBtn.visibility = View.GONE
         binding.listBtn.visibility = View.VISIBLE
-        // Save layout type to SharedPreferences
         saveLayoutType(LAYOUT_TYPE_GRID)
     }
 
     private fun setListLayoutManager() {
         val linearLayoutManager = LinearLayoutManager(this)
         binding.videoRVFA.layoutManager = linearLayoutManager
-
-//// Show video_view and hide grid_video_view
-//        binding.videoView.visibility = View.VISIBLE
-//        binding.gridVideoView.visibility = View.GONE
-
-        // Show listBtn and hide gridBtn
         binding.listBtn.visibility = View.GONE
         binding.gridBtn.visibility = View.VISIBLE
-        // Save layout type to SharedPreferences
         saveLayoutType(LAYOUT_TYPE_LIST)
     }
 
@@ -160,12 +149,6 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
             .putString(PREF_LAYOUT_TYPE, layoutType)
             .apply()
     }
-//    private fun animateLayoutChange(layoutManager: RecyclerView.LayoutManager) {
-//        // Set layout animation to RecyclerView
-//        binding.videoRVFA.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fade_in)
-//    }
-
-
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {

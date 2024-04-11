@@ -37,7 +37,7 @@ class homeNav : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
-        adapter = VideoAdapter(requireContext(), MainActivity.videoList)
+        adapter = VideoAdapter(requireContext(), MainActivity.videoList )
 
         binding.folderRV.setHasFixedSize(true)
         binding.folderRV.setItemViewCacheSize(10)

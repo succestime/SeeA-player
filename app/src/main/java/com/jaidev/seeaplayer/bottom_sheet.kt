@@ -1,9 +1,9 @@
 package com.jaidev.seeaplayer
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.jaidev.seeaplayer.databinding.ActivityBottomSheetBinding
 
 class bottom_sheet : AppCompatActivity() {
@@ -17,7 +17,7 @@ class bottom_sheet : AppCompatActivity() {
         binding = ActivityBottomSheetBinding.inflate(layoutInflater)
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
-        videoAdapter = VideoAdapter(this, MainActivity.videoList)
+        videoAdapter = VideoAdapter(this, MainActivity.videoList )
 
         binding.renameBtn.setOnClickListener {
             // Add your functionality here

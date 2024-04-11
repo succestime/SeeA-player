@@ -37,6 +37,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             setSongPosition(increment = true)
             PlayerMusicActivity.musicService!!.createMediaPlayer()
             Glide.with(this)
+                .asBitmap()
                 .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
                 .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
                 .into(binding.songImgNP)
@@ -64,6 +65,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             binding.root.visibility = View.VISIBLE
             binding.songNameNP.isSelected = true
             Glide.with(requireContext())
+                .asBitmap()
                 .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
                 .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
                 .into(binding.songImgNP)
@@ -104,6 +106,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
         }
         binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
         Glide.with(requireContext())
+            .asBitmap()
             .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
             .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
             .into(binding.songImgNP)

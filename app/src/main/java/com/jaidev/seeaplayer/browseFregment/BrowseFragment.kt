@@ -2,23 +2,16 @@
 
 package com.jaidev.seeaplayer.browseFregment
 
-import android.Manifest
+//import com.jaidev.seeaplayer.DownloadWithPauseResumeNew
 import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.app.DownloadManager
-import android.content.Context
-import android.content.Context.DOWNLOAD_SERVICE
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.provider.MediaStore
 import android.text.SpannableStringBuilder
@@ -35,15 +28,11 @@ import android.webkit.WebChromeClient
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
-import android.widget.EditText
-import androidx.core.app.ActivityCompat
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.Snackbar
-import com.jaidev.seeaplayer.DownloadWithPauseResumeNew
 import com.jaidev.seeaplayer.LinkTubeActivity
 import com.jaidev.seeaplayer.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.LinkTubeActivity.Companion.tabsList
@@ -54,10 +43,11 @@ import java.io.ByteArrayOutputStream
 
 
 
+
 class BrowseFragment(private var urlNew : String) : Fragment() {
     lateinit var binding: FragmentBrowseBinding
     var webIcon: Bitmap? = null
-    private var url: String? = null
+
     companion object {
 
     }
@@ -75,19 +65,17 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
         binding.webView.apply {
 
             when {
-                URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
-                urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
+             URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
+              urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
                 else -> loadUrl("https://search.brave.com/search?q=$urlNew")
             }
 
         }
 
-
-
-
         return view
 
     }
+
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "ObsoleteSdkInt")
     override fun onResume() {
@@ -98,7 +86,9 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
 
         // for downloading file using external download manager
         binding.webView.setDownloadListener { url, _, _, _, _ ->
-            startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)))
+            val downloadIntent = Intent(Intent.ACTION_VIEW)
+            downloadIntent.setData(Uri.parse(url))
+            startActivity(downloadIntent)
         }
 
         val linkRef = requireActivity() as LinkTubeActivity
@@ -109,25 +99,6 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
         }catch (_:Exception){}
 
 
-        binding.webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
-            linkRef.saveData()
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ActivityCompat.checkSelfPermission(requireActivity(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ) == PackageManager.PERMISSION_GRANTED) {
-                    Log.v("TAG", "Permission is granted")
-                    downloadDialog(url, userAgent, contentDisposition, mimetype)
-                    linkRef.saveData()
-                } else {
-                    Log.v("TAG", "Permission is revoked")
-                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-                }
-            } else {
-                Log.v("TAG", "Permission is granted")
-                downloadDialog(url, userAgent, contentDisposition, mimetype)
-            }
-        }
 
         // Check if it's a tablet
         val isTablet = resources.configuration.smallestScreenWidthDp >= 600
@@ -178,19 +149,38 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
             settings.javaScriptEnabled = true
             settings.setSupportZoom(true)
             settings.builtInZoomControls = true
-            settings.displayZoomControls = false
+         settings.displayZoomControls = false
+            settings.userAgentString = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4501.0 Mobile Safari/537.36"
+       settings.useWideViewPort = true
+        settings.loadWithOverviewMode = true
+
 
 
 
             webViewClient = object : WebViewClient() {
 
+                    @Deprecated("Deprecated in Java")
+                    override fun onReceivedError(
+                        view: WebView?,
+                        errorCode: Int,
+                        description: String?,
+                        failingUrl: String?
+                    ) {
+                        // Handle WebView error
+                        Log.e("WebViewError", "Error loading $failingUrl: $description (error code: $errorCode)")
+                    }
+
+
                 override fun onLoadResource(view: WebView?, url: String?) {
                     super.onLoadResource(view, url)
-                    if (LinkTubeActivity.isDesktopSite)
-                        view?.evaluateJavascript(
-                            "document.querySelector('meta[name=\"viewport\"]').setAttribute('content'," +
-                                    " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));",
-                            null)
+                    settings.setSupportZoom(true)
+                    settings.builtInZoomControls = true
+                    settings.displayZoomControls = false
+//                    if (LinkTubeActivity.isDesktopSite)
+//                        view?.evaluateJavascript(
+//                            "document.querySelector('meta[name=\"viewport\"]').setAttribute('content'," +
+//                                    " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));",
+//                            null)
 
                 }
 
@@ -210,11 +200,7 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
                     linkRef.binding.progressBar.progress = 0
                     linkRef.binding.progressBar.visibility = View.VISIBLE
                     linkRef.saveData()
-//                    if (url!!.contains(
-//                            "you",
-//                            ignoreCase = false
-//                        )
-//                    )
+
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
@@ -419,77 +405,101 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
     }
 
 
-    private fun downloadDialog(url: String?, userAgent: String?, contentDisposition: String?, mimetype: String?) {
-        val linkRef = requireActivity() as LinkTubeActivity
+//    private fun downloadDialog(url: String?, userAgent: String?, contentDisposition: String?, mimetype: String?) {
+//        val linkRef = requireActivity() as LinkTubeActivity
+//
+//        val filename = URLUtil.guessFileName(url, contentDisposition, mimetype)
+//        val builder = AlertDialog.Builder(requireContext())
+//        val dialogView = layoutInflater.inflate(R.layout.custon_dialog_downloader, null)
+//        val buttonYes = dialogView.findViewById<Button>(R.id.Button_Yes)
+//        val buttonNo = dialogView.findViewById<Button>(R.id.Button_No)
+//        val editTextFileName = dialogView.findViewById<EditText>(R.id.EditTextFileName)
+//        val editTextFileUrl = dialogView.findViewById<EditText>(R.id.EditTextFile_Url)
+//
+//        builder.setView(dialogView)
+//        val alertDialog = builder.create()
+//        alertDialog.setCancelable(false)
+//
+//        editTextFileName.setText(filename)
+//        editTextFileUrl.setText(url)
+//
+//        val fi = editTextFileName.text.toString()
+//
+////        buttonYes.setOnClickListener {
+//////            val intent = Intent(it.context, DownloadWithPauseResumeNew::class.java)
+////            intent.putExtra("urlss", url)
+////            intent.putExtra("filenames", fi)
+////            startActivity(intent)
+////            alertDialog.dismiss()
+////        }
+//
+//        buttonNo.setOnClickListener {
+//            alertDialog.dismiss()
+//        }
+//
+//        builder.setTitle(R.string.download_title)
+//        builder.setMessage(getString(R.string.download_file)+ ' '  + filename)
+//
+//        linkRef.saveData()
+//
+//        builder.setPositiveButton(getString(R.string.ok)) { dialog, which ->
+//            val request = DownloadManager.Request(Uri.parse(url))
+//            val cookie = CookieManager.getInstance().getCookie(url)
+//
+//            request.addRequestHeader("Cookie", cookie)
+//            request.addRequestHeader("User-Agent", userAgent)
+//
+//            // Set MIME type for the download request based on the detected mimetype
+//            if (mimetype != null) {
+//                request.setMimeType(mimetype)
+//            }
+//
+//            request.allowScanningByMediaScanner()
+//
+//            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+//
+//            val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+//            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
+//
+//            downloadManager.enqueue(request)
+//        }
+//
+//        builder.setNegativeButton("No") { dialog, which ->
+//            binding.webView.goBack()
+//        }
+//
+//        alertDialog.show()
+//    }
+//
+//    private fun getSystemService(serviceName: String): Any? {
+//        return when (serviceName) {
+//            Context.DOWNLOAD_SERVICE -> requireContext().getSystemService(Context.DOWNLOAD_SERVICE)
+//            else -> null
+//        }
+//
+//    }
 
-        val filename = URLUtil.guessFileName(url, contentDisposition, mimetype)
-        val builder = AlertDialog.Builder(requireContext())
-        val dialogView = layoutInflater.inflate(R.layout.custon_dialog_downloader, null)
-        val buttonYes = dialogView.findViewById<Button>(R.id.Button_Yes)
-        val buttonNo = dialogView.findViewById<Button>(R.id.Button_No)
-        val editTextFileName = dialogView.findViewById<EditText>(R.id.EditTextFileName)
-        val editTextFileUrl = dialogView.findViewById<EditText>(R.id.EditTextFile_Url)
 
-        builder.setView(dialogView)
-        val alertDialog = builder.create()
-        alertDialog.setCancelable(false)
 
-        editTextFileName.setText(filename)
-        editTextFileUrl.setText(url)
+//        binding.webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
+//            linkRef.saveData()
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                if (ActivityCompat.checkSelfPermission(requireActivity(),
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                    ) == PackageManager.PERMISSION_GRANTED) {
+//                    Log.v("TAG", "Permission is granted")
+//                    downloadDialog(url, userAgent, contentDisposition, mimetype)
+//                    linkRef.saveData()
+//                } else {
+//                    Log.v("TAG", "Permission is revoked")
+//                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+//                }
+//            } else {
+//                Log.v("TAG", "Permission is granted")
+//                downloadDialog(url, userAgent, contentDisposition, mimetype)
+//            }
+//        }
 
-        val fi = editTextFileName.text.toString()
 
-        buttonYes.setOnClickListener {
-            val intent = Intent(it.context, DownloadWithPauseResumeNew::class.java)
-            intent.putExtra("urlss", url)
-            intent.putExtra("filenames", fi)
-            startActivity(intent)
-            alertDialog.dismiss()
-        }
-
-        buttonNo.setOnClickListener {
-            alertDialog.dismiss()
-        }
-
-        builder.setTitle(R.string.download_title)
-        builder.setMessage(getString(R.string.download_file)+ ' '  + filename)
-
-        linkRef.saveData()
-
-        builder.setPositiveButton(getString(R.string.ok)) { dialog, which ->
-            val request = DownloadManager.Request(Uri.parse(url))
-            val cookie = CookieManager.getInstance().getCookie(url)
-
-            request.addRequestHeader("Cookie", cookie)
-            request.addRequestHeader("User-Agent", userAgent)
-
-            // Set MIME type for the download request based on the detected mimetype
-            if (mimetype != null) {
-                request.setMimeType(mimetype)
-            }
-
-            request.allowScanningByMediaScanner()
-
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-
-            val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-
-            downloadManager.enqueue(request)
-        }
-
-        builder.setNegativeButton("No") { dialog, which ->
-            binding.webView.goBack()
-        }
-
-        alertDialog.show()
-    }
-
-    private fun getSystemService(serviceName: String): Any? {
-        return when (serviceName) {
-            Context.DOWNLOAD_SERVICE -> requireContext().getSystemService(Context.DOWNLOAD_SERVICE)
-            else -> null
-        }
-
-    }
 }

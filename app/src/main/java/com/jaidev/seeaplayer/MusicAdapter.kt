@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
@@ -5,7 +6,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -115,22 +114,22 @@ class MusicAdapter(
                 toggleSelection(position)
             } else {
 
-                        when {
-                            MainActivity.search -> sendIntent(
-                                ref = "MusicAdapterSearch",
-                                pos = position
-                            )
+                when {
+                    MainActivity.search -> sendIntent(
+                        ref = "MusicAdapterSearch",
+                        pos = position
+                    )
 
-                            musicList[position].id == PlayerMusicActivity.nowMusicPlayingId ->
-                                sendIntent(
-                                    ref = "NowPlaying",
-                                    pos = PlayerMusicActivity.songPosition
-                                )
+                    musicList[position].id == PlayerMusicActivity.nowMusicPlayingId ->
+                        sendIntent(
+                            ref = "NowPlaying",
+                            pos = PlayerMusicActivity.songPosition
+                        )
 
-                            else -> sendIntent(ref = "MusicAdapter", pos = position)
+                    else -> sendIntent(ref = "MusicAdapter", pos = position)
 
-                        }
-                    }
+                }
+            }
 
 
 
@@ -512,19 +511,6 @@ class MusicAdapter(
         dialogRF = dialogBuilder.create()
         dialogRF.show()
 
-        val positiveButton = dialogRF.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
-        val negativeButton = dialogRF.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-        positiveButton.setBackgroundColor(Color.BLACK)
-        negativeButton.setBackgroundColor(Color.BLACK)
-
-        // Set margins between the buttons
-        val layoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
-        layoutParams.setMargins(0, 0, 50, 0) // Add margin to the right of the positive button
-        positiveButton.layoutParams = layoutParams
-
-        val negativeLayoutParams = negativeButton.layoutParams as LinearLayout.LayoutParams
-        negativeLayoutParams.setMargins(0, 0, 100, 0) // Add margin to the left of the negative button
-        negativeButton.layoutParams = negativeLayoutParams
     }
 
 

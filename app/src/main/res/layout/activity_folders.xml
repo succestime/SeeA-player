@@ -14,22 +14,6 @@
         android:layout_height="match_parent"
         >
 
-        <!-- Placeholder for List View -->
-        <include
-            android:id="@+id/video_view"
-            layout="@layout/video_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-
-        <!-- Placeholder for Grid View -->
-        <include
-            android:id="@+id/grid_video_view"
-            layout="@layout/grid_video_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
         <FrameLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
