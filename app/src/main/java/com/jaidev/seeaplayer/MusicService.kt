@@ -62,6 +62,16 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
             prevIntent,
             flag
         )
+        val replayIntent = Intent(
+            baseContext,
+            NotificationReceiver::class.java
+        ).setAction(ApplicationClass.REPLAY)
+        val replayPendingIntent = PendingIntent.getBroadcast(
+            baseContext,
+            0,
+            replayIntent,
+            flag
+        )
 
         val playIntent =
             Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.PLAY)
@@ -72,6 +82,14 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
             flag
         )
 
+        val forwardIntent =
+            Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.FORWARD)
+        val forwardPendingIntent = PendingIntent.getBroadcast(
+            baseContext,
+            0,
+            forwardIntent,
+            flag
+        )
         val nextIntent =
             Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.NEXT)
         val nextPendingIntent = PendingIntent.getBroadcast(
@@ -95,7 +113,7 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
         val image = if (imgArt != null) {
             BitmapFactory.decodeByteArray(imgArt, 0, imgArt.size)
         } else {
-            BitmapFactory.decodeResource(resources, R.drawable.speaker)
+            BitmapFactory.decodeResource(resources, R.drawable.music_speaker_three)
         }
 
         val notification =
@@ -113,7 +131,9 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
                 .setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC)
                 .setOnlyAlertOnce(true)
                 .addAction(R.drawable.ic_previous_icon, "Previous", prevPendingIntent)
+                .addAction(R.drawable.replay_10, "Replay", replayPendingIntent)
                 .addAction(playPauseBtn, "Play", playPendingIntent)
+                .addAction(R.drawable.forward_10, "Froward", forwardPendingIntent)
                 .addAction(R.drawable.ic_next_icon, "Next", nextPendingIntent)
                 .addAction(R.drawable.exit_icon, "Exit", exitPendingIntent)
                 .build()

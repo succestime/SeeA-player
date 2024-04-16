@@ -8,9 +8,6 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
@@ -42,7 +39,7 @@ import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.databinding.VideoViewBinding
 import java.io.File
 
-class VideoAdapter(private val context: Context, private var videoList: ArrayList<VideoData>,private val isFolder: Boolean = false,  private var songImageHeight: Int = 0)
+class VideoAdapter(private val context: Context, private var videoList: ArrayList<VideoData>,private val isFolder: Boolean = false,)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var newPosition = 0
@@ -172,7 +169,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                             }
                             .create()
 
-                        dialogIF.window?.setGravity(Gravity.BOTTOM) // Set the gravity of the dialog window to bottom
+//                        dialogIF.window?.setGravity(Gravity.BOTTOM) // Set the gravity of the dialog window to bottom
                         dialogIF.show()
 
                         val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
@@ -188,7 +185,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                     bindingMf.renameBtn.setOnClickListener {
                         dialog.dismiss()
-                        requestPermissionR()
+
 
                         // Get the current video title as default text
                         val defaultTitle = videoList[position].title
@@ -199,7 +196,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                     bindingMf.deleteBtn.setOnClickListener {
                         dialog.dismiss()
-                        requestPermissionR()
 
                         val alertDialogBuilder = AlertDialog.Builder(context)
                         val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
@@ -368,7 +364,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                     bindingMf.renameBtn.setOnClickListener {
                         dialog.dismiss()
-                        requestPermissionR()
 
                         // Get the current video title as default text
                         val defaultTitle = videoList[position].title
@@ -379,7 +374,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                     bindingMf.deleteBtn.setOnClickListener {
                         dialog.dismiss()
-                        requestPermissionR()
 
                         val alertDialogBuilder = AlertDialog.Builder(context)
                         val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
@@ -471,7 +465,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             VIEW_TYPE_VIDEO -> {
                 (holder as VideoViewHolder).bind(videoData)
             }
-            VIEW_TYPE_GRID_VIDEO -> {
+           else -> {
                 (holder as GridVideoViewHolder).bind(videoData)
             }
         }
@@ -530,8 +524,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             // Hide the menu_rename item if more than one item is selected
-            val renameItem = menu?.findItem(R.id.menu_rename)
-            renameItem?.isVisible = selectedItems.size == 1
+//            val renameItem = menu?.findItem(R.id.shareMultiBrowser)
+//            renameItem?.isVisible = selectedItems.size == 1
 
             return true
         }
@@ -541,11 +535,11 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             // Handle action mode menu items
             val actionMode = mode
             when (item?.itemId) {
-                R.id.menu_delete -> {
+                R.id.shareMultiBrowser -> {
                     deleteSelectedVideos(actionMode)
                     return true
                 }
-                R.id.menu_rename -> {
+                R.id.deleteMultiBrowser -> {
 // Call the showRenameDialog method here
                     if (selectedItems.size == 1) {
                         val selectedPosition = selectedItems.first()
@@ -744,17 +738,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     }
 
 
-    //for requesting android 11 or higher storage permission
-    private fun requestPermissionR() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                intent.addCategory("android.intent.category.DEFAULT")
-                intent.data = Uri.parse("package:${context.applicationContext.packageName}")
-                ContextCompat.startActivity(context, intent, null)
-            }
-        }
-    }
 
     private fun setIconTint(imageView: ImageView) {
         // Get the drawable

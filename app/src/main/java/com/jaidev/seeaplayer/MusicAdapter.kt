@@ -9,8 +9,6 @@ import android.content.SharedPreferences
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
@@ -100,7 +98,7 @@ class MusicAdapter(
         Glide.with(context)
             .asBitmap()
             .load(musicList[position].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(holder.image)
 
         holder.root.setOnLongClickListener {
@@ -230,7 +228,6 @@ class MusicAdapter(
 
             bindingMf.renameBtn.setOnClickListener {
                 dialog.dismiss()
-                requestPermissionR()
                 // Get the current music title as default text
                 val defaultTitle = musicList[position].title
                 // Show the rename dialog with the current music title as default text
@@ -238,7 +235,6 @@ class MusicAdapter(
             }
 
             bindingMf.deleteBtn.setOnClickListener {
-                requestPermissionR()
                 dialog.dismiss()
                 val alertDialogBuilder = AlertDialog.Builder(context)
                 val layoutInflater = LayoutInflater.from(context)
@@ -349,9 +345,9 @@ class MusicAdapter(
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            // Hide the menu_rename item if more than one item is selected
-            val renameItem = menu?.findItem(R.id.menu_rename)
-            renameItem?.isVisible = selectedItems.size == 1
+//            // Hide the menu_rename item if more than one item is selected
+//            val renameItem = menu?.findItem(R.id.menu_rename)
+//            renameItem?.isVisible = selectedItems.size == 1
 
             return true
         }
@@ -360,13 +356,13 @@ class MusicAdapter(
             // Handle action mode menu items
             val actionMode = mode
             when (item?.itemId) {
-                R.id.menu_delete -> {
+                R.id.shareMultiBrowser -> {
                     deleteSelectedVideos(actionMode, newPosition)
 
                     return true
                 }
 
-                R.id.menu_rename -> {
+                R.id.deleteMultiBrowser -> {
 // Call the showRenameDialog method here
                     if (selectedItems.size == 1) {
                         val selectedPosition = selectedItems.first()
@@ -566,17 +562,6 @@ class MusicAdapter(
         notifyDataSetChanged()
     }
 
-    //for requesting android 11 or higher storage permission
-    private fun requestPermissionR() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                intent.addCategory("android.intent.category.DEFAULT")
-                intent.data = Uri.parse("package:${context.applicationContext.packageName}")
-                ContextCompat.startActivity(context, intent, null)
-            }
-        }
-    }
 
 
 

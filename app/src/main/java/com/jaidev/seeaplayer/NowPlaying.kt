@@ -39,7 +39,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             Glide.with(this)
                 .asBitmap()
                 .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
-                .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+                .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
             PlayerMusicActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
@@ -67,7 +67,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             Glide.with(requireContext())
                 .asBitmap()
                 .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
-                .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+                .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
             if(PlayerMusicActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon)
@@ -108,7 +108,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
         Glide.with(requireContext())
             .asBitmap()
             .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgNP)
     }
 

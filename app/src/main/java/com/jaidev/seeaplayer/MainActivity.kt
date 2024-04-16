@@ -7,6 +7,7 @@ import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -16,20 +17,20 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
@@ -123,23 +124,19 @@ class MainActivity : AppCompatActivity() {
         checkInternetConnection()
 
 
-        toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
+       toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
 
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
+       val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
-
-
 
 
         setActionBarGradient()
         drawerLayout = binding.drawerLayoutMA
         // Set the background color of SwipeRefreshLayout based on app theme
         setDrawerLayoutBackgroundColor()
-        // Set the title for the action bar
-//        supportActionBar?.title = "SeeA Player"
 
         if (requestRuntimePermission()) {
             folderList = ArrayList()
@@ -216,6 +213,16 @@ class MainActivity : AppCompatActivity() {
                 R.id.settingsNav -> {
                     val intent = Intent(this@MainActivity, More::class.java)
                     startActivity(intent) }
+
+                R.id.downloadsNav -> {
+                    val intent = Intent(this@MainActivity, FileActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.HistoryNav -> {
+                    val intent = Intent(this@MainActivity, History::class.java)
+                    startActivity(intent)
+                }
                 R.id.themesNav -> {
                     val themes = resources.getStringArray(R.array.theme)
                     val builder = MaterialAlertDialogBuilder(this)
@@ -357,7 +364,7 @@ class MainActivity : AppCompatActivity() {
 
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
-            drawerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        drawerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
         } else {
             // Light mode is enabled, set background color to white
             drawerLayout.setBackgroundColor(resources.getColor(android.R.color.white))
@@ -387,7 +394,7 @@ class MainActivity : AppCompatActivity() {
     private fun setFragment(fragment: Fragment) {
         currentFragment = fragment
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.frameLayout, fragment)
+      transaction.replace(R.id.frameLayout, fragment)
         transaction.disallowAddToBackStack()
         transaction.commit()
     }
@@ -461,9 +468,14 @@ class MainActivity : AppCompatActivity() {
                 videoList = getAllVideos()
                 setFragment(homeNav())
                 MusicListMA = getAllAudios()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    requestPermissionR()
+                }
             } else Snackbar.make(binding.root, "Storage Permission Needed!!", 5000)
                 .setAction("OK") {
                     ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 13)
+
                 }
                 .show()
 //                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE),13)
@@ -477,15 +489,30 @@ class MainActivity : AppCompatActivity() {
                 videoList = getAllVideos()
                 setFragment(homeNav())
                 MusicListMA = getAllAudios()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    requestPermissionR()
+                }
             } else Snackbar.make(binding.root, "Storage Permission Needed!!", 5000)
                 .setAction("OK") {
                     ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE), 14)
+
                 }
                 .show()
         }
     }
 
-
+    //for requesting android 11 or higher storage permission
+    private fun requestPermissionR() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.data = Uri.parse("package:${this.applicationContext.packageName}")
+                ContextCompat.startActivity(this, intent, null)
+            }
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
@@ -721,7 +748,7 @@ class MainActivity : AppCompatActivity() {
         // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()
         if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
+//             Light mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(

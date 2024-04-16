@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".ApplicationClass"
@@ -29,10 +30,21 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".DownloadWithPauseResumeNew"
+            android:name=".ImageViewerActivity"
             android:exported="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity
-            android:name=".Download_browser"
+            android:name=".FileActivity"
             android:exported="false" />
         <activity
             android:name=".History"
@@ -159,10 +171,19 @@
 
         <service android:name=".MusicService" />
         <service android:name=".FolderDetectionService" />
+        <service android:name=".FileDownloadService" />
 
         <receiver
             android:name=".musicActivity.NotificationReceiver"
             android:enabled="true" />
+        <receiver
+            android:name=".DownloadCompleteReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -2,16 +2,24 @@
 
 package com.jaidev.seeaplayer.browseFregment
 
-//import com.jaidev.seeaplayer.DownloadWithPauseResumeNew
+
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.provider.MediaStore
 import android.text.SpannableStringBuilder
@@ -23,11 +31,14 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
+import android.webkit.DownloadListener
+import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -38,19 +49,32 @@ import com.jaidev.seeaplayer.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.LinkTubeActivity.Companion.tabsList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.changeTab
+import com.jaidev.seeaplayer.dataClass.FileType
 import com.jaidev.seeaplayer.databinding.FragmentBrowseBinding
 import java.io.ByteArrayOutputStream
 
 
-
-
-class BrowseFragment(private var urlNew : String) : Fragment() {
+class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener {
     lateinit var binding: FragmentBrowseBinding
     var webIcon: Bitmap? = null
 
     companion object {
+        private const val CHANNEL_ID = "FileDownloadChannel"
 
     }
+    interface DownloadListener {
+        fun onDownloadStarted(
+            fileName: String,
+            fileSize: String,
+            fileType: FileType,
+            fileIconResId: Int
+        )
+
+        fun onDownloadProgress(downloadId: Long, bytesDownloaded: Long, totalBytes: Long)
+
+        fun onDownloadCompleted(downloadId: Long)
+    }
+
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
@@ -76,21 +100,45 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
 
     }
 
-
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "ObsoleteSdkInt")
     override fun onResume() {
         super.onResume()
+        registerDownloadReceiver()
         tabsList[myPager.currentItem].name =
             binding.webView.url.toString()
         LinkTubeActivity.tabsBtn.text = tabsList.size.toString()
 
-        // for downloading file using external download manager
-        binding.webView.setDownloadListener { url, _, _, _, _ ->
-            val downloadIntent = Intent(Intent.ACTION_VIEW)
-            downloadIntent.setData(Uri.parse(url))
-            startActivity(downloadIntent)
-        }
+        binding.webView.setDownloadListener { url, _, _, mimeType, _ ->
+            // Determine the file extension based on MIME type
+            val fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
 
+            // Extract the filename from the URL
+            val fileName = URLUtil.guessFileName(url, null, fileExtension)
+
+            // Check the file type and initiate appropriate download action
+            if (!mimeType.isNullOrBlank() && !fileExtension.isNullOrBlank()) {
+                when {
+                    mimeType.startsWith("application/pdf") -> {
+                        startDownload(url, "document.pdf", fileExtension)
+                    }
+                    mimeType.startsWith("video/") -> {
+                        // Assuming the filename is 'video.mp4' for demonstration
+                        startDownload(url, "video.mp4", fileExtension)
+                    }
+                    mimeType.startsWith("image/") -> {
+                        // Assuming the filename is 'image.jpg' for demonstration
+                        startDownload(url, "image.jpg", fileExtension)
+                    }
+                    else -> {
+                        // Handle other file types here if needed
+                        startDownload(url, fileName, fileExtension)
+                    }
+                }
+            } else {
+                // Handle invalid MIME type or file extension
+                Log.e("DownloadListener", "Invalid MIME type or file extension")
+            }
+        }
         val linkRef = requireActivity() as LinkTubeActivity
 
         var frag: BrowseFragment? = null
@@ -257,16 +305,113 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
             }
 ///////////////////////////////
 ////////////////////////////// //
-            // in video teacher was saying this can make issue so also watch this this
-            binding.webView.reload()
+            // in video teacher was saying this can make issue so also watch this
+//            binding.webView.reload()
+        }
+    }
+
+    @SuppressLint("Range")
+    private fun startDownload(url: String, fileName: String, fileExtension: String?) {
+        val downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val downloadUri = Uri.parse(url)
+
+        val request = DownloadManager.Request(downloadUri)
+            .setTitle(fileName) // Set the desired file name explicitly
+            .setDescription("Downloading")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+
+        val downloadId = downloadManager.enqueue(request)
+
+        // Notify FileActivity about download start
+        val fileType = getFileType(fileExtension)
+        val fileIconResId = getIconResId(fileExtension)
+
+        // Update UI to show download progress
+        (requireActivity() as? DownloadListener)?.onDownloadStarted(fileName, "", fileType, fileIconResId)
+
+        // Create a notification to display download progress
+        val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        createNotificationChannel(notificationManager)
+
+        val notificationBuilder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+            .setContentTitle(fileName) // Use the provided file name in the notification
+            .setContentText("Downloading $fileName")
+            .setSmallIcon(R.drawable.download_icon)
+            .setOnlyAlertOnce(true)
+            .setOngoing(true)
+
+        val notification = notificationBuilder.build()
+        notificationManager.notify(downloadId.toInt(), notification)
+
+
+        }
+
+
+
+
+    private fun getFileType(fileExtension: String?): FileType {
+        return when (fileExtension?.toLowerCase()) {
+            "pdf" -> FileType.PDF
+            "jpg" -> FileType.IMAGE
+            "mp4" -> FileType.VIDEO
+            "mp3" -> FileType.AUDIO
+            "html" -> FileType.WEBSITE
+            "apk" -> FileType.APK
+
+            else -> FileType.UNKNOWN
+        }
+    }
+
+    private fun getIconResId(fileExtension: String?): Int {
+        return when (getFileType(fileExtension)) {
+            FileType.PDF -> R.drawable.internat_browser
+            FileType.VIDEO -> R.drawable.video_browser
+            FileType.IMAGE -> R.drawable.image_browser
+            FileType.AUDIO -> R.drawable.music_download_browser
+            FileType.APK -> R.drawable.pdf_image
+            FileType.WEBSITE -> R.drawable.pdf_image
+
+
+            else -> R.drawable.image_browser
         }
     }
 
 
+    @SuppressLint("ObsoleteSdkInt")
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "File Downloads",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private fun registerDownloadReceiver() {
+        val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        requireActivity().registerReceiver(downloadReceiver, filter)
+    }
 
+    private fun unregisterDownloadReceiver() {
+        requireActivity().unregisterReceiver(downloadReceiver)
+    }
 
+    private val downloadReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == intent?.action) {
+                val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                // Handle download completion
+
+            }
+        }
+    }
     override fun onPause() {
         super.onPause()
+        unregisterDownloadReceiver()
+
         (requireActivity() as LinkTubeActivity).saveBookmarks()
         // for clearing all  webView data
         binding.webView.apply {
@@ -404,102 +549,15 @@ class BrowseFragment(private var urlNew : String) : Fragment() {
         return super.onContextItemSelected(item)
     }
 
-
-//    private fun downloadDialog(url: String?, userAgent: String?, contentDisposition: String?, mimetype: String?) {
-//        val linkRef = requireActivity() as LinkTubeActivity
-//
-//        val filename = URLUtil.guessFileName(url, contentDisposition, mimetype)
-//        val builder = AlertDialog.Builder(requireContext())
-//        val dialogView = layoutInflater.inflate(R.layout.custon_dialog_downloader, null)
-//        val buttonYes = dialogView.findViewById<Button>(R.id.Button_Yes)
-//        val buttonNo = dialogView.findViewById<Button>(R.id.Button_No)
-//        val editTextFileName = dialogView.findViewById<EditText>(R.id.EditTextFileName)
-//        val editTextFileUrl = dialogView.findViewById<EditText>(R.id.EditTextFile_Url)
-//
-//        builder.setView(dialogView)
-//        val alertDialog = builder.create()
-//        alertDialog.setCancelable(false)
-//
-//        editTextFileName.setText(filename)
-//        editTextFileUrl.setText(url)
-//
-//        val fi = editTextFileName.text.toString()
-//
-////        buttonYes.setOnClickListener {
-//////            val intent = Intent(it.context, DownloadWithPauseResumeNew::class.java)
-////            intent.putExtra("urlss", url)
-////            intent.putExtra("filenames", fi)
-////            startActivity(intent)
-////            alertDialog.dismiss()
-////        }
-//
-//        buttonNo.setOnClickListener {
-//            alertDialog.dismiss()
-//        }
-//
-//        builder.setTitle(R.string.download_title)
-//        builder.setMessage(getString(R.string.download_file)+ ' '  + filename)
-//
-//        linkRef.saveData()
-//
-//        builder.setPositiveButton(getString(R.string.ok)) { dialog, which ->
-//            val request = DownloadManager.Request(Uri.parse(url))
-//            val cookie = CookieManager.getInstance().getCookie(url)
-//
-//            request.addRequestHeader("Cookie", cookie)
-//            request.addRequestHeader("User-Agent", userAgent)
-//
-//            // Set MIME type for the download request based on the detected mimetype
-//            if (mimetype != null) {
-//                request.setMimeType(mimetype)
-//            }
-//
-//            request.allowScanningByMediaScanner()
-//
-//            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-//
-//            val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-//            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-//
-//            downloadManager.enqueue(request)
-//        }
-//
-//        builder.setNegativeButton("No") { dialog, which ->
-//            binding.webView.goBack()
-//        }
-//
-//        alertDialog.show()
-//    }
-//
-//    private fun getSystemService(serviceName: String): Any? {
-//        return when (serviceName) {
-//            Context.DOWNLOAD_SERVICE -> requireContext().getSystemService(Context.DOWNLOAD_SERVICE)
-//            else -> null
-//        }
-//
-//    }
-
-
-
-//        binding.webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
-//            linkRef.saveData()
-//
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                if (ActivityCompat.checkSelfPermission(requireActivity(),
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-//                    ) == PackageManager.PERMISSION_GRANTED) {
-//                    Log.v("TAG", "Permission is granted")
-//                    downloadDialog(url, userAgent, contentDisposition, mimetype)
-//                    linkRef.saveData()
-//                } else {
-//                    Log.v("TAG", "Permission is revoked")
-//                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-//                }
-//            } else {
-//                Log.v("TAG", "Permission is granted")
-//                downloadDialog(url, userAgent, contentDisposition, mimetype)
-//            }
-//        }
+    override fun onDownloadStart(
+        url: String?,
+        userAgent: String?,
+        contentDisposition: String?,
+        mimetype: String?,
+        contentLength: Long
+    ) {
+        TODO("Not yet implemented")
+    }
 
 
 }

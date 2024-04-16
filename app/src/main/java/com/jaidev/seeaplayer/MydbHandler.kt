@@ -3,7 +3,6 @@ package com.jaidev.seeaplayer
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.jaidev.seeaplayer.LinkTubeActivity.Companion.myPager
@@ -46,20 +45,24 @@ class MydbHandler(
 
     @SuppressLint("Range")
     fun databaseToString(): List<String> {
-        val db = writableDatabase
-        val query = "SELECT * FROM $TABLE_SITES"
-        val dbstring = mutableListOf<String>()
-        val cursor: Cursor = db.rawQuery(query, null)
-        if (cursor.moveToFirst()) {
-            do {
-                val urlString = cursor.getString(cursor.getColumnIndex(COLUMN_NAME))
-                if (urlString != null) {
-                    dbstring.add(urlString)
-                }
-            } while (cursor.moveToNext())
+        val db = readableDatabase
+        val query = "SELECT * FROM $TABLE_SITES ORDER BY $COLUMN_ID DESC" // Order by ID in descending order
+        val dbStrings = mutableListOf<String>()
+        val cursor = db.rawQuery(query, null)
+
+        cursor.use {
+            if (it.moveToFirst()) {
+                do {
+                    val urlString = it.getString(it.getColumnIndex(COLUMN_NAME))
+                    if (urlString != null) {
+                        dbStrings.add(urlString)
+                    }
+                } while (it.moveToNext())
+            }
         }
-        cursor.close()
-        return dbstring
+
+        db.close()
+        return dbStrings.reversed() // Return reversed list (newest first)
     }
 
 

@@ -1,6 +1,5 @@
 package com.jaidev.seeaplayer
 
-import android.net.Uri
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
@@ -21,7 +20,8 @@ class History : AppCompatActivity() {
 
         val sites: List<String> = dbHandler.databaseToString()
         if (sites.isNotEmpty()) {
-            val myAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, sites)
+            val reversedSites = sites.reversed() // Reverse the list (oldest first)
+            val myAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,  reversedSites)
             val myList = findViewById<ListView>(R.id.listViewHistory)
             myList.adapter = myAdapter
             // Set item click listener
@@ -34,8 +34,7 @@ class History : AppCompatActivity() {
     }
 
     private fun openUrlInBrowser(query: String) {
-        val url = "https://search.brave.com/search?q=${Uri.encode(query)}"
-        val browserFragment = BrowseFragment(urlNew = url)
+        val browserFragment = BrowseFragment(urlNew = query)
         changeTab("Brave", browserFragment)
     }
 

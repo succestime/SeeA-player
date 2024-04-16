@@ -419,6 +419,10 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
 
     }
 
+    private fun getSemiTransparentGrayDrawable(): ColorDrawable {
+        val color = Color.parseColor("#011B29")
+        return ColorDrawable(color)
+    }
     @SuppressLint("SetTextI18n")
     fun setupSleepTimer() {
         if (timer != null)
@@ -448,7 +452,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     self.dismiss()
                     playVideo()
                 }
-                .setBackground(ColorDrawable(0x803700B3.toInt()))
+                .setBackground(getSemiTransparentGrayDrawable())
                 .create()
             dialogS.show()
             bindingS.speedText.text = "$sleepTime Min"
@@ -474,7 +478,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             .setPositiveButton("Done") { _, _ ->
 //                dialog.dismiss()
             }
-            .setBackground(ColorDrawable(0x803700B3.toInt()))
+            .setBackground(getSemiTransparentGrayDrawable())
             .create()
         dialogS.show()
         bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
@@ -501,7 +505,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 playVideo()
                 // dialog.dismiss()
             }
-            .setBackground(ColorDrawable(0x803700B3.toInt()))
+            .setBackground(getSemiTransparentGrayDrawable())
             .create()
         dialogB.show()
         bindingB.verticalBar.progress = loudnessEnhancer.targetGain.toInt() / 100

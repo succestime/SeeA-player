@@ -8,34 +8,80 @@
     tools:context=".browseFregment.HomeFragment"
     android:background="@drawable/bg_search_backgroung">
 
-    <SearchView
-        android:id="@+id/searchView"
+    <LinearLayout
+        android:id="@+id/btnTextUrlLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginHorizontal="24dp"
+        android:layout_weight="1"
         android:background="@drawable/custom_brower_home"
-        android:iconifiedByDefault="false"
-        android:queryHint="Search"
+        android:weightSum="10"
+        android:layout_marginHorizontal="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.3"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:background="?attr/selectableItemBackground"
+            android:elevation="2dp"
+            >
 
-    <ImageButton
-        android:id="@+id/voiceSearchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:contentDescription="Voice Search"
-        android:src="@drawable/google_mic"
-        android:layout_marginEnd="20dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@+id/searchView"
-        app:layout_constraintEnd_toEndOf="@+id/searchView"
-        app:layout_constraintTop_toTopOf="@+id/searchView" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/webIcon"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/car_ui_padding_2"
+                android:tint="@color/white"
+                android:src="@drawable/search_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <EditText
+                android:id="@+id/homeTextUrl"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="@string/enter_url"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:imeOptions="actionGo"
+                android:inputType="textAutoComplete"
+                android:paddingEnd="5dp"
+                tools:ignore="RtlSymmetry" />
 
 
+            <ImageButton
+                android:id="@+id/homeCrossBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/browser_clear"
+                android:background="@android:color/transparent"
+                android:layout_marginEnd="15dp"
+                app:tint="@color/white"
+                android:visibility="gone"
+                />
+            <ImageButton
+                android:id="@+id/voiceSearchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/google_mic"
+                android:background="@android:color/transparent"
+                android:visibility="visible"
+                android:layout_marginEnd="15dp"
+                app:tint="@color/white" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView4"
         app:cardCornerRadius="5dp"
@@ -45,7 +91,7 @@
         android:backgroundTint="@color/light_dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchView">
+        app:layout_constraintTop_toBottomOf="@+id/btnTextUrlLayout">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.jaidev.seeaplayer.BookmarkActivity
@@ -34,7 +33,6 @@ class HomeFragment : Fragment() {
 
 
 
-
         return view
     }
 
@@ -48,7 +46,7 @@ class HomeFragment : Fragment() {
         LinkTubeActivity.tabsList[LinkTubeActivity.myPager.currentItem].name = "Home"
 
         linkTubeRef.binding.btnTextUrl.setText("")
-        binding.searchView.setQuery("" , false)
+//        binding.searchView.setQuery("" , false)
         linkTubeRef.binding.webIcon.setImageResource(R.drawable.search_icon)
 
         linkTubeRef.binding.refreshBrowserBtn.visibility = View.GONE
@@ -94,26 +92,66 @@ class HomeFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-            android.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                if (!query.isNullOrBlank()) {
-                    performSearch(query)
-                }
-                return true
-            }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText.isNullOrBlank()) {
-                    // Show voiceSearchButton when search view is empty
+
+
+        // TextWatcher for btnTextUrl
+        val homeTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.isNullOrEmpty()) {
                     binding.voiceSearchButton.visibility = View.VISIBLE
+                    binding.homeCrossBtn.visibility = View.GONE
                 } else {
-                    // Hide voiceSearchButton when search view has text
-                    binding.voiceSearchButton.visibility = View.GONE
+                  binding.voiceSearchButton.visibility = View.GONE
+              binding.homeCrossBtn.visibility = View.VISIBLE
                 }
-                return true
             }
-        })
+            override fun afterTextChanged(s: Editable?) {}
+        }
+      binding.homeTextUrl.addTextChangedListener(homeTextWatcher)
+
+        // OnClickListener for crossBtn to clear text
+     binding.homeCrossBtn.setOnClickListener {
+            binding.homeTextUrl.text.clear()
+        }
+        // Listen for the action performed on the EditText
+       binding.homeTextUrl.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
+                // Perform action when the Enter key or Go button is pressed
+                val query =  binding.homeTextUrl.text.toString()
+                if (checkForInternet(requireContext())) {
+                    changeTab(query, BrowseFragment(query))
+                } else {
+                    Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+                }
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+
+
+//        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+//            android.widget.SearchView.OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean {
+//                if (!query.isNullOrBlank()) {
+//                    performSearch(query)
+//                }
+//                return true
+//            }
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                if (newText.isNullOrBlank()) {
+//                    // Show voiceSearchButton when search view is empty
+//                    binding.voiceSearchButton.visibility = View.VISIBLE
+//                } else {
+//                    // Hide voiceSearchButton when search view has text
+//                    binding.voiceSearchButton.visibility = View.GONE
+//                }
+//                return true
+//            }
+//        })
 
         // Set up click listener for voiceSearchButton
         binding.voiceSearchButton.setOnClickListener {

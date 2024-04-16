@@ -71,7 +71,7 @@ class LinkTubeActivity : AppCompatActivity() {
         var bookmarkIndex : Int = -1
         lateinit var myPager : ViewPager2
         lateinit var tabsBtn : MaterialTextView
-        private const val REQUEST_CODE_SPEECH_INPUT = 2000
+        const val REQUEST_CODE_SPEECH_INPUT = 2000
 
 
 
@@ -133,7 +133,7 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     R.id.download -> {
-                      startActivity(Intent(this, Download_browser::class.java))
+                      startActivity(Intent(this, FileActivity::class.java))
                     }
 
                     R.id.save -> {
@@ -195,7 +195,7 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     R.id.download      -> {
-                        startActivity(Intent(this, Download_browser::class.java))
+                        startActivity(Intent(this, FileActivity::class.java))
                     }
                   R.id.save -> {
                     save()
@@ -651,6 +651,14 @@ class LinkTubeActivity : AppCompatActivity() {
             val list: ArrayList<Bookmark> = GsonBuilder().create().fromJson(data, object: TypeToken<ArrayList<Bookmark>>(){}.type)
             bookmarkList.addAll(list)
         }
+    }
+
+    fun onPageStarted(url: String?) {
+
+    }
+
+    fun onPageFinished(url: String?) {
+
     }
 
 

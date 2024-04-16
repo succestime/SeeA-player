@@ -78,7 +78,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 //            musicListPA.add(getMusicDetails(intent.data!!))
             Glide.with(this)
                 .load(getImgArt(musicListPA[songPosition].path))
-                .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+                .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgPA)
             binding.songNamePA.text = musicListPA[songPosition].title
         }
@@ -286,7 +286,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         fIndex = favouriteChecker(musicListPA[songPosition].id)
         Glide.with(applicationContext)
             .load(musicListPA[songPosition].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgPA)
         binding.songNamePA.text = musicListPA[songPosition].title
         if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
@@ -398,7 +398,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         NowPlaying.binding.songNameNP.isSelected = true
         Glide.with(applicationContext)
             .load(musicListPA[songPosition].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(NowPlaying.binding.songImgNP)
         NowPlaying.binding.songNameNP.text = musicListPA[songPosition].title
     }
@@ -448,18 +448,5 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             dialog.dismiss()
         }
     }
-
-//    private fun initServiceAndPlaylist(playlist: ArrayList<Music>, shuffle: Boolean, playNext: Boolean = false){
-//        val intent = Intent(this, MusicService::class.java)
-//        bindService(intent, this, BIND_AUTO_CREATE)
-//        startService(intent)
-//        musicListPA = ArrayList()
-//        musicListPA.addAll(playlist)
-//        if(shuffle) musicListPA.shuffle()
-//        setLayout()
-//       if(!playNext) PlayNext.playNextList = ArrayList()
-//    }
-
-
 
 }

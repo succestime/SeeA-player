@@ -25,6 +25,38 @@ class NotificationReceiver:BroadcastReceiver() {
             ApplicationClass.EXIT -> {
                 exitApplication()
             }
+            ApplicationClass.REPLAY -> replay(context = context!!)
+            ApplicationClass.FORWARD -> forward(context = context!!)
+        }
+    }
+
+    private fun replay(context: Context) {
+        PlayerMusicActivity.musicService?.let { musicService ->
+            val currentPosition = musicService.mediaPlayer?.currentPosition ?: return
+            val newPosition = currentPosition - 10000 // Rewind 10 seconds (10000 milliseconds)
+
+            // Ensure new position doesn't go below 0
+            val seekPosition = if (newPosition < 0) 0 else newPosition
+
+            musicService.mediaPlayer?.seekTo(seekPosition)
+            playMusic() // Resume playback after rewinding
+        }
+    }
+
+
+    private fun forward(context: Context) {
+        PlayerMusicActivity.musicService?.let { musicService ->
+            val currentPosition = musicService.mediaPlayer?.currentPosition ?: return
+            val newPosition = currentPosition + 10000 // Forward 10 seconds (10000 milliseconds)
+
+            // Get the total duration of the media
+            val duration = musicService.mediaPlayer?.duration ?: return
+
+            // Ensure new position doesn't exceed the total duration
+            val seekPosition = if (newPosition > duration) duration else newPosition
+
+            musicService.mediaPlayer?.seekTo(seekPosition)
+            playMusic() // Resume playback after fast-forwarding
         }
     }
     private fun playMusic(){
@@ -50,13 +82,13 @@ class NotificationReceiver:BroadcastReceiver() {
         PlayerMusicActivity.musicService!!.createMediaPlayer()
         Glide.with(context)
             .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(PlayerMusicActivity.binding.songImgPA)
 
         PlayerMusicActivity.binding.songNamePA.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
         Glide.with(context)
             .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(NowPlaying.binding.songImgNP)
 
         NowPlaying.binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title

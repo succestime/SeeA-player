@@ -53,7 +53,7 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         Glide.with(context)
             .asBitmap()
             .load(musicReList[position].albumArtUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker)).centerCrop()
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three)).centerCrop()
             .into(holder.image)
 
         holder.more.setOnClickListener {

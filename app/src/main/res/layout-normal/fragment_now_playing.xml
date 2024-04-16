@@ -18,7 +18,7 @@
         android:layout_alignTop="@id/songImgNP"
         android:layout_alignBottom="@id/songImgNP"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="36dp"
+        android:layout_marginStart="35dp"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
         android:scaleType="fitCenter"
@@ -30,7 +30,7 @@
     android:layout_marginVertical="2dp"
     android:layout_marginStart="2dp"
     android:scaleType="centerCrop"
-    android:src="@drawable/speaker"/>
+    android:src="@drawable/music_speaker_three"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
        android:id="@+id/nextBtnNP"

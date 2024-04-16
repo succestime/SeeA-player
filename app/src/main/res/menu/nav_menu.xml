@@ -10,6 +10,14 @@
         android:title="@string/settings"
         android:icon="@drawable/ic_settings"
         />
+    <item android:id="@+id/downloadsNav"
+        android:title="@string/downloads_files"
+        android:icon="@drawable/video_browser"
+        />
+    <item android:id="@+id/HistoryNav"
+        android:title="@string/history"
+        android:icon="@drawable/history_browser"
+        />
 
     <item android:id="@+id/sortOrderNav"
         android:title="@string/sort_order"

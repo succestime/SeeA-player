@@ -63,9 +63,8 @@
         android:layout_height="250dp"
         android:layout_margin="20dp"
         android:padding="5dp"
-
         android:layout_gravity="center"
-        android:src="@drawable/speaker"
+        android:src="@drawable/music_speaker_three"
         app:shapeAppearanceOverlay="@style/curved"
         app:strokeColor="@color/cool_blue"
         app:strokeWidth="2dp"/>

@@ -176,7 +176,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
         Glide.with(this)
             .asBitmap()
             .load(reMusicList[songPosition].albumArtUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker)).centerCrop()
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three)).centerCrop()
             .into(binding.songImgPA)
        binding.songNamePA.text = reMusicList[songPosition].title
         if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,

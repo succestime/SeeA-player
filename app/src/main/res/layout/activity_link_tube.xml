@@ -31,7 +31,8 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
                 android:src="@drawable/home_browse"
-                tools:ignore="RedundantDescriptionCheck" />
+                tools:ignore="RedundantDescriptionCheck"
+                app:tint="@color/white" />
             <ImageButton
                 android:id="@+id/backBrowserBtn"
                 android:layout_width="40dp"
@@ -41,6 +42,7 @@
                 android:visibility="visible"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
+                app:tint="@color/white"
                 android:src="@drawable/back_browser"
                 tools:ignore="RedundantDescriptionCheck" />
             <ImageButton
@@ -52,6 +54,7 @@
                 android:visibility="visible"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
+                app:tint="@color/white"
                 android:src="@drawable/forward_browser"
                 tools:ignore="RedundantDescriptionCheck" />
             <ImageButton
@@ -61,6 +64,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:visibility="gone"
+                app:tint="@color/white"
                 android:src="@drawable/ic_refresh"
                 tools:ignore="RedundantDescriptionCheck" />
 
@@ -90,6 +94,7 @@
                             android:layout_marginEnd="5dp"
                             android:layout_marginStart="@dimen/car_ui_padding_2"
                             android:src="@drawable/search_icon"
+                            app:tint="@color/white"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -103,6 +108,8 @@
                         android:background="@android:color/transparent"
                         android:hint="@string/enter_url"
                         android:imeOptions="actionGo"
+                        android:textColor="@color/white"
+                      android:textColorHint="@color/white"
                         android:inputType="textAutoComplete"
                         android:paddingEnd="5dp"
                         tools:ignore="RtlSymmetry" />
@@ -112,9 +119,10 @@
         android:id="@+id/crossBtn"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:src="@drawable/clear_browser"
+        android:src="@drawable/browser_clear"
         android:background="@android:color/transparent"
         android:layout_marginEnd="2dp"
+        app:tint="@color/white"
         android:visibility="gone"
      />
                     <ImageButton
@@ -124,6 +132,7 @@
                         android:src="@drawable/google_mic"
                         android:background="@android:color/transparent"
                         android:visibility="gone"
+                        app:tint="@color/white"
                         android:layout_marginEnd="2dp"
                         />
 
@@ -134,7 +143,8 @@
                         android:src="@drawable/ic_bookmark"
                         android:background="@android:color/transparent"
                         android:visibility="gone"
-                        android:layout_marginEnd="5dp"
+                        app:tint="@color/white"
+                        android:layout_margin="5dp"
                         />
 
                 </LinearLayout>
@@ -154,6 +164,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
                 android:text="@string/one_browse"
+                android:textColor="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
             <ImageButton
@@ -163,6 +174,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/go_btn"
                 android:src="@drawable/icon_dark"
+                app:tint="@color/white"
                 android:layout_marginStart="5dp"
                 tools:ignore="RedundantDescriptionCheck" />
 
@@ -222,78 +234,72 @@
                 android:id="@+id/bottomMediaBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:src="@drawable/folder_icon"
                 android:visibility="visible"
-                app:tint="?android:attr/textColorPrimary"
+                app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
             <ImageButton
                 android:id="@+id/bottomHomeBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:src="@drawable/home_browse"
                 android:visibility="visible"
-                app:tint="?android:attr/textColorPrimary"
+                app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
             <ImageButton
                 android:id="@+id/bottomBackBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:src="@drawable/back_browser"
                 android:visibility="visible"
-                app:tint="?android:attr/textColorPrimary"
+                app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
             <ImageButton
                 android:id="@+id/bottomForwardBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:src="@drawable/forward_browser"
                 android:visibility="visible"
-                app:tint="?android:attr/textColorPrimary"
+                app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
             <ImageButton
                 android:id="@+id/bottomRefreshBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:src="@drawable/ic_refresh"
                 android:visibility="visible"
-                app:tint="?android:attr/textColorPrimary"
+                app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
             <ImageButton
                 android:id="@+id/bottomMoreBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:src="@drawable/icon_dark"
                 android:visibility="visible"
-                app:tint="?android:attr/textColorPrimary"
+                app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
         </LinearLayout>
 

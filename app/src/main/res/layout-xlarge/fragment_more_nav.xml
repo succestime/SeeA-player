@@ -330,6 +330,7 @@ android:layout_marginStart="10dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="25dp"
+                    app:tint="@color/white"
                     android:src="@drawable/ic_settings" />
 
 
