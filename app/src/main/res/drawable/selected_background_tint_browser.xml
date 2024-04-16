@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Set the background color for the selected box -->
+    <solid android:color="#0B4663" />
+    <!-- Optionally, you can define corner radius and other properties -->
+    <corners android:radius="4dp" />
+</shape>
