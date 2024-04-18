@@ -53,7 +53,6 @@ import com.google.android.exoplayer2.ui.TimeBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.LinkTubeActivity
 import com.jaidev.seeaplayer.MainActivity
-import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.RecentVideoAdapter
 import com.jaidev.seeaplayer.allAdapters.PlaybackIconsAdapter
@@ -343,7 +342,6 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     }
                     4 -> {
                         startActivity(Intent(this@ReVideoPlayerActivity, LinkTubeActivity::class.java))
-                        finish()
 
                     }
                     5-> {
@@ -533,9 +531,9 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             if (status) {
                 this.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
                 // dialog.dismiss()
-                binding.playerView.hideController()
+                binding.playerView.showContextMenu()
                 playVideo()
-                PlayerActivity.pipStatus = 0
+             pipStatus = 0
             } else {
                 val intent = Intent(
                     "android.settings.PICTURE_IN_PICTURE_SETTINGS",
@@ -752,7 +750,13 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
             }
             startActivity(intent)
         }
-        if(!isInPictureInPictureMode) pauseVideo()
+        if(isInPictureInPictureMode){ playVideo()
+            playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
+        } else {
+            pauseVideo()
+            playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
+
+        }
     }
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {

@@ -50,6 +50,8 @@ import com.jaidev.seeaplayer.LinkTubeActivity.Companion.tabsList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.changeTab
 import com.jaidev.seeaplayer.dataClass.FileType
+import com.jaidev.seeaplayer.dataClass.HistoryItem
+import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.databinding.FragmentBrowseBinding
 import java.io.ByteArrayOutputStream
 
@@ -207,16 +209,19 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
             webViewClient = object : WebViewClient() {
 
-                    @Deprecated("Deprecated in Java")
-                    override fun onReceivedError(
-                        view: WebView?,
-                        errorCode: Int,
-                        description: String?,
-                        failingUrl: String?
-                    ) {
-                        // Handle WebView error
-                        Log.e("WebViewError", "Error loading $failingUrl: $description (error code: $errorCode)")
-                    }
+                @Deprecated("Deprecated in Java")
+                override fun onReceivedError(
+                    view: WebView?,
+                    errorCode: Int,
+                    description: String?,
+                    failingUrl: String?
+                ) {
+                    // Handle WebView error
+                    Log.e(
+                        "WebViewError",
+                        "Error loading $failingUrl: $description (error code: $errorCode)"
+                    )
+                }
 
 
                 override fun onLoadResource(view: WebView?, url: String?) {
@@ -255,9 +260,18 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     super.onPageFinished(view, url)
                     linkRef.binding.progressBar.visibility = View.GONE
                     binding.webView.zoomOut()
+                    // Save the visited page to history
 
+
+                    val websiteTitle = HistoryManager.extractWebsiteTitle(url ?: "")
+                    val favicon = view?.favicon
+                    val timestamp = System.currentTimeMillis()
+                    val historyItem = HistoryItem(url ?: "", websiteTitle, timestamp, favicon)
+                    // Add history item to the HistoryManager
+                  HistoryManager.addHistoryItem(historyItem, requireContext())
 
                 }
+
 
             }
             webChromeClient = object : WebChromeClient() {
@@ -303,10 +317,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                 linkRef.binding.root.onTouchEvent(motionEvent)
                 return@setOnTouchListener false
             }
-///////////////////////////////
-////////////////////////////// //
-            // in video teacher was saying this can make issue so also watch this
-//            binding.webView.reload()
+
         }
     }
 
@@ -425,6 +436,8 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             WebStorage.getInstance().deleteAllData()
         }
     }
+    // Assuming this is in your BrowseFragment or similar place
+
 
     override fun onCreateContextMenu(
         menu: ContextMenu,

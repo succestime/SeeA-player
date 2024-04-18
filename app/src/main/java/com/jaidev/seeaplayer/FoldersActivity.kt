@@ -357,7 +357,7 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     override fun onResume() {
         super.onResume()
         setActionBarGradient()
-        if(PlayerActivity.position != -1) binding.nowPlayingBtn.visibility = View.VISIBLE
+        if(PlayerActivity.position != -1) {binding.nowPlayingBtn.visibility = View.VISIBLE}
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged= false
     }

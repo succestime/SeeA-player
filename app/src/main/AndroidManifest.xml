@@ -29,6 +29,10 @@
         android:theme="@style/coolBlueNav"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <activity
+            android:name=".HistoryBrowser"
+            android:exported="false" />
         <activity
             android:name=".ImageViewerActivity"
             android:exported="false" />

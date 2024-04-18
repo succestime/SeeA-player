@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -16,7 +17,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
@@ -30,17 +30,17 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
-import com.jaidev.seeaplayer.databinding.VideoViewBinding
 import java.io.File
 
 class VideoAdapter(private val context: Context, private var videoList: ArrayList<VideoData>,private val isFolder: Boolean = false,)
-    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    : RecyclerView.Adapter<VideoAdapter.MyHolder>() {
 
     private var newPosition = 0
     private lateinit var dialogRF: AlertDialog
@@ -52,7 +52,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
     companion object {
         private const val PREF_NAME = "video_titles"
-        private const val VIEW_TYPE_VIDEO = 0
+//        private const val VIEW_TYPE_VIDEO = 0
         private const val VIEW_TYPE_GRID_VIDEO = 1
     }
     init {
@@ -73,403 +73,210 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         videoDeleteListener = listener
     }
     // Function to update layout mode dynamically
+    @SuppressLint("NotifyDataSetChanged")
     fun enableGridMode(enable: Boolean) {
         isGridMode = enable
         notifyDataSetChanged()
     }
-    inner class VideoViewHolder(private val binding: VideoViewBinding) :
-        RecyclerView.ViewHolder(binding.root) ,VideoViewHolderBinder {
+//    interface VideoViewHolderBinder {
+//        fun bind(videoData: VideoData)
+//    }
 
-        @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
-        override  fun bind(videoData: VideoData) {
-            binding.apply {
-                videoName.text = videoData.title
-                duration.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
-                // Load image using Glide
-                Glide.with(context)
-                    .asBitmap()
-                    .load(videoList[position].artUri)
-                    .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-                    .into(videoImage)
+    class MyHolder(binding: GridVideoViewBinding) : RecyclerView.ViewHolder(binding.root) {
+        val title = binding.videoName
+        val duration = binding.duration
+        val image = binding.videoImage
+        val more = binding.MoreChoose
+        val root = binding.root
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
+      return MyHolder(GridVideoViewBinding.inflate(LayoutInflater.from(context), parent, false))
 
-                setIconTint(MoreChoose)
-                root.setOnLongClickListener {
-                    toggleSelection(position)
-                    true
-                }
-                root.setOnClickListener {
-                    if (actionMode != null) {
-                        // If action mode is active, toggle selection as usual
-                        toggleSelection(position)
-                    } else {
-                        // Otherwise, play the video without enabling selection
-                        when {
-                            isFolder -> {
-                                PlayerActivity.pipStatus = 1
-                                sendIntent(pos = position, ref = "FoldersActivity")
-                            }
-                            MainActivity.search -> {
-                                PlayerActivity.pipStatus = 2
-                                sendIntent(pos = position, ref = "SearchVideos")
-                            }
-                            videoList[position].id == PlayerActivity.nowPlayingId -> {
-                                sendIntent(pos = position, ref = "NowPlaying")
-                            }
-                            else -> {
-                                // Only play the video without enabling selection
-                                sendIntent(pos = position, ref = "NormalClick")
-                            }
-                        }
+}
+
+    @SuppressLint("NotifyDataSetChanged")
+    override fun onBindViewHolder(holder: MyHolder, @SuppressLint("RecyclerView") position: Int) {
+        holder.title.text = videoList[position].title
+        holder.duration.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
+        Glide.with(context)
+            .asBitmap()
+            .load(videoList[position].artUri)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+            .into(holder.image)
+
+        setIconTint(holder.more)
+        // Determine if the item is currently selected
+        if (selectedItems.contains(position)) {
+            // Set your custom selected background on the root view of the item
+            holder.root.setBackgroundResource(R.drawable.browser_selected_background)
+        } else {
+            // Reset to default background based on app theme
+            val defaultBackgroundColor = getDefaultBackgroundColor()
+            holder.root.setBackgroundColor(defaultBackgroundColor)
+        }
+        holder.root.setOnLongClickListener {
+            toggleSelection(position)
+            true
+        }
+        holder.root.setOnClickListener {
+            if (actionMode != null) {
+                // If action mode is active, toggle selection as usual
+                toggleSelection(position)
+            } else {
+                // Otherwise, play the video without enabling selection
+                when {
+
+                    isFolder -> {
+                        PlayerActivity.pipStatus = 1
+                        sendIntent(pos = position, ref = "FoldersActivity")
+                    }
+                    MainActivity.search -> {
+                        PlayerActivity.pipStatus = 2
+                        sendIntent(pos = position, ref = "SearchVideos")
+                    }
+                    videoList[position].id == PlayerActivity.nowPlayingId -> {
+                        sendIntent(pos = position, ref = "NowPlaying")
+                    }
+                    else -> {
+                        // Only play the video without enabling selection
+                        sendIntent(pos = position, ref = "NormalClick")
                     }
                 }
-
-
-                // Show/hide multi-select icon based on selection
-                multiIcon.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
-
-
-                MoreChoose.setOnClickListener {
-                    newPosition = position
-
-                    // Inflate the custom dialog layout
-                    val customDialog = LayoutInflater.from(context).inflate(R.layout.video_more_features, root, false)
-                    val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
-                    // Create the dialog
-                    val dialogBuilder = MaterialAlertDialogBuilder(context)
-                        .setView(customDialog)
-                    val dialog = dialogBuilder.create()
-
-                    // Show the dialog
-                    dialog.show()
-
-                    // Get the window attributes of the dialog
-                    val window = dialog.window
-                    window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
-                    window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
-
-                    // Set click listeners for dialog buttons
-                    bindingMf.shareBtn.setOnClickListener {
-                        dialog.dismiss()
-                        val shareIntent = Intent()
-                        shareIntent.action = Intent.ACTION_SEND
-                        shareIntent.type = "video/*"
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoList[position].path))
-                        startActivity(context, Intent.createChooser(shareIntent, "Sharing Video"), null)
-                    }
-
-                    bindingMf.infoBtn.setOnClickListener {
-                        dialog.dismiss()
-                        val customDialogIF = LayoutInflater.from(context).inflate(R.layout.details_view, root, false)
-                        val bindingIF = DetailsViewBinding.bind(customDialogIF)
-                        val dialogIF = MaterialAlertDialogBuilder(context)
-                            .setView(customDialogIF)
-                            .setCancelable(false)
-                            .setPositiveButton("OK") { self, _ ->
-                                self.dismiss()
-                            }
-                            .create()
-
-//                        dialogIF.window?.setGravity(Gravity.BOTTOM) // Set the gravity of the dialog window to bottom
-                        dialogIF.show()
-
-                        val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
-                            .append(videoList[position].title)
-                            .bold { append("\n\nDuration : ") }
-                            .append(DateUtils.formatElapsedTime(videoList[position].duration / 1000))
-                            .bold { append("\n\nFile Size : ") }.append(
-                                Formatter.formatShortFileSize(context, videoList[position].size.toLong())
-                            )
-                            .bold { append("\n\nLocation : ") }.append(videoList[position].path)
-                        bindingIF.detailTV.text = infoText
-                    }
-
-                    bindingMf.renameBtn.setOnClickListener {
-                        dialog.dismiss()
-
-
-                        // Get the current video title as default text
-                        val defaultTitle = videoList[position].title
-
-                        // Show the rename dialog with the current video title as default text
-                        showRenameDialog(position, defaultTitle)
-                    }
-
-                    bindingMf.deleteBtn.setOnClickListener {
-                        dialog.dismiss()
-
-                        val alertDialogBuilder = AlertDialog.Builder(context)
-                        val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-
-                        val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
-                        val deleteText = view.findViewById<TextView>(R.id.deleteText)
-                        val cancelText = view.findViewById<TextView>(R.id.cancelText)
-                        val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
-
-                        // Set the delete text color to red
-                        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-
-                        // Set the cancel text color to black
-                        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-
-                        // Load video image into iconImageView using Glide
-                        Glide.with(context)
-                            .asBitmap()
-                            .load(videoList[position].artUri)
-                            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-                            .into(iconImageView)
-
-                        videoNameDelete.text = videoList[position].title
-
-                        alertDialogBuilder.setView(view)
-
-                        val alertDialog = alertDialogBuilder.create()
-
-                        deleteText.setOnClickListener {
-                            val file = File(videoList[position].path)
-                            if (file.exists() && file.delete()) {
-                                MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                                when {
-                                    MainActivity.search -> {
-                                        MainActivity.dataChanged = true
-                                        videoList.removeAt(position)
-                                        notifyDataSetChanged()
-                                    }
-                                    isFolder -> {
-                                        MainActivity.dataChanged = true
-                                        FoldersActivity.currentFolderVideos.removeAt(position)
-                                        notifyDataSetChanged()
-                                        videoDeleteListener?.onVideoDeleted()
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-                            }
-                            alertDialog.dismiss()
-                        }
-
-                        cancelText.setOnClickListener {
-                            // Handle cancel action here
-                            alertDialog.dismiss()
-                        }
-                        alertDialog.show()
-                    }
-                }
-
-
             }
         }
-    }
-
-    inner class GridVideoViewHolder(private val binding: GridVideoViewBinding) :
-        RecyclerView.ViewHolder(binding.root),VideoViewHolderBinder{
-         override fun bind(videoData: VideoData) {
-            binding.apply {
-                videoName.text = videoData.title
-                duration.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
-
-                Glide.with(context)
-                    .asBitmap()
-                    .load(videoList[position].artUri)
-                    .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-                    .into(videoImage)
-
-                setIconTint(MoreChoose)
-                root.setOnLongClickListener {
-                    toggleSelection(position)
-                    true
-                }
-                root.setOnClickListener {
-                    if (actionMode != null) {
-                        // If action mode is active, toggle selection as usual
-                        toggleSelection(position)
-                    } else {
-                        // Otherwise, play the video without enabling selection
-                        when {
-                            isFolder -> {
-                                PlayerActivity.pipStatus = 1
-                                sendIntent(pos = position, ref = "FoldersActivity")
-                            }
-                            MainActivity.search -> {
-                                PlayerActivity.pipStatus = 2
-                                sendIntent(pos = position, ref = "SearchVideos")
-                            }
-                            videoList[position].id == PlayerActivity.nowPlayingId -> {
-                                sendIntent(pos = position, ref = "NowPlaying")
-                            }
-                            else -> {
-                                // Only play the video without enabling selection
-                                sendIntent(pos = position, ref = "NormalClick")
-                            }
-                        }
-                    }
-                }
 
 
 //                // Show/hide multi-select icon based on selection
 //                multiIcon.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
 
 
-                MoreChoose.setOnClickListener {
-                    newPosition = position
+        holder.more.setOnClickListener {
+            newPosition = position
 
-                    // Inflate the custom dialog layout
-                    val customDialog = LayoutInflater.from(context).inflate(R.layout.video_more_features, root, false)
-                    val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
-                    // Create the dialog
-                    val dialogBuilder = MaterialAlertDialogBuilder(context)
-                        .setView(customDialog)
-                    val dialog = dialogBuilder.create()
+            // Inflate the custom dialog layout
+            val customDialog = LayoutInflater.from(context).inflate(R.layout.video_more_features, holder.root, false)
+            val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
+            // Create the dialog
+            val dialogBuilder = MaterialAlertDialogBuilder(context)
+                .setView(customDialog)
+            val dialog = dialogBuilder.create()
 
-                    // Show the dialog
-                    dialog.show()
+            // Show the dialog
+            dialog.show()
 
-                    // Get the window attributes of the dialog
-                    val window = dialog.window
-                    window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
-                    window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
+            // Get the window attributes of the dialog
+            val window = dialog.window
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
+            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
 
-                    // Set click listeners for dialog buttons
-                    bindingMf.shareBtn.setOnClickListener {
-                        dialog.dismiss()
-                        val shareIntent = Intent()
-                        shareIntent.action = Intent.ACTION_SEND
-                        shareIntent.type = "video/*"
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoList[position].path))
-                        startActivity(context, Intent.createChooser(shareIntent, "Sharing Video"), null)
+            // Set click listeners for dialog buttons
+            bindingMf.shareBtn.setOnClickListener {
+                dialog.dismiss()
+                val shareIntent = Intent()
+                shareIntent.action = Intent.ACTION_SEND
+                shareIntent.type = "video/*"
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoList[position].path))
+                startActivity(context, Intent.createChooser(shareIntent, "Sharing Video"), null)
+            }
+
+            bindingMf.infoBtn.setOnClickListener {
+                dialog.dismiss()
+                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
+                val bindingIF = DetailsViewBinding.bind(customDialogIF)
+                val dialogIF = MaterialAlertDialogBuilder(context)
+                    .setView(customDialogIF)
+                    .setCancelable(false)
+                    .setPositiveButton("OK") { self, _ ->
+                        self.dismiss()
                     }
+                    .create()
+                dialogIF.show()
 
-                    bindingMf.infoBtn.setOnClickListener {
-                        dialog.dismiss()
-                        val customDialogIF = LayoutInflater.from(context).inflate(R.layout.details_view, root, false)
-                        val bindingIF = DetailsViewBinding.bind(customDialogIF)
-                        val dialogIF = MaterialAlertDialogBuilder(context)
-                            .setView(customDialogIF)
-                            .setCancelable(false)
-                            .setPositiveButton("OK") { self, _ ->
-                                self.dismiss()
+                val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
+                    .append(videoList[position].title)
+                    .bold { append("\n\nDuration : ") }
+                    .append(DateUtils.formatElapsedTime(videoList[position].duration / 1000))
+                    .bold { append("\n\nFile Size : ") }.append(
+                        Formatter.formatShortFileSize(context, videoList[position].size.toLong())
+                    )
+                    .bold { append("\n\nLocation : ") }.append(videoList[position].path)
+                bindingIF.detailTV.text = infoText
+            }
+
+            bindingMf.renameBtn.setOnClickListener {
+                dialog.dismiss()
+
+                // Get the current video title as default text
+                val defaultTitle = videoList[position].title
+
+                // Show the rename dialog with the current video title as default text
+                showRenameDialog(position, defaultTitle)
+            }
+
+            bindingMf.deleteBtn.setOnClickListener {
+                dialog.dismiss()
+
+                val alertDialogBuilder = AlertDialog.Builder(context)
+                val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
+
+                val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
+                val deleteText = view.findViewById<TextView>(R.id.deleteText)
+                val cancelText = view.findViewById<TextView>(R.id.cancelText)
+                val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
+
+                // Set the delete text color to red
+                deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+
+                // Set the cancel text color to black
+                cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+
+                // Load video image into iconImageView using Glide
+                Glide.with(context)
+                    .asBitmap()
+                    .load(videoList[position].artUri)
+                    .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+                    .into(iconImageView)
+
+                videoNameDelete.text = videoList[position].title
+
+                alertDialogBuilder.setView(view)
+
+                val alertDialog = alertDialogBuilder.create()
+
+                deleteText.setOnClickListener {
+                    val file = File(videoList[position].path)
+                    if (file.exists() && file.delete()) {
+                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                        when {
+                            MainActivity.search -> {
+                                MainActivity.dataChanged = true
+                                videoList.removeAt(position)
+                                notifyDataSetChanged()
                             }
-                            .create()
-                        dialogIF.show()
-
-                        val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
-                            .append(videoList[position].title)
-                            .bold { append("\n\nDuration : ") }
-                            .append(DateUtils.formatElapsedTime(videoList[position].duration / 1000))
-                            .bold { append("\n\nFile Size : ") }.append(
-                                Formatter.formatShortFileSize(context, videoList[position].size.toLong())
-                            )
-                            .bold { append("\n\nLocation : ") }.append(videoList[position].path)
-                        bindingIF.detailTV.text = infoText
-                    }
-
-                    bindingMf.renameBtn.setOnClickListener {
-                        dialog.dismiss()
-
-                        // Get the current video title as default text
-                        val defaultTitle = videoList[position].title
-
-                        // Show the rename dialog with the current video title as default text
-                        showRenameDialog(position, defaultTitle)
-                    }
-
-                    bindingMf.deleteBtn.setOnClickListener {
-                        dialog.dismiss()
-
-                        val alertDialogBuilder = AlertDialog.Builder(context)
-                        val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-
-                        val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
-                        val deleteText = view.findViewById<TextView>(R.id.deleteText)
-                        val cancelText = view.findViewById<TextView>(R.id.cancelText)
-                        val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
-
-                        // Set the delete text color to red
-                        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-
-                        // Set the cancel text color to black
-                        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-
-                        // Load video image into iconImageView using Glide
-                        Glide.with(context)
-                            .asBitmap()
-                            .load(videoList[position].artUri)
-                            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-                            .into(iconImageView)
-
-                        videoNameDelete.text = videoList[position].title
-
-                        alertDialogBuilder.setView(view)
-
-                        val alertDialog = alertDialogBuilder.create()
-
-                        deleteText.setOnClickListener {
-                            val file = File(videoList[position].path)
-                            if (file.exists() && file.delete()) {
-                                MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                                when {
-                                    MainActivity.search -> {
-                                        MainActivity.dataChanged = true
-                                        videoList.removeAt(position)
-                                        notifyDataSetChanged()
-                                    }
-                                    isFolder -> {
-                                        MainActivity.dataChanged = true
-                                        FoldersActivity.currentFolderVideos.removeAt(position)
-                                        notifyDataSetChanged()
-                                        videoDeleteListener?.onVideoDeleted()
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+                            isFolder -> {
+                                MainActivity.dataChanged = true
+                                FoldersActivity.currentFolderVideos.removeAt(position)
+                                notifyDataSetChanged()
+                                videoDeleteListener?.onVideoDeleted()
                             }
-                            alertDialog.dismiss()
                         }
-
-                        cancelText.setOnClickListener {
-                            // Handle cancel action here
-                            alertDialog.dismiss()
-                        }
-                        alertDialog.show()
+                    } else {
+                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
                     }
+                    alertDialog.dismiss()
                 }
 
+                cancelText.setOnClickListener {
+                    // Handle cancel action here
+                    alertDialog.dismiss()
+                }
+                alertDialog.show()
             }
         }
-    }
-    override fun getItemViewType(position: Int): Int {
-        return if (isFolder) VIEW_TYPE_GRID_VIDEO else VIEW_TYPE_VIDEO
+
     }
 
-    interface VideoViewHolderBinder {
-        fun bind(videoData: VideoData)
-    }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            VIEW_TYPE_VIDEO -> {
-                val binding = VideoViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                VideoViewHolder(binding)
-            }
-            VIEW_TYPE_GRID_VIDEO -> {
-                val binding = GridVideoViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                GridVideoViewHolder(binding)
-            }
-            else -> throw IllegalArgumentException("Invalid view type")
-        }
-    }
-
-
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val videoData = videoList[position]
-        when (holder.itemViewType) {
-            VIEW_TYPE_VIDEO -> {
-                (holder as VideoViewHolder).bind(videoData)
-            }
-           else -> {
-                (holder as GridVideoViewHolder).bind(videoData)
-            }
-        }
-    }
 
 
 
@@ -481,11 +288,20 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
 
 
-
+    // Function to get default background color based on app theme
+    private fun getDefaultBackgroundColor(): Int {
+        val isDarkMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return if (isDarkMode) {
+            // Dark mode is enabled, return dark color resource
+            ContextCompat.getColor(context, R.color.gray)
+        } else {
+            // Light mode is enabled, return light color resource
+            ContextCompat.getColor(context, R.color.white)
+        }
+    }
 
     // Toggle selection for multi-select
     // Toggle selection for multi-select
-    @SuppressLint("NotifyDataSetChanged")
     private fun toggleSelection(position: Int) {
         if (selectedItems.contains(position)) {
             selectedItems.remove(position)
@@ -493,17 +309,18 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             selectedItems.add(position)
         }
 
-        // Start or finish action mode based on selection
         if (selectedItems.isEmpty()) {
             actionMode?.finish()
         } else {
             startActionMode()
         }
 
-        // Update selected items
-        notifyDataSetChanged()
+        notifyItemChanged(position) // Update selected state for the item
+        actionMode?.title = "${selectedItems.size} selected" // Update action mode title
         actionMode?.invalidate()
+
     }
+
 
 
     // Start action mode for multi-select
@@ -518,29 +335,26 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             // Inflate action mode menu
-            mode?.menuInflater?.inflate(R.menu.multiple_select_menu, menu)
+            mode?.menuInflater?.inflate(R.menu.multiple_player_select_menu, menu)
             return true
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             // Hide the menu_rename item if more than one item is selected
-//            val renameItem = menu?.findItem(R.id.shareMultiBrowser)
-//            renameItem?.isVisible = selectedItems.size == 1
+            val renameItem = menu?.findItem(R.id.renameMulti)
+            renameItem?.isVisible = selectedItems.size == 1
 
             return true
         }
 
 
+        @SuppressLint("NotifyDataSetChanged")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             // Handle action mode menu items
             val actionMode = mode
             when (item?.itemId) {
-                R.id.shareMultiBrowser -> {
-                    deleteSelectedVideos(actionMode)
-                    return true
-                }
-                R.id.deleteMultiBrowser -> {
-// Call the showRenameDialog method here
+                R.id.renameMulti -> {
+                    // Call the showRenameDialog method here
                     if (selectedItems.size == 1) {
                         val selectedPosition = selectedItems.first()
                         val defaultName = videoList[selectedPosition].title
@@ -550,7 +364,42 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     }
                     return true
                 }
-                // Add more action mode items as needed
+                R.id.deleteMulti -> {
+                    if (selectedItems.isNotEmpty()) {
+                        // Build confirmation dialog
+                        AlertDialog.Builder(context)
+                            .setTitle("Confirm Delete")
+                            .setMessage("Are you sure you want to delete these ${selectedItems.size} selected videos?")
+                            .setPositiveButton("Delete") { _, _ ->
+                                // User clicked Delete, proceed with deletion
+                                val positionsToDelete = ArrayList(selectedItems)
+                                positionsToDelete.sortDescending()
+
+                                for (position in positionsToDelete) {
+                                    val video = videoList[position]
+                                    val file = File(video.path)
+
+                                    if (file.exists() && file.delete()) {
+                                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                                        videoList.removeAt(position)
+                                    }
+                                }
+
+                                selectedItems.clear()
+                                mode?.finish()
+                                notifyDataSetChanged()
+                            }
+                            .setNegativeButton("Cancel") { dialog, _ ->
+                                // User clicked Cancel, dismiss dialog
+                                dialog.dismiss()
+                            }
+                            .show()
+
+
+                    }
+                    return true
+                }
+
             }
             return false
         }
@@ -562,69 +411,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             notifyDataSetChanged()
         }
     }
-    private fun deleteSelectedVideos(actionMode: ActionMode?) {
-        val selectedPositions = ArrayList(selectedItems)
-        val deleteDialogBuilder = AlertDialog.Builder(context)
-        val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-
-        val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
-        val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
-        val iconImageView = deleteView.findViewById<ImageView>(R.id.videoImage)
-        val videoNameDelete = deleteView.findViewById<TextView>(R.id.videmusicNameDelete)
-
-        // Set the delete text color to red
-        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-
-        // Set the cancel text color to black
-        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-
-        // Load video image into iconImageView using Glide
-        Glide.with(context)
-            .asBitmap()
-            .load(videoList[selectedPositions.first()].artUri) // Assuming only one item is selected
-            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-            .into(iconImageView)
-
-        // Set the video name
-        videoNameDelete.text = videoList[selectedPositions.first()].title // Assuming only one item is selected
-
-        deleteDialogBuilder.setView(deleteView)
-
-        val deleteDialog = deleteDialogBuilder.create()
-
-        deleteText.setOnClickListener {
-            for (position in selectedPositions) {
-                val file = File(videoList[position].path)
-                if (file.exists() && file.delete()) {
-                    MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                    when {
-                        MainActivity.search -> {
-                            MainActivity.dataChanged = true
-                            videoList.removeAt(position)
-                            notifyItemRemoved(position)
-                        }
-                        isFolder -> {
-                            MainActivity.dataChanged = true
-                            FoldersActivity.currentFolderVideos.removeAt(position)
-                            notifyItemRemoved(position)
-                            videoDeleteListener?.onVideoDeleted()
-                        }
-                    }
-                } else {
-                    Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-                }
-            }
-            deleteDialog.dismiss()
-            actionMode?.finish()
-            // You might want to call updateTotalVideoCount() here to refresh the total video count
-        }
-
-        cancelText.setOnClickListener {
-            // Handle cancel action here
-            deleteDialog.dismiss()
-        }
-        deleteDialog.show()
-    }
+//
 
 
     // Update the total video count interface method
@@ -762,3 +549,108 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 }
 
 
+
+
+
+
+
+//// Create a copy of selected item positions
+//val positionsToDelete = ArrayList(selectedItems)
+//// Sort positions in descending order to avoid index issues
+//positionsToDelete.sortDescending()
+//
+//// Iterate over sorted positions and delete videos
+//for (position in positionsToDelete) {
+//    val video = videoList[position]
+//    val file = File(video.path)
+//
+//    // Check if file exists and delete it
+//    if (file.exists() && file.delete()) {
+//        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+//        videoList.removeAt(position)
+//    }
+//}
+//
+//// Clear selected items
+//selectedItems.clear()
+//
+//// Finish action mode
+//mode?.finish()
+//
+//// Notify adapter that data set has changed
+//notifyDataSetChanged()
+//
+
+
+
+
+
+
+
+
+
+
+
+//private fun deleteSelectedVideos(actionMode: ActionMode?) {
+//        val selectedPositions = ArrayList(selectedItems)
+//        val deleteDialogBuilder = AlertDialog.Builder(context)
+//        val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
+//
+//        val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
+//        val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
+//        val iconImageView = deleteView.findViewById<ImageView>(R.id.videoImage)
+//        val videoNameDelete = deleteView.findViewById<TextView>(R.id.videmusicNameDelete)
+//
+//        // Set the delete text color to red
+//        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+//
+//        // Set the cancel text color to black
+//        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+//
+//        // Load video image into iconImageView using Glide
+//        Glide.with(context)
+//            .asBitmap()
+//            .load(videoList[selectedPositions.first()].artUri) // Assuming only one item is selected
+//            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+//            .into(iconImageView)
+//
+//        // Set the video name
+//        videoNameDelete.text = videoList[selectedPositions.first()].title // Assuming only one item is selected
+//
+//        deleteDialogBuilder.setView(deleteView)
+//
+//        val deleteDialog = deleteDialogBuilder.create()
+//
+//        deleteText.setOnClickListener {
+//            for (position in selectedPositions) {
+//                val file = File(videoList[position].path)
+//                if (file.exists() && file.delete()) {
+//                    MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+//                    when {
+//                        MainActivity.search -> {
+//                            MainActivity.dataChanged = true
+//                            videoList.removeAt(position)
+//                            notifyItemRemoved(position)
+//                        }
+//                        isFolder -> {
+//                            MainActivity.dataChanged = true
+//                            FoldersActivity.currentFolderVideos.removeAt(position)
+//                            notifyItemRemoved(position)
+//                            videoDeleteListener?.onVideoDeleted()
+//                        }
+//                    }
+//                } else {
+//                    Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//            deleteDialog.dismiss()
+//            actionMode?.finish()
+//            // You might want to call updateTotalVideoCount() here to refresh the total video count
+//        }
+//
+//        cancelText.setOnClickListener {
+//            // Handle cancel action here
+//            deleteDialog.dismiss()
+//        }
+//        deleteDialog.show()
+//    }

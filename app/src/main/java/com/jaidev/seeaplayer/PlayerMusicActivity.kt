@@ -45,6 +45,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         var min60: Boolean = false
         var isFavourite : Boolean = false
         var fIndex : Int = 0
+        private var isServiceBound = false
         var musicService: MusicService? = null
         const val FAVOURITES_PREF_KEY = "FavouriteSongs"
         var nowMusicPlayingId : String = ""
@@ -75,6 +76,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             bindService(intentService, this, BIND_AUTO_CREATE)
             startService(intentService)
             musicListPA = ArrayList()
+
 //            musicListPA.add(getMusicDetails(intent.data!!))
             Glide.with(this)
                 .load(getImgArt(musicListPA[songPosition].path))
@@ -380,7 +382,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         if (musicListPA.isNotEmpty()) {
             // Check if the currently playing music has been deleted
             val deletedMusic = musicListPA[songPosition]
-            if (deletedMusic.id != PlayerMusicActivity.nowMusicPlayingId) {
+            if (deletedMusic.id != nowMusicPlayingId) {
                 // The currently playing music has been deleted, adjust the song position
 
                 createMediaPlayer()

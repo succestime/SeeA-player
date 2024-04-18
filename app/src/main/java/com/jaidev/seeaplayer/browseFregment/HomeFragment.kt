@@ -131,28 +131,6 @@ class HomeFragment : Fragment() {
             return@setOnEditorActionListener false
         }
 
-
-//        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-//            android.widget.SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                if (!query.isNullOrBlank()) {
-//                    performSearch(query)
-//                }
-//                return true
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                if (newText.isNullOrBlank()) {
-//                    // Show voiceSearchButton when search view is empty
-//                    binding.voiceSearchButton.visibility = View.VISIBLE
-//                } else {
-//                    // Hide voiceSearchButton when search view has text
-//                    binding.voiceSearchButton.visibility = View.GONE
-//                }
-//                return true
-//            }
-//        })
-
         // Set up click listener for voiceSearchButton
         binding.voiceSearchButton.setOnClickListener {
             linkTubeRef.speak()

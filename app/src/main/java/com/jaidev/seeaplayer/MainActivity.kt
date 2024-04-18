@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.HistoryNav -> {
-                    val intent = Intent(this@MainActivity, History::class.java)
+                    val intent = Intent(this@MainActivity, HistoryBrowser::class.java)
                     startActivity(intent)
                 }
                 R.id.themesNav -> {
@@ -467,7 +467,6 @@ class MainActivity : AppCompatActivity() {
                 folderList = ArrayList()
                 videoList = getAllVideos()
                 setFragment(homeNav())
-                MusicListMA = getAllAudios()
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     requestPermissionR()
@@ -488,7 +487,6 @@ class MainActivity : AppCompatActivity() {
                 folderList = ArrayList()
                 videoList = getAllVideos()
                 setFragment(homeNav())
-                MusicListMA = getAllAudios()
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     requestPermissionR()

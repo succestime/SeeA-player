@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.recantFragment
 
 import android.annotation.SuppressLint
@@ -39,7 +40,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         // of PlayerActivity of this reMusicActivity
         lateinit var reMusicList: ArrayList<RecantMusic>
         var songPosition: Int = 0
-      var isPlaying: Boolean = false
+        var isPlaying: Boolean = false
         var musicService : MusicService? = null
         private var isServiceBound = false
 
@@ -47,8 +48,8 @@ class ReMusicPlayerActivity : AppCompatActivity()
         var min30: Boolean = false
         var min60: Boolean = false
 
-@SuppressLint("StaticFieldLeak")
-lateinit var binding: ActivityReMusicPlayerBinding
+        @SuppressLint("StaticFieldLeak")
+        lateinit var binding: ActivityReMusicPlayerBinding
         var repeat: Boolean = false
 
         fun updateNextMusicTitle() {
@@ -57,31 +58,49 @@ lateinit var binding: ActivityReMusicPlayerBinding
             binding.nextMusicTitle.text = nextMusicTitle
 
         }
+
+        fun createMediaPlayer() {
+            try {
+                if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
+                musicService!!.mediaPlayer!!.reset()
+                musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
+                musicService!!.mediaPlayer!!.prepare()
+                musicService!!.mediaPlayer!!.start()
+                isPlaying = true
+                binding.tvSeekBarStart1.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+                binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+                binding.seekBarRPA.progress = 0
+                binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
+                binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+                updateNextMusicTitle()
+                musicService!!.mediaPlayer!!.setOnCompletionListener(this@Companion)
+            }catch (e : Exception){return}
+        }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityReMusicPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-       updateNextMusicTitle()
+        updateNextMusicTitle()
         initializeLayout()
 
-       binding.backBtnPA.setOnClickListener { finish() }
+        binding.backBtnPA.setOnClickListener { finish() }
 
-      binding.playPauseBtnPA.setOnClickListener {
+        binding.playPauseBtnPA.setOnClickListener {
             if (isPlaying) pauseMusic()
             else playMusic()
         }
 
-     binding.previousBtnPA.setOnClickListener {
+        binding.previousBtnPA.setOnClickListener {
             prevNextSong(increment = false)
         }
-       binding.nextBtnPA.setOnClickListener {
+        binding.nextBtnPA.setOnClickListener {
             prevNextSong(increment = true)
         }
         binding.seekBarRPA.setOnSeekBarChangeListener(object  : OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-             if (fromUser) musicService!!.mediaPlayer!!.seekTo(progress)
+                if (fromUser) musicService!!.mediaPlayer!!.seekTo(progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
@@ -94,11 +113,11 @@ lateinit var binding: ActivityReMusicPlayerBinding
                 repeat = true
                 binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
             } else {
-               repeat = false
-               binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_pink))
+                repeat = false
+                binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_pink))
             }
         }
-       binding.equalizerBtnPA.setOnClickListener {
+        binding.equalizerBtnPA.setOnClickListener {
             try {
                 val eqIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
                 eqIntent.putExtra(
@@ -113,7 +132,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
             }
         }
 
-       binding.timerBtnPA.setOnClickListener {
+        binding.timerBtnPA.setOnClickListener {
             val timer = min15 || min30 || min60
             if (!timer) showBottomSheetDialog()
             else {
@@ -121,10 +140,10 @@ lateinit var binding: ActivityReMusicPlayerBinding
                 builder.setTitle("Stop Timer")
                     .setMessage("Do you want to stop timer?")
                     .setPositiveButton("Yes") { _, _ ->
-                     min15 = false
-                     min30 = false
-                     min60 = false
-                     binding.timerBtnPA.setColorFilter(
+                        min15 = false
+                        min30 = false
+                        min60 = false
+                        binding.timerBtnPA.setColorFilter(
                             ContextCompat.getColor(
                                 this,
                                 R.color.cool_pink
@@ -141,7 +160,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
             }
         }
 
-       binding.shareBtnPA.setOnClickListener {
+        binding.shareBtnPA.setOnClickListener {
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
             shareIntent.type = "audio/*"
@@ -178,7 +197,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
             .load(reMusicList[songPosition].albumArtUri)
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three)).centerCrop()
             .into(binding.songImgPA)
-       binding.songNamePA.text = reMusicList[songPosition].title
+        binding.songNamePA.text = reMusicList[songPosition].title
         if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
             R.color.cool_green
         ))
@@ -188,23 +207,23 @@ lateinit var binding: ActivityReMusicPlayerBinding
 
 
     }
-           private fun createMediaPlayer(){
-               try {
-                   if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
-                   musicService!!.mediaPlayer!!.reset()
-                   musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
-                   musicService!!.mediaPlayer!!.prepare()
-                   musicService!!.mediaPlayer!!.start()
-                   isPlaying = true
-                   binding.tvSeekBarStart1.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-                   binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
-                  binding.seekBarRPA.progress = 0
-                   binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
-                   binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-                 updateNextMusicTitle()
-                   musicService!!.mediaPlayer!!.setOnCompletionListener(this)
-               }catch (e : Exception){return}
-           }
+    private fun createMediaPlayer(){
+        try {
+            if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
+            musicService!!.mediaPlayer!!.reset()
+            musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
+            musicService!!.mediaPlayer!!.prepare()
+            musicService!!.mediaPlayer!!.start()
+            isPlaying = true
+            binding.tvSeekBarStart1.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+            binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+            binding.seekBarRPA.progress = 0
+            binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
+            binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+            updateNextMusicTitle()
+            musicService!!.mediaPlayer!!.setOnCompletionListener(this)
+        }catch (e : Exception){return}
+    }
 
     private fun initializeLayout(){
         songPosition =  intent.getIntExtra("index" , 0)
@@ -218,6 +237,14 @@ lateinit var binding: ActivityReMusicPlayerBinding
                 setLayout()
 
             }
+
+            "ReNowPlaying" -> {
+                setLayout()
+                binding.tvSeekBarStart1.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+                binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+                binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
+                binding.seekBarRPA.progress = musicService!!.mediaPlayer!!.currentPosition
+            }
             "DaysMusic" -> {
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
@@ -230,15 +257,15 @@ lateinit var binding: ActivityReMusicPlayerBinding
         }
     }
     private fun playMusic() {
-     isPlaying = true
-      binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-      musicService!!.mediaPlayer!!.start()
+        isPlaying = true
+        binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+        musicService!!.mediaPlayer!!.start()
 
     }
 
     private fun pauseMusic() {
         isPlaying = false
-       binding.playPauseBtnPA.setIconResource(R.drawable.play_music_icon)
+        binding.playPauseBtnPA.setIconResource(R.drawable.play_music_icon)
         musicService!!.mediaPlayer!!.pause()
 
 
@@ -254,7 +281,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
             createMediaPlayer()
         }
     }
-     private fun setSongPosition(increment: Boolean) {
+    private fun setSongPosition(increment: Boolean) {
 
         if(!repeat){
             if (increment) {
@@ -271,18 +298,18 @@ lateinit var binding: ActivityReMusicPlayerBinding
     }
 
 
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service is MusicService.MyBinder) {
-                musicService = service.currentService()
-                isServiceBound = true
-            }
-            createMediaPlayer()
-            musicService!!.reSeekSetup()
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        if (service is MusicService.MyBinder) {
+            musicService = service.currentService()
+            isServiceBound = true
         }
+        createMediaPlayer()
+        musicService!!.reSeekSetup()
+    }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-            isServiceBound = false
-        }
+    override fun onServiceDisconnected(name: ComponentName?) {
+        isServiceBound = false
+    }
 
 
     override fun onDestroy() {
@@ -314,7 +341,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
             Toast.makeText(baseContext, "Music will stop after 15 minutes", Toast.LENGTH_SHORT)
                 .show()
             binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
-           min15 = true
+            min15 = true
             Thread {
                 Thread.sleep((15 * 60000).toLong())
                 if (min15) exitApplication() }.start()
@@ -333,7 +360,7 @@ lateinit var binding: ActivityReMusicPlayerBinding
         dialog.findViewById<LinearLayout>(R.id.min_60)?.setOnClickListener {
             Toast.makeText(baseContext, "Music will stop after 60 minutes", Toast.LENGTH_SHORT)
                 .show()
-           binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
+            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
             min60 = true
             Thread {
                 Thread.sleep((60 * 60000).toLong())
@@ -343,4 +370,6 @@ lateinit var binding: ActivityReMusicPlayerBinding
     }
 }
 
+private fun MediaPlayer.setOnCompletionListener(companion: ReMusicPlayerActivity.Companion) {
 
+}

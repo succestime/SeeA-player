@@ -30,7 +30,7 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
     var mediaPlayer: MediaPlayer? = null
     private lateinit var mediaSession : MediaSessionCompat
     private lateinit var runnable: Runnable
-
+    var isPlaying: Boolean = false
     override fun onBind(intent: Intent?): IBinder {
         mediaSession = MediaSessionCompat(baseContext , "My Music")
         return myBinder
@@ -240,5 +240,6 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_STICKY
     }
+
 
 }

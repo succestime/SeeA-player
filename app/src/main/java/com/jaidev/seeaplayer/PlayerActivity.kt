@@ -347,7 +347,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
                     4 -> {
                         startActivity(Intent(this@PlayerActivity, LinkTubeActivity::class.java))
-                        finish()
 
                     }
                     5 ->{     setupSleepTimer()   }
@@ -372,7 +371,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     }
 
                    8-> {
-                        setupPIPMode()
+                       setupPIPMode()
                     }
 
                    9 -> {
@@ -516,6 +515,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         val color = Color.parseColor("#011B29")
         return ColorDrawable(color)
     }
+
     @SuppressLint("ObsoleteSdkInt")
     fun setupPIPMode() {
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
@@ -532,9 +532,10 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (status) {
                 this.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
-                binding.playerView.hideController()
+                // dialog.dismiss()
+                binding.playerView.showController()
                 playVideo()
-                pipStatus = 0
+               pipStatus = 0
             } else {
                 val intent = Intent(
                     "android.settings.PICTURE_IN_PICTURE_SETTINGS",
@@ -548,6 +549,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             playVideo()
         }
     }
+
+
+
     private fun initializeLayout() {
         when (intent.getStringExtra("class")) {
             "FoldersActivity" -> {
@@ -562,12 +566,13 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             }
             "NowPlaying" -> {
                 speed = 1.0f
-                videoTitle.text = playerList[position].title
-                videoTitle.isSelected = true
+              videoTitle.text = playerList[position].title
+              videoTitle.isSelected = true
+                binding.playerView.player = player
                 doubleTapEnable()
-                playVideo()
                 playInFullscreen(enable = isFullscreen)
                 seekBarFeature()
+              createPlayer()
             }
 
 
@@ -679,7 +684,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
         loudnessEnhancer.enabled = true
 
-        nowPlayingId = playerList[position].id
+       nowPlayingId = playerList[position].id
 
         seekBarFeature()
         binding.playerView.setControllerVisibilityListener {
@@ -693,6 +698,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
 
         }
+
+
     }
 
     private fun playVideo() {
@@ -774,17 +781,25 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             val intent = Intent(this, PlayerActivity::class.java)
             when(pipStatus){
                 1 -> intent.putExtra("class","FolderActivity")
+
                 2 -> intent.putExtra("class","SearchedVideos")
             }
             startActivity(intent)
         }
-        if(!isInPictureInPictureMode) pauseVideo()
+        if(isInPictureInPictureMode){ playVideo()
+            playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
+
+       } else {
+            pauseVideo()
+            playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
+
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        player.pause()
-        player.release()
+       player.pause()
+       player.release()
         audioManager?.abandonAudioFocus(this)
 
     }

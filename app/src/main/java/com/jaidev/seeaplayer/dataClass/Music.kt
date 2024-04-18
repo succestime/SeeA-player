@@ -40,7 +40,6 @@ fun getImgArt(path: String): ByteArray? {
     return retriever.embeddedPicture
 }
 
-//
 fun setSongPosition(increment: Boolean) {
 
     if(!PlayerMusicActivity.repeat){

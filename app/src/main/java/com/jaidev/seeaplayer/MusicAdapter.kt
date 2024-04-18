@@ -308,7 +308,6 @@ class MusicAdapter(
 
     // Toggle selection for multi-select
     // Toggle selection for multi-select
-    @SuppressLint("NotifyDataSetChanged")
     private fun toggleSelection(position: Int) {
         if (selectedItems.contains(position)) {
             selectedItems.remove(position)
@@ -316,17 +315,17 @@ class MusicAdapter(
             selectedItems.add(position)
         }
 
-        // Start or finish action mode based on selection
         if (selectedItems.isEmpty()) {
             actionMode?.finish()
         } else {
             startActionMode()
         }
 
-        // Update selected items
-        notifyDataSetChanged()
+        notifyItemChanged(position) // Update selected state for the item
+        actionMode?.title = "${selectedItems.size} selected" // Update action mode title
         actionMode?.invalidate()
     }
+
 
     // Start action mode for multi-select
     private fun startActionMode() {
@@ -340,30 +339,26 @@ class MusicAdapter(
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             // Inflate action mode menu
-            mode?.menuInflater?.inflate(R.menu.multiple_select_menu, menu)
+            mode?.menuInflater?.inflate(R.menu.multiple_player_select_menu, menu)
             return true
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-//            // Hide the menu_rename item if more than one item is selected
-//            val renameItem = menu?.findItem(R.id.menu_rename)
-//            renameItem?.isVisible = selectedItems.size == 1
+            // Hide the menu_rename item if more than one item is selected
+            val renameItem = menu?.findItem(R.id.renameMulti)
+            renameItem?.isVisible = selectedItems.size == 1
 
             return true
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             // Handle action mode menu items
             val actionMode = mode
             when (item?.itemId) {
-                R.id.shareMultiBrowser -> {
-                    deleteSelectedVideos(actionMode, newPosition)
+                R.id.renameMulti -> {
 
-                    return true
-                }
-
-                R.id.deleteMultiBrowser -> {
-// Call the showRenameDialog method here
+                  // Call the showRenameDialog method here
                     if (selectedItems.size == 1) {
                         val selectedPosition = selectedItems.first()
                         val defaultName = musicList[selectedPosition].title
@@ -371,9 +366,43 @@ class MusicAdapter(
                     } else {
                         Toast.makeText(
                             context,
-                            "Please select only one video to rename",
+                            "Please select only one music to rename",
                             Toast.LENGTH_SHORT
                         ).show()
+                    }
+                    return true
+                }
+
+                R.id.deleteMulti -> {
+                    if (selectedItems.isNotEmpty()) {
+                        // Build confirmation dialog
+                        AlertDialog.Builder(context)
+                            .setTitle("Confirm Delete")
+                            .setMessage("Are you sure you want to delete these ${selectedItems.size} selected musics?")
+                            .setPositiveButton("Delete") { _, _ ->
+                                // User clicked Delete, proceed with deletion
+                                val positionsToDelete = ArrayList(selectedItems)
+                                positionsToDelete.sortDescending()
+
+                                for (position in positionsToDelete) {
+                                    val music = musicList[position]
+                                    val file = File(music.path)
+
+                                    if (file.exists() && file.delete()) {
+                                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                                        musicList.removeAt(position)
+                                    }
+                                }
+
+                                selectedItems.clear()
+                                mode?.finish()
+                                notifyDataSetChanged()
+                            }
+                            .setNegativeButton("Cancel") { dialog, _ ->
+                                // User clicked Cancel, dismiss dialog
+                                dialog.dismiss()
+                            }
+                            .show()
                     }
                     return true
                 }
@@ -390,79 +419,6 @@ class MusicAdapter(
             notifyDataSetChanged()
         }
     }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun deleteSelectedVideos(actionMode: ActionMode?, @SuppressLint("RecyclerView") position: Int) {
-        val selectedPositions = ArrayList(selectedItems)
-        val deleteDialogBuilder = AlertDialog.Builder(context)
-        val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-
-        val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
-        val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
-        val iconImageView = deleteView.findViewById<ImageView>(R.id.videoImage)
-        val videoNameDelete = deleteView.findViewById<TextView>(R.id.videmusicNameDelete)
-
-        // Set the delete text color to red
-        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-
-        // Set the cancel text color to black
-        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-
-        // Load video image into iconImageView using Glide
-        Glide.with(context)
-            .asBitmap()
-            .load(musicList[selectedPositions.first()].artUri) // Assuming only one item is selected
-            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-            .into(iconImageView)
-
-        // Set the video name
-        videoNameDelete.text = musicList[selectedPositions.first()].title // Assuming only one item is selected
-
-        deleteDialogBuilder.setView(deleteView)
-
-        val deleteDialog = deleteDialogBuilder.create()
-
-        deleteText.setOnClickListener {
-            for (position in selectedPositions) {
-                val file = File(musicList[position].path)
-                if (file.exists() && file.delete()) {
-                    MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                    when {
-                        MainActivity.search -> {
-                            MainActivity.dataChanged = true
-                            musicList.removeAt(position)
-                            notifyDataSetChanged()
-                            musicDeleteListener?.onMusicDeleted()
-                        }
-
-                        isMusic -> {
-                            MainActivity.dataChanged = true
-                            MainActivity.MusicListMA.removeAt(position)
-                            notifyDataSetChanged()
-                            musicDeleteListener?.onMusicDeleted()
-                        }
-
-                    }
-                } else {
-                    Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-                }
-            }
-            deleteDialog.dismiss()
-            actionMode?.finish()
-            // You might want to call updateTotalVideoCount() here to refresh the total video count
-        }
-
-        cancelText.setOnClickListener {
-            // Handle cancel action here
-            deleteDialog.dismiss()
-        }
-        deleteDialog.show()
-    }
-
-
-
-
-
 
 
     private fun renameMusic(position: Int, newName: String) {
@@ -566,3 +522,87 @@ class MusicAdapter(
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+//@SuppressLint("NotifyDataSetChanged")
+//private fun deleteSelectedVideos(actionMode: ActionMode?, @SuppressLint("RecyclerView") position: Int) {
+//    val selectedPositions = ArrayList(selectedItems)
+//    val deleteDialogBuilder = AlertDialog.Builder(context)
+//    val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
+//
+//    val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
+//    val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
+//    val iconImageView = deleteView.findViewById<ImageView>(R.id.videoImage)
+//    val videoNameDelete = deleteView.findViewById<TextView>(R.id.videmusicNameDelete)
+//
+//    // Set the delete text color to red
+//    deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+//
+//    // Set the cancel text color to black
+//    cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+//
+//    // Load video image into iconImageView using Glide
+//    Glide.with(context)
+//        .asBitmap()
+//        .load(musicList[selectedPositions.first()].artUri) // Assuming only one item is selected
+//        .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+//        .into(iconImageView)
+//
+//    // Set the video name
+//    videoNameDelete.text = musicList[selectedPositions.first()].title // Assuming only one item is selected
+//
+//    deleteDialogBuilder.setView(deleteView)
+//
+//    val deleteDialog = deleteDialogBuilder.create()
+//
+//    deleteText.setOnClickListener {
+//        for (position in selectedPositions) {
+//            val file = File(musicList[position].path)
+//            if (file.exists() && file.delete()) {
+//                MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+//                when {
+//                    MainActivity.search -> {
+//                        MainActivity.dataChanged = true
+//                        musicList.removeAt(position)
+//                        notifyDataSetChanged()
+//                        musicDeleteListener?.onMusicDeleted()
+//                    }
+//
+//                    isMusic -> {
+//                        MainActivity.dataChanged = true
+//                        MainActivity.MusicListMA.removeAt(position)
+//                        notifyDataSetChanged()
+//                        musicDeleteListener?.onMusicDeleted()
+//                    }
+//
+//                }
+//            } else {
+//                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//        deleteDialog.dismiss()
+//        actionMode?.finish()
+//        // You might want to call updateTotalVideoCount() here to refresh the total video count
+//    }
+//
+//    cancelText.setOnClickListener {
+//        // Handle cancel action here
+//        deleteDialog.dismiss()
+//    }
+//    deleteDialog.show()
+//}
+//
+//
+
+
+
+

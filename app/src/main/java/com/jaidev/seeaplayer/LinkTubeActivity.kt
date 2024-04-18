@@ -129,7 +129,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
                     R.id.history -> {
 
-                        startActivity(Intent(this, History::class.java))
+                        startActivity(Intent(this, HistoryBrowser::class.java))
                     }
 
                     R.id.download -> {
@@ -191,7 +191,7 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     R.id.history -> {
-                        startActivity(Intent(this, History::class.java))
+                        startActivity(Intent(this, HistoryBrowser::class.java))
                     }
 
                     R.id.download      -> {
