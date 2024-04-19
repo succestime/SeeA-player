@@ -17,7 +17,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
@@ -27,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -101,8 +101,16 @@ class MusicAdapter(
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(holder.image)
 
+
+        if (selectedItems.contains(position)) {
+            // Set your custom selected background on the root view of the item
+            holder.root.setBackgroundResource(R.drawable.browser_selected_background)
+        } else {
+            holder.root.setBackgroundResource(android.R.color.transparent)
+        }
         holder.root.setOnLongClickListener {
             toggleSelection(position)
+            startActionMode()
             true
         }
 
@@ -163,7 +171,7 @@ class MusicAdapter(
 
         }
         // Show/hide multi-select icon based on selection
-        holder.button.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
+//        holder.button.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
 
         holder.more.setOnClickListener {
             newPosition = position
@@ -306,6 +314,17 @@ class MusicAdapter(
         return musicList.size
     }
 
+//    private fun getDefaultBackgroundColor(): Int {
+//        val isDarkMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+//        return if (isDarkMode) {
+//            // Dark mode is enabled, return dark color resource
+//            ContextCompat.getColor(context, R.color.gray)
+//        } else {
+//            // Light mode is enabled, return light color resource
+//            ContextCompat.getColor(context, R.color.white)
+//        }
+//    }
+
     // Toggle selection for multi-select
     // Toggle selection for multi-select
     private fun toggleSelection(position: Int) {
@@ -373,6 +392,9 @@ class MusicAdapter(
                     return true
                 }
 
+                R.id.shareMulti -> {
+                    shareSelectedFiles()
+                }
                 R.id.deleteMulti -> {
                     if (selectedItems.isNotEmpty()) {
                         // Build confirmation dialog
@@ -420,6 +442,32 @@ class MusicAdapter(
         }
     }
 
+
+    private fun shareSelectedFiles() {
+        val uris = mutableListOf<Uri>()
+
+        // Iterate through selectedItems to get selected file items
+        for (position in selectedItems) {
+            val music = musicList[position]
+            val fileUri = FileProvider.getUriForFile(
+                context,
+                context.applicationContext.packageName + ".provider",
+                File(music.path)
+            )
+            uris.add(fileUri)
+        }
+
+        // Create an ACTION_SEND intent to share multiple files
+        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+        shareIntent.type = "*/*"
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        // Start the intent chooser to share multiple files
+        val chooser = Intent.createChooser(shareIntent, "Share Files")
+        chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(chooser)
+    }
 
     private fun renameMusic(position: Int, newName: String) {
         val music = musicList[position]

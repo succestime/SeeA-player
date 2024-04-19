@@ -13,9 +13,13 @@
         <item name="android:statusBarColor" >#8ACDF3</item>
 <!--        <item name="android:actionBarStyle">@style/CustomActionBar</item>-->
         <item name="android:textColor">@color/black</item>
+        <item name="actionModeStyle">@style/AppTheme.LightActionMode</item>
 
     </style>
 
+    <style name="AppTheme.LightActionMode" parent="Widget.AppCompat.ActionMode">
+        <item name="background">@color/light_statusBar</item>
+    </style>
     // theme for Navigation Drawer
     <style name="coolPinkNav" parent="Theme.MaterialComponents.Light.NoActionBar">
 

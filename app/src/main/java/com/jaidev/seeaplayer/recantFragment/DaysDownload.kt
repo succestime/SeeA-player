@@ -28,11 +28,13 @@ import com.jaidev.seeaplayer.databinding.FragmentDaysDownloadBinding
 import java.util.concurrent.TimeUnit
 // Import statements go here
 
-class DaysDownload : Fragment() {
+class DaysDownload : Fragment(){
     private lateinit var binding: FragmentDaysDownloadBinding
     lateinit var adapter: RecentVideoAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-
+    companion object {
+        lateinit var currentFolderVideos: ArrayList<RecantVideo>
+    }
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -218,6 +220,7 @@ class DaysDownload : Fragment() {
 
         return recantVList
     }
+
 
 
 }

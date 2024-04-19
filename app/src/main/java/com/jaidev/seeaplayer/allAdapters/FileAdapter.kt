@@ -103,7 +103,6 @@ class FileAdapter(
             fileNameTextView.text = fileItem.fileName
             fileSizeTextView.text = formatFileSize(fileItem.fileSize)
             // Display the actual website name
-
             fileNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
 // Update item view background based on selection

@@ -43,7 +43,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         var isPlaying: Boolean = false
         var musicService : MusicService? = null
         private var isServiceBound = false
-
+        var position: Int = -1
         var min15: Boolean = false
         var min30: Boolean = false
         var min60: Boolean = false

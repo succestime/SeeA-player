@@ -149,6 +149,8 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
             .putString(PREF_LAYOUT_TYPE, layoutType)
             .apply()
     }
+// Inside your Activity (e.g., MainActivity)
+
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -177,6 +179,7 @@ class FoldersActivity : AppCompatActivity(),VideoAdapter.VideoDeleteListener{
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
         menuInflater.inflate(R.menu.search_music_view, menu)
+
         val searchItem = menu.findItem(R.id.searchMusicView)
 
         val searchView = searchItem?.actionView as SearchView
