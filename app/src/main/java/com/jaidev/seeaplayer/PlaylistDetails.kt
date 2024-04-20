@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
@@ -52,24 +53,24 @@ class PlaylistDetails : AppCompatActivity() {
             startActivity(Intent(this , SelectionActivity::class.java))
         }
 
-binding.removeAllPD.setOnClickListener {
-    val builder = MaterialAlertDialogBuilder(this)
-    builder.setTitle("Remove")
-        .setMessage("Do you want to remove all songs from playlist?")
-        .setPositiveButton("Yes"){ dialog, _ ->
-            PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist.clear()
-            adapter.refreshPlaylist()
-            dialog.dismiss()
-        }
-        .setNegativeButton("No"){dialog, _ ->
-            dialog.dismiss()
-        }
-    val customDialog = builder.create()
-    customDialog.show()
-    customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-    customDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.GREEN)
+        binding.removeAllPD.setOnClickListener {
+            val builder = MaterialAlertDialogBuilder(this)
+            builder.setTitle("Remove")
+                .setMessage("Do you want to remove all songs from playlist?")
+                .setPositiveButton("Yes"){ dialog, _ ->
+                    PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist.clear()
+                    adapter.refreshPlaylist()
+                    dialog.dismiss()
+                }
+                .setNegativeButton("No"){dialog, _ ->
+                    dialog.dismiss()
+                }
+            val customDialog = builder.create()
+            customDialog.show()
+            customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+            customDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.GREEN)
 
-         }
+        }
 
         supportActionBar?.apply {
             setBackgroundDrawable(
@@ -84,7 +85,7 @@ binding.removeAllPD.setOnClickListener {
 
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
-}
+    }
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -131,7 +132,7 @@ binding.removeAllPD.setOnClickListener {
                 .into(binding.playlistImgPD)
             binding.shuffleBtnPD.visibility = View.VISIBLE
         }
-       adapter.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
 
     }
 }

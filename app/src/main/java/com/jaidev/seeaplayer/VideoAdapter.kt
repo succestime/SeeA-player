@@ -51,10 +51,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
     private var isGridMode = false // Track if grid mode is enabled
-    private val fileItemPrefs = videoItemPreferences(context)
     companion object {
         private const val PREF_NAME = "video_titles"
-//        private const val VIEW_TYPE_VIDEO = 0
         private const val VIEW_TYPE_GRID_VIDEO = 1
     }
     init {

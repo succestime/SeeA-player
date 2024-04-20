@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
@@ -38,7 +39,7 @@ class PlaylistActivity : AppCompatActivity() {
         binding.playlistRV.layoutManager = GridLayoutManager(this@PlaylistActivity,2)
         adapter = PlaylistViewAdapter(this , playlistList = musicPlaylist.ref)
         binding.playlistRV.adapter = adapter
-binding.addPlaylistBtn.setOnClickListener { customAlertDialog() }
+        binding.addPlaylistBtn.setOnClickListener { customAlertDialog() }
 
         supportActionBar?.apply {
             setBackgroundDrawable(

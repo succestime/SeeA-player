@@ -1,16 +1,17 @@
+
 package com.jaidev.seeaplayer
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaidev.seeaplayer.databinding.ActivitySelectionBinding
 
 class SelectionActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySelectionBinding
     private lateinit var adapter: MusicAdapter
-    private lateinit var selectionConstraintlayout: ConstraintLayout
+    private lateinit var selectionConstraintlayout: CardView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +24,10 @@ class SelectionActivity : AppCompatActivity() {
         binding.selectionRV.layoutManager = LinearLayoutManager(this,)
         adapter = MusicAdapter(this, MainActivity.MusicListMA,  selectionActivity = true )
         binding.selectionRV.adapter = adapter
-binding.backBtnSA.setOnClickListener { finish() }
+        binding.backBtnSA.setOnClickListener { finish() }
+//        binding.addSA.setOnClickListener {
+//            startActivity(Intent(this, PlaylistDetails::class.java))
+//        }
         // for search View
         binding.searchViewSA.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean =true

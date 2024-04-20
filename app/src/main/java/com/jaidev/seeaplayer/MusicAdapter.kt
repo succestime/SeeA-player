@@ -17,6 +17,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
@@ -41,7 +42,7 @@ import java.io.File
 
 class MusicAdapter(
     private val context: Context,
-    private var musicList: ArrayList<Music>,
+    var musicList: ArrayList<Music>,
     private var playlistDetails: Boolean = false,
     private val isMusic: Boolean = false,
     val selectionActivity: Boolean = false
@@ -52,8 +53,9 @@ class MusicAdapter(
     private lateinit var dialogRF: AlertDialog
     private lateinit var sharedPreferences: SharedPreferences
 
+
     // Tracks selected items
-    private val selectedItems = HashSet<Int>()
+    val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
 
     companion object {
@@ -108,10 +110,19 @@ class MusicAdapter(
         } else {
             holder.root.setBackgroundResource(android.R.color.transparent)
         }
-        holder.root.setOnLongClickListener {
-            toggleSelection(position)
-            startActionMode()
-            true
+        // Handle item selection based on selectionActivity flag
+        if (selectionActivity) {
+            holder.root.setOnClickListener {
+                // Toggle selection of the item on single click
+                toggleSelection(position)
+            }
+        } else {
+            holder.root.setOnLongClickListener {
+                // Start selection mode on long click
+                toggleSelection(position)
+                startActionMode()
+                true
+            }
         }
 
         holder.root.setOnClickListener {
@@ -148,27 +159,16 @@ class MusicAdapter(
                 }
             }
 
+
             selectionActivity -> {
                 holder.root.setOnClickListener {
-                    if (addSong(musicList[position]))
-                        holder.root.setBackgroundColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.cool_green
-                            )
-                        )
-                    else
-                        holder.root.setBackgroundColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.white
-                            )
-                        )
+                    val rootView = holder.itemView // Get the root view of the item
+
+
+                    addSong(position, rootView)
 
                 }
             }
-
-
         }
         // Show/hide multi-select icon based on selection
 //        holder.button.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
@@ -314,16 +314,20 @@ class MusicAdapter(
         return musicList.size
     }
 
-//    private fun getDefaultBackgroundColor(): Int {
-//        val isDarkMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-//        return if (isDarkMode) {
-//            // Dark mode is enabled, return dark color resource
-//            ContextCompat.getColor(context, R.color.gray)
-//        } else {
-//            // Light mode is enabled, return light color resource
-//            ContextCompat.getColor(context, R.color.white)
-//        }
-//    }
+
+    private fun addSong(position: Int, rootView: View): Boolean {
+        if (selectedItems.contains(position)) {
+            // Item is already selected, deselect it
+            selectedItems.remove(position)
+            rootView.setBackgroundResource(android.R.color.transparent)
+            return false
+        } else {
+            // Item is not selected, select it
+            selectedItems.add(position)
+            rootView.setBackgroundResource(R.drawable.browser_selected_background)
+            return true
+        }
+    }
 
     // Toggle selection for multi-select
     // Toggle selection for multi-select
@@ -481,8 +485,6 @@ class MusicAdapter(
     }
 
 
-
-
     private fun showRenameDialog(position: Int, defaultTitle: String) {
         val dialogBuilder = AlertDialog.Builder(context)
 
@@ -549,108 +551,23 @@ class MusicAdapter(
 
 
 
-    private fun addSong(song: Music): Boolean{
-        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.forEachIndexed { index, music ->
-            if(song.id == music.id){
-                PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(index)
-                return false
-            }
-        }
-        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.add(song)
-        return true
-    }
+
     @SuppressLint("NotifyDataSetChanged")
     fun refreshPlaylist(){
         musicList = ArrayList()
-        musicList = PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist
+//        musicList = PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun addAll(selectedSongs: ArrayList<Music>) {
+        musicList = ArrayList()
+        musicList.addAll(selectedSongs)
         notifyDataSetChanged()
     }
 
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-//@SuppressLint("NotifyDataSetChanged")
-//private fun deleteSelectedVideos(actionMode: ActionMode?, @SuppressLint("RecyclerView") position: Int) {
-//    val selectedPositions = ArrayList(selectedItems)
-//    val deleteDialogBuilder = AlertDialog.Builder(context)
-//    val deleteView = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-//
-//    val deleteText = deleteView.findViewById<TextView>(R.id.deleteText)
-//    val cancelText = deleteView.findViewById<TextView>(R.id.cancelText)
-//    val iconImageView = deleteView.findViewById<ImageView>(R.id.videoImage)
-//    val videoNameDelete = deleteView.findViewById<TextView>(R.id.videmusicNameDelete)
-//
-//    // Set the delete text color to red
-//    deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-//
-//    // Set the cancel text color to black
-//    cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-//
-//    // Load video image into iconImageView using Glide
-//    Glide.with(context)
-//        .asBitmap()
-//        .load(musicList[selectedPositions.first()].artUri) // Assuming only one item is selected
-//        .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-//        .into(iconImageView)
-//
-//    // Set the video name
-//    videoNameDelete.text = musicList[selectedPositions.first()].title // Assuming only one item is selected
-//
-//    deleteDialogBuilder.setView(deleteView)
-//
-//    val deleteDialog = deleteDialogBuilder.create()
-//
-//    deleteText.setOnClickListener {
-//        for (position in selectedPositions) {
-//            val file = File(musicList[position].path)
-//            if (file.exists() && file.delete()) {
-//                MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-//                when {
-//                    MainActivity.search -> {
-//                        MainActivity.dataChanged = true
-//                        musicList.removeAt(position)
-//                        notifyDataSetChanged()
-//                        musicDeleteListener?.onMusicDeleted()
-//                    }
-//
-//                    isMusic -> {
-//                        MainActivity.dataChanged = true
-//                        MainActivity.MusicListMA.removeAt(position)
-//                        notifyDataSetChanged()
-//                        musicDeleteListener?.onMusicDeleted()
-//                    }
-//
-//                }
-//            } else {
-//                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//        deleteDialog.dismiss()
-//        actionMode?.finish()
-//        // You might want to call updateTotalVideoCount() here to refresh the total video count
-//    }
-//
-//    cancelText.setOnClickListener {
-//        // Handle cancel action here
-//        deleteDialog.dismiss()
-//    }
-//    deleteDialog.show()
-//}
-//
-//
-
 
 
 

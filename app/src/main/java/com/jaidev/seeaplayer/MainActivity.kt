@@ -223,6 +223,10 @@ class MainActivity : AppCompatActivity() {
                     val intent = Intent(this@MainActivity, HistoryBrowser::class.java)
                     startActivity(intent)
                 }
+                R.id.searchNav -> {
+                    val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
+                    startActivity(intent)
+                }
                 R.id.themesNav -> {
                     val themes = resources.getStringArray(R.array.theme)
                     val builder = MaterialAlertDialogBuilder(this)

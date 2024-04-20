@@ -60,7 +60,6 @@ class LinkTubeActivity : AppCompatActivity() {
     lateinit var binding: ActivityLinkTubeBinding
     private var printJob : PrintJob? = null
     // Assuming 'this' is a valid Context from an Activity or Fragment
-    private lateinit var dbHandler: MydbHandler
 
 
     companion object {
@@ -89,7 +88,6 @@ class LinkTubeActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
 
-        dbHandler = MydbHandler(this, null, null, 1)
 
 
         getAllBookmarks()
@@ -444,7 +442,6 @@ class LinkTubeActivity : AppCompatActivity() {
         } catch (_: Exception) {
         }
         val webUrl =  frag?.binding?.webView?.url
-        dbHandler.addUrl(webUrl)
     }
 
     fun speak() {

@@ -77,7 +77,8 @@ class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
             startActivity(Intent(requireContext(), FavouriteActivity::class.java))
         }
         binding.playlistBtn.setOnClickListener {
-            startActivity(Intent(requireContext(), PlaylistActivity::class.java))
+            startActivity(Intent(requireContext(), PlaylistActivity
+            ::class.java))
         }
 
         swipeRefreshLayout = binding.swipeRefreshMusic

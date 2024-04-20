@@ -17,7 +17,7 @@
     <string name="sort_order">Sort Order</string>
     <string name="about">About</string>
     <string name="exit">Exit</string>
-    <string name="nav_text">Welcome to World of Entertainment </string>
+    <string name="nav_text">Welcome to SeeA Player </string>
 
 
     <string name="lock">Lock Icon</string>
@@ -176,6 +176,9 @@
     <string name="grid">Grid</string>
     <string name="downloads_files">Downloads Files</string>
     <string name="history">History</string>
+    <string name="link_tube_nav">Link Tube</string>
+    <string name="app_exit">App Exit</string>
+    <string name="search_nav">Search</string>
 
 
     <string-array name="theme">

@@ -4,8 +4,9 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="15dp"
-    app:strokeWidth="4dp"
+    app:strokeWidth="2dp"
     app:strokeColor="@color/cool_blue"
+    android:backgroundTint="@android:color/transparent"
     android:layout_margin="10dp"
     >
 
@@ -13,7 +14,7 @@
        android:id="@+id/playlistImg"
         android:layout_width="170dp"
         android:layout_height="130dp"
-        android:src="@drawable/speaker"
+        android:src="@drawable/music_speaker_three"
         app:shapeAppearanceOverlay="@style/curved"
         android:contentDescription="@string/song_img"/>
 

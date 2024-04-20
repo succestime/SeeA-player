@@ -12,6 +12,7 @@ import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -29,7 +30,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantDownloadViewBinding
-import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
+import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.recantFragment.ReVideoPlayerActivity
 import java.io.File
 
@@ -101,13 +102,16 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             newPosition = position
 
             val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.video_more_features, holder.root, false)
-            val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
+                .inflate(R.layout.recant_video_more_features, holder.root, false)
+            val bindingMf = RecantVideoMoreFeaturesBinding.bind(customDialog)
             val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
                 .create()
             dialog.show()
 
-            bindingMf.renameBtn.setOnClickListener {  }
+            // Get the window attributes of the dialog
+            val window = dialog.window
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
+            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
 
             bindingMf.deleteBtn.setOnClickListener {
 

@@ -29,7 +29,12 @@
         android:theme="@style/coolBlueNav"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".PlaylistItems"
+            android:exported="false" />
+        <activity
+            android:name=".PlaylistMusicActivity"
+            android:exported="false" />
         <activity
             android:name=".HistoryBrowser"
             android:exported="false" />

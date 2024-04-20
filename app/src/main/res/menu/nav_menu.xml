@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-
+<group>
+    <item android:title="@string/settings">
+        <menu>
     <item android:id="@+id/themesNav"
         android:title="@string/themes"
         android:icon="@drawable/theme_icon"
@@ -9,6 +12,21 @@
     <item android:id="@+id/settingsNav"
         android:title="@string/settings"
         android:icon="@drawable/ic_settings"
+        />
+
+    <item android:id="@+id/sortOrderNav"
+        android:title="@string/sort_order"
+        android:icon="@drawable/short_order_icon"
+        />
+        </menu>
+    </item>
+</group>
+        <group >
+            <item  android:title="@string/search_nav">
+                <menu>
+    <item android:id="@+id/searchNav"
+        android:title="@string/link_tube_nav"
+        android:icon="@drawable/search_link_tube"
         />
     <item android:id="@+id/downloadsNav"
         android:title="@string/downloads_files"
@@ -18,14 +36,18 @@
         android:title="@string/history"
         android:icon="@drawable/history_browser"
         />
+                </menu>
+            </item>
+        </group>
 
-    <item android:id="@+id/sortOrderNav"
-        android:title="@string/sort_order"
-        android:icon="@drawable/short_order_icon"
-        />
-
+<group>
+    <item android:title="@string/app_exit" >
+        <menu>
     <item android:id="@+id/exitNav"
         android:title="@string/exit"
         android:icon="@drawable/exit_icon"
         />
+        </menu>
+    </item>
+</group>
 </menu>
