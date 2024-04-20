@@ -32,9 +32,7 @@
         <activity
             android:name=".PlaylistItems"
             android:exported="false" />
-        <activity
-            android:name=".PlaylistMusicActivity"
-            android:exported="false" />
+
         <activity
             android:name=".HistoryBrowser"
             android:exported="false" />
@@ -55,9 +53,7 @@
         <activity
             android:name=".FileActivity"
             android:exported="false" />
-        <activity
-            android:name=".History"
-            android:exported="false" />
+
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
