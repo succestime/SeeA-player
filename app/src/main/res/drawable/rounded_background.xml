@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- rounded_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#3C3A3A" />
+    <corners android:radius="16dp" /> <!-- Adjust the radius as needed for the desired curve -->
+</shape>
