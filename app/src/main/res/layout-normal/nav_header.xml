@@ -3,7 +3,7 @@
     android:id="@+id/linearLayoutNav"
     android:layout_width="match_parent"
     android:layout_height="170dp"
-    android:layout_marginTop="80dp"
+    android:layout_marginTop="90dp"
 
     android:orientation="vertical"
     android:background="@color/cool_blue">

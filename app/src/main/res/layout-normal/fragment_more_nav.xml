@@ -53,12 +53,15 @@
                         <androidx.cardview.widget.CardView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            app:cardCornerRadius="5dp"
+
                             >
 
                             <LinearLayout
                                 android:id="@+id/goToSignin"
                                 android:layout_width="match_parent"
                                 android:layout_height="60dp"
+                      android:background="#294653"
                                 android:orientation="horizontal">
 
                                 <ImageView
@@ -74,6 +77,8 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
                                     android:layout_marginStart="10dp"
+                                    android:textColor="@color/white"
+
                                     android:gravity="center_vertical"
                                     android:text="@string/login_or_signin"
                                     android:textSize="20sp" />
@@ -191,7 +196,7 @@
                                     android:textColor="@color/white"
                                     android:textStyle="bold"
                                     android:layout_marginTop="25dp"
-                                    android:textSize="10sp"
+                                    android:textSize="13sp"
                                     android:layout_marginStart="15dp"/>
 
 

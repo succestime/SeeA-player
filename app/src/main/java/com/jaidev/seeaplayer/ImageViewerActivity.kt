@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.jaidev.seeaplayer.databinding.ActivityImageViewerBinding
 import java.io.File
@@ -32,6 +34,8 @@ class ImageViewerActivity : AppCompatActivity() {
             val bitmap = BitmapFactory.decodeFile(imagePath)
             binding.photoView.setImageBitmap(bitmap)
         }
+
+        setActionBarGradient()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -103,6 +107,31 @@ class ImageViewerActivity : AppCompatActivity() {
         }
     }
 
+    private fun setActionBarGradient() {
+        // Check the current night mode
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Light mode is applied
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@ImageViewerActivity,
+                        R.drawable.background_actionbar_light
+                    )
+                )
+            }
+        } else {
+            // Dark mode is applied or the mode is set to follow system
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@ImageViewerActivity,
+                        R.drawable.background_actionbar
+                    )
+                )
+            }
+        }
+    }
     private fun openImageWithDefaultApp() {
         // Check if imagePath is valid
         if (!imagePath.isNullOrBlank()) {
@@ -122,6 +151,10 @@ class ImageViewerActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        setActionBarGradient()
+    }
 
     private fun getImageUri(imagePath: String?): Uri? {
         return imagePath?.let {

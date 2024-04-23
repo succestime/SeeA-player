@@ -30,11 +30,11 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".PlaylistItems"
+            android:name=".SettingDownloads"
             android:exported="false" />
-
         <activity
             android:name=".HistoryBrowser"
+
             android:exported="false" />
         <activity
             android:name=".ImageViewerActivity"
@@ -53,7 +53,6 @@
         <activity
             android:name=".FileActivity"
             android:exported="false" />
-
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -123,9 +122,10 @@
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".PlayerMusicActivity"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
+            tools:ignore="LockedOrientationActivity">
+        </activity>
         <activity
             android:name=".bottom_sheet"
             android:exported="false" />
@@ -151,6 +151,7 @@
             tools:targetApi="n">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
 

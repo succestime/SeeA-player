@@ -15,6 +15,7 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
@@ -26,10 +27,12 @@ import android.text.SpannableStringBuilder
 import android.util.Base64
 import android.util.Log
 import android.view.ContextMenu
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.MimeTypeMap
@@ -41,13 +44,16 @@ import android.webkit.WebViewClient
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.Snackbar
+import com.jaidev.seeaplayer.HistoryBrowser
 import com.jaidev.seeaplayer.LinkTubeActivity
 import com.jaidev.seeaplayer.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.LinkTubeActivity.Companion.tabsList
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
 import com.jaidev.seeaplayer.changeTab
 import com.jaidev.seeaplayer.dataClass.FileType
 import com.jaidev.seeaplayer.dataClass.HistoryItem
@@ -59,11 +65,14 @@ import java.io.ByteArrayOutputStream
 class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener {
     lateinit var binding: FragmentBrowseBinding
     var webIcon: Bitmap? = null
+    private lateinit var historyAdapter: HistoryAdapter
+    private var isBtnTextUrlFocused = false // Flag to track if btnTextUrl has been focused
 
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
 
     }
+
     interface DownloadListener {
         fun onDownloadStarted(
             fileName: String,
@@ -93,10 +102,21 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             when {
              URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
               urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
-                else -> loadUrl("https://search.brave.com/search?q=$urlNew")
+                else -> loadUrl("https://www.google.com/search?q=$urlNew")
             }
 
         }
+        val rootView = view.rootView
+
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            rootView.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+            binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
+        }
+
 
         return view
 
@@ -150,6 +170,46 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
 
 
+        linkRef.binding.btnTextUrl.setOnClickListener {
+            linkRef.binding.btnTextUrl.requestFocus()
+
+        }
+
+        historyAdapter = HistoryAdapter(
+            HistoryBrowser.historyItems,
+            object : HistoryAdapter.ItemClickListener {
+                override fun onItemClick(historyItem: HistoryItem) {
+                    // Handle item click here, if needed
+                }
+            },
+            isHomeFragment = true
+        )
+
+        binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
+        binding.historyRecycler.adapter = historyAdapter
+
+        loadHistoryItems()
+
+
+        // Listen for Enter key press to hide keyboard and historyRecycler
+        linkRef.binding.btnTextUrl.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                // Hide the soft keyboard
+                val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(linkRef.binding.btnTextUrl.windowToken, 0)
+
+                // Hide the historyRecycler
+                binding.historyRecycler.visibility = View.GONE
+
+                return@setOnKeyListener true
+            }
+            return@setOnKeyListener false
+        }
+
+        // Set focus listener for btnTextUrl to update isBtnTextUrlFocused flag
+        linkRef.binding.btnTextUrl.setOnFocusChangeListener { _, hasFocus ->
+            isBtnTextUrlFocused = hasFocus
+        }
         // Check if it's a tablet
         val isTablet = resources.configuration.smallestScreenWidthDp >= 600
 
@@ -438,6 +498,23 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     }
     // Assuming this is in your BrowseFragment or similar place
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun loadHistoryItems() {
+        val historyList = HistoryManager.getHistoryList(requireContext())
+        val limitedHistoryList = historyList.take(10)
+        HistoryBrowser.historyItems.clear()
+        HistoryBrowser.historyItems.addAll(limitedHistoryList)
+        historyAdapter.notifyDataSetChanged()
+        updateEmptyStateVisibility()
+    }
+
+    private fun updateEmptyStateVisibility() {
+        if (HistoryBrowser.historyItems.isEmpty()) {
+            binding.historyRecycler.visibility = View.GONE
+        } else {
+            binding.historyRecycler.visibility = View.VISIBLE
+        }
+    }
 
     override fun onCreateContextMenu(
         menu: ContextMenu,

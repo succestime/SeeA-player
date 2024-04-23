@@ -4,7 +4,6 @@ package com.jaidev.seeaplayer
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -56,12 +55,6 @@ class PlaylistActivity : AppCompatActivity() {
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
 
-        // Update visibility of emptyStateLayout
-        if (musicPlaylist.ref.isEmpty()) {
-            binding.emptyStateLayout.visibility = View.VISIBLE
-        } else {
-            binding.emptyStateLayout.visibility = View.GONE
-        }
     }
 
 
@@ -114,35 +107,25 @@ class PlaylistActivity : AppCompatActivity() {
             }.show()
 
     }
-    private fun addPlaylist(name: String, createdBy: String){
-        var playlistExists = false
-        for(i in musicPlaylist.ref) {
-            if (name == i.name){
-                playlistExists = true
-                break
+    private fun addPlaylist(name: String, createdBy: String) {
+        val playlistExists = musicPlaylist.ref.any { it.name == name }
+        if (playlistExists) {
+            Toast.makeText(this, "Playlist Exists!", Toast.LENGTH_SHORT).show()
+        } else {
+            val tempPlaylist = Playlist().apply {
+                this.name = name
+                this.playlist = ArrayList()
+                this.createdBy = createdBy
+                this.createdOn = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH).format(Calendar.getInstance().time)
             }
-        }
-        if(playlistExists) Toast.makeText(this, "Playlist Exist!!", Toast.LENGTH_SHORT).show()
-        else {
-            val tempPlaylist = Playlist()
-            tempPlaylist.name = name
-            tempPlaylist.playlist = ArrayList()
-            tempPlaylist.createdBy = createdBy
-            val calendar = Calendar.getInstance().time
-            val sdf = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
-            tempPlaylist.createdOn = sdf.format(calendar)
             musicPlaylist.ref.add(tempPlaylist)
+
+            // Save updated playlists to SharedPreferences
+
             adapter.refreshPlaylist()
-
-
-            // Update visibility of emptyStateLayout
-            if (musicPlaylist.ref.isEmpty()) {
-                binding.emptyStateLayout.visibility = View.VISIBLE
-            } else {
-                binding.emptyStateLayout.visibility = View.GONE
-            }
         }
     }
+
 
 
 
@@ -152,4 +135,6 @@ class PlaylistActivity : AppCompatActivity() {
         super.onResume()
         adapter.notifyDataSetChanged()
     }
+
+
 }

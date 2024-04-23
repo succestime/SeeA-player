@@ -44,6 +44,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.bottomNavigation.downloadNav
 import com.jaidev.seeaplayer.bottomNavigation.homeNav
@@ -64,6 +65,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: VideoAdapter
     private  var runnable : Runnable? = null
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
+
     private var checkedItem: Int = 0
     private var selected: String = ""
     private val CHECKED_ITEM = "checked_item"
@@ -107,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.apply()
 
+
         when (getCheckedItem()) {
             0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -141,8 +145,8 @@ class MainActivity : AppCompatActivity() {
         if (requestRuntimePermission()) {
             folderList = ArrayList()
             videoList = getAllVideos()
-            setFragment(homeNav())
             MusicListMA = getAllAudios()
+            setFragment(homeNav())
 
 //            FavoritesManager.loadFavorites(this@MainActivity)
 
@@ -157,8 +161,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             folderList = ArrayList()
             videoList = ArrayList()
-            setFragment(homeNav())
             MusicListMA = getAllAudios()
+            setFragment(homeNav())
         }
 // Check if the service needs to be started
         if (shouldStartService()) {
@@ -212,17 +216,16 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.settingsNav -> {
                     val intent = Intent(this@MainActivity, More::class.java)
-                    startActivity(intent) }
+                    startActivity(intent)
+
+                }
 
                 R.id.downloadsNav -> {
                     val intent = Intent(this@MainActivity, FileActivity::class.java)
                     startActivity(intent)
+
                 }
 
-                R.id.HistoryNav -> {
-                    val intent = Intent(this@MainActivity, HistoryBrowser::class.java)
-                    startActivity(intent)
-                }
                 R.id.searchNav -> {
                     val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
                     startActivity(intent)
@@ -361,6 +364,7 @@ class MainActivity : AppCompatActivity() {
             .apply()
     }
     private fun setDrawerLayoutBackgroundColor() {
+
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
@@ -470,6 +474,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
                 folderList = ArrayList()
                 videoList = getAllVideos()
+                MusicListMA = getAllAudios()
                 setFragment(homeNav())
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -490,6 +495,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
                 folderList = ArrayList()
                 videoList = getAllVideos()
+                MusicListMA = getAllAudios()
                 setFragment(homeNav())
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

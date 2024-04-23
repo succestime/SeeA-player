@@ -1,7 +1,9 @@
-
 package com.jaidev.seeaplayer.browseFregment
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,20 +11,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.internal.ViewUtils.hideKeyboard
 import com.jaidev.seeaplayer.BookmarkActivity
 import com.jaidev.seeaplayer.BookmarkAdapter
+import com.jaidev.seeaplayer.HistoryBrowser
 import com.jaidev.seeaplayer.LinkTubeActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
 import com.jaidev.seeaplayer.changeTab
 import com.jaidev.seeaplayer.checkForInternet
+import com.jaidev.seeaplayer.dataClass.HistoryItem
+import com.jaidev.seeaplayer.dataClass.HistoryManager
+import com.jaidev.seeaplayer.dataClass.SearchHistoryItem
 import com.jaidev.seeaplayer.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
+    private lateinit var historyAdapter: HistoryAdapter
+    private var searchHistoryList: MutableList<SearchHistoryItem> = mutableListOf()
+    private var isBtnTextUrlFocused = false // Flag to track if btnTextUrl has been focused
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,12 +45,22 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         binding = FragmentHomeBinding.bind(view)
 
+        val rootView = view.rootView
+
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            rootView.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+            binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
+        }
 
 
         return view
     }
 
-
+    @SuppressLint("RestrictedApi")
     override fun onResume() {
         super.onResume()
 
@@ -46,13 +70,11 @@ class HomeFragment : Fragment() {
         LinkTubeActivity.tabsList[LinkTubeActivity.myPager.currentItem].name = "Home"
 
         linkTubeRef.binding.btnTextUrl.setText("")
-//        binding.searchView.setQuery("" , false)
         linkTubeRef.binding.webIcon.setImageResource(R.drawable.search_icon)
-
         linkTubeRef.binding.refreshBrowserBtn.visibility = View.GONE
         linkTubeRef.binding.googleMicBtn.visibility = View.VISIBLE
         linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
-
+        linkTubeRef.binding.crossBtn.visibility = View.GONE
 
         // TextWatcher for btnTextUrl
         val textWatcher = object : TextWatcher {
@@ -71,20 +93,66 @@ class HomeFragment : Fragment() {
             }
             override fun afterTextChanged(s: Editable?) {}
         }
-            linkTubeRef.binding.btnTextUrl.addTextChangedListener(textWatcher)
+        linkTubeRef.binding.btnTextUrl.addTextChangedListener(textWatcher)
 
-        // OnClickListener for crossBtn to clear text
         linkTubeRef.binding.crossBtn.setOnClickListener {
             linkTubeRef.binding.btnTextUrl.text.clear()
         }
-        // Listen for the action performed on the EditText
+
+        linkTubeRef.binding.btnTextUrl.setOnClickListener {
+            linkTubeRef.binding.btnTextUrl.requestFocus()
+        }
+        // Set click listener for homeTextUrl
+        binding.homeTextUrl.setOnClickListener {
+            // Request focus on btnTextUrl only if it's not already focused
+            if (!isBtnTextUrlFocused) {
+                linkTubeRef.binding.btnTextUrl.requestFocus()
+                isBtnTextUrlFocused = true // Update the flag
+            }
+
+            // Show the keyboard explicitly
+            val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(linkTubeRef.binding.btnTextUrl, InputMethodManager.SHOW_IMPLICIT)
+
+            // Check if the keyboard is visible
+            val rootView = view?.rootView
+            rootView?.viewTreeObserver?.addOnGlobalLayoutListener {
+                val rect = Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val screenHeight = rootView.height
+                val keypadHeight = screenHeight - rect.bottom
+                val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+
+                // Update the visibility of RecyclerView based on keyboard visibility
+                binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
+            }
+        }
+
+        historyAdapter = HistoryAdapter(
+            HistoryBrowser.historyItems,
+            object : HistoryAdapter.ItemClickListener {
+                override fun onItemClick(historyItem: HistoryItem) {
+                    // Handle item click here, if needed
+                }
+            },
+            isHomeFragment = true
+        )
+
+        binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
+        binding.historyRecycler.adapter = historyAdapter
+
+
+
+        // Set editor action listener for btnTextUrl (IME_ACTION_DONE or IME_ACTION_GO)
         linkTubeRef.binding.btnTextUrl.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
-                // Perform action when the Enter key or Go button is pressed
-                val query =  linkTubeRef.binding.btnTextUrl.text.toString()
+                val query = linkTubeRef.binding.btnTextUrl.text.toString()
                 if (checkForInternet(requireContext())) {
-                    changeTab(query, BrowseFragment(query))
-                    linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
+                    // Hide keyboard and RecyclerView
+                    hideKeyboard(linkTubeRef.binding.btnTextUrl)
+                    binding.historyRecycler.visibility = View.GONE
+                    // Perform search
+                    performSearch(query)
                 } else {
                     Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
                 }
@@ -93,61 +161,41 @@ class HomeFragment : Fragment() {
             return@setOnEditorActionListener false
         }
 
-
-
-        // TextWatcher for btnTextUrl
-        val homeTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    binding.voiceSearchButton.visibility = View.VISIBLE
-                    binding.homeCrossBtn.visibility = View.GONE
-                } else {
-                  binding.voiceSearchButton.visibility = View.GONE
-              binding.homeCrossBtn.visibility = View.VISIBLE
-                }
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        }
-      binding.homeTextUrl.addTextChangedListener(homeTextWatcher)
-
-        // OnClickListener for crossBtn to clear text
-     binding.homeCrossBtn.setOnClickListener {
-            binding.homeTextUrl.text.clear()
-        }
-        // Listen for the action performed on the EditText
-       binding.homeTextUrl.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
-                // Perform action when the Enter key or Go button is pressed
-                val query =  binding.homeTextUrl.text.toString()
-                if (checkForInternet(requireContext())) {
-                    changeTab(query, BrowseFragment(query))
-                } else {
-                    Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
-                }
-                return@setOnEditorActionListener true
-            }
-            return@setOnEditorActionListener false
-        }
-
-        // Set up click listener for voiceSearchButton
         binding.voiceSearchButton.setOnClickListener {
             linkTubeRef.speak()
         }
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(5)
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext() , 5)
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 5)
         binding.recyclerView.adapter = BookmarkAdapter(requireContext())
 
         if (LinkTubeActivity.bookmarkList.size < 1)
             binding.viewAllBtn.visibility = View.GONE
+
         binding.viewAllBtn.setOnClickListener {
-            startActivity(Intent(requireContext() , BookmarkActivity::class.java))
+            startActivity(Intent(requireContext(), BookmarkActivity::class.java))
         }
 
+        loadHistoryItems()
+    }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun loadHistoryItems() {
+        val historyList = HistoryManager.getHistoryList(requireContext())
+        val limitedHistoryList = historyList.take(15)
+        HistoryBrowser.historyItems.clear()
+        HistoryBrowser.historyItems.addAll(limitedHistoryList)
+        historyAdapter.notifyDataSetChanged()
+        updateEmptyStateVisibility()
+    }
+
+    private fun updateEmptyStateVisibility() {
+        if (HistoryBrowser.historyItems.isEmpty()) {
+            binding.historyRecycler.visibility = View.GONE
+        } else {
+            binding.historyRecycler.visibility = View.VISIBLE
+        }
     }
 
     private fun performSearch(query: String) {
@@ -157,6 +205,4 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 }

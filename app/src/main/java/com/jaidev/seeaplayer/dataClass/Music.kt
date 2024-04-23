@@ -16,18 +16,15 @@ data class Music(val id : String, var title : String, val album : String,val art
 
 }
 
-class Playlist {
+
+class Playlist{
     lateinit var name: String
-    var playlist: ArrayList<Music> = ArrayList()
+    lateinit var playlist: ArrayList<Music>
     lateinit var createdBy: String
     lateinit var createdOn: String
-
-
 }
-
-
-class MusicPlaylist {
-    var ref : ArrayList<Playlist> = ArrayList()
+class MusicPlaylist{
+    var ref: ArrayList<Playlist> = ArrayList()
 }
 
 fun formatDuration(duration: Long):String{
@@ -88,3 +85,5 @@ fun checkPlaylist(playlist: ArrayList<Music>) : ArrayList<Music>{
     }
     return playlist
 }
+
+

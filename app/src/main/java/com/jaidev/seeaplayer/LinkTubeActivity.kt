@@ -88,8 +88,6 @@ class LinkTubeActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
 
-
-
         getAllBookmarks()
         tabsList.add(Tab("Home",HomeFragment(), LinkTubeActivity()))
         binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
@@ -483,7 +481,7 @@ class LinkTubeActivity : AppCompatActivity() {
     }
 
     fun navigateToBrowserFragment(query: String) {
-        val url = "https://search.brave.com/search?q=${Uri.encode(query)}"
+        val url = "https://www.google.com/search?q=${Uri.encode(query)}"
         val browserFragment = BrowseFragment(urlNew = url)
         changeTab("Brave", browserFragment)
     }
@@ -494,13 +492,14 @@ class LinkTubeActivity : AppCompatActivity() {
             // Check if the input is a number or a string
             val searchQuery =
                 if (speechInput.matches(Regex("-?\\d+(\\.\\d+)?"))) { // Check if input is a number
-                    "https://search.brave.com/search?q=$speechInput"
+                    "https://www.google.com/search?q=$speechInput"
                 } else {
-                    "https://search.brave.com/search?q=${Uri.encode(speechInput)}"
+                    "https://www.google.com/search?q=${Uri.encode(speechInput)}"
                 }
             webView.loadUrl(searchQuery)
         }
     }
+
 
 
     @Deprecated("Deprecated in Java")
@@ -695,3 +694,4 @@ fun checkForInternet(context: Context): Boolean {
 
 
 }
+

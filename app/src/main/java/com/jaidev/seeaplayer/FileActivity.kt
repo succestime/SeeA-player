@@ -10,10 +10,13 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
+import android.widget.CompoundButton
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -24,6 +27,7 @@ import com.jaidev.seeaplayer.allAdapters.FileAdapter
 import com.jaidev.seeaplayer.dataClass.FileItem
 import com.jaidev.seeaplayer.dataClass.FileType
 import com.jaidev.seeaplayer.databinding.ActivityFileBinding
+import com.jaidev.seeaplayer.databinding.ActivitySettingDownloadsBinding
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.File
@@ -36,7 +40,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     private lateinit var binding: ActivityFileBinding
     private var selectedBox: View? = null // Track currently selected box
     private var isEditTextVisible = false
-
+    private var sortByNewestFirst = true // Default to sort by newest first
     companion object {
 
         private val DOWNLOADS_DIRECTORY = Environment.DIRECTORY_DOWNLOADS
@@ -50,6 +54,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         setContentView(binding.root)
        supportActionBar?.hide()
         setActionBarGradient()
+
+
         // Set click listeners for each box
         binding.monthlyBox.setOnClickListener { toggleSelection(binding.monthlyBox) }
         binding.quarterlyBox.setOnClickListener { toggleSelection(binding.quarterlyBox) }
@@ -59,17 +65,18 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         // Set up RecyclerView and adapter
         fileListAdapter = FileAdapter(this, fileItems, this)
 
-//        fileListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-//            override fun onChanged() {
-//                super.onChanged()
-//                updateImageButtonsVisibility()
-//            }
-//        })
+        binding.settingBrowser.setOnClickListener {
+            showSettingDialog()
+
+        }
+
         binding.recyclerFileView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@FileActivity)
             adapter = fileListAdapter
         }
+
+
         binding.imageButtonSearch.setOnClickListener {
             // Show editTextSearch
             binding.editTextSearch.visibility = View.VISIBLE
@@ -138,25 +145,69 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         selectBox(binding.monthlyBox)
     }
 
-//    private fun updateImageButtonsVisibility() {
-//        if (fileListAdapter.isMultipleSelectionEnabled()) {
-//            // Show image buttons when multiple items are selected
-//            binding.shareBrowser.visibility = View.VISIBLE
-//            binding.deleteBrowser.visibility = View.VISIBLE
-//            binding.settingBrowser.visibility = View.GONE
-//            binding.imageButtonSearch.visibility = View.GONE
-//        } else {
-//            // Hide image buttons when no items are selected
-//            binding.shareBrowser.visibility = View.GONE
-//            binding.deleteBrowser.visibility = View.GONE
-//            binding.settingBrowser.visibility = View.VISIBLE
-//            binding.imageButtonSearch.visibility = View.VISIBLE
-//        }
-//    }
 
 
 
-        private fun filterFileItems(searchText: String) {
+
+    private fun showSettingDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.activity_setting_downloads, null)
+        val dialogBinding = ActivitySettingDownloadsBinding.bind(dialogView)
+
+        // Initialize switches based on stored settings
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        // Read the stored value for sortByNewestFirst (defaulting to true if not found)
+        sortByNewestFirst = sharedPreferences.getBoolean("sortByNewestFirst", true)
+        dialogBinding.switchNewFiles.isChecked = !sortByNewestFirst
+        dialogBinding.switchOldFiles.isChecked = sortByNewestFirst
+
+        val switchListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            when (buttonView.id) {
+                R.id.switchNewFiles -> {
+                    // Update the sorting order and switch states
+                    sortByNewestFirst = !isChecked
+                    dialogBinding.switchOldFiles.isChecked = sortByNewestFirst
+                }
+                R.id.switchOldFiles -> {
+                    // Update the sorting order and switch states
+                    sortByNewestFirst = isChecked
+                    dialogBinding.switchNewFiles.isChecked = !isChecked
+                }
+            }
+        }
+
+
+        dialogBinding.switchNewFiles.setOnCheckedChangeListener(switchListener)
+        dialogBinding.switchOldFiles.setOnCheckedChangeListener(switchListener)
+
+
+        val dialogBuilder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setTitle("Order of Downloaded files")
+            .setPositiveButton("Apply") { dialog, _ ->
+                sortByNewestFirst = dialogBinding.switchOldFiles.isChecked
+                sortFilesByTimestamp()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        dialogBuilder.show()
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun sortFilesByTimestamp() {
+        if (sortByNewestFirst) {
+            fileItems.sortByDescending { it.lastModifiedTimestamp }
+        } else {
+            fileItems.sortBy { it.lastModifiedTimestamp }
+        }
+        fileListAdapter.notifyDataSetChanged()
+    }
+
+    private fun filterFileItems(searchText: String) {
         val filteredList = if (searchText.isEmpty()) {
             // If search text is empty, show all items
             fileItems.toList()
@@ -217,6 +268,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
 
     }
+
+
     override fun onItemClick(fileItem: FileItem) {
         if (fileItem.fileType == FileType.IMAGE) {
             openImageFile(fileItem)
@@ -399,6 +452,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
                 }
             }
         }
+// Sort files based on the default sorting order
+        sortFilesByTimestamp()
 
         return downloadedFiles
     }
@@ -497,6 +552,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         super.onResume()
         setActionBarGradient()
 
+        sortFilesByTimestamp()
     }
 
 }

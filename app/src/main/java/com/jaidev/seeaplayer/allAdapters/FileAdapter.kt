@@ -255,8 +255,6 @@ class FileAdapter(
         private val audioNameTextView: TextView = itemView.findViewById(R.id.titleAudioView)
         private val audioSizeTextView: TextView = itemView.findViewById(R.id.AudioSizeView)
         private val audioMoreTextView: ImageButton = itemView.findViewById(R.id.iconAudioView)
-        private val fileSelectImageView: ImageButton = itemView.findViewById(R.id.multiAudioIcon)
-        private val fileIconImageView: ImageButton = itemView.findViewById(R.id.iconImageView)
 
         init {
             audioMoreTextView.setOnClickListener {
@@ -334,8 +332,6 @@ class FileAdapter(
         private val websiteNameTextView: TextView = itemView.findViewById(R.id.titleWebApkView)
         private val websiteSizeTextView: TextView = itemView.findViewById(R.id.WebApkSizeView)
         private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
-        private val fileSelectImageView: ImageButton = itemView.findViewById(R.id.multiWebsiteIcon)
-        private val fileIconImageView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
 
         init {
             websiteMoreTextView.setOnClickListener {
@@ -414,8 +410,6 @@ class FileAdapter(
         private val apkNameTextView: TextView = itemView.findViewById(R.id.titleWebApkView)
         private val apkSizeTextView: TextView = itemView.findViewById(R.id.WebApkSizeView)
         private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
-        private val fileSelectImageView: ImageButton = itemView.findViewById(R.id.multiWebsiteIcon)
-        private val fileIconImageView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
 
         init {
             websiteMoreTextView.setOnClickListener {

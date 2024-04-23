@@ -17,7 +17,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
@@ -159,13 +158,12 @@ class MusicAdapter(
                 }
             }
 
-
-            selectionActivity -> {
+            selectionActivity ->{
                 holder.root.setOnClickListener {
-                    val rootView = holder.itemView // Get the root view of the item
-
-
-                    addSong(position, rootView)
+                    if(addSong(musicList[position]))
+                        holder.root.setBackgroundColor(ContextCompat.getColor(context, R.color.cool_pink))
+                    else
+                        holder.root.setBackgroundColor(ContextCompat.getColor(context, R.color.white))
 
                 }
             }
@@ -315,18 +313,15 @@ class MusicAdapter(
     }
 
 
-    private fun addSong(position: Int, rootView: View): Boolean {
-        if (selectedItems.contains(position)) {
-            // Item is already selected, deselect it
-            selectedItems.remove(position)
-            rootView.setBackgroundResource(android.R.color.transparent)
-            return false
-        } else {
-            // Item is not selected, select it
-            selectedItems.add(position)
-            rootView.setBackgroundResource(R.drawable.browser_selected_background)
-            return true
+    private fun addSong(song: Music): Boolean{
+        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.forEachIndexed { index, music ->
+            if(song.id == music.id){
+                PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(index)
+                return false
+            }
         }
+        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.add(song)
+        return true
     }
 
     // Toggle selection for multi-select

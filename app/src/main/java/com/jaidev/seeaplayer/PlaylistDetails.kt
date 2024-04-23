@@ -34,8 +34,9 @@ class PlaylistDetails : AppCompatActivity() {
         binding = ActivityPlatylistDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         currentPlaylistPos = intent.extras?.get("index") as Int
-        PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist =
-            checkPlaylist(playlist =  PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist)
+        try{PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist =
+            checkPlaylist(playlist = PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist)}
+        catch(_: Exception){}
         binding.playlistDetailsRV.setHasFixedSize(true)
         binding.playlistDetailsRV.setItemViewCacheSize(13)
         binding.playlistDetailsRV.layoutManager = LinearLayoutManager(this,)
@@ -133,6 +134,5 @@ class PlaylistDetails : AppCompatActivity() {
             binding.shuffleBtnPD.visibility = View.VISIBLE
         }
         adapter.notifyDataSetChanged()
-
-    }
+         }
 }

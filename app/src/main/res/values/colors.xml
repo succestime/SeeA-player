@@ -13,6 +13,7 @@
     <color name="titleColor">#fff</color>
 
     <color name="colorPrimary">#1b272c</color>
+    <color name="dialog_custom_color">#3C3A3A</color>
     <color name="cool_pink">#E91E63</color>
     <color name="red">#FFFF0000</color>
     <color name="green">#FF00FF00</color>

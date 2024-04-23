@@ -69,17 +69,98 @@
                 tools:ignore="RedundantDescriptionCheck" />
 
 
+<!--            <LinearLayout-->
+<!--                android:id="@+id/demoTextUrlLayout"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:background="@drawable/custom_brower_home"-->
+<!--                android:weightSum="10"-->
+<!--                android:layout_gravity="center_vertical"-->
+<!--                android:orientation="horizontal">-->
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_marginTop="2dp"-->
+<!--                    android:background="?attr/selectableItemBackground"-->
+<!--                    android:elevation="2dp"-->
+<!--                    >-->
 
+<!--                    <com.google.android.material.imageview.ShapeableImageView-->
+<!--                        android:id="@+id/webDemoIcon"-->
+<!--                        android:layout_width="25dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_marginEnd="5dp"-->
+<!--                        android:layout_marginStart="@dimen/car_ui_padding_2"-->
+<!--                        android:src="@drawable/search_icon"-->
+<!--                        app:tint="@color/white"-->
+<!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toTopOf="parent"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/btnDemoTextUrl"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="40dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:gravity="center_vertical"-->
+<!--                        android:background="@android:color/transparent"-->
+<!--                        android:hint="@string/enter_url"-->
+<!--                        android:textColor="@color/white"-->
+<!--                        android:textColorHint="@color/white"-->
+<!--                        android:paddingEnd="5dp"-->
+<!--                        tools:ignore="RtlSymmetry" />-->
+
+
+<!--                    <ImageButton-->
+<!--                        android:id="@+id/crossBtn"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:src="@drawable/browser_clear"-->
+<!--                        android:background="@android:color/transparent"-->
+<!--                        android:layout_marginEnd="2dp"-->
+<!--                        app:tint="@color/white"-->
+<!--                        android:visibility="gone"-->
+<!--                        />-->
+<!--                    <ImageButton-->
+<!--                        android:id="@+id/googleMicBtn"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:src="@drawable/google_mic"-->
+<!--                        android:background="@android:color/transparent"-->
+<!--                        android:visibility="gone"-->
+<!--                        app:tint="@color/white"-->
+<!--                        android:layout_marginEnd="2dp"-->
+<!--                        />-->
+
+<!--                    <ImageButton-->
+<!--                        android:id="@+id/bookMarkBtn"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:src="@drawable/ic_bookmark"-->
+<!--                        android:background="@android:color/transparent"-->
+<!--                        android:visibility="gone"-->
+<!--                        app:tint="@color/white"-->
+<!--                        android:layout_margin="5dp"-->
+<!--                        />-->
+
+<!--                </LinearLayout>-->
+
+
+<!--            </LinearLayout>-->
             <LinearLayout
-                android:id="@+id/btnTextUrlLayout"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:visibility="visible"
                 android:background="@drawable/custom_brower_home"
                 android:weightSum="10"
                 android:layout_gravity="center_vertical"
                 android:orientation="horizontal">
                 <LinearLayout
+                    android:id="@+id/btnTextUrlLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="2dp"
@@ -200,18 +281,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--        android:id="@+id/settingBtn"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:contentDescription="@string/settings_btn"-->
-<!--        android:src="@drawable/search_setting"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.9"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.9" />-->
 
 
     <LinearLayout

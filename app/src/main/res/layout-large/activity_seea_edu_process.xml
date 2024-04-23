@@ -40,6 +40,16 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <Button
+                android:id="@+id/payButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="350dp"
+                android:layout_marginEnd="30dp"
+                android:backgroundTint="#E3B52A"
+                android:paddingBottom="10dp"
+                android:text="Pay Now " />
 
 
         </LinearLayout>
@@ -95,7 +105,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="200dp"
             android:focusableInTouchMode="true"
             android:orientation="vertical">
@@ -131,25 +141,11 @@
         </LinearLayout>
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent">-->
 
-            <Button
-                android:id="@+id/payButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginTop="300dp"
-                android:backgroundTint="#E3B52A"
-                android:paddingBottom="10dp"
-                android:text="Pay Now "
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
 
 
     </androidx.cardview.widget.CardView>

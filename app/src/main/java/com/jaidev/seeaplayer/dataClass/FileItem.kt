@@ -24,7 +24,10 @@ data class FileItem(
         fun getPrefKey(fileItem: FileItem): String {
             return PREF_FILE_ITEM_PREFIX + fileItem.filePath.hashCode()
         }
+
+
     }
+
 }
 
 enum class FileType {

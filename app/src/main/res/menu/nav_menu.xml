@@ -32,10 +32,7 @@
         android:title="@string/downloads_files"
         android:icon="@drawable/video_browser"
         />
-    <item android:id="@+id/HistoryNav"
-        android:title="@string/history"
-        android:icon="@drawable/history_browser"
-        />
+
                 </menu>
             </item>
         </group>

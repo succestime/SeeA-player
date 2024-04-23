@@ -29,7 +29,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
     private lateinit var emptyStateLayout: ViewStub // Add reference to emptyStateLayout
 
     companion object{
-        private val historyItems: MutableList<HistoryItem> = mutableListOf()
+        val historyItems: MutableList<HistoryItem> = mutableListOf()
     }
 
     @SuppressLint("ClickableViewAccessibility")
