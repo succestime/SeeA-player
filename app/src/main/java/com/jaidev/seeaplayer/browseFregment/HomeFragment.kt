@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.browseFregment
 
 import android.annotation.SuppressLint
@@ -17,14 +18,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.internal.ViewUtils.hideKeyboard
-import com.jaidev.seeaplayer.BookmarkActivity
-import com.jaidev.seeaplayer.BookmarkAdapter
-import com.jaidev.seeaplayer.HistoryBrowser
-import com.jaidev.seeaplayer.LinkTubeActivity
+import com.jaidev.seeaplayer.browserActivity.BookmarkActivity
+import com.jaidev.seeaplayer.allAdapters.BookmarkAdapter
+import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
-import com.jaidev.seeaplayer.changeTab
-import com.jaidev.seeaplayer.checkForInternet
+import com.jaidev.seeaplayer.browserActivity.changeTab
+import com.jaidev.seeaplayer.browserActivity.checkForInternet
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.dataClass.SearchHistoryItem
@@ -101,6 +102,8 @@ class HomeFragment : Fragment() {
 
         linkTubeRef.binding.btnTextUrl.setOnClickListener {
             linkTubeRef.binding.btnTextUrl.requestFocus()
+            loadHistoryItems()
+
         }
         // Set click listener for homeTextUrl
         binding.homeTextUrl.setOnClickListener {
@@ -134,8 +137,10 @@ class HomeFragment : Fragment() {
                 override fun onItemClick(historyItem: HistoryItem) {
                     // Handle item click here, if needed
                 }
+
             },
             isHomeFragment = true
+
         )
 
         binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())

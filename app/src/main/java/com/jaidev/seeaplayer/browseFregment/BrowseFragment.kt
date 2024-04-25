@@ -45,16 +45,21 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.Snackbar
-import com.jaidev.seeaplayer.HistoryBrowser
-import com.jaidev.seeaplayer.LinkTubeActivity
-import com.jaidev.seeaplayer.LinkTubeActivity.Companion.myPager
-import com.jaidev.seeaplayer.LinkTubeActivity.Companion.tabsList
+import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
-import com.jaidev.seeaplayer.changeTab
+import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.dataClass.FileType
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
@@ -64,10 +69,12 @@ import java.io.ByteArrayOutputStream
 
 class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener {
     lateinit var binding: FragmentBrowseBinding
+
     var webIcon: Bitmap? = null
     private lateinit var historyAdapter: HistoryAdapter
     private var isBtnTextUrlFocused = false // Flag to track if btnTextUrl has been focused
-
+    private var mInterstitialAd: InterstitialAd? = null
+lateinit var mAdView : AdView
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
 
@@ -96,7 +103,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         val view = inflater.inflate(R.layout.fragment_browse, container, false)
         binding = FragmentBrowseBinding.bind(view)
         registerForContextMenu(binding.webView)
-
         binding.webView.apply {
 
             when {
@@ -114,9 +120,12 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             val screenHeight = rootView.height
             val keypadHeight = screenHeight - rect.bottom
             val isKeyboardVisible = keypadHeight > screenHeight * 0.15
-            binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
-        }
 
+            // Hide historyRecycler if keyboard is dismissed
+            if (!isKeyboardVisible) {
+                binding.historyRecycler.visibility = View.GONE
+            }
+        }
 
         return view
 
@@ -171,6 +180,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
 
         linkRef.binding.btnTextUrl.setOnClickListener {
+            binding.historyRecycler.visibility = View.VISIBLE
             linkRef.binding.btnTextUrl.requestFocus()
 
         }
@@ -649,5 +659,22 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         TODO("Not yet implemented")
     }
 
+    fun loadAd() {
+        val adRequest = AdRequest.Builder().build()
 
+
+        InterstitialAd.load(
+            requireContext(),
+            "ca-app-pub-4270893888625106/2835817173",
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    mInterstitialAd = null
+                }
+
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    mInterstitialAd = interstitialAd
+                }
+            })
+    }
 }

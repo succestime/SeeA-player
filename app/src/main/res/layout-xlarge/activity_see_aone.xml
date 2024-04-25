@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/seeAOneLayout"
     android:background="@color/black"
-    tools:context=".SeeAOne">
+    tools:context=".Subscription.SeeAOne">
 
 
     <ImageView

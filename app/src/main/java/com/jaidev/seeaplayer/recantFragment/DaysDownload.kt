@@ -22,7 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.MainActivity.Companion.videoRecantList
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.RecentVideoAdapter
+import com.jaidev.seeaplayer.allAdapters.RecentVideoAdapter
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.databinding.FragmentDaysDownloadBinding
 import java.util.concurrent.TimeUnit

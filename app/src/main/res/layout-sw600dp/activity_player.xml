@@ -11,6 +11,7 @@
 
     <FrameLayout
         android:id="@+id/frameLayout2"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:ignore="MissingClass">
@@ -60,6 +61,8 @@
         android:id="@+id/lockButton"
         android:layout_width="50dp"
         android:layout_height="65dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/ic_lock_open_icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -260,5 +263,20 @@
 
     </LinearLayout>
 
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:adSize="250x250"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/frameLayout2"
+        tools:ignore="MissingConstraints">
+
+    </com.google.android.gms.ads.AdView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

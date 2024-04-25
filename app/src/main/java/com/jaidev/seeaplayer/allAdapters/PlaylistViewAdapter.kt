@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jaidev.seeaplayer.PlaylistActivity
-import com.jaidev.seeaplayer.PlaylistDetails
+import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Playlist
 import com.jaidev.seeaplayer.databinding.PlaylistViewBinding

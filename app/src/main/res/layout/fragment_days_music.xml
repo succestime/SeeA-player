@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshMusic"
-    tools:context=".DaysMusic">
+    tools:context=".recantFragment.DaysMusic">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -90,7 +90,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:name="com.jaidev.seeaplayer.ReNowPlaying"
+            android:name="com.jaidev.seeaplayer.recantFragment.ReNowPlaying"
             tools:layout="@layout/fragment_now_playing" />
 
 

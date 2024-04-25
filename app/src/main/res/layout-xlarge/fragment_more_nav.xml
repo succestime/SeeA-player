@@ -462,4 +462,16 @@ android:layout_marginStart="10dp"
 
     </LinearLayout>
 
+    <com.jaidev.seeaplayer.mynative.TemplateView
+        android:id="@+id/templateView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:gnt_template_type="@layout/gnt_medium_template_view"
+        tools:ignore="MissingClass" />
 </RelativeLayout>

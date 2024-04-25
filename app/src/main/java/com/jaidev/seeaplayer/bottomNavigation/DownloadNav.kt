@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.ReDownloadAdapter
+import com.jaidev.seeaplayer.allAdapters.ReDownloadAdapter
 import com.jaidev.seeaplayer.databinding.FragmentDownloadNavBinding
 
 

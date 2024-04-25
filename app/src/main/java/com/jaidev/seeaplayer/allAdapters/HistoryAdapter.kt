@@ -10,16 +10,15 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.jaidev.seeaplayer.LinkTubeActivity
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
-import com.jaidev.seeaplayer.changeTab
+import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
-import java.util.Locale
 
 class HistoryAdapter(
-    private val historyItems: MutableList<HistoryItem>,
+    private var historyItems: MutableList<HistoryItem>,
     private val itemClickListener: ItemClickListener,
     private val isHomeFragment: Boolean = false
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -117,7 +116,7 @@ class HistoryAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val historyItem = filteredItems[position]
+        val historyItem = historyItems[position]
         when (holder) {
             is NormalViewHolder -> holder.bind(historyItem)
             is HomeViewHolder -> holder.bind(historyItem)
@@ -125,7 +124,7 @@ class HistoryAdapter(
     }
 
     override fun getItemCount(): Int {
-        return filteredItems.size
+        return historyItems.size
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -141,19 +140,15 @@ class HistoryAdapter(
         historyItems.clear()
         notifyDataSetChanged()
     }
+
     @SuppressLint("NotifyDataSetChanged")
-    fun filterItems(searchText: String) {
-        filteredItems.clear()
-        if (searchText.isEmpty()) {
-            filteredItems.addAll(historyItems)
-        } else {
-            val searchPattern = searchText.toLowerCase(Locale.getDefault())
-            filteredItems.addAll(historyItems.filter {
-                it.url.toLowerCase(Locale.getDefault()).contains(searchPattern)
-            })
-        }
+    fun filterList(filteredList: List<HistoryItem>) {
+        historyItems = ArrayList()
+        historyItems.addAll(filteredList)
         notifyDataSetChanged()
     }
+
+
     private fun navigateToBrowserFragment(query: String) {
         val browserFragment = BrowseFragment(urlNew = query)
         changeTab("Brave", browserFragment)

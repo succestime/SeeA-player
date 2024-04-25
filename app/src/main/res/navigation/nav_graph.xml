@@ -27,7 +27,7 @@
     </fragment>
     <activity
         android:id="@+id/seeAOne"
-        android:name="com.jaidev.seeaplayer.SeeAOne"
+        android:name="com.jaidev.seeaplayer.Subscription.SeeAOne"
         android:label="activity_see_aone"
         tools:layout="@layout/activity_see_aone" />
     <fragment

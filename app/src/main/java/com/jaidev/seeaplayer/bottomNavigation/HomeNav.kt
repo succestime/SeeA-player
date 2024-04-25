@@ -13,10 +13,10 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.jaidev.seeaplayer.FoldersAdapter
+import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.VideoAdapter
+import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
 
 class homeNav : Fragment() {

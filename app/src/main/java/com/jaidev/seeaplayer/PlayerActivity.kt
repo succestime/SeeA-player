@@ -50,8 +50,12 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.TimeBar
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.allAdapters.PlaybackIconsAdapter
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.dataClass.IconModel
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityPlayerBinding
@@ -96,7 +100,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private lateinit var eqContainer: FrameLayout
     private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
     private lateinit var player: ExoPlayer
-
+    lateinit var mAdView: AdView
 
     companion object {
         private var audioManager: AudioManager? = null
@@ -138,6 +142,12 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
         initializePlayer()
+
+        MobileAds.initialize(this){}
+        mAdView = findViewById(R.id.adView)
+
+
+
         // Set up your ExoPlayer instance and attach it to the CustomPlayerView
         val player = SimpleExoPlayer.Builder(this).build()
         binding.playerView.player = player
@@ -637,7 +647,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         if (player.isPlaying) {
             isPlayingBeforePause = true
             player.pause()
+
         } else {
+
             isPlayingBeforePause = false
         }
     }
@@ -754,6 +766,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
 
     private fun pauseVideo() {
+        // banner ads
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
         playPauseBtn.setImageResource(R.drawable.ic_play_icon)
         player.pause()
     }

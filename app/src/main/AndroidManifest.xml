@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
 
     <application
         android:name=".ApplicationClass"
@@ -28,16 +29,20 @@
         android:supportsRtl="true"
         android:theme="@style/coolBlueNav"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        >
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
+
         <activity
             android:name=".SettingDownloads"
             android:exported="false" />
         <activity
-            android:name=".HistoryBrowser"
-
+            android:name=".browserActivity.HistoryBrowser"
             android:exported="false" />
         <activity
-            android:name=".ImageViewerActivity"
+            android:name=".browserActivity.ImageViewerActivity"
             android:exported="false" />
 
         <provider
@@ -51,25 +56,23 @@
         </provider>
 
         <activity
-            android:name=".FileActivity"
+            android:name=".browserActivity.FileActivity"
             android:exported="false" />
 
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-4270893888625106~1970609446" />
+
 
         <activity
-            android:name=".SeeaEduProcess"
+            android:name=".Subscription.SeeaEduProcess"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".SeeAOne"
+            android:name=".Subscription.SeeAOne"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".SeeAEdu"
+            android:name=".Subscription.SeeAEdu"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
@@ -89,10 +92,10 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".BookmarkActivity"
+            android:name=".browserActivity.BookmarkActivity"
             android:exported="false" />
         <activity
-            android:name=".LinkTubeActivity"
+            android:name=".browserActivity.LinkTubeActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="true" />
         <activity
@@ -101,17 +104,17 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".SelectionActivity"
+            android:name=".musicActivity.SelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".PlaylistDetails"
+            android:name=".musicActivity.PlaylistDetails"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".PlaylistActivity"
+            android:name=".musicActivity.PlaylistActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
@@ -125,6 +128,7 @@
             android:exported="true"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
+
         </activity>
         <activity
             android:name=".bottom_sheet"
@@ -175,15 +179,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MusicService" />
-        <service android:name=".FolderDetectionService" />
-        <service android:name=".FileDownloadService" />
+        <service android:name=".Services.MusicService" />
+        <service android:name=".Services.FolderDetectionService" />
+        <service android:name=".Services.FileDownloadService" />
 
         <receiver
             android:name=".musicActivity.NotificationReceiver"
             android:enabled="true" />
         <receiver
-            android:name=".DownloadCompleteReceiver"
+            android:name=".Services.DownloadCompleteReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

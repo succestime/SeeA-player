@@ -23,7 +23,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.jaidev.seeaplayer.FileItemPreferences
+import com.jaidev.seeaplayer.Services.FileItemPreferences
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.FileItem
 import com.jaidev.seeaplayer.dataClass.FileType

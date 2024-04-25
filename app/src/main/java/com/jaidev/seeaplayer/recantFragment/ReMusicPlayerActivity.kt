@@ -20,10 +20,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
-import com.jaidev.seeaplayer.MusicService
+import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.exitApplication
@@ -33,7 +36,7 @@ import com.jaidev.seeaplayer.databinding.ActivityReMusicPlayerBinding
 class ReMusicPlayerActivity : AppCompatActivity()
     , ServiceConnection, MediaPlayer.OnCompletionListener
 {
-
+    lateinit var mAdView: AdView
     private lateinit var reMusicPlayerLayout: LinearLayout
 
     companion object {
@@ -84,6 +87,12 @@ class ReMusicPlayerActivity : AppCompatActivity()
         supportActionBar?.hide()
         updateNextMusicTitle()
         initializeLayout()
+
+        MobileAds.initialize(this){}
+        mAdView = findViewById(R.id.adView)
+        // banner ads
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         binding.backBtnPA.setOnClickListener { finish() }
 

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="60dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".NowPlaying"
+    tools:context=".musicActivity.NowPlaying"
     android:background="@drawable/curved_nowpalying_background">
 
 

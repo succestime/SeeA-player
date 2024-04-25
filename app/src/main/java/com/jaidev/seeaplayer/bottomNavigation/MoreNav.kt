@@ -21,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.FragmentMoreNavBinding
+import com.jaidev.seeaplayer.loadSmallMediumSizeNativeAds
 import com.jaidev.seeaplayer.signin
 
 class moreNav : Fragment() {
@@ -41,9 +42,11 @@ class moreNav : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
-//        binding.goToSignin.setOnClickListener {
-//            it.findNavController().navigate(R.id.action_moreNav_to_profile)
-//        }
+        binding.templateView?.let {
+            loadSmallMediumSizeNativeAds(requireContext(),R.string.small_medium_native_ads,
+                it
+            )
+        }
 
         if (auth.currentUser == null) {
             startActivity(Intent(requireContext(), signin::class.java))

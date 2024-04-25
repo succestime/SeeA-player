@@ -20,10 +20,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.MainActivity.Companion.MusicListMA
 import com.jaidev.seeaplayer.MainActivity.Companion.musicListSearch
 import com.jaidev.seeaplayer.MainActivity.Companion.search
+import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.databinding.FragmentMusicNavBinding
+import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
 
 
-class musicNav : Fragment(),MusicAdapter.MusicDeleteListener  {
+class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
 
     private lateinit var binding: FragmentMusicNavBinding
     lateinit var adapter: MusicAdapter

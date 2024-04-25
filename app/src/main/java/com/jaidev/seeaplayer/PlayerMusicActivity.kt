@@ -20,8 +20,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.appopen.AppOpenAd
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.dataClass.favouriteChecker
@@ -29,10 +35,15 @@ import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.ActivityPlayerMusicBinding
+import com.jaidev.seeaplayer.musicActivity.NowPlaying
+import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 
 class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer.OnCompletionListener {
 
     private lateinit var playerMusicLayout: LinearLayout
+    lateinit var mAdView: AdView
+    private var appOpenAd : AppOpenAd? = null
 
     companion object {
         private const val CHECK_INTERVAL = 5000L // Check every 5 seconds
@@ -53,7 +64,8 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         lateinit var binding: ActivityPlayerMusicBinding
         var repeat: Boolean = false
         lateinit var loudnessEnhancer: LoudnessEnhancer
-
+        private const val APP_OPEN_AD_SHOWN_KEY = "app_open_ad_shown"
+        private var isAdDisplayed = false
 
         fun updateNextMusicTitle() {
             val nextSongPosition = if (songPosition + 1 < MainActivity.MusicListMA.size) songPosition + 1 else 0 // Assuming looping back to the first song after reaching the end
@@ -69,6 +81,14 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         binding = ActivityPlayerMusicBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+
+        MobileAds.initialize(this){}
+        mAdView = findViewById(R.id.adView)
+        // banner ads
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
+
         updateNextMusicTitle()
         if(intent.data?.scheme.contentEquals("content")){
             songPosition = 0
@@ -76,7 +96,6 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             bindService(intentService, this, BIND_AUTO_CREATE)
             startService(intentService)
             musicListPA = ArrayList()
-
 //            musicListPA.add(getMusicDetails(intent.data!!))
             Glide.with(this)
                 .load(getImgArt(musicListPA[songPosition].path))
@@ -450,5 +469,40 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             dialog.dismiss()
         }
     }
+    fun loadAppOpenAd() {
+        if (!isAdDisplayed) {
+            val adRequest = AdRequest.Builder().build()
+            AppOpenAd.load(
+                this,
+                "ca-app-pub-3940256099942544/9257395921",
+                adRequest,
+                AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
+                appOpenAdLoadCallback
+            )
+        }
+    }
+
+    private val appOpenAdLoadCallback = object : AppOpenAd.AppOpenAdLoadCallback() {
+        override fun onAdLoaded(ad: AppOpenAd) {
+            appOpenAd = ad
+            appOpenAd!!.show(this@PlayerMusicActivity)
+            isAdDisplayed = true // Mark ad as displayed
+        }
+
+        override fun onAdFailedToLoad(p0: LoadAdError) {
+            // Handle failed ad loading
+        }
+    }
+
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+       loadAppOpenAd()
+
+    }
 
 }
+
+
+

@@ -1,26 +1,62 @@
 package com.jaidev.seeaplayer
-//
-//import android.content.Context
-//import android.os.Environment
-//import androidx.core.content.ContextCompat
-//import java.util.Locale
-//
-//object Utils {
-//
-//    fun getRootPath(context: Context): String {
-//        return if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
-//            val file = ContextCompat.getExternalFilesDirs(context.applicationContext, null)[0]
-//            file.absolutePath
-//        } else {
-//            context.applicationContext.filesDir.absolutePath
-//        }
-//    }
-//
-//    fun getProgressDisplayLine(currentBytes: Long, totalBytes: Long): String {
-//        return "${getBytesToMBString(currentBytes)}/${getBytesToMBString(totalBytes)}"
-//    }
-//
-//    private fun getBytesToMBString(bytes: Long): String {
-//        return String.format(Locale.ENGLISH, "%.2f MB", bytes / (1024.0 * 1024.0))
-//    }
-//}
+
+import android.content.Context
+import android.view.View
+import android.widget.FrameLayout
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.jaidev.seeaplayer.mynative.TemplateView
+
+fun loadBannerAds(
+    context: Context,
+    adsFrameLayout: FrameLayout,
+    adSize: AdSize,
+    adUnitIdL : Int
+){
+    val adView = AdView(context)
+    adView.setAdSize(adSize)
+    adView.adUnitId = context.getString(adUnitIdL)
+    adsFrameLayout.addView(adView)
+
+    val adRequest = AdRequest.Builder().build()
+    adView.loadAd(adRequest)
+    adView.adListener = object : AdListener(){
+
+        override fun onAdFailedToLoad(adError: LoadAdError) {
+            super.onAdFailedToLoad(adError)
+            adsFrameLayout.gone()
+            adView.loadAd(adRequest)
+        }
+
+        override fun onAdLoaded() {
+            super.onAdLoaded()
+            adsFrameLayout.visible()
+        }
+    }
+
+}
+
+fun loadSmallMediumSizeNativeAds(context: Context, adUnitIdL: Int, templateView: TemplateView){
+    val adLoader = AdLoader.Builder(context,context.getString(adUnitIdL))
+        .forNativeAd { nativeAd ->
+            templateView.visible()
+            templateView.setNativeAd(nativeAd)
+        }.withAdListener(object : AdListener(){
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                templateView.gone()
+            }
+        }).build()
+    adLoader.loadAd(AdRequest.Builder().build())
+}
+
+
+fun View.gone(){
+    visibility = View.GONE
+}
+fun View.visible(){
+    visibility = View.VISIBLE
+}
