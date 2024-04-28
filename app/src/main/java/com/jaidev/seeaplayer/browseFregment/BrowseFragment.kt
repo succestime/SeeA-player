@@ -332,7 +332,7 @@ lateinit var mAdView : AdView
                     val timestamp = System.currentTimeMillis()
                     val historyItem = HistoryItem(url ?: "", websiteTitle, timestamp, favicon)
                     // Add history item to the HistoryManager
-                  HistoryManager.addHistoryItem(historyItem, requireContext())
+                HistoryManager.addHistoryItem(historyItem, requireContext())
 
                 }
 

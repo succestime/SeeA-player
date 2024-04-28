@@ -26,7 +26,6 @@ import com.jaidev.seeaplayer.browseFregment.BrowseFragment
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.databinding.ActivityHistoryBrowserBinding
-import java.util.Locale
 
 class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
     private var isEditTextVisible = false
@@ -100,36 +99,24 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                s?.let { searchText ->
-                    // Filter the history items based on the searchText
-                    val filteredList = historyItems.filter { historyItem ->
-                        // You can adjust the condition based on your filtering criteria.
-                        // Here, I'm filtering based on whether the URL contains the search text.
-                        historyItem.url.contains(searchText, ignoreCase = true)
-                    }
-                    // Update the adapter with the filtered list
-                    fileListAdapter.filterList(filteredList)
-                    // Update empty state visibility
-                    updateEmptyStateVisibility()
+                s?.let {
+                    // Filter items based on user input
+                    val searchText = s.toString().trim()
+                    filterItems(searchText)
                 }
             }
         })
 
     }
 
+    private fun filterItems(query: String) {
+        val filteredList = historyItems.filter { historyItem ->
+            historyItem.url.contains(query, ignoreCase = true) // Filter based on title, change this according to your requirements
+        }.toMutableList()
 
-    private fun filterFileItems(searchText: String) {
-        val filteredList = if (searchText.isEmpty()) {
-            // If search text is empty, show all items
-            historyItems.toList()
-        } else {
-            // Filter fileItems based on file name containing searchText
-            historyItems.filter { fileItem ->
-                fileItem.url.toLowerCase(Locale.getDefault()).contains(searchText)
-            }
-        }
         fileListAdapter.filterList(filteredList)
     }
+
 
     private fun handleEditTextTouch(v: View, event: MotionEvent) {
         val bounds: Rect = binding.editTextSearch.compoundDrawablesRelative[2].bounds
@@ -147,7 +134,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             if (touchArea.contains(event.x.toInt(), event.y.toInt())) {
                 // Hide editTextSearch
                 hideEditText()
-                filterFileItems("") // Passing empty string to show all files
+
 
 
                 return
@@ -164,7 +151,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         if (touchArea.contains(event.x.toInt(), event.y.toInt())) {
             // Clear the text in the EditText
             binding.editTextSearch.text?.clear()
-            filterFileItems("") // Passing empty string to show all files
+
 
         }
     }

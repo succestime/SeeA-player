@@ -13,28 +13,20 @@ object HistoryManager {
     fun addHistoryItem(item: HistoryItem, context: Context) {
         val historyList = getHistoryList(context).toMutableList()
 
-        // Check if the item already exists in the history list based on URL and title
-        val existingItems = historyList.filter { it.url == item.url && it.title == item.title }
+        // Check if the item already exists in the history list based on URL
+        val existingItem = historyList.find { it.url == item.url }
 
-        if (existingItems.isNotEmpty()) {
-            // Check if any existing item has a loaded image
-            val existingItemWithImage = existingItems.find { it.imageBitmap != null }
-
-            // If at least one existing item has a loaded image, remove all existing items without images
-            // and add the new item
-            if (existingItemWithImage != null) {
-                historyList.removeAll { it.imageBitmap == null && it.url == item.url && it.title == item.title }
-                historyList.add(0, item)
-            }
-        } else {
-            // Add the new item to the beginning of the list
-            historyList.add(0, item)
+        if (existingItem != null) {
+            // If the item already exists, remove it first
+            historyList.remove(existingItem)
         }
+
+        // Add the new item to the beginning of the list
+        historyList.add(0, item)
 
         // Save the updated history list
         saveHistoryList(historyList, context)
     }
-
 
 
     fun getHistoryList(context: Context): List<HistoryItem> {

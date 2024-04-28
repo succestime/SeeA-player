@@ -20,22 +20,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.internal.ViewUtils.hideKeyboard
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.BookmarkAdapter
-import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
+import com.jaidev.seeaplayer.allAdapters.SavedTitlesAdapter
 import com.jaidev.seeaplayer.browserActivity.BookmarkActivity
 import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.browserActivity.checkForInternet
-import com.jaidev.seeaplayer.dataClass.HistoryItem
-import com.jaidev.seeaplayer.dataClass.HistoryManager
-import com.jaidev.seeaplayer.dataClass.SearchHistoryItem
+import com.jaidev.seeaplayer.dataClass.SearchTitle
+import com.jaidev.seeaplayer.dataClass.SearchTitleStore
 import com.jaidev.seeaplayer.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var historyAdapter: HistoryAdapter
-    private var searchHistoryList: MutableList<SearchHistoryItem> = mutableListOf()
     private var isBtnTextUrlFocused = false // Flag to track if btnTextUrl has been focused
 
     override fun onCreateView(
@@ -159,21 +156,13 @@ class HomeFragment : Fragment() {
             }
         }
 
-        historyAdapter = HistoryAdapter(
-            HistoryBrowser.historyItems,
-            object : HistoryAdapter.ItemClickListener {
-                override fun onItemClick(historyItem: HistoryItem) {
-                    // Handle item click here, if needed
-                }
 
-            },
-            isHomeFragment = true
-
-        )
         binding.historyRecycler.setHasFixedSize(true)
         binding.historyRecycler.setItemViewCacheSize(5)
         binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
-        binding.historyRecycler.adapter = historyAdapter
+        binding.historyRecycler.adapter = SavedTitlesAdapter(requireContext())
+
+
 
 
 
@@ -211,17 +200,9 @@ class HomeFragment : Fragment() {
             startActivity(Intent(requireContext(), BookmarkActivity::class.java))
         }
 
-        loadHistoryItems()
+
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun loadHistoryItems() {
-        val historyList = HistoryManager.getHistoryList(requireContext())
-        val limitedHistoryList = historyList.take(15)
-        HistoryBrowser.historyItems.clear()
-        HistoryBrowser.historyItems.addAll(limitedHistoryList)
-        updateEmptyStateVisibility()
-    }
 
     private fun updateEmptyStateVisibility() {
         if (HistoryBrowser.historyItems.isEmpty()) {
@@ -232,9 +213,17 @@ class HomeFragment : Fragment() {
     }
 
     // Inside performSearch() method
+    // Inside performSearch() method
     private fun performSearch(query: String) {
         if (checkForInternet(requireContext())) {
-            // Save the search topic
+            // Check if the title is already saved
+            val isTitleSaved = SearchTitleStore.getTitles(requireContext()).any { it.title == query }
+
+            if (!isTitleSaved) {
+                // Create a SearchTitle object with the query and save it
+                val searchTitle = SearchTitle(query)
+                SearchTitleStore.addTitle(requireContext(), searchTitle)
+            }
 
             // Change tab and perform search
             changeTab(query, BrowseFragment(query))
@@ -242,6 +231,8 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 
 
 }
