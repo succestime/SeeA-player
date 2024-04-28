@@ -1,5 +1,5 @@
 
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.musicActivity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -13,6 +13,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.jaidev.seeaplayer.PlayerActivity
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.FavouriteAdapter
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.checkPlaylist
@@ -38,16 +40,23 @@ class FavouriteActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         favouriteSongs = checkPlaylist(favouriteSongs)
-
-
         binding.favouriteRV.setHasFixedSize(true)
         binding.favouriteRV.setItemViewCacheSize(13)
-        binding.favouriteRV.layoutManager = GridLayoutManager(this, 4)
+        binding.favouriteRV.layoutManager = GridLayoutManager(this, 3)
         adapter = FavouriteAdapter(this, favouriteSongs)
         binding.favouriteRV.adapter = adapter
 
         favouritesChanged = false
 
+        shuffleEmpty()
+        setActionBarGradient()
+        favouritelayout = binding.favouriteLayout
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
+        loadFavouriteSongs()
+    }
+
+    private fun shuffleEmpty(){
         if(favouriteSongs.size < 1) binding.shuffleBtnFA.visibility = View.INVISIBLE
 
         binding.shuffleBtnFA.setOnClickListener {
@@ -57,21 +66,16 @@ class FavouriteActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
-        setActionBarGradient()
-        favouritelayout = binding.favouriteLayout
-
-        // Set the background color of SwipeRefreshLayout based on app theme
-        setSwipeRefreshBackgroundColor()
-
         // Update visibility of emptyStateLayout
         if (favouriteSongs.isEmpty()) {
             binding.emptyStateLayout.visibility = View.VISIBLE
         } else {
             binding.emptyStateLayout.visibility = View.GONE
         }
-        loadFavouriteSongs()
     }
+
+
+
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -91,7 +95,7 @@ class FavouriteActivity : AppCompatActivity() {
         val nightMode = AppCompatDelegate.getDefaultNightMode()
         if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
             // Light mode is applied
-           supportActionBar?.apply {
+            supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         this@FavouriteActivity,
@@ -99,9 +103,9 @@ class FavouriteActivity : AppCompatActivity() {
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
-           supportActionBar?.apply {
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
+            supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         this@FavouriteActivity,
@@ -109,8 +113,37 @@ class FavouriteActivity : AppCompatActivity() {
                     )
                 )
             }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@FavouriteActivity,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@FavouriteActivity,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
+            }
         }
     }
+
 
 
     @SuppressLint("NotifyDataSetChanged")

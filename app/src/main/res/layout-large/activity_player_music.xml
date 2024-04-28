@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/PlayerMusicLayout"
     android:orientation="vertical"
-    tools:context=".PlayerMusicActivity">
+    tools:context=".musicActivity.PlayerMusicActivity">
 
     <!--    First Row-->
     <LinearLayout

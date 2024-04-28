@@ -28,6 +28,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -60,6 +61,7 @@ import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.databinding.ActivityMainBinding
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -115,20 +117,21 @@ class MainActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.apply()
 
-
         when (getCheckedItem()) {
             0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupActionBar()
-
+        navView()
+        bottomNav()
+        funRequestRuntimePermission()
+        setActionBarGradient()
         // Check internet connectivity and show/hide the "Subscribe" TextView
         checkInternetConnection()
 
@@ -142,33 +145,15 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
 
 
-        setActionBarGradient()
         drawerLayout = binding.drawerLayoutMA
         // Set the background color of SwipeRefreshLayout based on app theme
+
+        navView = binding.navView
+        val linearLayoutNav = findViewById<LinearLayout>(R.id.linearLayoutNav)
+
         setDrawerLayoutBackgroundColor()
 
-        if (requestRuntimePermission()) {
-            folderList = ArrayList()
-            videoList = getAllVideos()
-            MusicListMA = getAllAudios()
-            setFragment(homeNav())
 
-//            FavoritesManager.loadFavorites(this@MainActivity)
-
-            runnable = Runnable {
-                if(dataChanged){
-                    dataChanged = false
-                    adapterChanged = true
-                }
-                Handler(Looper.getMainLooper()).postDelayed(runnable!!, 200)
-            }
-            Handler(Looper.getMainLooper()).postDelayed(runnable!!, 0)
-        } else {
-            folderList = ArrayList()
-            videoList = ArrayList()
-            MusicListMA = getAllAudios()
-            setFragment(homeNav())
-        }
 // Check if the service needs to be started
         if (shouldStartService()) {
             startMediaScanService()
@@ -181,41 +166,9 @@ class MainActivity : AppCompatActivity() {
             mInterstitialAd?.show(this)
         }
 
+    }
 
-
-        binding.bottomNav.setOnItemSelectedListener {
-
-            try {
-                when (it.itemId) {
-                    R.id.home -> {
-                        setFragment(homeNav())
-                    }
-
-                    R.id.music -> {
-                        setFragment(musicNav())
-                    }
-
-                    R.id.download -> {
-                        setFragment(downloadNav())
-                    }
-
-                    R.id.linkTube -> {
-                        val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
-                        startActivity(intent)
-                    }
-
-                    R.id.more -> {
-                        val intent = Intent(this@MainActivity, More::class.java)
-                        startActivity(intent)
-                    }
-
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Error coming", Toast.LENGTH_SHORT).show()
-            }
-            return@setOnItemSelectedListener true
-        }
-
+    private fun navView(){
         binding.navView.setNavigationItemSelectedListener {
 
             when (it.itemId) {
@@ -320,9 +273,66 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-
     }
+
+    private fun bottomNav(){
+        binding.bottomNav.setOnItemSelectedListener {
+
+            try {
+                when (it.itemId) {
+                    R.id.home -> {
+                        setFragment(homeNav())
+                    }
+
+                    R.id.music -> {
+                        setFragment(musicNav())
+                    }
+
+                    R.id.download -> {
+                        setFragment(downloadNav())
+                    }
+
+                    R.id.linkTube -> {
+                        val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
+                        startActivity(intent)
+                    }
+
+                    R.id.more -> {
+                        val intent = Intent(this@MainActivity, More::class.java)
+                        startActivity(intent)
+                    }
+
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Error coming", Toast.LENGTH_SHORT).show()
+            }
+            return@setOnItemSelectedListener true
+        }
+    }
+private fun funRequestRuntimePermission(){
+    if (requestRuntimePermission()) {
+        folderList = ArrayList()
+        videoList = getAllVideos()
+        MusicListMA = getAllAudios()
+        setFragment(homeNav())
+
+//            FavoritesManager.loadFavorites(this@MainActivity)
+
+        runnable = Runnable {
+            if(dataChanged){
+                dataChanged = false
+                adapterChanged = true
+            }
+            Handler(Looper.getMainLooper()).postDelayed(runnable!!, 200)
+        }
+        Handler(Looper.getMainLooper()).postDelayed(runnable!!, 0)
+    } else {
+        folderList = ArrayList()
+        videoList = ArrayList()
+        MusicListMA = getAllAudios()
+        setFragment(homeNav())
+    }
+}
     private fun setupActionBar() {
         supportActionBar?.setDisplayShowCustomEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -368,6 +378,7 @@ class MainActivity : AppCompatActivity() {
             .putInt(CHECKED_ITEM, i)
             .apply()
     }
+    @SuppressLint("ResourceType")
     private fun setDrawerLayoutBackgroundColor() {
 
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -377,10 +388,12 @@ class MainActivity : AppCompatActivity() {
 
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
-        drawerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            drawerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            navView.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
         } else {
             // Light mode is enabled, set background color to white
             drawerLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            navView.setBackgroundColor(resources.getColor(R.color.light_navBar))
         }
     }
     private fun shouldStartService(): Boolean {
@@ -579,7 +592,6 @@ class MainActivity : AppCompatActivity() {
         if (toggle.onOptionsItemSelected(item))
             return true
 
-
         // Handle other menu items if needed
         return super.onOptionsItemSelected(item)
     }
@@ -761,7 +773,7 @@ class MainActivity : AppCompatActivity() {
         // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()
         if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-//             Light mode is applied
+            // Light mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -770,9 +782,9 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
-            supportActionBar?.apply {
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
+          supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         this@MainActivity,
@@ -780,8 +792,37 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@MainActivity,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+               supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@MainActivity,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
+            }
         }
     }
+
 
 
 

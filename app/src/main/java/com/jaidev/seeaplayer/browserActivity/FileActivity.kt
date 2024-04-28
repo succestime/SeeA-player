@@ -77,18 +77,54 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         // Set up RecyclerView and adapter
         fileListAdapter = FileAdapter(this, fileItems, this)
 
-        binding.settingBrowser.setOnClickListener {
-            showSettingDialog()
-
-        }
-
         binding.recyclerFileView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@FileActivity)
             adapter = fileListAdapter
         }
 
+        thread()
+        initializeBinding()
+        // Call method to retrieve downloaded files
+        val fileList = retrieveDownloadedFiles()
+        fileItems.addAll(fileList)
+        fileListAdapter.notifyDataSetChanged()
 
+        // Additional setup and initialization...
+
+
+
+
+        binding.totalFile.text = "Total Downloaded files : ${fileList.size}"
+
+        selectBox(binding.monthlyBox)
+    }
+
+    private fun thread(){
+        thread {
+            val websiteUrl = "https://www.google.com" // Replace with the target website URL
+
+            val fileDetails = fetchFileDetailsFromWebsite(websiteUrl)
+
+            // Check if file details are retrieved successfully
+            if (fileDetails != null) {
+                val (fileUrl, fileName) = fileDetails
+
+                // Start the file download using the obtained file URL and filename
+                FileDownloader.downloadFile(this@FileActivity, fileUrl, fileName)
+            } else {
+                // Handle error or display a message if file details retrieval fails
+            }
+        }
+
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initializeBinding(){
+        binding.settingBrowser.setOnClickListener {
+            showSettingDialog()
+
+        }
         binding.imageButtonSearch.setOnClickListener {
             // Show editTextSearch
             binding.editTextSearch.visibility = View.VISIBLE
@@ -128,37 +164,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
                 }
             }
         })
-        // Call method to retrieve downloaded files
-        val fileList = retrieveDownloadedFiles()
-        fileItems.addAll(fileList)
-        fileListAdapter.notifyDataSetChanged()
-
-        // Additional setup and initialization...
-
-
-    thread {
-            val websiteUrl = "https://www.google.com" // Replace with the target website URL
-
-            val fileDetails = fetchFileDetailsFromWebsite(websiteUrl)
-
-            // Check if file details are retrieved successfully
-            if (fileDetails != null) {
-                val (fileUrl, fileName) = fileDetails
-
-                // Start the file download using the obtained file URL and filename
-                FileDownloader.downloadFile(this@FileActivity, fileUrl, fileName)
-            } else {
-                // Handle error or display a message if file details retrieval fails
-            }
-        }
-
-        binding.totalFile.text = "Total Downloaded files : ${fileList.size}"
-
-        selectBox(binding.monthlyBox)
     }
-
-
-
 
 
     private fun showSettingDialog() {

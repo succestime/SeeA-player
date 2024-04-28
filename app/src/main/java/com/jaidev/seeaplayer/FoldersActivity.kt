@@ -27,7 +27,8 @@ import java.io.File
 
 
 
-class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
+class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
+    {
     private lateinit var binding: ActivityFoldersBinding
     private lateinit var adapter: VideoAdapter
     private var isSearchViewClicked = false
@@ -38,6 +39,8 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
     private val LAYOUT_TYPE_GRID = "grid"
     private val LAYOUT_TYPE_LIST = "list"
     private var songImageHeight: Int = 0
+    private var videoRenameListener: VideoAdapter.VideoRenameListener? = null
+
     companion object {
         lateinit var currentFolderVideos: ArrayList<VideoData>
     }
@@ -69,6 +72,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
 
 
 
+
         // Restore layout type from SharedPreferences
         val savedLayoutType = getSharedPreferences("LayoutPrefs", Context.MODE_PRIVATE)
             .getString(PREF_LAYOUT_TYPE, LAYOUT_TYPE_LIST)
@@ -77,6 +81,21 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
         } else {
             setListLayoutManager()
         }
+
+
+        initializeBinding()
+        toggleLayoutManager()
+
+        setActionBarGradient()
+        swipeRefreshLayout = binding.swipeRefreshFolder
+
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
+
+    }
+    @SuppressLint("SetTextI18n")
+    private fun initializeBinding(){
+        val position = intent.getIntExtra("position", 0)
 
         binding.swipeRefreshFolder.setOnRefreshListener {
 
@@ -87,7 +106,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
             binding.swipeRefreshFolder.isRefreshing = false // Hide the refresh indicator
 
         }
-
         binding.nowPlayingBtn.setOnClickListener {
             val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
             intent.putExtra("class", "NowPlaying")
@@ -106,14 +124,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
             setListLayoutManager()
 
         }
-
-        toggleLayoutManager()
-
-        setActionBarGradient()
-        swipeRefreshLayout = binding.swipeRefreshFolder
-
-        // Set the background color of SwipeRefreshLayout based on app theme
-        setSwipeRefreshBackgroundColor()
 
     }
 
@@ -242,7 +252,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
                         // Filter videos based on the user's input
                         if (video.title.lowercase().contains(queryText)) {
                             MainActivity.searchList.add(video)
-//                            binding.searchBackBtn.visibility = View.VISIBLE
                         }
 
                     }
@@ -253,11 +262,9 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
                 // Check if the search view is clicked or if there is text in the search view
                 if (isSearchViewClicked || newText?.isNotEmpty() == true) {
                     binding.recyclerView.visibility = View.VISIBLE
-//                    binding.searchBackBtn.visibility = View.VISIBLE
 
                 } else {
                     binding.recyclerView.visibility = View.GONE
-//                    binding.searchBackBtn.visibility = View.GONE
 
                 }
 
@@ -340,20 +347,48 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
-                       this@FoldersActivity,
+                        this@FoldersActivity,
                         R.drawable.background_actionbar_light
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
-                       this@FoldersActivity,
+                        this@FoldersActivity,
                         R.drawable.background_actionbar
                     )
                 )
+            }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@FoldersActivity,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@FoldersActivity,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
             }
         }
     }
@@ -365,4 +400,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener{
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged= false
     }
+
+
 }

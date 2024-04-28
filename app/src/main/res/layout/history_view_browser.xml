@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:orientation="horizontal">
@@ -23,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:text="PDF Title"
-        android:maxLines="2"
+        android:maxLines="1"
         android:gravity="center_vertical"
         android:textColor="@color/white"
         app:layout_constraintStart_toEndOf="@+id/historyView"
@@ -44,5 +45,13 @@
         app:tint="@color/white" />
 
     <!-- Add more metadata views if needed -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#373636"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        tools:ignore="MissingConstraints">
 
+    </View>
 </androidx.constraintlayout.widget.ConstraintLayout>

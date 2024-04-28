@@ -3,8 +3,8 @@ package com.jaidev.seeaplayer.dataClass
 
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import com.jaidev.seeaplayer.FavouriteActivity
-import com.jaidev.seeaplayer.PlayerMusicActivity
+import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess

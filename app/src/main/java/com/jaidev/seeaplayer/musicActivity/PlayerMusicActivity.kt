@@ -1,5 +1,5 @@
 
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.musicActivity
 
 import android.annotation.SuppressLint
 import android.content.ComponentName
@@ -27,6 +27,8 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.exitApplication
@@ -35,9 +37,6 @@ import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.ActivityPlayerMusicBinding
-import com.jaidev.seeaplayer.musicActivity.NowPlaying
-import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
-import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 
 class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer.OnCompletionListener {
 
@@ -87,9 +86,18 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
-
-
+        unKnown()
+        initializeBinding()
         updateNextMusicTitle()
+
+
+        playerMusicLayout = binding.PlayerMusicLayout
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setMusicLayoutBackgroundColor()
+
+    }
+
+    private fun unKnown(){
         if(intent.data?.scheme.contentEquals("content")){
             songPosition = 0
             val intentService = Intent(this, MusicService::class.java)
@@ -105,10 +113,19 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
         else initializeLayout()
 
+
+    }
+    private fun initializeBinding(){
         binding.backBtnPA.setOnClickListener { finish() }
         binding.playPauseBtnPA.setOnClickListener {
-            if (isPlaying) pauseMusic()
-            else playMusic()
+            if (isPlaying) {
+                pauseMusic()
+                musicService!!.showNotification(R.drawable.play_music_icon)
+            }
+            else {
+                playMusic()
+                musicService!!.showNotification(R.drawable.ic_pause_icon)
+            }
         }
         binding.previousBtnPA.setOnClickListener {
             prevNextSong(increment = false)
@@ -122,7 +139,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     musicService!!.mediaPlayer!!.seekTo(progress)
-                 musicService!!.showNotification(if (isPlaying) R.drawable.ic_pause_icon else R.drawable.play_icon)
+                    musicService!!.showNotification(if (isPlaying) R.drawable.ic_pause_icon else R.drawable.play_icon)
                 }
             }
 
@@ -200,16 +217,11 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             } else{
                 isFavourite = true
                 binding.favouriteBtnPA.setImageResource(R.drawable.favorite_icon)
-           FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
+                FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
             }
         }
 
-        playerMusicLayout = binding.PlayerMusicLayout
-        // Set the background color of SwipeRefreshLayout based on app theme
-        setMusicLayoutBackgroundColor()
-
     }
-
     private fun   setMusicLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -388,6 +400,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
         createMediaPlayer()
         musicService!!.seekBarSetup()
+
 
 
     }

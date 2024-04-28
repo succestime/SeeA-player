@@ -85,6 +85,8 @@ class moreNav : Fragment() {
     }
 
 
+
+
     private fun checkConnection(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -174,8 +176,8 @@ class moreNav : Fragment() {
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
             (activity as AppCompatActivity).supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -184,8 +186,38 @@ class moreNav : Fragment() {
                     )
                 )
             }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                (activity as AppCompatActivity).supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                (activity as AppCompatActivity).supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
+            }
         }
     }
+
+
     override fun onResume() {
         super.onResume()
         binding.userDetails.text = updateData()

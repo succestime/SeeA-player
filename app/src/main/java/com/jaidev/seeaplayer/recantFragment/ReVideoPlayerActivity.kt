@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer.recantFragment
 
 import android.annotation.SuppressLint
@@ -54,11 +55,11 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.allAdapters.RecentVideoAdapter
 import com.jaidev.seeaplayer.allAdapters.PlaybackIconsAdapter
+import com.jaidev.seeaplayer.allAdapters.RecentVideoAdapter
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.dataClass.IconModel
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.databinding.ActivityRePlayerBinding
@@ -379,7 +380,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                         setupBoosterDialog()
                     }
 
-                   8 -> {
+                    8 -> {
                         setupPIPMode()
                     }
 
@@ -449,7 +450,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 .setOnCancelListener { playVideo() }
                 .setPositiveButton("Done") { self, _ ->
                     Toast.makeText(this@ReVideoPlayerActivity, "Sleep Timer is start", Toast.LENGTH_SHORT).show()
-                  timer = Timer()
+                    timer = Timer()
                     val task = object : TimerTask() {
                         override fun run() {
                             moveTaskToBack(true)
@@ -457,7 +458,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                         }
                     }
 
-                   timer!!.schedule(task, sleepTime * 60 * 1000.toLong())
+                    timer!!.schedule(task, sleepTime * 60 * 1000.toLong())
                     self.dismiss()
                     playVideo()
                 }
@@ -510,7 +511,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
             .setOnCancelListener { playVideo() }
             .setPositiveButton("Done") { _, _ ->
-               loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress * 100)
+                loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress * 100)
                 playVideo()
                 // dialog.dismiss()
             }
@@ -544,7 +545,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 // dialog.dismiss()
                 binding.playerView.showContextMenu()
                 playVideo()
-             pipStatus = 0
+                pipStatus = 0
             } else {
                 val intent = Intent(
                     "android.settings.PICTURE_IN_PICTURE_SETTINGS",
@@ -563,7 +564,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         when (intent.getStringExtra("class")) {
             "RecantVideo" -> {
                 recantPlayerList = ArrayList()
-         recantPlayerList.addAll(MainActivity.videoRecantList)
+                recantPlayerList.addAll(MainActivity.videoRecantList)
                 createPlayer()
             }
         }
@@ -639,7 +640,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 binding.lockButton.setImageResource(R.drawable.ic_lock_open_icon)
             }
         }
-   }
+    }
 
     private fun createPlayer() {
 
@@ -790,7 +791,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         super.onDestroy()
         player.pause()
         player.release()
-  audioManager?.abandonAudioFocus(this)
+        audioManager?.abandonAudioFocus(this)
 
     }
 

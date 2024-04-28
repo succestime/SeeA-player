@@ -8,7 +8,6 @@ import android.content.Intent
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.ApplicationClass
-import com.jaidev.seeaplayer.PlayerMusicActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.dataClass.favouriteChecker

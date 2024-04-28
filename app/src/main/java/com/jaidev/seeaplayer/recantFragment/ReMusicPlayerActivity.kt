@@ -26,8 +26,8 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
-import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.dataClass.reFormatDuration
@@ -45,7 +45,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         var songPosition: Int = 0
         var isPlaying: Boolean = false
         var musicService : MusicService? = null
-        private var isServiceBound = false
+        private var isServiceBound = null
         var position: Int = -1
         var min15: Boolean = false
         var min30: Boolean = false
@@ -87,6 +87,8 @@ class ReMusicPlayerActivity : AppCompatActivity()
         supportActionBar?.hide()
         updateNextMusicTitle()
         initializeLayout()
+        initializeBinding()
+
 
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
@@ -94,6 +96,15 @@ class ReMusicPlayerActivity : AppCompatActivity()
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
 
+
+
+
+        reMusicPlayerLayout = binding.ReMusicPlayerLayout
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setMusicLayoutBackgroundColor()
+    }
+
+    private fun initializeBinding(){
         binding.backBtnPA.setOnClickListener { finish() }
 
         binding.playPauseBtnPA.setOnClickListener {
@@ -177,12 +188,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
             startActivity(Intent.createChooser(shareIntent, "Sharing Music File!!"))
 
         }
-
-        reMusicPlayerLayout = binding.ReMusicPlayerLayout!!
-        // Set the background color of SwipeRefreshLayout based on app theme
-        setMusicLayoutBackgroundColor()
     }
-
     private fun   setMusicLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -309,24 +315,19 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         if (service is MusicService.MyBinder) {
-            musicService = service.currentService()
-            isServiceBound = true
+            val binder = service as MusicService.MyBinder
+            ReMusicPlayerActivity.musicService = binder.currentService()
+//            isServiceBound = true
         }
-        createMediaPlayer()
+      createMediaPlayer()
         musicService!!.reSeekSetup()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        isServiceBound = false
+        isServiceBound = null
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isServiceBound) {
-            isServiceBound = false
-        }
-    }
 
     override fun onCompletion(p0: MediaPlayer?) {
         setSongPosition(increment = true)

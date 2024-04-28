@@ -1,5 +1,3 @@
-
-
 package com.jaidev.seeaplayer.bottomNavigation
 
 import android.annotation.SuppressLint
@@ -13,9 +11,9 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
 
@@ -59,12 +57,6 @@ class homeNav : Fragment() {
             refreshFolders()
         }
 
-//        binding.searchBackBtn.setOnClickListener {
-//            binding.searchRecyclerView.visibility = View.GONE
-//            binding.searchBackBtn.visibility = View.GONE
-//        }
-
-
         swipeRefreshLayout = binding.swipeRefreshFolder
 
         // Set the background color of SwipeRefreshLayout based on app theme
@@ -103,11 +95,6 @@ class homeNav : Fragment() {
 
         searchView = searchItem?.actionView as SearchView
 
-//        // Set an expand listener to track whether the search view is explicitly clicked
-//        searchView.setOnSearchClickListener {
-//            isSearchViewClicked = true
-//        }
-
         // Set a collapse listener to track when the search view is closed
         searchView.setOnCloseListener {
             isSearchViewClicked = false
@@ -127,7 +114,6 @@ class homeNav : Fragment() {
                         // Filter videos based on the user's input
                         if (video.title.lowercase().contains(queryText)) {
                             MainActivity.searchList.add(video)
-//                            binding.searchBackBtn.visibility = View.VISIBLE
 
                         }
                     }
@@ -138,10 +124,8 @@ class homeNav : Fragment() {
                 // Check if the search view is clicked or if there is text in the search view
                 if (isSearchViewClicked || newText?.isNotEmpty() == true) {
                   binding.searchRecyclerView.visibility = View.VISIBLE
-//                   binding.searchBackBtn.visibility = View.VISIBLE
                 } else {
                     binding.searchRecyclerView.visibility = View.GONE
-//                    binding.searchBackBtn.visibility = View.GONE
                 }
                 return true
             }

@@ -88,7 +88,7 @@ class LinkTubeActivity : AppCompatActivity() {
         lateinit var tabsBtn : MaterialTextView
         const val REQUEST_CODE_SPEECH_INPUT = 2000
 
-
+        private const val TABS_LIST_KEY = "tabs_list"
 
     }
 
@@ -105,18 +105,29 @@ class LinkTubeActivity : AppCompatActivity() {
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         rewardedIAd()
+        initializeView()
+        initializeBinding()
+        getAllBookmarks()
+
         // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
 
-        getAllBookmarks()
+
         tabsList.add(Tab("Home",HomeFragment(), LinkTubeActivity()))
         binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
         binding.myPager.isUserInputEnabled = false
         myPager = binding.myPager
         tabsBtn = binding.tabBtn
-        initializeView()
+
         changeFullscreen(enable = true)
+
+
+
+
+    }
+
+    private  fun initializeBinding(){
         binding.googleMicBtn.setOnClickListener {
             speak()
         }
@@ -150,11 +161,11 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     R.id.download -> {
-                      startActivity(Intent(this, FileActivity::class.java))
+                        startActivity(Intent(this, FileActivity::class.java))
                     }
 
                     R.id.save -> {
-                    save()
+                        save()
                     }
 
                     R.id.bookmark -> {
@@ -214,8 +225,8 @@ class LinkTubeActivity : AppCompatActivity() {
                     R.id.download -> {
                         startActivity(Intent(this, FileActivity::class.java))
                     }
-                  R.id.save -> {
-                    save()
+                    R.id.save -> {
+                        save()
                     }
                     R.id.bookmark -> {
                         bookMark()
@@ -255,14 +266,14 @@ class LinkTubeActivity : AppCompatActivity() {
 
         // Show or hide the buttons based on the device type
         if (isTablet) {
-           binding.backBrowserBtn.visibility = View.VISIBLE
-           binding.forwardBrowserBtn.visibility = View.VISIBLE
+            binding.backBrowserBtn.visibility = View.VISIBLE
+            binding.forwardBrowserBtn.visibility = View.VISIBLE
         } else {
             binding.backBrowserBtn.visibility = View.GONE
-         binding.forwardBrowserBtn.visibility = View.GONE
+            binding.forwardBrowserBtn.visibility = View.GONE
         }
-
     }
+
 
     private fun desktopMade(){
         var frag: BrowseFragment? = null
@@ -453,15 +464,7 @@ class LinkTubeActivity : AppCompatActivity() {
             .show()
     }
 
-    //   Assuming 'webView' and 'dbHandler' are properly initialized within the class
-    fun saveData() {
-        var frag: BrowseFragment? = null
-        try {
-            frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
-        } catch (_: Exception) {
-        }
-        val webUrl =  frag?.binding?.webView?.url
-    }
+
 
     fun speak() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -554,24 +557,22 @@ class LinkTubeActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     @SuppressLint("NotifyDataSetChanged")
     override fun onBackPressed() {
-
         var frag: BrowseFragment? = null
         try {
             frag = tabsList[binding.myPager.currentItem] as BrowseFragment
         } catch (_: Exception) {
         }
+
         when {
             frag?.binding?.webView?.canGoBack() == true -> frag.binding.webView.goBack()
             binding.myPager.currentItem != 0 -> {
                 tabsList.removeAt(binding.myPager.currentItem)
                 binding.myPager.adapter!!.notifyDataSetChanged()
                 binding.myPager.currentItem = tabsList.size - 1
-                // saveData()
-            }
 
+            }
             else -> super.onBackPressed()
         }
-
     }
 
     private inner class TabsAdapter(fa: FragmentManager, lc: Lifecycle) :
@@ -659,6 +660,9 @@ class LinkTubeActivity : AppCompatActivity() {
 
         }
     }
+    override fun onPause() {
+        super.onPause()
+    }
 
     override fun onResume() {
         super.onResume()
@@ -669,6 +673,7 @@ class LinkTubeActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun saveAsPdf(web: WebView){
         val pm = getSystemService(Context.PRINT_SERVICE) as PrintManager

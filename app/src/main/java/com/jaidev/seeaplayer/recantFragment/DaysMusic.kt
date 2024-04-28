@@ -37,6 +37,7 @@ class DaysMusic : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view =  inflater.inflate(R.layout.fragment_days_music, container, false)
         binding = FragmentDaysMusicBinding.bind(view)
+
         binding.MusicRV.setHasFixedSize(true)
         binding.MusicRV.setItemViewCacheSize(13)
         binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
@@ -57,17 +58,6 @@ class DaysMusic : Fragment() {
         }, 2000) // 2000 milliseconds (2 seconds)
 
 
-        binding.shuffleBtn.setOnClickListener {
-            val intent = Intent(requireContext() , ReMusicPlayerActivity::class.java)
-            intent.putExtra("index" , 0)
-            intent.putExtra("class" , "DaysMusic")
-            startActivity(intent)
-        }
-        if (musicRecantList.isEmpty()) {
-            binding.shuffleBtn.visibility = View.GONE
-        } else {
-            binding.shuffleBtn.visibility = View.VISIBLE
-        }
 
         swipeRefreshLayout = binding.swipeRefreshMusic
 
@@ -78,6 +68,21 @@ class DaysMusic : Fragment() {
         return view
     }
 
+    private fun shuffleEmpty(){
+        binding.shuffleBtn.setOnClickListener {
+            val intent = Intent(requireContext() , ReMusicPlayerActivity::class.java)
+            intent.putExtra("index" , 0)
+            intent.putExtra("class" , "DaysMusic")
+            startActivity(intent)
+        }
+
+        if (musicRecantList.isEmpty()) {
+            binding.shuffleBtn.visibility = View.GONE
+        } else {
+            binding.shuffleBtn.visibility = View.VISIBLE
+        }
+
+    }
     private fun requestRuntimePermission(): Boolean {
         // Check for permission based on Android version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

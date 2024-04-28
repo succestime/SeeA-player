@@ -36,11 +36,10 @@
             android:value="ca-app-pub-3940256099942544~3347511713"/>
 
         <activity
-            android:name=".SettingDownloads"
-            android:exported="false" />
-        <activity
             android:name=".browserActivity.HistoryBrowser"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".browserActivity.ImageViewerActivity"
             android:exported="false" />
@@ -119,20 +118,18 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".FavouriteActivity"
+            android:name=".musicActivity.FavouriteActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".PlayerMusicActivity"
+            android:name=".musicActivity.PlayerMusicActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
 
         </activity>
-        <activity
-            android:name=".bottom_sheet"
-            android:exported="false" />
+
         <activity
             android:name=".recantFragment.ReVideoPlayerActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"

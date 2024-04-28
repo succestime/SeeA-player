@@ -23,7 +23,12 @@ class SeeaEduProcess : AppCompatActivity() {
         binding = ActivitySeeaEduProcessBinding.inflate(layoutInflater)
         supportActionBar?.hide()
         setContentView(binding.root)
+        initializeBinding()
 
+
+    }
+
+    private fun initializeBinding(){
         val items = listOf("Months", "Years")
         val itemsNull = listOf("Null")
         val itemsMonth = listOf("Month (1)", "Months (Quarterly)")
@@ -105,7 +110,9 @@ class SeeaEduProcess : AppCompatActivity() {
             val itemSelected = adapterView.getItemAtPosition(i)
             Toast.makeText(this, "Item: $itemSelected", Toast.LENGTH_SHORT).show()
         }
+
     }
+
 
     private fun calculateAmount(time: String, quantity: Int): String {
         val amount = when (time) {

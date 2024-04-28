@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jaidev.seeaplayer.PlayerMusicActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.dataClass.checkPlaylist
@@ -47,6 +46,15 @@ class PlaylistDetails : AppCompatActivity() {
         adapter = MusicAdapter(this, PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist,  playlistDetails = true)
         binding.playlistDetailsRV.adapter = adapter
 
+        shuffleAddRemove()
+        setActionBarGradient()
+        playlistdetailsLayout = binding.playlistDetailsLayout
+
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
+    }
+
+    private fun shuffleAddRemove(){
         binding.shuffleBtnPD.setOnClickListener {
             val intent = Intent(this, PlayerMusicActivity::class.java)
             intent.putExtra("index", 0)
@@ -77,12 +85,6 @@ class PlaylistDetails : AppCompatActivity() {
 
         }
 
-
-        setActionBarGradient()
-        playlistdetailsLayout = binding.playlistDetailsLayout
-
-        // Set the background color of SwipeRefreshLayout based on app theme
-        setSwipeRefreshBackgroundColor()
     }
 
     private fun setSwipeRefreshBackgroundColor() {
@@ -113,8 +115,8 @@ class PlaylistDetails : AppCompatActivity() {
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -122,6 +124,34 @@ class PlaylistDetails : AppCompatActivity() {
                         R.drawable.background_actionbar
                     )
                 )
+            }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@PlaylistDetails,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@PlaylistDetails,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
             }
         }
     }

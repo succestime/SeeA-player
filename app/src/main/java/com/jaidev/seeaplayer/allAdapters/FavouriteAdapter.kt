@@ -10,8 +10,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.jaidev.seeaplayer.FavouriteActivity.Companion.favouriteSongs
-import com.jaidev.seeaplayer.PlayerMusicActivity
+import com.jaidev.seeaplayer.musicActivity.FavouriteActivity.Companion.favouriteSongs
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.databinding.FavouriteViewBinding

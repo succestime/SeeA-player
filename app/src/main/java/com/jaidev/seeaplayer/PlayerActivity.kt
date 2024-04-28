@@ -157,15 +157,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         player.setMediaItem(mediaItem)
         player.prepare()
 
-        videoTitle = findViewById(R.id.videoTitle)
-        playPauseBtn = findViewById(R.id.playPauseBtn)
-        fullScreenBtn = findViewById(R.id.fullScreenBtn)
-        durationChangeTextView = findViewById(R.id.durationChangeTextView)
-        durationChangeTextView.visibility = View.GONE
 
-        nightMode = findViewById(R.id.night_mode)
-        recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
-        eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
         // for immersive mode
@@ -183,8 +175,23 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         filePickerDialog.setPositiveBtnName("OK")
         filePickerDialog.setNegativeBtnName("Cancel")
 
-
+        someIdes()
         horizontalIconList()
+        directPlayVideoFromGallery()
+    }
+
+private fun someIdes(){
+    videoTitle = findViewById(R.id.videoTitle)
+    playPauseBtn = findViewById(R.id.playPauseBtn)
+    fullScreenBtn = findViewById(R.id.fullScreenBtn)
+    durationChangeTextView = findViewById(R.id.durationChangeTextView)
+    durationChangeTextView.visibility = View.GONE
+
+    nightMode = findViewById(R.id.night_mode)
+    recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
+    eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
+}
+    private fun directPlayVideoFromGallery(){
         try {
             if (intent.data?.scheme.contentEquals("content")) {
                 playerList = ArrayList()
@@ -218,25 +225,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         } catch (e: Exception) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
-// Check if this activity was started with a share intent
-        if (Intent.ACTION_SEND == intent.action && intent.type?.startsWith("video/") == true) {
-            handleSharedVideo(intent) // Handle the shared video
-        } else {
-            // Normal initialization for non-shared content
-            initializeLayout()
-            initializeBinding()
-        }
-    }
-    private fun handleSharedVideo(intent: Intent) {
-        val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-        if (uri != null) {
-            // Initialize player with the shared video URI
-            initializePlayerWithUri(uri)
-        } else {
-            // Handle case where URI is null or invalid
-            Toast.makeText(this, "Invalid shared video", Toast.LENGTH_SHORT).show()
-            finish() // Close the activity if URI is invalid
-        }
+
     }
 
     private fun initializePlayerWithUri(uri: Uri) {

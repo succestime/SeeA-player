@@ -18,12 +18,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.internal.ViewUtils.hideKeyboard
-import com.jaidev.seeaplayer.browserActivity.BookmarkActivity
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.BookmarkAdapter
+import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
+import com.jaidev.seeaplayer.browserActivity.BookmarkActivity
 import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
-import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
 import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.browserActivity.checkForInternet
 import com.jaidev.seeaplayer.dataClass.HistoryItem
@@ -72,7 +72,7 @@ class HomeFragment : Fragment() {
 
         linkTubeRef.binding.btnTextUrl.setText("")
         linkTubeRef.binding.webIcon.setImageResource(R.drawable.search_icon)
-        linkTubeRef.binding.refreshBrowserBtn.visibility = View.GONE
+//        linkTubeRef.binding.refreshBrowserBtn.visibility = View.GONE
         linkTubeRef.binding.googleMicBtn.visibility = View.VISIBLE
         linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
         linkTubeRef.binding.crossBtn.visibility = View.GONE
@@ -102,9 +102,37 @@ class HomeFragment : Fragment() {
 
         linkTubeRef.binding.btnTextUrl.setOnClickListener {
             linkTubeRef.binding.btnTextUrl.requestFocus()
-            loadHistoryItems()
 
         }
+
+        linkTubeRef.binding.searchBrowser.setOnClickListener {
+            // Request focus on btnTextUrl
+            linkTubeRef.binding.btnTextUrl.requestFocus()
+
+            // Check if btnTextUrl has text, if so, select all text
+            if (linkTubeRef.binding.btnTextUrl.text.isNotEmpty()) {
+                linkTubeRef.binding.btnTextUrl.selectAll()
+            }
+
+            // Show the keyboard explicitly
+            val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(linkTubeRef.binding.btnTextUrl, InputMethodManager.SHOW_IMPLICIT)
+
+            // Check if the keyboard is visible
+            val rootView = view?.rootView
+            rootView?.viewTreeObserver?.addOnGlobalLayoutListener {
+                val rect = Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val screenHeight = rootView.height
+                val keypadHeight = screenHeight - rect.bottom
+                val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+
+                // Update the visibility of RecyclerView based on keyboard visibility
+                binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
+            }
+        }
+
+
         // Set click listener for homeTextUrl
         binding.homeTextUrl.setOnClickListener {
             // Request focus on btnTextUrl only if it's not already focused
@@ -142,7 +170,8 @@ class HomeFragment : Fragment() {
             isHomeFragment = true
 
         )
-
+        binding.historyRecycler.setHasFixedSize(true)
+        binding.historyRecycler.setItemViewCacheSize(5)
         binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.historyRecycler.adapter = historyAdapter
 
@@ -191,7 +220,6 @@ class HomeFragment : Fragment() {
         val limitedHistoryList = historyList.take(15)
         HistoryBrowser.historyItems.clear()
         HistoryBrowser.historyItems.addAll(limitedHistoryList)
-        historyAdapter.notifyDataSetChanged()
         updateEmptyStateVisibility()
     }
 
@@ -203,11 +231,17 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // Inside performSearch() method
     private fun performSearch(query: String) {
         if (checkForInternet(requireContext())) {
+            // Save the search topic
+
+            // Change tab and perform search
             changeTab(query, BrowseFragment(query))
         } else {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 }

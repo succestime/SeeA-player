@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
@@ -33,7 +34,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
     private lateinit var fileListAdapter: HistoryAdapter
     private lateinit var emptyStateLayout: ViewStub // Add reference to emptyStateLayout
     private var appOpenAd : AppOpenAd? = null
-
+    private var isAdDisplayed = false
     companion object{
         val historyItems: MutableList<HistoryItem> = mutableListOf()
     }
@@ -44,6 +45,8 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         binding = ActivityHistoryBrowserBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+
+        MobileAds.initialize(this){}
         loadAppOpenAd()
 
         val historyList = HistoryManager.getHistoryList(this).toMutableList()
@@ -53,7 +56,12 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         binding.recyclerFileView.adapter = fileListAdapter
         // Show empty state layout based on history list size
        updateEmptyStateVisibility()
+        initializeBinding()
 
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initializeBinding(){
         binding.imageButtonSearch.setOnClickListener {
             // Show editTextSearch
             binding.editTextSearch.visibility = View.VISIBLE
@@ -92,13 +100,24 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    val searchText = s.toString().trim()
-                    filterFileItems(searchText)
+                s?.let { searchText ->
+                    // Filter the history items based on the searchText
+                    val filteredList = historyItems.filter { historyItem ->
+                        // You can adjust the condition based on your filtering criteria.
+                        // Here, I'm filtering based on whether the URL contains the search text.
+                        historyItem.url.contains(searchText, ignoreCase = true)
+                    }
+                    // Update the adapter with the filtered list
+                    fileListAdapter.filterList(filteredList)
+                    // Update empty state visibility
+                    updateEmptyStateVisibility()
                 }
             }
         })
+
     }
+
+
     private fun filterFileItems(searchText: String) {
         val filteredList = if (searchText.isEmpty()) {
             // If search text is empty, show all items
@@ -111,6 +130,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         }
         fileListAdapter.filterList(filteredList)
     }
+
     private fun handleEditTextTouch(v: View, event: MotionEvent) {
         val bounds: Rect = binding.editTextSearch.compoundDrawablesRelative[2].bounds
         val drawableStart = binding.editTextSearch.compoundDrawablesRelative[0] // Index 0 for drawable start
@@ -246,25 +266,28 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
     }
 
     fun loadAppOpenAd() {
-
-        val adRequest = AdRequest.Builder().build()
-        AppOpenAd.load(this, "ca-app-pub-3940256099942544/9257395921",
-            adRequest, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, appOpenAdLoadCallback)
-
+        if (!isAdDisplayed) {
+            val adRequest = AdRequest.Builder().build()
+            AppOpenAd.load(
+                this,
+                "ca-app-pub-3940256099942544/9257395921",
+                adRequest,
+                AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
+                appOpenAdLoadCallback
+            )
+        }
     }
 
     private val appOpenAdLoadCallback = object : AppOpenAd.AppOpenAdLoadCallback() {
         override fun onAdLoaded(ad: AppOpenAd) {
             appOpenAd = ad
-
             appOpenAd!!.show(this@HistoryBrowser)
-
+        isAdDisplayed = true // Mark ad as displayed
         }
 
         override fun onAdFailedToLoad(p0: LoadAdError) {
             // Handle failed ad loading
         }
     }
-
 
 }

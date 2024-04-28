@@ -87,8 +87,8 @@ class PlaylistActivity : AppCompatActivity() {
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -97,8 +97,37 @@ class PlaylistActivity : AppCompatActivity() {
                     )
                 )
             }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@PlaylistActivity,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@PlaylistActivity,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
+            }
         }
     }
+
 
     private fun customAlertDialog(){
         val customDialog = LayoutInflater.from(this@PlaylistActivity).inflate(R.layout.add_playlist_dialog, binding.root, false)

@@ -49,6 +49,7 @@ class DaysDownload : Fragment(){
         adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true)
         binding.DownloadRV.adapter = adapter
         binding.daysTotalVideos.text = "Recant Videos : 0"
+
         if (!requestRuntimePermission()) {
             // Permission not granted yet
             return view

@@ -13,20 +13,29 @@ object HistoryManager {
     fun addHistoryItem(item: HistoryItem, context: Context) {
         val historyList = getHistoryList(context).toMutableList()
 
-        // Check if the item already exists in the history list based on URL
-        val existingItem = historyList.find { it.url == item.url }
-        if (existingItem != null) {
-            // If the item already exists, update its timestamp and image
-            existingItem.timestamp = System.currentTimeMillis()
-            existingItem.imageBitmap = item.imageBitmap
+        // Check if the item already exists in the history list based on URL and title
+        val existingItems = historyList.filter { it.url == item.url && it.title == item.title }
+
+        if (existingItems.isNotEmpty()) {
+            // Check if any existing item has a loaded image
+            val existingItemWithImage = existingItems.find { it.imageBitmap != null }
+
+            // If at least one existing item has a loaded image, remove all existing items without images
+            // and add the new item
+            if (existingItemWithImage != null) {
+                historyList.removeAll { it.imageBitmap == null && it.url == item.url && it.title == item.title }
+                historyList.add(0, item)
+            }
         } else {
-            // If the item does not exist, add it to the history list
-            historyList.add(0, item) // Add item to the beginning of the list (newest first)
+            // Add the new item to the beginning of the list
+            historyList.add(0, item)
         }
 
         // Save the updated history list
         saveHistoryList(historyList, context)
     }
+
+
 
     fun getHistoryList(context: Context): List<HistoryItem> {
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
@@ -100,97 +109,3 @@ object HistoryManager {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//package com.jaidev.seeaplayer.dataClass
-//
-//import android.content.Context
-//import android.graphics.Bitmap
-//import android.graphics.BitmapFactory
-//import android.net.Uri
-//import java.io.ByteArrayOutputStream
-//
-//object HistoryManager {
-//    private const val HISTORY_PREF_KEY = "history_items"
-//
-//    fun addHistoryItem(item: HistoryItem, context: Context) {
-//        val historyList = getHistoryList(context).toMutableList()
-//
-//        // Check if the item already exists in the history list based on URL
-//        val existingItem = historyList.find { it.url == item.url }
-//        if (existingItem != null) {
-//            // If the item already exists, update its timestamp and image
-//            existingItem.timestamp = System.currentTimeMillis()
-//            existingItem.imageBitmap = item.imageBitmap
-//        } else {
-//            // If the item does not exist, add it to the history list
-//            historyList.add(0, item) // Add item to the beginning of the list (newest first)
-//        }
-//
-//        // Save the updated history list
-//        saveHistoryList(historyList, context)
-//    }
-//
-//    fun getHistoryList(context: Context): List<HistoryItem> {
-//        val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-//        val historySet = sharedPreferences.getStringSet(HISTORY_PREF_KEY, setOf()) ?: setOf()
-//
-//        return historySet.mapNotNull { itemString ->
-//            val parts = itemString.split("|||")
-//            if (parts.size == 4) {
-//                val url = parts[0]
-//                val title = parts[1]
-//                val timestamp = parts[2].toLong()
-//                val imageByteArray = parts[3].toByteArray()
-//                val imageBitmap = byteArrayToBitmap(imageByteArray)
-//                HistoryItem(url, title, timestamp, imageBitmap)
-//            } else {
-//                null
-//            }
-//        }.sortedByDescending { it.timestamp } // Sort by timestamp in descending order (newest first)
-//    }
-//
-//    private fun saveHistoryList(historyList: List<HistoryItem>, context: Context) {
-//        val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        val historySet = historyList.map { item ->
-//            "${item.url}|||${item.title}|||${item.timestamp}|||${bitmapToByteArray(item.imageBitmap)}"
-//        }.toSet()
-//        editor.putStringSet(HISTORY_PREF_KEY, historySet)
-//        editor.apply()
-//    }
-//
-//    fun extractWebsiteTitle(url: String): String {
-//        return Uri.parse(url).host ?: ""
-//    }
-//
-//    private fun bitmapToByteArray(bitmap: Bitmap?): ByteArray {
-//        val outputStream = ByteArrayOutputStream()
-//        bitmap?.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-//        return outputStream.toByteArray()
-//    }
-//
-//    private fun byteArrayToBitmap(byteArray: ByteArray): Bitmap? {
-//        return if (byteArray.isNotEmpty()) {
-//            BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-//        } else {
-//            null
-//        }
-//    }
-//}

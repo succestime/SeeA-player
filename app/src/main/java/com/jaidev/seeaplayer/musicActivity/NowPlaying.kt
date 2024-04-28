@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.MainActivity
-import com.jaidev.seeaplayer.PlayerMusicActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.dataClass.setSongPosition
@@ -55,8 +54,12 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             intent.putExtra("class", "NowPlaying")
             ContextCompat.startActivity(requireContext(), intent, null)
         }
+
         return view
     }
+
+
+
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("NotifyDataSetChanged")

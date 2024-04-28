@@ -33,14 +33,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
-import com.jaidev.seeaplayer.PlayerMusicActivity
-import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
-import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
+import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import java.io.File
 
 

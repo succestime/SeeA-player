@@ -27,20 +27,18 @@ import android.text.SpannableStringBuilder
 import android.util.Base64
 import android.util.Log
 import android.view.ContextMenu
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.webkit.CookieManager
+import android.view.inputmethod.EditorInfo
 import android.webkit.DownloadListener
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
-import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
@@ -52,14 +50,16 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.internal.ViewUtils
 import com.google.android.material.snackbar.Snackbar
+import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
 import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsList
-import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
 import com.jaidev.seeaplayer.browserActivity.changeTab
+import com.jaidev.seeaplayer.browserActivity.checkForInternet
 import com.jaidev.seeaplayer.dataClass.FileType
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
@@ -120,18 +120,17 @@ lateinit var mAdView : AdView
             val screenHeight = rootView.height
             val keypadHeight = screenHeight - rect.bottom
             val isKeyboardVisible = keypadHeight > screenHeight * 0.15
-
-            // Hide historyRecycler if keyboard is dismissed
-            if (!isKeyboardVisible) {
-                binding.historyRecycler.visibility = View.GONE
-            }
+            binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
         }
+
 
         return view
 
     }
 
-    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "ObsoleteSdkInt")
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "ObsoleteSdkInt",
+        "RestrictedApi"
+    )
     override fun onResume() {
         super.onResume()
         registerDownloadReceiver()
@@ -177,12 +176,14 @@ lateinit var mAdView : AdView
             frag = tabsList[linkRef.binding.myPager.currentItem].fragment as BrowseFragment
         }catch (_:Exception){}
 
+        linkRef.binding.crossBtn.setOnClickListener {
+            linkRef.binding.btnTextUrl.text.clear()
 
+        }
 
         linkRef.binding.btnTextUrl.setOnClickListener {
-            binding.historyRecycler.visibility = View.VISIBLE
             linkRef.binding.btnTextUrl.requestFocus()
-
+         loadHistoryItems()
         }
 
         historyAdapter = HistoryAdapter(
@@ -192,34 +193,32 @@ lateinit var mAdView : AdView
                     // Handle item click here, if needed
                 }
             },
-            isHomeFragment = true
+            isBrowseFragment = true
         )
 
+        binding.historyRecycler.setHasFixedSize(true)
+        binding.historyRecycler.setItemViewCacheSize(5)
         binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.historyRecycler.adapter = historyAdapter
 
-        loadHistoryItems()
-
-
-        // Listen for Enter key press to hide keyboard and historyRecycler
-        linkRef.binding.btnTextUrl.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                // Hide the soft keyboard
-                val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(linkRef.binding.btnTextUrl.windowToken, 0)
-
-                // Hide the historyRecycler
-                binding.historyRecycler.visibility = View.GONE
-
-                return@setOnKeyListener true
+        // Set editor action listener for btnTextUrl (IME_ACTION_DONE or IME_ACTION_GO)
+        linkRef.binding.btnTextUrl.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
+                val query = linkRef.binding.btnTextUrl.text.toString()
+                if (checkForInternet(requireContext())) {
+                    // Hide keyboard and RecyclerView
+                    ViewUtils.hideKeyboard(linkRef.binding.btnTextUrl)
+                    binding.historyRecycler.visibility = View.GONE
+                    // Perform search
+                    performSearch(query)
+                } else {
+                    Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+                }
+                return@setOnEditorActionListener true
             }
-            return@setOnKeyListener false
+            return@setOnEditorActionListener false
         }
 
-        // Set focus listener for btnTextUrl to update isBtnTextUrlFocused flag
-        linkRef.binding.btnTextUrl.setOnFocusChangeListener { _, hasFocus ->
-            isBtnTextUrlFocused = hasFocus
-        }
         // Check if it's a tablet
         val isTablet = resources.configuration.smallestScreenWidthDp >= 600
 
@@ -254,15 +253,14 @@ lateinit var mAdView : AdView
             }
         }
 
-        linkRef.binding.refreshBrowserBtn.visibility = View.VISIBLE
-        linkRef.binding.refreshBrowserBtn.setOnClickListener {
+
+
+        binding.swipeRefreshBrowser.setOnRefreshListener {
             binding.webView.reload()
+
+             binding.swipeRefreshBrowser.visibility = View.GONE
         }
 
-        linkRef.binding.bottomRefreshBrowser.visibility = View.VISIBLE
-        linkRef.binding.bottomRefreshBrowser.setOnClickListener {
-            binding.webView.reload()
-        }
 
 
         binding.webView.apply {
@@ -297,13 +295,10 @@ lateinit var mAdView : AdView
                 override fun onLoadResource(view: WebView?, url: String?) {
                     super.onLoadResource(view, url)
                     settings.setSupportZoom(true)
+                    settings.javaScriptEnabled = true
                     settings.builtInZoomControls = true
                     settings.displayZoomControls = false
-//                    if (LinkTubeActivity.isDesktopSite)
-//                        view?.evaluateJavascript(
-//                            "document.querySelector('meta[name=\"viewport\"]').setAttribute('content'," +
-//                                    " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));",
-//                            null)
+
 
                 }
 
@@ -322,7 +317,6 @@ lateinit var mAdView : AdView
                     super.onPageStarted(view, url, favicon)
                     linkRef.binding.progressBar.progress = 0
                     linkRef.binding.progressBar.visibility = View.VISIBLE
-                    linkRef.saveData()
 
                 }
 
@@ -389,8 +383,17 @@ lateinit var mAdView : AdView
             }
 
         }
-    }
 
+        loadHistoryItems()
+
+    }
+    private fun performSearch(query: String) {
+        if (checkForInternet(requireContext())) {
+            changeTab(query, BrowseFragment(query))
+        } else {
+            Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+        }
+    }
     @SuppressLint("Range")
     private fun startDownload(url: String, fileName: String, fileExtension: String?) {
         val downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -495,23 +498,23 @@ lateinit var mAdView : AdView
 
         (requireActivity() as LinkTubeActivity).saveBookmarks()
         // for clearing all  webView data
-        binding.webView.apply {
-            clearMatches()
-            clearHistory()
-            clearFormData()
-            clearSslPreferences()
-            clearCache(true)
-
-            CookieManager.getInstance().removeAllCookies(null)
-            WebStorage.getInstance().deleteAllData()
-        }
+//        binding.webView.apply {
+//            clearMatches()
+//            clearHistory()
+//            clearFormData()
+//            clearSslPreferences()
+//            clearCache(true)
+//
+//            CookieManager.getInstance().removeAllCookies(null)
+//            WebStorage.getInstance().deleteAllData()
+//        }
     }
     // Assuming this is in your BrowseFragment or similar place
 
     @SuppressLint("NotifyDataSetChanged")
     private fun loadHistoryItems() {
         val historyList = HistoryManager.getHistoryList(requireContext())
-        val limitedHistoryList = historyList.take(10)
+        val limitedHistoryList = historyList.take(15)
         HistoryBrowser.historyItems.clear()
         HistoryBrowser.historyItems.addAll(limitedHistoryList)
         historyAdapter.notifyDataSetChanged()

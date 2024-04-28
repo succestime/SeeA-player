@@ -41,6 +41,7 @@
     <color name="green_primary">#00FF00</color> <!-- Change this to your desired green color -->
     <color name="black_statusBar">#0F4D6C</color> <!-- Change this to your desired green color -->
     <color name="light_statusBar">#8ACDF3</color> <!-- Change this to your desired green color -->
+    <color name="light_navBar">#C4E2F3</color> <!-- Change this to your desired green color -->
 
 
     <color name="icon_light_color">#000000</color> <!-- Black color for light mode -->

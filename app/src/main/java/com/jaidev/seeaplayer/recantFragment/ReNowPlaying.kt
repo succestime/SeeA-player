@@ -14,12 +14,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.allAdapters.RecentVideoAdapter
+import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.dataClass.reSetSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentReNowPlayingBinding
 
 class ReNowPlaying : Fragment()  {
-    lateinit var adapter: RecentVideoAdapter
+    lateinit var adapter: RecantMusicAdapter
     companion object{
        @SuppressLint("StaticFieldLeak")
         lateinit var binding: FragmentReNowPlayingBinding
@@ -29,9 +29,14 @@ class ReNowPlaying : Fragment()  {
         val view = inflater.inflate(R.layout.fragment_re_now_playing, container, false)
         binding = FragmentReNowPlayingBinding.bind(view)
         binding.root.visibility = View.INVISIBLE
+        adapter = RecantMusicAdapter(requireContext(), MainActivity.musicRecantList)
 
-        adapter = RecentVideoAdapter(requireContext(), MainActivity.videoRecantList)
+        initializeBinding()
 
+        return view
+    }
+
+    private fun initializeBinding(){
         binding.playPauseBtnNP.setOnClickListener {
             if(ReMusicPlayerActivity.isPlaying){ pauseMusic() }
             else {
@@ -56,7 +61,7 @@ class ReNowPlaying : Fragment()  {
             intent.putExtra("class", "ReNowPlaying")
             ContextCompat.startActivity(requireContext(), intent, null)
         }
-        return view
+
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -96,20 +101,7 @@ class ReNowPlaying : Fragment()  {
 
 
 
-    private fun refreshNowPlayingUI() {
 
-        if (ReMusicPlayerActivity.isPlaying) {
-            binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon)
-        } else {
-            binding.playPauseBtnNP.setIconResource(R.drawable.play_music_icon)
-        }
-        binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
-        Glide.with(requireContext())
-            .asBitmap()
-            .load(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].albumArtUri)
-            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
-            .into(binding.songImgNP)
-    }
 
 
 }

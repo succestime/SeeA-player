@@ -47,10 +47,10 @@
         <TextView
             android:id="@+id/TopicName"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="40dp"
             android:text="Topic Name"
-
+android:gravity="center_vertical"
+            android:maxLines="1"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent"
@@ -61,7 +61,7 @@
         <TextView
             android:id="@+id/websiteName"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="20dp"
             android:text="Website Name"
             app:layout_constraintTop_toBottomOf="@+id/TopicName"
             app:layout_constraintBottom_toBottomOf="parent" />

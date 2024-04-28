@@ -42,7 +42,6 @@ import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
-import com.jaidev.seeaplayer.recantFragment.DaysDownload
 import java.io.File
 
 class VideoAdapter(private val context: Context, private var videoList: ArrayList<VideoData>,private val isFolder: Boolean = false,private val isRecantVideo: Boolean = false)
@@ -55,9 +54,12 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
     private var isGridMode = false // Track if grid mode is enabled
+
     companion object {
         private const val PREF_NAME = "video_titles"
         private const val VIEW_TYPE_GRID_VIDEO = 1
+        private var videoRenameListener: VideoRenameListener? = null
+
     }
     init {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -71,6 +73,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
 
     }
+    interface VideoRenameListener {
+        fun onVideoRenamed(position: Int, newName: String)
+    }
+
     private var videoDeleteListener: VideoDeleteListener? = null
 
     fun setVideoDeleteListener(listener: VideoDeleteListener) {
@@ -206,11 +212,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
             bindingMf.renameBtn.setOnClickListener {
                 dialog.dismiss()
-
-                // Get the current video title as default text
-                val defaultTitle = videoList[position].title
-                // Show the rename dialog with the current video title as default text
-                showRenameDialog(position, defaultTitle)
+                showRenameDialog(position, videoList[position].title)
             }
 
             bindingMf.deleteBtn.setOnClickListener {
@@ -285,6 +287,62 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         return videoList.size
     }
 
+    private fun showRenameDialog(position: Int, defaultName: String) {
+        val dialogBuilder = AlertDialog.Builder(context)
+
+        // Set up the layout for the dialog
+        val view = LayoutInflater.from(context).inflate(R.layout.rename_field, null)
+        val editText = view.findViewById<EditText>(R.id.renameField)
+        editText.setText(defaultName) // Set default text as current music title
+
+
+        dialogBuilder.setView(view)
+            .setTitle("Rename Video")
+            .setMessage("Enter new name for the video:")
+            .setCancelable(false)
+            .setPositiveButton("Rename") { _, _ ->
+                val newName = editText.text.toString().trim()
+                if (newName.isNotEmpty() && newName != defaultName) {
+                    renameVideo(position, newName)
+                    dialogRF.dismiss()
+                } else {
+                    Toast.makeText(context, "Please enter a valid name", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        dialogRF = dialogBuilder.create()
+        dialogRF.show()
+    }
+    private fun renameVideo(position: Int, newName: String) {
+        val music = videoList[position]
+        music.title = newName
+        notifyItemChanged(position)
+        saveVideoTitles(music.id, newName)
+        val defaultTitle = music.title
+        showRenameDialog(position, defaultTitle)
+    }
+
+    // Save updated video titles to SharedPreferences
+    private fun saveVideoTitles(uniqueIdentifier: String, newName: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(uniqueIdentifier, newName)
+        editor.apply()
+    }
+
+    // Load saved video titles from SharedPreferences
+    private fun loadVideoTitles() {
+        for (video in videoList) {
+            val savedTitle = sharedPreferences.getString(video.id, null)
+            savedTitle?.let {
+                video.title = it
+            }
+        }
+    }
+
+
 
     // Function to get default background color based on app theme
     private fun getDefaultBackgroundColor(): Int {
@@ -297,7 +355,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             ContextCompat.getColor(context, R.color.white)
         }
     }
-
+    fun updateVideoTitle(position: Int, newName: String) {
+        videoList[position].title = newName
+        notifyItemChanged(position)
+    }
     // Toggle selection for multi-select
     // Toggle selection for multi-select
     private fun toggleSelection(position: Int) {
@@ -355,7 +416,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     if (selectedItems.size == 1) {
                         val selectedPosition = selectedItems.first()
                         val defaultName = videoList[selectedPosition].title
-                        showRenameDialog(selectedPosition, defaultName)
+                      showRenameDialog(selectedPosition, defaultName)
                     } else {
                         Toast.makeText(context, "Please select only one video to rename", Toast.LENGTH_SHORT).show()
                     }
@@ -442,108 +503,9 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         context.startActivity(chooser)
     }
 
-    // Update the total video count interface method
-
-    private fun renameMusic(position: Int, newName: String) {
-        val music = videoList[position]
-        val uniqueIdentifier = music.id // or music.path, depending on what is unique
-        music.path = newName
-        notifyItemChanged(position)
-        saveMusicTitle(uniqueIdentifier, newName)
-        val defaultTitle = music.title
-        showRenameDialog(position, defaultTitle)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun showRenameDialog(position: Int, defaultTitle: String) {
-        val dialogBuilder = AlertDialog.Builder(context)
-
-        // Set up the layout for the dialog
-        val view = LayoutInflater.from(context).inflate(R.layout.rename_field, null)
-        val editText = view.findViewById<EditText>(R.id.renameField)
-        editText.setText(defaultTitle) // Set default text as current music title
-
-        dialogBuilder.setView(view)
-            .setTitle("Rename Video")
-            .setMessage("Enter new name for the video:")
-            .setCancelable(false)
-            .setPositiveButton("Rename") { _, _ ->
-                //val newName = editText.text.toString().trim()
-                val currentFile = File(videoList[position].path)
-                val newName = editText.text.toString().trim()
-                if (newName.isNotEmpty()) {
-                    renameMusic(position, newName)
-
-                    if (currentFile.exists() && newName.toString().isNotEmpty()) {
-                        val newFile = File(
-                            currentFile.parentFile,
-                            newName.toString() + "." + currentFile.extension
-                        )
-                        if (currentFile.renameTo(newFile)) {
-                            MediaScannerConnection.scanFile(context, arrayOf(newFile.toString()),
-                                arrayOf("video/*"), null)
-                            when {
-
-                                isFolder -> {
-                                    FoldersActivity.currentFolderVideos[position].title = newName.toString()
-                                    FoldersActivity.currentFolderVideos[position].path = newFile.path
-                                    FoldersActivity.currentFolderVideos[position].artUri = Uri.fromFile(newFile)
-                                    MainActivity.dataChanged = true
-                                    videoDeleteListener?.onVideoDeleted()
-                                    notifyItemChanged(position)
-                                }
-
-                                isRecantVideo -> {
-                                    DaysDownload.currentFolderVideos[position].title = newName.toString()
-                                    DaysDownload.currentFolderVideos[position].path = newFile.path
-                                    DaysDownload.currentFolderVideos[position].artUri = Uri.fromFile(newFile)
-                                    MainActivity.dataChanged = true
-                                    videoDeleteListener?.onVideoDeleted()
-                                    notifyItemChanged(position)
-                                }
-                                else -> {
-                                    MainActivity.videoList[position].title = newName.toString()
-                                    MainActivity.videoList[position].path = newFile.path
-                                    MainActivity.videoList[position].artUri = Uri.fromFile(newFile)
-                                    MainActivity.dataChanged = true
-                                    videoDeleteListener?.onVideoDeleted()
-                                    notifyItemChanged(position)
-                                }
-                            }
-                        } else {
-                            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-
-                    dialogRF.dismiss()
-                } else {
-                    Toast.makeText(context, "Name can't be empty", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Cancel") { self, _ ->
-                self.dismiss()
-            }
-        dialogRF = dialogBuilder.create()
-        dialogRF.show()
 
 
-    }
-    private fun saveMusicTitle(uniqueIdentifier: String, newName: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(uniqueIdentifier, newName)
-        editor.apply()
-    }
 
-
-    private fun loadVideoTitles() {
-        for (music in videoList) {
-            val savedTitle = sharedPreferences.getString(music.id, null)
-            savedTitle?.let {
-                music.title = it
-            }
-        }
-    }
 
     private fun sendIntent(pos: Int, ref: String) {
         PlayerActivity.position = pos

@@ -28,9 +28,7 @@ class SelectionActivity : AppCompatActivity() {
         adapter = MusicAdapter(this, MainActivity.MusicListMA,  selectionActivity = true )
         binding.selectionRV.adapter = adapter
         binding.backBtnSA.setOnClickListener { finish() }
-//        binding.addSA.setOnClickListener {
-//            startActivity(Intent(this, PlaylistDetails::class.java))
-//        }
+
         // for search View
         binding.searchViewSA.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean =true

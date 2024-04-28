@@ -38,6 +38,7 @@ class login : AppCompatActivity() {
         }
     }
 
+
     private fun setActionBarGradient() {
         // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()
