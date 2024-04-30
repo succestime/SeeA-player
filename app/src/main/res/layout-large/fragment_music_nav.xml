@@ -91,7 +91,7 @@
                     android:id="@+id/musicemptyStateLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout="@layout/download_empty_state_layout"
+                    android:layout="@layout/music_nav_empty_state_layout"
                     android:foregroundGravity="center"
                     android:visibility="gone"/>
 

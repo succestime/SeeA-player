@@ -62,7 +62,11 @@ class homeNav : Fragment() {
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
 
-
+        if (MainActivity.folderList.isEmpty()) {
+            binding.videoEmptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.videoEmptyStateLayout.visibility = View.GONE
+        }
 
         return binding.root
     }

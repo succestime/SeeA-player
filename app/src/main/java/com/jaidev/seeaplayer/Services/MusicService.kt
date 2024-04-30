@@ -6,6 +6,7 @@ package com.jaidev.seeaplayer.Services
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.AudioManager
@@ -19,11 +20,16 @@ import android.os.Looper
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.ApplicationClass
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.dataClass.exitApplication
+import com.jaidev.seeaplayer.dataClass.favouriteChecker
 import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt
+import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.musicActivity.NotificationReceiver
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
@@ -172,21 +178,21 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
                     handlePlayPause()
                     return super.onMediaButtonEvent(mediaButtonEvent)
                 }
-//                override fun onSkipToNext() {
-//                    super.onSkipToNext()
-//                    setSongPosition(increment = true) // Update the song position
-//                    createMediaPlayer() // Create media player for the new song
-//                    // Update notification and UI accordingly
-//                }
-//
-//                // called when Previous button is pressed
-//                override fun onSkipToPrevious() {
-//                    super.onSkipToPrevious()
-//                    setSongPosition(increment = false) // Update the song position
-//                    createMediaPlayer() // Create media player for the new song
-//                    // Update notification and UI accordingly
-//                }
+                override fun onSkipToNext() {
+                    super.onSkipToNext()
+                    prevNextSong(increment = true, context = this@MusicService)
+                }
 
+                // called when Previous button is pressed
+                override fun onSkipToPrevious() {
+                    super.onSkipToPrevious()
+                    prevNextSong(increment = false, context = this@MusicService)
+                }
+
+                override fun onStop() {
+                    super.onStop()
+                    exitApplication()
+                }
                 override fun onSeekTo(pos: Long) {
                     super.onSeekTo(pos)
                     mediaPlayer?.seekTo(pos.toInt())
@@ -267,12 +273,11 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
                 mediaPlayer!!.currentPosition.toLong(), playbackSpeed
             )
             .setActions(
-                PlaybackStateCompat.ACTION_FAST_FORWARD or
                         PlaybackStateCompat.ACTION_PLAY_PAUSE or
-//                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
-//                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
                         PlaybackStateCompat.ACTION_STOP or
-                        PlaybackStateCompat.ACTION_SEEK_TO
+                       PlaybackStateCompat.ACTION_SEEK_TO
             )
             .build()
     }
@@ -296,7 +301,40 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
         //update playback state for notification
         mediaSession.setPlaybackState(getPlayBackState())
     }
+    @SuppressLint("SuspiciousIndentation")
+    fun prevNextSong(increment: Boolean, context: Context){
+        setSongPosition(increment = increment)
+        PlayerMusicActivity.musicService!!.createMediaPlayer()
+        Glide.with(context)
+            .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+            .into(PlayerMusicActivity.binding.songImgPA)
 
+        PlayerMusicActivity.binding.songNamePA.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
+        Glide.with(context)
+            .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+            .into(NowPlaying.binding.songImgNP)
+
+        NowPlaying.binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
+        playMusic()
+
+        PlayerMusicActivity.fIndex = favouriteChecker(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].id)
+
+        if(PlayerMusicActivity.isFavourite) PlayerMusicActivity.binding.favouriteBtnPA.setImageResource(
+            R.drawable.favorite_icon
+        )
+        else PlayerMusicActivity.binding.favouriteBtnPA.setImageResource(R.drawable.favorite_empty_icon)
+    }
+
+    private fun playMusic(){
+        PlayerMusicActivity.isPlaying = true
+        PlayerMusicActivity.musicService!!.mediaPlayer!!.start()
+        PlayerMusicActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
+        PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+        //for handling app crash during notification play - pause btn (While app opened through intent)
+        try{ NowPlaying.binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon) }catch (_: Exception){}
+    }
     override fun onAudioFocusChange(focusChange: Int) {
         if(focusChange <= 0){
             //pause music
