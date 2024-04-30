@@ -51,9 +51,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.TimeBar
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
@@ -101,7 +98,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     private lateinit var eqContainer: FrameLayout
     private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
     private lateinit var player: ExoPlayer
-    lateinit var mAdView: AdView
+//    lateinit var mAdView: AdView
 
     // horizontal recyclerView variables
     companion object {
@@ -141,8 +138,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
 
-        MobileAds.initialize(this){}
-        mAdView = findViewById(R.id.adView)
+//        MobileAds.initialize(this){}
+//        mAdView = findViewById(R.id.adView)
 
 
         // banner ads
@@ -701,8 +698,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
 
 
     private fun pauseVideo() {
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+//        val adRequest = AdRequest.Builder().build()
+//        mAdView.loadAd(adRequest)
         playPauseBtn.setImageResource(R.drawable.ic_play_icon)
         player.pause()
     }

@@ -77,7 +77,7 @@ class LinkTubeActivity : AppCompatActivity() {
     lateinit var mAdView: AdView
     private var mInterstitialAd : InterstitialAd? = null
     private var rewardedInterstitialAd : RewardedInterstitialAd? = null
-
+    private var tempText: CharSequence? = null
     companion object {
         var tabsList: ArrayList<Tab> = ArrayList()
         private var isFullscreen: Boolean = true

@@ -20,4 +20,6 @@ data class HistoryItem(
     override fun hashCode(): Int {
         return url.hashCode()
     }
+
+
 }

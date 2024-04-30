@@ -15,7 +15,6 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
@@ -43,6 +42,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
@@ -54,7 +54,8 @@ import com.google.android.material.internal.ViewUtils
 import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
-import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
+import com.jaidev.seeaplayer.allAdapters.SavedTitlesAdapter
+import com.jaidev.seeaplayer.allAdapters.SearchItemAdapter
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsList
@@ -67,14 +68,16 @@ import com.jaidev.seeaplayer.databinding.FragmentBrowseBinding
 import java.io.ByteArrayOutputStream
 
 
-class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener {
+class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener, HistoryAdapter.ItemClickListener {
     lateinit var binding: FragmentBrowseBinding
 
     var webIcon: Bitmap? = null
-    private lateinit var historyAdapter: HistoryAdapter
-    private var isBtnTextUrlFocused = false // Flag to track if btnTextUrl has been focused
     private var mInterstitialAd: InterstitialAd? = null
-lateinit var mAdView : AdView
+    private var tempText: CharSequence? = null
+    private lateinit var fileListAdapter: SearchItemAdapter
+    private lateinit var searchHintTitleRecyclerView: RecyclerView // Add this line
+
+    lateinit var mAdView : AdView
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
 
@@ -112,16 +115,19 @@ lateinit var mAdView : AdView
             }
 
         }
+
+
         val rootView = view.rootView
 
-        rootView.viewTreeObserver.addOnGlobalLayoutListener {
-            val rect = Rect()
-            rootView.getWindowVisibleDisplayFrame(rect)
-            val screenHeight = rootView.height
-            val keypadHeight = screenHeight - rect.bottom
-            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
-            binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
-        }
+//        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+//            val rect = Rect()
+//            rootView.getWindowVisibleDisplayFrame(rect)
+//            val screenHeight = rootView.height
+//            val keypadHeight = screenHeight - rect.bottom
+//            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+//            binding.recyclerviewLayout.visibility = if (!isKeyboardVisible) View.GONE else View.VISIBLE
+//
+//        }
 
 
         return view
@@ -182,24 +188,21 @@ lateinit var mAdView : AdView
         }
 
         linkRef.binding.btnTextUrl.setOnClickListener {
-            linkRef.binding.btnTextUrl.requestFocus()
-         loadHistoryItems()
+            if (linkRef.binding.btnTextUrl.text.isNotEmpty()) {
+                linkRef.binding.btnTextUrl.text.clear()
+                binding.recyclerviewLayout.visibility = View.VISIBLE
+
+            }
+
         }
 
-        historyAdapter = HistoryAdapter(
-            HistoryBrowser.historyItems,
-            object : HistoryAdapter.ItemClickListener {
-                override fun onItemClick(historyItem: HistoryItem) {
-                    // Handle item click here, if needed
-                }
-            },
-            isBrowseFragment = true
-        )
+
 
         binding.historyRecycler.setHasFixedSize(true)
         binding.historyRecycler.setItemViewCacheSize(5)
         binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
-        binding.historyRecycler.adapter = historyAdapter
+        binding.historyRecycler.adapter = SavedTitlesAdapter(requireContext())
+
 
         // Set editor action listener for btnTextUrl (IME_ACTION_DONE or IME_ACTION_GO)
         linkRef.binding.btnTextUrl.setOnEditorActionListener { _, actionId, _ ->
@@ -208,7 +211,7 @@ lateinit var mAdView : AdView
                 if (checkForInternet(requireContext())) {
                     // Hide keyboard and RecyclerView
                     ViewUtils.hideKeyboard(linkRef.binding.btnTextUrl)
-                    binding.historyRecycler.visibility = View.GONE
+                    binding.recyclerviewLayout.visibility = View.GONE
                     // Perform search
                     performSearch(query)
                 } else {
@@ -218,6 +221,20 @@ lateinit var mAdView : AdView
             }
             return@setOnEditorActionListener false
         }
+
+
+
+
+//        // Set up RecyclerView adapter
+//        val historyList = HistoryManager.getHistoryList(requireContext()).toMutableList()
+//        fileListAdapter = if (historyList.isNotEmpty()) {
+//            SearchItemAdapter(requireContext(), historyList.first())
+//        } else {
+//            SearchItemAdapter(requireContext(), null)
+//        }
+//        binding.searchHintTitleRV.layoutManager = LinearLayoutManager(requireContext())
+//        binding.searchHintTitleRV.adapter = fileListAdapter
+
 
         // Check if it's a tablet
         val isTablet = resources.configuration.smallestScreenWidthDp >= 600
@@ -254,12 +271,11 @@ lateinit var mAdView : AdView
         }
 
 
+binding.swipeRefreshBrowser.setOnRefreshListener {
+    binding.webView.reload()
+    binding.swipeRefreshBrowser.isRefreshing = false
+}
 
-        binding.swipeRefreshBrowser.setOnRefreshListener {
-            binding.webView.reload()
-
-             binding.swipeRefreshBrowser.visibility = View.GONE
-        }
 
 
 
@@ -333,7 +349,8 @@ lateinit var mAdView : AdView
                     val historyItem = HistoryItem(url ?: "", websiteTitle, timestamp, favicon)
                     // Add history item to the HistoryManager
                 HistoryManager.addHistoryItem(historyItem, requireContext())
-
+                    // Update searchHintTitleRecyclerView here
+                    updateSearchHintTitleRecyclerView()
                 }
 
 
@@ -384,7 +401,7 @@ lateinit var mAdView : AdView
 
         }
 
-        loadHistoryItems()
+
 
     }
     private fun performSearch(query: String) {
@@ -392,6 +409,20 @@ lateinit var mAdView : AdView
             changeTab(query, BrowseFragment(query))
         } else {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateSearchHintTitleRecyclerView() {
+        // Get the updated history list
+        val historyList = HistoryManager.getHistoryList(requireContext()).toMutableList()
+        fileListAdapter = if (historyList.isNotEmpty()) {
+            SearchItemAdapter(requireContext(), historyList.first())
+        } else {
+            SearchItemAdapter(requireContext(), null)
+        }
+        binding.searchHintTitleRV.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = fileListAdapter
         }
     }
     @SuppressLint("Range")
@@ -511,23 +542,7 @@ lateinit var mAdView : AdView
     }
     // Assuming this is in your BrowseFragment or similar place
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun loadHistoryItems() {
-        val historyList = HistoryManager.getHistoryList(requireContext())
-        val limitedHistoryList = historyList.take(15)
-        HistoryBrowser.historyItems.clear()
-        HistoryBrowser.historyItems.addAll(limitedHistoryList)
-        historyAdapter.notifyDataSetChanged()
-        updateEmptyStateVisibility()
-    }
 
-    private fun updateEmptyStateVisibility() {
-        if (HistoryBrowser.historyItems.isEmpty()) {
-            binding.historyRecycler.visibility = View.GONE
-        } else {
-            binding.historyRecycler.visibility = View.VISIBLE
-        }
-    }
 
     override fun onCreateContextMenu(
         menu: ContextMenu,
@@ -679,5 +694,19 @@ lateinit var mAdView : AdView
                     mInterstitialAd = interstitialAd
                 }
             })
+    }
+
+    override fun onItemClick(historyItem: HistoryItem) {
+        // Handle item click here
+        val query = historyItem.url
+        openUrlInBrowser(query)
+        showLoadingToast()
+    }
+    private fun showLoadingToast() {
+        Toast.makeText(requireContext(), "Provided link is loading. You can go back.", Toast.LENGTH_LONG).show()
+    }
+    private fun openUrlInBrowser(query: String) {
+        val browserFragment = BrowseFragment(urlNew = query)
+        changeTab("Brave", browserFragment)
     }
 }

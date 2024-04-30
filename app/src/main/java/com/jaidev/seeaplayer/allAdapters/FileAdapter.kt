@@ -11,7 +11,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -23,8 +22,9 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.jaidev.seeaplayer.Services.FileItemPreferences
+import com.google.android.material.textfield.TextInputEditText
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.Services.FileItemPreferences
 import com.jaidev.seeaplayer.dataClass.FileItem
 import com.jaidev.seeaplayer.dataClass.FileType
 import java.io.File
@@ -703,47 +703,49 @@ class FileAdapter(
     }
 
 
-  @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged")
     private fun showRenameDialog(position: Int) {
         val oldFileItem = fileList[position]
 
-        val dialog = AlertDialog.Builder(context)
-        dialog.setTitle("Rename File")
-
-        val editText = EditText(context)
+        // Inflate custom layout
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.rename_field, null)
+        val editText = dialogView.findViewById<TextInputEditText>(R.id.renameField)
         editText.setText(oldFileItem.fileName) // Use fileName for display in the EditText
 
-        dialog.setView(editText)
+        val dialog = AlertDialog.Builder(context)
+            .setTitle("Rename File")
+            .setMessage("Enter new name for the file:")
+            .setView(dialogView)
+            .setPositiveButton("Rename") { _, _ ->
+                val newFileName = editText.text.toString().trim()
+                if (newFileName.isNotEmpty()) {
+                    val oldFile = File(oldFileItem.filePath)
+                    val parentDir = oldFile.parentFile
+                    val newFile = File(parentDir, newFileName)
 
-        dialog.setPositiveButton("Rename") { _, _ ->
-            val newFileName = editText.text.toString().trim()
-            if (newFileName.isNotEmpty()) {
-                val oldFile = File(oldFileItem.filePath)
-                val parentDir = oldFile.parentFile
-                val newFile = File(parentDir, newFileName)
-
-                if (oldFile.renameTo(newFile)) {
-                    // Update the file name in the FileItem
-                    oldFileItem.fileName = newFileName
-                    oldFileItem.originalFileName = newFileName
-                    oldFileItem.filePath = newFile.absolutePath // Update the file path if necessary
-                    fileItemPrefs.saveFileItem(oldFileItem) // Save updated FileItem
-                    notifyDataSetChanged() // Notify adapter of the change
+                    if (oldFile.renameTo(newFile)) {
+                        // Update the file name in the FileItem
+                        oldFileItem.fileName = newFileName
+                        oldFileItem.originalFileName = newFileName
+                        oldFileItem.filePath = newFile.absolutePath // Update the file path if necessary
+                        fileItemPrefs.saveFileItem(oldFileItem) // Save updated FileItem
+                        notifyDataSetChanged() // Notify adapter of the change
+                    } else {
+                        // Failed to rename the file
+                        Log.e("FileAdapter", "Failed to rename file: ${oldFileItem.fileName}")
+                        Toast.makeText(context, "Failed to rename file", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    // Failed to rename the file
-                    Log.e("FileAdapter", "Failed to rename file: ${oldFileItem.fileName}")
-                    Toast.makeText(context, "Failed to rename file", Toast.LENGTH_SHORT).show()
+                    Log.e("FileAdapter", "New file name is empty")
+                    Toast.makeText(context, "Please provide a valid file name", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Log.e("FileAdapter", "New file name is empty")
-                Toast.makeText(context, "Please provide a valid file name", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        dialog.setNegativeButton("Cancel", null)
+            .setNegativeButton("Cancel", null)
+            .create()
 
         dialog.show()
     }
+
 
     private fun deleteFile(position: Int) {
         if (position != RecyclerView.NO_POSITION && position < fileList.size) {

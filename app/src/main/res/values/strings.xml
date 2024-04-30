@@ -191,4 +191,9 @@
 
 
     <string name="small_medium_native_ads">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="are_you_sure_you_want_to_clear_all_the_browsing_data">Are you sure , you want to clear all the browsing data?</string>
+    <string name="if_you_clear_the_browsing_data_it_will_not_be_recoverable">If you clear the browsing data, it will not be recoverable.</string>
+    <string name="clear_data_dialog_title">Are you sure , you want to clear all the browsing data?</string>
+    <string name="clear_data_dialog_message">If you clear the browsing data, it will not be recoverable.</string>
+    <string name="related_to_recant_searches">Related to recant searches</string>
 </resources>

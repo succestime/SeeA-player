@@ -7,14 +7,15 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewStub
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -51,16 +52,19 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         val historyList = HistoryManager.getHistoryList(this).toMutableList()
         fileListAdapter = HistoryAdapter(historyList , this )
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
+        binding.recyclerFileView.setHasFixedSize(true)
+        binding.recyclerFileView.setItemViewCacheSize(10)
         binding.recyclerFileView.layoutManager = LinearLayoutManager(this)
         binding.recyclerFileView.adapter = fileListAdapter
         // Show empty state layout based on history list size
-       updateEmptyStateVisibility()
+        updateEmptyStateVisibility()
         initializeBinding()
 
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeBinding(){
+
         binding.imageButtonSearch.setOnClickListener {
             // Show editTextSearch
             binding.editTextSearch.visibility = View.VISIBLE
@@ -100,21 +104,12 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
 
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
-                    // Filter items based on user input
-                    val searchText = s.toString().trim()
-                    filterItems(searchText)
+                    fileListAdapter.filter(s.toString())
+                    updateEmptyStateVisibility()
                 }
             }
         })
 
-    }
-
-    private fun filterItems(query: String) {
-        val filteredList = historyItems.filter { historyItem ->
-            historyItem.url.contains(query, ignoreCase = true) // Filter based on title, change this according to your requirements
-        }.toMutableList()
-
-        fileListAdapter.filterList(filteredList)
     }
 
 
@@ -134,6 +129,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             if (touchArea.contains(event.x.toInt(), event.y.toInt())) {
                 // Hide editTextSearch
                 hideEditText()
+                fileListAdapter.filter("") // Passing empty string to show all files
 
 
 
@@ -151,6 +147,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         if (touchArea.contains(event.x.toInt(), event.y.toInt())) {
             // Clear the text in the EditText
             binding.editTextSearch.text?.clear()
+            fileListAdapter.filter("") // Passing empty string to show all files
 
 
         }
@@ -191,40 +188,36 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
 
 
     private fun showClearDataConfirmationDialog() {
+        // Create a custom dialog layout
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_layout, null)
+
+        // Initialize AlertDialogBuilder with custom layout
         val alertDialogBuilder = AlertDialog.Builder(this)
-        alertDialogBuilder.apply {
-            setMessage("Are you sure you want to clear all the browsing data?\nIf you clear the browsing data, it will not be recoverable.")
-            setPositiveButton("Clear Data") { dialog, _ ->
-                clearBrowsingData()
-                dialog.dismiss()
-            }
-            setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setView(dialogView)
+
+        // Set the dialog titles
+        val dialogTitle = dialogView.findViewById<TextView>(R.id.dialogTitle)
+        dialogTitle.text = getString(R.string.clear_data_dialog_title)
+
+        val dialogMessage = dialogView.findViewById<TextView>(R.id.dialogMessage)
+        dialogMessage.text = getString(R.string.clear_data_dialog_message)
+
+        // Set positive button (Clear Data)
+        alertDialogBuilder.setPositiveButton("Clear Data") { dialog, _ ->
+            clearBrowsingData()
+            dialog.dismiss()
         }
 
-        // Create the AlertDialog
+        // Set negative button (Cancel)
+        alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        // Create and show the AlertDialog
         val alertDialog = alertDialogBuilder.create()
-
-        // Set text color for buttons
-        alertDialog.setOnShowListener {
-            val buttonPositive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            val buttonNegative = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-
-            // Set cool blue color for positive button ("Clear Data")
-            buttonPositive.setTextColor(ContextCompat.getColor(this@HistoryBrowser,
-                R.color.cool_blue
-            ))
-
-            // Set cool blue color for negative button ("Cancel")
-            buttonNegative.setTextColor(ContextCompat.getColor(this@HistoryBrowser,
-                R.color.cool_blue
-            ))
-        }
-
-        // Show the AlertDialog
         alertDialog.show()
     }
+
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -269,7 +262,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         override fun onAdLoaded(ad: AppOpenAd) {
             appOpenAd = ad
             appOpenAd!!.show(this@HistoryBrowser)
-        isAdDisplayed = true // Mark ad as displayed
+            isAdDisplayed = true // Mark ad as displayed
         }
 
         override fun onAdFailedToLoad(p0: LoadAdError) {

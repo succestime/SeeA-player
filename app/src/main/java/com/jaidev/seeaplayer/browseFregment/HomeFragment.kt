@@ -22,7 +22,6 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.BookmarkAdapter
 import com.jaidev.seeaplayer.allAdapters.SavedTitlesAdapter
 import com.jaidev.seeaplayer.browserActivity.BookmarkActivity
-import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.browserActivity.checkForInternet
@@ -204,13 +203,13 @@ class HomeFragment : Fragment() {
     }
 
 
-    private fun updateEmptyStateVisibility() {
-        if (HistoryBrowser.historyItems.isEmpty()) {
-            binding.historyRecycler.visibility = View.GONE
-        } else {
-            binding.historyRecycler.visibility = View.VISIBLE
-        }
-    }
+//    private fun updateEmptyStateVisibility() {
+//        if (HistoryBrowser.historyItems.isEmpty()) {
+//            binding.historyRecycler.visibility = View.GONE
+//        } else {
+//            binding.historyRecycler.visibility = View.VISIBLE
+//        }
+//    }
 
     // Inside performSearch() method
     // Inside performSearch() method
