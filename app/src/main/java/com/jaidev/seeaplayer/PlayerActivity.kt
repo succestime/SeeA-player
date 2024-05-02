@@ -50,6 +50,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.TimeBar
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -248,10 +249,10 @@ private fun someIdes(){
     }
     @SuppressLint("NotifyDataSetChanged")
     private fun horizontalIconList() {
-        iconModelArrayList.add(IconModel(R.drawable.next_icon,"", android.R.color.white))
-        iconModelArrayList.add(IconModel(R.drawable.night_mode,"Night Mode", android.R.color.white))
-        iconModelArrayList.add(IconModel(R.drawable.ic_speed_icon,"Speed", android.R.color.white))
-        iconModelArrayList.add(IconModel(R.drawable.orientation_icon,"Rotate", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.round_navigate_next,"", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.round_nights_stay,"Night Mode", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.round_speed,"Speed", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.round_screen_rotation,"Rotate", android.R.color.white))
         iconModelArrayList.add(IconModel(R.drawable.search_link_tube,"Link Tube", android.R.color.white))
 
 
@@ -269,21 +270,21 @@ private fun someIdes(){
                             iconModelArrayList.clear()
                             iconModelArrayList.add(
                                 IconModel(
-                                    R.drawable.next_icon,
+                                    R.drawable.round_navigate_next,
                                     "",
                                     android.R.color.white
                                 )
                             )
                             iconModelArrayList.add(
                                 IconModel(
-                                    R.drawable.night_mode,
+                                    R.drawable.round_nights_stay,
                                     "Night Mode",
                                     android.R.color.white
                                 )
                             )
                             iconModelArrayList.add(
                                 IconModel(
-                                    R.drawable.ic_speed_icon,
+                                    R.drawable.round_speed,
 
                                     "Speed",
                                     android.R.color.white
@@ -291,7 +292,7 @@ private fun someIdes(){
                             )
                             iconModelArrayList.add(
                                 IconModel(
-                                    R.drawable.orientation_icon,
+                                    R.drawable.round_screen_rotation,
                                     "Rotate",
                                     android.R.color.white
                                 )
@@ -310,28 +311,28 @@ private fun someIdes(){
                             if (iconModelArrayList.size == 5) {
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.ic_timer_icon,
+                                        R.drawable.round_sleep_timer,
                                         "Sleep Timer",
                                         android.R.color.white
                                     )
                                 )
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.muit2_round,
+                                        R.drawable.round_volume_off,
                                         "Mute",
                                         android.R.color.white
                                     )
                                 )
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.ic_booster_icon,
+                                        R.drawable.round_speaker,
                                         "Booster",
                                         android.R.color.white
                                     )
                                 )
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.ic_picture_in_picture_icon,
+                                        R.drawable.round_picture_in_picture_alt,
                                         "PIP Mode",
                                         android.R.color.white
                                     )
@@ -339,14 +340,14 @@ private fun someIdes(){
 
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.ic_subtitles_icon,
+                                        R.drawable.round_subtitles,
                                         "Subtitle",
                                         android.R.color.white
                                     )
                                 )
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.equalizer_icon,
+                                        R.drawable.round_graphic_eq,
                                         "Equalizer",
                                         android.R.color.white
                                     )
@@ -354,7 +355,7 @@ private fun someIdes(){
 
 
                             }
-                            iconModelArrayList[position] = IconModel(R.drawable.ic_back_icon, "")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_back, "")
                             playbackIconsAdapter.notifyDataSetChanged()
                             expand = true
                         }
@@ -363,12 +364,12 @@ private fun someIdes(){
                     1 -> {
                         if (dark) {
                             nightMode?.visibility = View.GONE
-                            iconModelArrayList[position] = IconModel(R.drawable.night_mode, "Night")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Night")
                             playbackIconsAdapter.notifyDataSetChanged()
                             dark = false
                         } else {
                             nightMode?.visibility = View.VISIBLE
-                            iconModelArrayList[position] = IconModel(R.drawable.night_mode, "Day")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Day")
                             playbackIconsAdapter.notifyDataSetChanged()
                             dark = true
                         }
@@ -397,13 +398,13 @@ private fun someIdes(){
                     6 -> {
                         if (mute) {
                             player.setVolume(100F)
-                            iconModelArrayList[position] = IconModel(R.drawable.muit2_round, "Mute")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute")
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = false
                         } else {
                             player.setVolume(0F)
                             iconModelArrayList[position] =
-                                IconModel(R.drawable.volume_icon, "Unmute")
+                                IconModel(R.drawable.round_volume_up, "Unmute")
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = true
                         }
@@ -650,21 +651,39 @@ private fun someIdes(){
         }
 
         playPauseBtn.setOnClickListener {
-            if (player.isPlaying) pauseVideo()
-            else playVideo()
+            if (player.isPlaying) {
+                val adRequest = AdRequest.Builder().build()
+                mAdView.loadAd(adRequest)
+                // Check if the banner ad is loaded
+                mAdView.adListener = object : AdListener() {
+                    override fun onAdLoaded() {
+                        binding.adsLayout.visibility = View.VISIBLE
+                    }
+                }
+                pauseVideo()
+            } else {
+                // If the banner ad is not loaded, hide the ads layout
+                if (!mAdView.isLoading) {
+                    binding.adsLayout.visibility = View.GONE
+                }
+                playVideo()
+            }
         }
 
+        binding.adsRemove.setOnClickListener {
+            binding.adsLayout.visibility = View.GONE
+        }
         findViewById<ImageButton>(R.id.nextBtn).setOnClickListener { nextPrevVideo() }
         findViewById<ImageButton>(R.id.prevBtn).setOnClickListener { nextPrevVideo(isNext = false) }
         findViewById<ImageButton>(R.id.repeatBtn).setOnClickListener {
             if (repeat) {
                 repeat = false
                 player.repeatMode = Player.REPEAT_MODE_OFF
-                findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.ic_repeat_off_icon)
+                findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.round_repeat)
             } else {
                 repeat = true
                 player.repeatMode = Player.REPEAT_MODE_ONE
-                findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.ic_repeat_on)
+                findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.round_repeat_on)
             }
         }
 
@@ -683,14 +702,14 @@ private fun someIdes(){
                 isLocked = true
                 binding.playerView.hideController()
                 binding.playerView.useController = false
-                binding.lockButton.setImageResource(R.drawable.ic_lock_close_icon)
+                binding.lockButton.setImageResource(R.drawable.round_lock)
             } else {
                 // for showing
                 isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
 
-                binding.lockButton.setImageResource(R.drawable.ic_lock_open_icon)
+                binding.lockButton.setImageResource(R.drawable.round_lock_open)
             }
         }
 
@@ -748,17 +767,15 @@ private fun someIdes(){
     }
 
     private fun playVideo() {
-        playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
+        binding.adsLayout.visibility = View.GONE
+        playPauseBtn.setImageResource(R.drawable.round_pause_24)
         nowPlayingId = playerList[position].id
         player.play()
     }
 
 
     private fun pauseVideo() {
-        // banner ads
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
-        playPauseBtn.setImageResource(R.drawable.ic_play_icon)
+        playPauseBtn.setImageResource(R.drawable.round_play)
         player.pause()
     }
 
@@ -800,11 +817,11 @@ private fun someIdes(){
         if (enable) {
             binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
             player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-            findViewById<ImageButton>(R.id.fullScreenBtn).setImageResource(R.drawable.ic_fullscreen_exit_icon)
+            findViewById<ImageButton>(R.id.fullScreenBtn).setImageResource(R.drawable.round_halfscreen)
         } else {
             binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
             player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
-            findViewById<ImageButton>(R.id.fullScreenBtn).setImageResource(R.drawable.ic_fullscreen_icon)
+            findViewById<ImageButton>(R.id.fullScreenBtn).setImageResource(R.drawable.round_fullscreen)
         }
     }
 
@@ -835,11 +852,11 @@ private fun someIdes(){
             startActivity(intent)
         }
         if(isInPictureInPictureMode){ playVideo()
-            playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
+            playPauseBtn.setImageResource(R.drawable.round_pause_24)
 
        } else {
             pauseVideo()
-            playPauseBtn.setImageResource(R.drawable.ic_pause_icon)
+            playPauseBtn.setImageResource(R.drawable.round_pause_24)
 
         }
     }
@@ -891,8 +908,8 @@ private fun someIdes(){
                 gestureDetectorCompat.onTouchEvent(motionEvent)
 
                 if (motionEvent.action == MotionEvent.ACTION_UP) {
-                    binding.brightnessIcon?.visibility = View.GONE
-                    binding.volumeIcon?.visibility = View.GONE
+//                    binding.brightnessIcon?.visibility = View.GONE
+//                    binding.volumeIcon?.visibility = View.GONE
                     // for immersive mode
                     WindowCompat.setDecorFitsSystemWindows(window, false)
                     WindowInsetsControllerCompat(window, binding.root).let { controller ->

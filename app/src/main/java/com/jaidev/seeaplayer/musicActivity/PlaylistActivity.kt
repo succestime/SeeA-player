@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
@@ -42,8 +42,9 @@ class PlaylistActivity : AppCompatActivity() {
 
         binding.playlistRV.setHasFixedSize(true)
         binding.playlistRV.setItemViewCacheSize(10)
-        binding.playlistRV.layoutManager = GridLayoutManager(this@PlaylistActivity,2)
-        adapter = PlaylistViewAdapter(this , playlistList = musicPlaylist.ref)
+        binding.playlistRV.layoutManager = LinearLayoutManager(this@PlaylistActivity)
+
+        adapter = PlaylistViewAdapter(this , playlistList = musicPlaylist.ref )
         binding.playlistRV.adapter = adapter
         binding.addPlaylistBtn.setOnClickListener { customAlertDialog() }
 

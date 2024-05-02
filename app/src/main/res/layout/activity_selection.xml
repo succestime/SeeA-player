@@ -29,31 +29,42 @@
             android:id="@+id/backBtnSA"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:src="@drawable/browser_clear"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/round_arrow_back"
             android:contentDescription="@string/back_btn"
             android:backgroundTint="@android:color/transparent"
             app:tint="?android:attr/textColorPrimary"
-            android:layout_margin="5dp"/>
-<TextView
-    android:id="@+id/addPlaylist"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:textSize="20sp"
-    android:gravity="center"
- android:layout_gravity="center_vertical"
-    android:text="Add to Playlist (0 musics)"/>
+         />
+<!--<TextView-->
+<!--    android:id="@+id/addPlaylist"-->
+<!--    android:layout_width="0dp"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_weight="1"-->
+<!--    android:textSize="20sp"-->
+<!--    android:gravity="center"-->
+<!-- android:layout_gravity="center_vertical"-->
+<!--    android:text="Add to Playlist (0 musics)"/>-->
 
-        <ImageButton
-            android:id="@+id/addSA"
-            android:layout_width="wrap_content"
+<!--        <ImageButton-->
+<!--            android:id="@+id/addSA"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:src="@drawable/correct_add"-->
+<!--            android:contentDescription="@string/back_btn"-->
+<!--            android:backgroundTint="@android:color/transparent"-->
+<!--            app:tint="?android:attr/textColorPrimary"-->
+<!--            android:layout_margin="5dp"/>-->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchViewSA"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:src="@drawable/correct_add"
-            android:contentDescription="@string/back_btn"
-            android:backgroundTint="@android:color/transparent"
-            app:tint="?android:attr/textColorPrimary"
-            android:layout_margin="5dp"/>
-
+            android:background="@drawable/custom_music_search_view"
+            android:focusable="false"
+            android:layout_marginHorizontal="5dp"
+            app:iconifiedByDefault="false"
+            app:layout_constraintTop_toTopOf="parent"
+            app:queryHint="@string/search_song"
+            app:searchIcon="@drawable/search_icon" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -64,17 +75,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchViewSA"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:background="@drawable/custom_music_search_view"
-            android:focusable="false"
-            app:iconifiedByDefault="false"
-            app:layout_constraintTop_toTopOf="parent"
-            app:queryHint="@string/search_song"
-            app:searchIcon="@drawable/search_icon" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

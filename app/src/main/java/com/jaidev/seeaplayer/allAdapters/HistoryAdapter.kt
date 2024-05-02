@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
-import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
 
@@ -20,6 +19,8 @@ class HistoryAdapter(
 
     interface ItemClickListener {
         fun onItemClick(historyItem: HistoryItem)
+
+
     }
 
     private var filteredItems: MutableList<HistoryItem> = mutableListOf()
@@ -64,7 +65,7 @@ class HistoryAdapter(
             corsDeleteButton.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    historyItems.removeAt(position)
+                    filteredItems.removeAt(position)
                     notifyItemRemoved(position)
                     HistoryManager.deleteHistoryItem(historyItem, itemView.context)
                 }
@@ -125,21 +126,6 @@ class HistoryAdapter(
         return VIEW_TYPE_NORMAL
 
     }
-
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun clear() {
-        historyItems.clear()
-        notifyDataSetChanged()
-    }
-
-
-
-    private fun navigateToBrowserFragment(query: String) {
-        val browserFragment = BrowseFragment(urlNew = query)
-        changeTab("Brave", browserFragment)
-    }
-
 
 
 }

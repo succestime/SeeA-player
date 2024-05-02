@@ -12,30 +12,31 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
-import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Playlist
-import com.jaidev.seeaplayer.databinding.PlaylistViewBinding
+import com.jaidev.seeaplayer.databinding.PlaylistMusicViewBinding
+import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 
-class PlaylistViewAdapter(private val context: Context, private var playlistList : ArrayList<Playlist>): RecyclerView.Adapter<PlaylistViewAdapter.MyAdapter>() {
+class PlaylistViewAdapter(private val context: Context, private var playlistList : ArrayList<Playlist> ): RecyclerView.Adapter<PlaylistViewAdapter.MyAdapter>() {
 
-    class MyAdapter(binding: PlaylistViewBinding) : RecyclerView.ViewHolder(binding.root) {
-        val image = binding.playlistImg
+    class MyAdapter(binding: PlaylistMusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
+        val image = binding.playlistImage
         val name = binding.playlistName
         val root = binding.root
-        val delete = binding.playlistDeleteBtn
+        val more = binding.playlistDelete
+//        val totalMusic = binding.totalVideosDuration
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter {
-        return MyAdapter(PlaylistViewBinding.inflate(LayoutInflater.from(context),parent,false))
+        return MyAdapter(PlaylistMusicViewBinding.inflate(LayoutInflater.from(context),parent,false))
     }
 
     override fun onBindViewHolder(holder: MyAdapter, position: Int) {
-
         holder.name.text = playlistList[position].name
         holder.name.isSelected = true
-        holder.delete.setOnClickListener {
+        holder.more.setOnClickListener {
             val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(playlistList[position].name)
                 .setMessage("Do you want to delete playlist ?")

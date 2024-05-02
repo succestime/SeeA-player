@@ -45,7 +45,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
-            PlayerMusicActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
+            PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_pause_24)
             playMusic()
         }
         binding.root.setOnClickListener {
@@ -77,8 +77,8 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
-            if(PlayerMusicActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon)
-            else binding.playPauseBtnNP.setIconResource(R.drawable.play_music_icon)
+            if(PlayerMusicActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+            else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
 
         }
     }
@@ -86,14 +86,14 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
     private fun playMusic(){
         PlayerMusicActivity.isPlaying = true
         PlayerMusicActivity.musicService!!.mediaPlayer!!.start()
-        binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon)
-        PlayerMusicActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
+        binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+        PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_pause_24)
     }
     private fun pauseMusic(){
         PlayerMusicActivity.isPlaying = false
         PlayerMusicActivity.musicService!!.mediaPlayer!!.pause()
-        binding.playPauseBtnNP.setIconResource(R.drawable.play_music_icon)
-        PlayerMusicActivity.musicService!!.showNotification(R.drawable.play_music_icon)
+        binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+        PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_play)
     }
 
     override fun onMusicDeleted() {
@@ -107,9 +107,9 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
     private fun refreshNowPlayingUI() {
 
         if (PlayerMusicActivity.isPlaying) {
-            binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon)
+            binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
         } else {
-            binding.playPauseBtnNP.setIconResource(R.drawable.play_music_icon)
+            binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
         }
         binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
         Glide.with(requireContext())

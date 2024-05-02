@@ -73,6 +73,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/curver_related"
                     android:padding="10dp"
+                    android:textColor="@color/white"
                     android:text="@string/related_to_recant_searches"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +84,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/historyRecycler"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="500dp"
                     android:background="@drawable/curver_related_recyclerview"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

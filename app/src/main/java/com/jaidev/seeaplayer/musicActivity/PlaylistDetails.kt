@@ -65,8 +65,12 @@ class PlaylistDetails : AppCompatActivity() {
         binding.addBtnPD.setOnClickListener {
             startActivity(Intent(this , SelectionActivity::class.java))
         }
+// Disable click events for addBtnPD
 
+
+        // Disable click events for removeAllPD
         binding.removeAllPD.setOnClickListener {
+
             val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle("Remove")
                 .setMessage("Do you want to remove all songs from playlist?")
@@ -160,8 +164,7 @@ class PlaylistDetails : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.moreInfoPD.text = "Total ${adapter.itemCount} Songs.\n\n" +
-                "Created On: ${PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].createdOn}\n\n" +
-                "  -- ${PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].createdBy}"
+                "Created On: ${PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].createdOn}"
 
         if(adapter.itemCount > 0)
         {

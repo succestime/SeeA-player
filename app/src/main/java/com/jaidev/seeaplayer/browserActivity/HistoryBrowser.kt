@@ -50,7 +50,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         loadAppOpenAd()
 
         val historyList = HistoryManager.getHistoryList(this).toMutableList()
-        fileListAdapter = HistoryAdapter(historyList , this )
+        fileListAdapter = HistoryAdapter(historyList ,this )
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
         binding.recyclerFileView.setHasFixedSize(true)
         binding.recyclerFileView.setItemViewCacheSize(10)
@@ -188,35 +188,41 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
 
 
     private fun showClearDataConfirmationDialog() {
-        // Create a custom dialog layout
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_layout, null)
+        if (fileListAdapter.itemCount == 0) {
+            // Show toast indicating no search history to delete
+            Toast.makeText(this, "There is no any Search History to delete", Toast.LENGTH_SHORT).show()
+        } else {
+            // Create a custom dialog layout
+            val dialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_layout, null)
 
-        // Initialize AlertDialogBuilder with custom layout
-        val alertDialogBuilder = AlertDialog.Builder(this)
-            .setView(dialogView)
+            // Initialize AlertDialogBuilder with custom layout
+            val alertDialogBuilder = AlertDialog.Builder(this)
+                .setView(dialogView)
 
-        // Set the dialog titles
-        val dialogTitle = dialogView.findViewById<TextView>(R.id.dialogTitle)
-        dialogTitle.text = getString(R.string.clear_data_dialog_title)
+            // Set the dialog titles
+            val dialogTitle = dialogView.findViewById<TextView>(R.id.dialogTitle)
+            dialogTitle.text = getString(R.string.clear_data_dialog_title)
 
-        val dialogMessage = dialogView.findViewById<TextView>(R.id.dialogMessage)
-        dialogMessage.text = getString(R.string.clear_data_dialog_message)
+            val dialogMessage = dialogView.findViewById<TextView>(R.id.dialogMessage)
+            dialogMessage.text = getString(R.string.clear_data_dialog_message)
 
-        // Set positive button (Clear Data)
-        alertDialogBuilder.setPositiveButton("Clear Data") { dialog, _ ->
-            clearBrowsingData()
-            dialog.dismiss()
+            // Set positive button (Clear Data)
+            alertDialogBuilder.setPositiveButton("Clear Data") { dialog, _ ->
+                clearBrowsingData()
+                dialog.dismiss()
+            }
+
+            // Set negative button (Cancel)
+            alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            // Create and show the AlertDialog
+            val alertDialog = alertDialogBuilder.create()
+            alertDialog.show()
         }
-
-        // Set negative button (Cancel)
-        alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.dismiss()
-        }
-
-        // Create and show the AlertDialog
-        val alertDialog = alertDialogBuilder.create()
-        alertDialog.show()
     }
+
 
 
 

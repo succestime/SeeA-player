@@ -203,16 +203,10 @@ class HomeFragment : Fragment() {
     }
 
 
-//    private fun updateEmptyStateVisibility() {
-//        if (HistoryBrowser.historyItems.isEmpty()) {
-//            binding.historyRecycler.visibility = View.GONE
-//        } else {
-//            binding.historyRecycler.visibility = View.VISIBLE
-//        }
-//    }
 
     // Inside performSearch() method
     // Inside performSearch() method
+    @SuppressLint("NotifyDataSetChanged")
     private fun performSearch(query: String) {
         if (checkForInternet(requireContext())) {
             // Check if the title is already saved
@@ -222,6 +216,9 @@ class HomeFragment : Fragment() {
                 // Create a SearchTitle object with the query and save it
                 val searchTitle = SearchTitle(query)
                 SearchTitleStore.addTitle(requireContext(), searchTitle)
+                // Add new item to the adapter
+                val adapter = binding.historyRecycler.adapter as SavedTitlesAdapter
+                adapter.addItem(query)
             }
 
             // Change tab and perform search

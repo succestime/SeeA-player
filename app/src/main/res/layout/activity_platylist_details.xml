@@ -11,28 +11,55 @@
     <LinearLayout
         android:id="@+id/linearLayoutDetails"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:orientation="horizontal"
+        android:layout_height="140dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/playlistImgPD"
-            android:layout_width="250dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/speaker" />
 
-        <TextView
-            android:id="@+id/moreInfoPD"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="5dp"
-            android:gravity="center|start"
-            android:text="@string/playlist_name"
-            android:textSize="16sp" />
+
+
+
+
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/linearLayout8"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutDetails">
+
+
+        <TextView
+            android:id="@+id/moreInfoPD"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="5dp"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:layout_marginTop="10dp"
+            android:text="@string/playlist_name"
+            android:textSize="15sp" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/shuffleBtnPD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center_vertical"
+            android:backgroundTint="@color/gray"
+            android:visibility="invisible"
+            app:icon="@drawable/shuffle_icon"
+            app:iconTint="@color/black"
+            app:strokeColor="@color/cool_blue" />
+
+    </LinearLayout>
     <!-- Horizontal line -->
     <View
         android:id="@+id/horizontalLine"
@@ -47,31 +74,12 @@
         android:id="@+id/playlistDetailsRV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/horizontalLine"
+        android:paddingBottom="330dp"
         android:scrollbarThumbVertical="@drawable/scroll_bar_icon"
         android:scrollbars="vertical"
-        android:paddingBottom="330dp"
-        android:layout_marginTop="10dp"/>
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/shuffleBtnPD"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        app:icon="@drawable/shuffle_icon"
-        app:iconSize="35dp"
-        app:iconTint="@color/cool_blue"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/cool_blue"
-        android:visibility="invisible"/>
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout8" />
 
 
     <!--for buttons-->

@@ -63,7 +63,9 @@ class MusicAdapter(
     private var actionMode: ActionMode? = null
 
     companion object {
+        private var itemCount: Int = 0
         private const val PREF_NAME = "music_titles"
+
     }
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
     init {
@@ -166,13 +168,9 @@ class MusicAdapter(
             selectionActivity ->{
                 holder.root.setOnClickListener {
                     if(addSong(musicList[position]))
-                        holder.root.setBackgroundColor(ContextCompat.getColor(context,
-                            R.color.cool_pink
-                        ))
+                        holder.root.setBackgroundResource(R.drawable.browser_selected_background)
                     else
-                        holder.root.setBackgroundColor(ContextCompat.getColor(context,
-                            R.color.white
-                        ))
+                        holder.root.setBackgroundResource(android.R.color.transparent)
 
                 }
             }
@@ -320,6 +318,7 @@ class MusicAdapter(
     override fun getItemCount(): Int {
         return musicList.size
     }
+
 
 
     private fun addSong(song: Music): Boolean{

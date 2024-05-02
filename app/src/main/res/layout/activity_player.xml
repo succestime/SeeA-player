@@ -31,7 +31,7 @@
                 android:layout_height="match_parent"
                 android:background="#77000000"
                 android:visibility="invisible"
-                app:yt_playerView="@id/playerView" >
+                app:yt_playerView="@id/playerView">
 
                 <TextView
                     android:id="@+id/durationChangeTextView"
@@ -40,11 +40,12 @@
                     android:layout_centerInParent="true"
                     android:text="@string/durationChangeTextView"
                     android:textColor="#DCD7D7"
-                    android:visibility="gone"
                     android:textSize="24sp"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     tools:layout_editor_absoluteX="153dp"
                     tools:layout_editor_absoluteY="331dp" />
+
             </com.github.vkay94.dtpv.youtube.YouTubeOverlay>
         </com.github.vkay94.dtpv.DoubleTapPlayerView>
 
@@ -161,23 +162,48 @@
             android:contentDescription="@string/Brightness_icon" />
     </LinearLayout>
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        app:adSize="250x250"
-        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+    <LinearLayout
+        android:id="@+id/adsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/frameLayout"
-        tools:ignore="MissingConstraints">
+        app:layout_constraintTop_toTopOf="parent">
 
-    </com.google.android.gms.ads.AdView>
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:adSize="250x250"
+            app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/frameLayout"
+            tools:ignore="MissingConstraints">
+
+        </com.google.android.gms.ads.AdView>
+
+        <ImageButton
+            android:id="@+id/adsRemove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:src="@drawable/clear_ads"
+            android:visibility="visible"
+            android:layout_marginStart="5dp"
+            app:layout_constraintStart_toEndOf="@+id/adsLayout"
+            app:layout_constraintTop_toTopOf="@+id/adsLayout"
+            >
+
+        </ImageButton>
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 
 

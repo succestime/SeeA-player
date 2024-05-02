@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.format.DateUtils
@@ -19,6 +22,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.OnUserEarnedRewardListener
+import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.dataClass.VideoData
@@ -38,8 +49,8 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
     private val PREF_LAYOUT_TYPE = "pref_layout_type"
     private val LAYOUT_TYPE_GRID = "grid"
     private val LAYOUT_TYPE_LIST = "list"
-    private var songImageHeight: Int = 0
-    private var videoRenameListener: VideoAdapter.VideoRenameListener? = null
+        lateinit var mAdView: AdView
+        private var rewardedInterstitialAd : RewardedInterstitialAd? = null
 
     companion object {
         lateinit var currentFolderVideos: ArrayList<VideoData>
@@ -51,6 +62,9 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         binding = ActivityFoldersBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        MobileAds.initialize(this){}
+
+        // banner ads
 
         val position = intent.getIntExtra("position", 0)
         currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
@@ -106,11 +120,18 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             binding.swipeRefreshFolder.isRefreshing = false // Hide the refresh indicator
 
         }
+
         binding.nowPlayingBtn.setOnClickListener {
-            val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
-            intent.putExtra("class", "NowPlaying")
-            startActivity( intent )
+            if (checkForInternet(this)) {
+                // Internet is available, proceed to load and show ad
+                loadRewardedAdAndStartPlayerActivity()
+            } else {
+                // No internet connection, proceed directly to PlayerActivity
+                startPlayerActivity()
+            }
         }
+
+
 
         binding.gridBtn.setOnClickListener {
             adapter.enableGridMode(true) // Disable grid mode
@@ -274,7 +295,29 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
 
         return true
     }
+        @SuppressLint("ObsoleteSdkInt")
+        fun checkForInternet(context: Context): Boolean {
+            val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val network = connectivityManager.activeNetwork ?: return false
+                val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+                return when {
+                    activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                    activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                    else -> false
+                }
+            } else {
+                @Suppress("DEPRECATION") val networkInfo =
+                    connectivityManager.activeNetworkInfo ?: return false
+                @Suppress("DEPRECATION")
+                return networkInfo.isConnected
+            }
+
+
+        }
     @SuppressLint("Range")
     fun getAllVideos(folderId: String): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
@@ -401,5 +444,35 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         MainActivity.adapterChanged= false
     }
 
+        private fun loadRewardedAdAndStartPlayerActivity() {
+            val adRequest = AdRequest.Builder().build()
+            RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest,
+                object : RewardedInterstitialAdLoadCallback() {
+                    override fun onAdLoaded(ad: RewardedInterstitialAd) {
+                        rewardedInterstitialAd = ad
+                        showRewardedAdAndStartPlayerActivity()
+                        startPlayerActivity()
+                    }
 
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        rewardedInterstitialAd = null
+                        // If ad fails to load, start PlayerActivity without showing the ad
+
+                    }
+                })
+        }
+
+        private fun showRewardedAdAndStartPlayerActivity() {
+            rewardedInterstitialAd?.show(this@FoldersActivity, object : OnUserEarnedRewardListener {
+                override fun onUserEarnedReward(p0: RewardItem) {
+                    // Handle reward if needed
+                }
+            })
+        }
+
+        private fun startPlayerActivity() {
+            val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
+            intent.putExtra("class", "NowPlaying")
+            startActivity(intent)
+        }
 }

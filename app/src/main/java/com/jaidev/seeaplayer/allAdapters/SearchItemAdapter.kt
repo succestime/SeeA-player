@@ -38,6 +38,8 @@ class SearchItemAdapter(private val context: Context, private val historyItem: H
             }
 
             writeTextView.setOnClickListener {
+                // Clear the text in btnTextUrl
+                // Write the URL in btnTextUrl
                 val title = historyItem.url
                 fillTitleInTextUrl(title)
             }

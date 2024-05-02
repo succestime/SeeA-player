@@ -74,7 +74,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
                 binding.seekBarRPA.progress = 0
                 binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
-                binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+                binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
                 updateNextMusicTitle()
                 musicService!!.mediaPlayer!!.setOnCompletionListener(this@Companion)
             }catch (e : Exception){return}
@@ -234,7 +234,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
             binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
             binding.seekBarRPA.progress = 0
             binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
-            binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+            binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
             updateNextMusicTitle()
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
         }catch (e : Exception){return}
@@ -273,14 +273,14 @@ class ReMusicPlayerActivity : AppCompatActivity()
     }
     private fun playMusic() {
         isPlaying = true
-        binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
+        binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
         musicService!!.mediaPlayer!!.start()
 
     }
 
     private fun pauseMusic() {
         isPlaying = false
-        binding.playPauseBtnPA.setIconResource(R.drawable.play_music_icon)
+        binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
         musicService!!.mediaPlayer!!.pause()
 
 

@@ -24,20 +24,13 @@ class FoldersAdapter(private val context: Context, private var foldersList: Arra
     @SuppressLint("SuspiciousIndentation")
     override fun onBindViewHolder(holder: MyHOlder, position: Int) {
         holder.folderName.text = foldersList[position].folderName
-
         holder.root.setOnClickListener {
             val intent = Intent(context, FoldersActivity::class.java)
             intent.putExtra("position", position)
             ContextCompat.startActivity(context, intent, null)
 
-
-
         }
-
-
     }
-
-
     override fun getItemCount(): Int {
         return foldersList.size
     }

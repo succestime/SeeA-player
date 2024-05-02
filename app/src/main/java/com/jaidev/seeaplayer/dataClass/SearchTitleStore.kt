@@ -31,13 +31,18 @@ class SearchTitleStore {
                 emptyList()
             }
         }
+        // Function to delete a title from the list
+  
+
 
         // Function to save titles
-        private fun saveTitles(context: Context, titles: List<SearchTitle>) {
+        fun saveTitles(context: Context, titles: List<SearchTitle>) {
             val sharedPreferences =
                 context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
             val jsonTitles = Gson().toJson(titles)
             sharedPreferences.edit().putString(KEY_TITLES, jsonTitles).apply()
         }
+
+
     }
 }

@@ -38,10 +38,11 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentEnd="true"
-        app:icon="@drawable/next_icon"
+        app:icon="@drawable/round_navigate_next"
         app:iconTint="@color/white"
         android:backgroundTint="#F2053853"
         android:layout_centerVertical="true"
+        app:iconSize="35dp"
         android:layout_marginEnd="10dp"/>
 
 
@@ -49,8 +50,9 @@
         android:id="@+id/playPauseBtnNP"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        app:icon="@drawable/play_music_icon"
+        app:icon="@drawable/round_play"
         app:iconTint="@color/white"
+        app:iconSize="35dp"
         android:layout_centerVertical="true"
         android:backgroundTint="#F2053853"
         android:layout_toStartOf="@id/nextBtnNP"

@@ -11,7 +11,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
+<!--        <com.google.android.gms.ads.AdView-->
+<!--            android:id="@+id/adView"-->
+<!--            android:layout_width="250dp"-->
+<!--            android:layout_height="250dp"-->
 
+<!--            app:adSize="250x250"-->
+<!--            app:adUnitId="ca-app-pub-3940256099942544/6300978111"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            tools:ignore="MissingConstraints">-->
+
+<!--        </com.google.android.gms.ads.AdView>-->
 
 
         <LinearLayout
@@ -75,6 +87,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/folderRV"
             android:layout_width="0dp"
@@ -97,6 +110,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"

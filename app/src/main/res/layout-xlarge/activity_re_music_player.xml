@@ -22,7 +22,7 @@
             android:layout_width="50dp"
             android:layout_height="80dp"
             app:tint="?android:attr/textColorPrimary"
-            android:src="@drawable/back_icon"
+            android:src="@drawable/round_back"
         android:layout_gravity="center"
             android:background="?attr/selectableItemBackground"
             android:layout_marginStart="20dp"
@@ -95,7 +95,7 @@
             android:id="@+id/previousBtnPA"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:icon="@drawable/previous_icon"
+            app:icon="@drawable/round_navigate_before"
             app:iconSize="40dp"/>
 
         <!--        Play & Pause Button-->
@@ -103,7 +103,7 @@
             android:id="@+id/playPauseBtnPA"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_pause_icon"
+            app:icon="@drawable/round_pause_24"
             app:iconSize="50dp"
             android:layout_marginHorizontal="25dp"
             app:shapeAppearanceOverlay="@style/curved"
@@ -115,7 +115,7 @@
             android:id="@+id/nextBtnPA"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:icon="@drawable/next_icon"
+            app:icon="@drawable/round_navigate_next"
             app:iconSize="40dp"/>
 
     </LinearLayout>
@@ -166,7 +166,7 @@
             android:id="@+id/repeatBtnPA"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_repeat_off_icon"
+            android:src="@drawable/round_repeat_music"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/repeat_btn"
             android:layout_weight="1"
@@ -178,7 +178,7 @@
             android:id="@+id/equalizerBtnPA"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:src="@drawable/equalizer_icon"
+            android:src="@drawable/round_graphic_music"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/equalizer_btn"
             android:layout_weight="1"
@@ -189,7 +189,7 @@
             android:id="@+id/timerBtnPA"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_timer_icon"
+            android:src="@drawable/round_timer_music"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/sleep_timer"
             android:layout_weight="1"
@@ -200,7 +200,7 @@
             android:id="@+id/shareBtnPA"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_share_icon"
+            android:src="@drawable/round_share_music"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/share"
             android:layout_weight="1"

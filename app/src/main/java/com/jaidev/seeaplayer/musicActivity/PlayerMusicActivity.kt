@@ -120,11 +120,11 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         binding.playPauseBtnPA.setOnClickListener {
             if (isPlaying) {
                 pauseMusic()
-                musicService!!.showNotification(R.drawable.play_music_icon)
+                musicService!!.showNotification(R.drawable.round_play)
             }
             else {
                 playMusic()
-                musicService!!.showNotification(R.drawable.ic_pause_icon)
+                musicService!!.showNotification(R.drawable.round_pause_24)
             }
         }
         binding.previousBtnPA.setOnClickListener {
@@ -139,7 +139,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     musicService!!.mediaPlayer!!.seekTo(progress)
-                    musicService!!.showNotification(if (isPlaying) R.drawable.ic_pause_icon else R.drawable.play_icon)
+                    musicService!!.showNotification(if (isPlaying) R.drawable.round_pause_24 else R.drawable.round_play)
                 }
             }
 
@@ -211,12 +211,12 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             fIndex = favouriteChecker(musicListPA[songPosition].id)
             if(isFavourite){
                 isFavourite = false
-                binding.favouriteBtnPA.setImageResource(R.drawable.favorite_empty_icon)
+                binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_border_music)
                 FavouriteActivity.favouriteSongs.removeAt(fIndex)
 
             } else{
                 isFavourite = true
-                binding.favouriteBtnPA.setImageResource(R.drawable.favorite_icon)
+                binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_music)
                 FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
             }
         }
@@ -328,8 +328,8 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         if(min15 || min30 || min60) binding.timerBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
             R.color.cool_green
         ))
-        if(isFavourite) binding.favouriteBtnPA.setImageResource(R.drawable.favorite_icon)
-        else binding.favouriteBtnPA.setImageResource(R.drawable.favorite_empty_icon)
+        if(isFavourite) binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_music)
+        else binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_border_music)
 
     }
 
@@ -343,8 +343,8 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             musicService!!.mediaPlayer!!.prepare()
             musicService!!.mediaPlayer!!.start()
             isPlaying = true
-            binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-          musicService!!.showNotification(R.drawable.ic_pause_icon)
+            binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
+          musicService!!.showNotification(R.drawable.round_pause_24)
             updateNextMusicTitle()
             binding.tvSeekBarStart.text =
                 formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
@@ -366,15 +366,15 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     private fun playMusic() {
         isPlaying = true
       musicService!!.mediaPlayer!!.start()
-        binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-       musicService!!.showNotification(R.drawable.ic_pause_icon)
+        binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
+       musicService!!.showNotification(R.drawable.round_pause_24)
 
     }
 
     private fun pauseMusic() {
         isPlaying = false
-        binding.playPauseBtnPA.setIconResource(R.drawable.play_music_icon)
-        musicService!!.showNotification(R.drawable.play_music_icon)
+        binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
+        musicService!!.showNotification(R.drawable.round_play)
      musicService!!.mediaPlayer!!.pause()
 
     }

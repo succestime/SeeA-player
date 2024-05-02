@@ -15,7 +15,9 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -42,9 +44,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -64,6 +64,8 @@ import com.jaidev.seeaplayer.browserActivity.checkForInternet
 import com.jaidev.seeaplayer.dataClass.FileType
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
+import com.jaidev.seeaplayer.dataClass.SearchTitle
+import com.jaidev.seeaplayer.dataClass.SearchTitleStore
 import com.jaidev.seeaplayer.databinding.FragmentBrowseBinding
 import java.io.ByteArrayOutputStream
 
@@ -75,9 +77,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     private var mInterstitialAd: InterstitialAd? = null
     private var tempText: CharSequence? = null
     private lateinit var fileListAdapter: SearchItemAdapter
-    private lateinit var searchHintTitleRecyclerView: RecyclerView // Add this line
-
-    lateinit var mAdView : AdView
+    private var isRecyclerViewLayoutVisible = false
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
 
@@ -106,28 +106,42 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         val view = inflater.inflate(R.layout.fragment_browse, container, false)
         binding = FragmentBrowseBinding.bind(view)
         registerForContextMenu(binding.webView)
-        binding.webView.apply {
 
+        binding.webView.apply {
+            // Check if the URL is valid or contains ".com"
             when {
-             URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
-              urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
-                else -> loadUrl("https://www.google.com/search?q=$urlNew")
+                URLUtil.isValidUrl(urlNew) || urlNew.contains(".com", ignoreCase = true) -> {
+                    loadUrl(urlNew)
+                }
+                else -> {
+                    // If not valid, load a default search page with the query
+                    loadUrl("https://www.google.com/search?q=$urlNew")
+                }
             }
 
+            // Enable JavaScript and other settings
+            settings.javaScriptEnabled = true
+            settings.javaScriptCanOpenWindowsAutomatically = true
+            settings.builtInZoomControls = true
+            settings.displayZoomControls = false
+            settings.setSupportZoom(true)
         }
 
+// Print the URL to logcat for verification
+        Log.d("WebViewURL", "URL to load: $urlNew")
 
         val rootView = view.rootView
 
-//        rootView.viewTreeObserver.addOnGlobalLayoutListener {
-//            val rect = Rect()
-//            rootView.getWindowVisibleDisplayFrame(rect)
-//            val screenHeight = rootView.height
-//            val keypadHeight = screenHeight - rect.bottom
-//            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
-//            binding.recyclerviewLayout.visibility = if (!isKeyboardVisible) View.GONE else View.VISIBLE
-//
-//        }
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            rootView.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+            if (!isKeyboardVisible) {
+                binding.recyclerviewLayout.visibility = View.GONE
+            }
+        }
 
 
         return view
@@ -187,16 +201,33 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
         }
 
+
         linkRef.binding.btnTextUrl.setOnClickListener {
-            if (linkRef.binding.btnTextUrl.text.isNotEmpty()) {
-                linkRef.binding.btnTextUrl.text.clear()
+            // Request focus for btnTextUrl
+            if (binding.recyclerviewLayout.visibility == View.VISIBLE) {
+                binding.recyclerviewLayout.visibility = View.GONE
+            } else {
+                linkRef.binding.btnTextUrl.requestFocus()
                 binding.recyclerviewLayout.visibility = View.VISIBLE
-
             }
-
+//            linkRef.binding.btnTextUrl.requestFocus()
+//            binding.recyclerviewLayout.visibility = View.VISIBLE
         }
 
+// Before loading the webpage, check for network connectivity
+        if (checkForInternet(requireContext())) {
+            // Proceed with loading the webpage
+        } else {
+            // Inform the user about the lack of internet connectivity
+            Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_SHORT).show()
+        }
 
+        // Implement a function to check for internet connectivity
+        fun checkForInternet(context: Context): Boolean {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connectivityManager.activeNetworkInfo
+            return networkInfo != null && networkInfo.isConnected
+        }
 
         binding.historyRecycler.setHasFixedSize(true)
         binding.historyRecycler.setItemViewCacheSize(5)
@@ -204,7 +235,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         binding.historyRecycler.adapter = SavedTitlesAdapter(requireContext())
 
 
-        // Set editor action listener for btnTextUrl (IME_ACTION_DONE or IME_ACTION_GO)
+// Set editor action listener for btnTextUrl (IME_ACTION_DONE or IME_ACTION_GO)
         linkRef.binding.btnTextUrl.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
                 val query = linkRef.binding.btnTextUrl.text.toString()
@@ -221,21 +252,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             }
             return@setOnEditorActionListener false
         }
-
-
-
-
-//        // Set up RecyclerView adapter
-//        val historyList = HistoryManager.getHistoryList(requireContext()).toMutableList()
-//        fileListAdapter = if (historyList.isNotEmpty()) {
-//            SearchItemAdapter(requireContext(), historyList.first())
-//        } else {
-//            SearchItemAdapter(requireContext(), null)
-//        }
-//        binding.searchHintTitleRV.layoutManager = LinearLayoutManager(requireContext())
-//        binding.searchHintTitleRV.adapter = fileListAdapter
-
-
         // Check if it's a tablet
         val isTablet = resources.configuration.smallestScreenWidthDp >= 600
 
@@ -280,41 +296,30 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
 
 
         binding.webView.apply {
-            settings.javaScriptEnabled = true
-            settings.setSupportZoom(true)
-            settings.builtInZoomControls = true
-         settings.displayZoomControls = false
-            settings.userAgentString = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4501.0 Mobile Safari/537.36"
-       settings.useWideViewPort = true
-        settings.loadWithOverviewMode = true
-
-
-
+//            settings.javaScriptEnabled = true
+//            settings.setSupportZoom(true)
+//            settings.builtInZoomControls = true
+//         settings.displayZoomControls = false
+//            settings.userAgentString = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4501.0 Mobile Safari/537.36"
+//       settings.useWideViewPort = true
+//        settings.loadWithOverviewMode = true
 
             webViewClient = object : WebViewClient() {
 
-                @Deprecated("Deprecated in Java")
+                // Inside your WebViewClient implementation
                 override fun onReceivedError(
                     view: WebView?,
                     errorCode: Int,
                     description: String?,
                     failingUrl: String?
                 ) {
-                    // Handle WebView error
-                    Log.e(
-                        "WebViewError",
-                        "Error loading $failingUrl: $description (error code: $errorCode)"
-                    )
+                    super.onReceivedError(view, errorCode, description, failingUrl)
+                    Log.e("WebViewError", "Error loading $failingUrl: $description (error code: $errorCode)")
+                    // Handle error gracefully, e.g., show an error message to the user
                 }
-
 
                 override fun onLoadResource(view: WebView?, url: String?) {
                     super.onLoadResource(view, url)
-                    settings.setSupportZoom(true)
-                    settings.javaScriptEnabled = true
-                    settings.builtInZoomControls = true
-                    settings.displayZoomControls = false
-
 
                 }
 
@@ -404,8 +409,20 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
 
 
     }
+
+
     private fun performSearch(query: String) {
         if (checkForInternet(requireContext())) {
+            // Check if the title is already saved
+            val isTitleSaved = SearchTitleStore.getTitles(requireContext()).any { it.title == query }
+
+            if (!isTitleSaved) {
+                // Create a SearchTitle object with the query and save it
+                val searchTitle = SearchTitle(query)
+                SearchTitleStore.addTitle(requireContext(), searchTitle)
+
+            }
+
             changeTab(query, BrowseFragment(query))
         } else {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
@@ -526,7 +543,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
     override fun onPause() {
         super.onPause()
         unregisterDownloadReceiver()
-
+      binding.recyclerviewLayout.visibility = View.GONE
         (requireActivity() as LinkTubeActivity).saveBookmarks()
         // for clearing all  webView data
 //        binding.webView.apply {
@@ -709,4 +726,39 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
         val browserFragment = BrowseFragment(urlNew = query)
         changeTab("Brave", browserFragment)
     }
+
+
+    private fun keyboard(){
+        val linkRef = requireActivity() as LinkTubeActivity
+        // Add a ViewTreeObserver to listen for keyboard visibility changes
+        linkRef.binding.root.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            linkRef.binding.root.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = linkRef.binding.root.height
+            val keypadHeight = screenHeight - rect.bottom
+            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+
+            // If the keyboard is not visible, hide the recyclerviewLayout
+            if (!isKeyboardVisible) {
+                binding.recyclerviewLayout.visibility = View.GONE
+
+            }else{
+                binding.recyclerviewLayout.visibility = View.VISIBLE
+
+            }
+        }
+    }
+    fun onBackPressed(): Boolean {
+        val webView = binding.webView
+        return if (webView.canGoBack()) {
+            webView.goBack()
+            true // Back press handled within the fragment
+        } else {
+            false // Back press not handled within the fragment
+        }
+    }
+
 }
+
+// Inside your BrowseFragment class
+

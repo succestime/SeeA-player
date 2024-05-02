@@ -23,11 +23,15 @@
         android:layout_height="68dp"
         android:layout_weight="1"
         android:paddingHorizontal="2dp"
+        android:gravity="center_vertical"
         android:orientation="vertical">
     <TextView
         android:id="@+id/songName"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:maxLines="1"
+        android:textStyle="bold"
         android:text="Song Name "
         android:layout_toEndOf="@+id/musicViewImage"
         android:layout_marginStart="5dp"/>
@@ -35,7 +39,9 @@
     <TextView
         android:id="@+id/songAlbum"
         android:layout_width="wrap_content"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
+        android:textColor="#5A5A5A"
+        android:textSize="10dp"
         android:text="Song Album "
         android:layout_marginStart="5dp"/>
 

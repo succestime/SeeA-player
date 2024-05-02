@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/iconImageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="15dp"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/history_svgrepo_com" />
@@ -18,7 +18,7 @@
         android:textSize="20sp"
         android:gravity="center"
         android:textStyle="bold"
-        android:textColor="@color/black" />
+       />
 
     <TextView
         android:id="@+id/dialogMessage"
@@ -27,6 +27,6 @@
         android:layout_marginTop="16dp"
         android:textSize="18sp"
         android:gravity="center"
-        android:textColor="@color/black" />
+        />
 
 </LinearLayout>

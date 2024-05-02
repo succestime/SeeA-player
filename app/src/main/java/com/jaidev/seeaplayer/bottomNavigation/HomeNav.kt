@@ -11,6 +11,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
@@ -24,7 +26,7 @@ class homeNav : Fragment() {
     private var isSearchViewClicked = false
     private lateinit var searchView: SearchView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-
+    lateinit var mAdView: AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -36,6 +38,8 @@ class homeNav : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
         adapter = VideoAdapter(requireContext(), MainActivity.videoList )
+
+
 
         binding.folderRV.setHasFixedSize(true)
         binding.folderRV.setItemViewCacheSize(10)
@@ -67,6 +71,9 @@ class homeNav : Fragment() {
         } else {
             binding.videoEmptyStateLayout.visibility = View.GONE
         }
+
+        MobileAds.initialize(requireContext()){}
+//       mAdView = binding.adView
 
         return binding.root
     }

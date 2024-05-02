@@ -557,21 +557,23 @@ class LinkTubeActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     @SuppressLint("NotifyDataSetChanged")
     override fun onBackPressed() {
-        var frag: BrowseFragment? = null
-        try {
-            frag = tabsList[binding.myPager.currentItem] as BrowseFragment
-        } catch (_: Exception) {
+        var handled = false
+        val currentFragment = tabsList.getOrNull(binding.myPager.currentItem)?.fragment
+        if (currentFragment is BrowseFragment) {
+            // Check if the current fragment is a BrowseFragment and can handle the back press
+            handled = currentFragment.onBackPressed()
         }
 
-        when {
-            frag?.binding?.webView?.canGoBack() == true -> frag.binding.webView.goBack()
-            binding.myPager.currentItem != 0 -> {
-                tabsList.removeAt(binding.myPager.currentItem)
-                binding.myPager.adapter!!.notifyDataSetChanged()
-                binding.myPager.currentItem = tabsList.size - 1
-
+        if (!handled) {
+            // If back press is not handled by the current fragment, perform default behavior
+            when {
+                binding.myPager.currentItem != 0 -> {
+                    tabsList.removeAt(binding.myPager.currentItem)
+                    binding.myPager.adapter?.notifyDataSetChanged()
+                    binding.myPager.currentItem = tabsList.size - 1
+                }
+                else -> super.onBackPressed()
             }
-            else -> super.onBackPressed()
         }
     }
 
@@ -598,7 +600,6 @@ class LinkTubeActivity : AppCompatActivity() {
                rewardedIAd()
                 rewardedInterstitialAd?.show(this, object : OnUserEarnedRewardListener {
                     override fun onUserEarnedReward(p0: RewardItem) {
-                        Toast.makeText(this@LinkTubeActivity, p0.amount.toString(), Toast.LENGTH_SHORT).show()
                     }
 
                 })
