@@ -172,7 +172,7 @@
             android:layout_height="250dp"
 
             app:adSize="250x250"
-            app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+            app:adUnitId="ca-app-pub-3504589383575544/5806566619"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

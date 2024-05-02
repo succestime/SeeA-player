@@ -22,14 +22,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.OnUserEarnedRewardListener
-import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.dataClass.VideoData
@@ -122,15 +117,12 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         }
 
         binding.nowPlayingBtn.setOnClickListener {
-            if (checkForInternet(this)) {
-                // Internet is available, proceed to load and show ad
-                loadRewardedAdAndStartPlayerActivity()
-            } else {
-                // No internet connection, proceed directly to PlayerActivity
-                startPlayerActivity()
-            }
+
+                    startPlayerActivity()
+
         }
 
+        // Delay execution of startPlayerActivity by 2 seconds
 
 
         binding.gridBtn.setOnClickListener {
@@ -444,35 +436,40 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         MainActivity.adapterChanged= false
     }
 
-        private fun loadRewardedAdAndStartPlayerActivity() {
-            val adRequest = AdRequest.Builder().build()
-            RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest,
-                object : RewardedInterstitialAdLoadCallback() {
-                    override fun onAdLoaded(ad: RewardedInterstitialAd) {
-                        rewardedInterstitialAd = ad
-                        showRewardedAdAndStartPlayerActivity()
-                        startPlayerActivity()
-                    }
-
-                    override fun onAdFailedToLoad(adError: LoadAdError) {
-                        rewardedInterstitialAd = null
-                        // If ad fails to load, start PlayerActivity without showing the ad
-
-                    }
-                })
-        }
-
-        private fun showRewardedAdAndStartPlayerActivity() {
-            rewardedInterstitialAd?.show(this@FoldersActivity, object : OnUserEarnedRewardListener {
-                override fun onUserEarnedReward(p0: RewardItem) {
-                    // Handle reward if needed
-                }
-            })
-        }
+//        private fun loadRewardedAdAndStartPlayerActivity() {
+//            val adRequest = AdRequest.Builder().build()
+//            RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest,
+//                object : RewardedInterstitialAdLoadCallback() {
+//                    override fun onAdLoaded(ad: RewardedInterstitialAd) {
+//                        rewardedInterstitialAd = ad
+//                        showRewardedAdAndStartPlayerActivity()
+//                        startPlayerActivity()
+//
+//                    }
+//
+//                    override fun onAdFailedToLoad(adError: LoadAdError) {
+//                        rewardedInterstitialAd = null
+//                        // If ad fails to load, start PlayerActivity without showing the ad
+//                        startPlayerActivity()
+//                    }
+//                })
+//        }
+//
+//        private fun showRewardedAdAndStartPlayerActivity() {
+//            rewardedInterstitialAd?.show(this@FoldersActivity, object : OnUserEarnedRewardListener {
+//                override fun onUserEarnedReward(p0: RewardItem) {
+//                    // Handle reward if needed
+//                }
+//            })
+//        }
 
         private fun startPlayerActivity() {
-            val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
-            intent.putExtra("class", "NowPlaying")
-            startActivity(intent)
+
+                val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
+                intent.putExtra("class", "NowPlaying")
+                startActivity(intent)
+
         }
-}
+
+
+    }

@@ -60,11 +60,15 @@ class DaysMusic : Fragment() {
 
 
         swipeRefreshLayout = binding.swipeRefreshMusic
-
+swipeRefreshLayout.setOnRefreshListener {
+    loadRecentMusics()
+    binding.shuffleBtn.visibility = View.VISIBLE
+    swipeRefreshLayout.isRefreshing = false
+}
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
 
-
+        shuffleEmpty()
         return view
     }
 
@@ -76,10 +80,11 @@ class DaysMusic : Fragment() {
             startActivity(intent)
         }
 
-        if (musicRecantList.isEmpty()) {
-            binding.shuffleBtn.visibility = View.GONE
-        } else {
+        if (musicRecantList.isNotEmpty()) {
             binding.shuffleBtn.visibility = View.VISIBLE
+        } else {
+            binding.shuffleBtn.visibility = View.GONE
+
         }
 
     }

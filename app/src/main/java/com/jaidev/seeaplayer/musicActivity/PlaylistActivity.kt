@@ -4,6 +4,7 @@ package com.jaidev.seeaplayer.musicActivity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -47,7 +48,6 @@ class PlaylistActivity : AppCompatActivity() {
         adapter = PlaylistViewAdapter(this , playlistList = musicPlaylist.ref )
         binding.playlistRV.adapter = adapter
         binding.addPlaylistBtn.setOnClickListener { customAlertDialog() }
-
 
 
         setActionBarGradient()
@@ -167,8 +167,14 @@ class PlaylistActivity : AppCompatActivity() {
 
             adapter.refreshPlaylist()
         }
-    }
+        // Update visibility of emptyStateLayout
+        if (musicPlaylist.ref.isEmpty()) {
+            binding.emptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.emptyStateLayout.visibility = View.GONE
+        }
 
+    }
 
     fun loadAd(){
         val adRequest = AdRequest.Builder().build()
@@ -188,6 +194,13 @@ class PlaylistActivity : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
+
+        // Update visibility of emptyStateLayout
+        if (musicPlaylist.ref.isEmpty()) {
+            binding.emptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.emptyStateLayout.visibility = View.GONE
+        }
         adapter.notifyDataSetChanged()
     }
 

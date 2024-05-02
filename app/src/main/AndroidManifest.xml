@@ -36,7 +36,7 @@
         >
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-3504589383575544~6864519496"/>
 
         <activity
             android:name=".browserActivity.HistoryBrowser"

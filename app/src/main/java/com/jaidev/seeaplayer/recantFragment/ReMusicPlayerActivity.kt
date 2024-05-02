@@ -22,7 +22,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.appopen.AppOpenAd
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
@@ -38,7 +40,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
 {
     lateinit var mAdView: AdView
     private lateinit var reMusicPlayerLayout: LinearLayout
-
+    private var appOpenAd : AppOpenAd? = null
     companion object {
         // of PlayerActivity of this reMusicActivity
         lateinit var reMusicList: ArrayList<RecantMusic>
@@ -54,6 +56,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: ActivityReMusicPlayerBinding
         var repeat: Boolean = false
+        private var isAdDisplayed = false
 
         fun updateNextMusicTitle() {
             val nextSongPosition = if (songPosition + 1 < MainActivity.musicRecantList.size) songPosition + 1 else 0 // Assuming looping back to the first song after reaching the end
@@ -378,6 +381,40 @@ class ReMusicPlayerActivity : AppCompatActivity()
             dialog.dismiss()
         }
     }
+
+
+    fun loadAppOpenAd() {
+        if (!isAdDisplayed) {
+            val adRequest = AdRequest.Builder().build()
+            AppOpenAd.load(
+                this,
+                "ca-app-pub-3504589383575544/8514536729",
+                adRequest,
+                AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
+                appOpenAdLoadCallback
+            )
+        }
+    }
+
+    private val appOpenAdLoadCallback = object : AppOpenAd.AppOpenAdLoadCallback() {
+        override fun onAdLoaded(ad: AppOpenAd) {
+            appOpenAd = ad
+            appOpenAd!!.show(this@ReMusicPlayerActivity)
+        isAdDisplayed = true // Mark ad as displayed
+        }
+
+        override fun onAdFailedToLoad(p0: LoadAdError) {
+            // Handle failed ad loading
+        }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loadAppOpenAd()
+
+    }
+
 }
 
 private fun MediaPlayer.setOnCompletionListener(companion: ReMusicPlayerActivity.Companion) {

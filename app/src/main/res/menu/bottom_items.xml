@@ -5,9 +5,7 @@
      android:title="@string/home"
      android:icon="@drawable/home_icon"  />
 
- <item android:id="@+id/music"
-       android:title="@string/music"
-  android:icon="@drawable/music_icon"/>
+
 
  <item android:id="@+id/download"
   android:title="@string/download"
@@ -16,6 +14,10 @@
  <item android:id="@+id/linkTube"
   android:title="@string/link_tube"
   android:icon="@drawable/search_link_tube"/>
+
+ <item android:id="@+id/music"
+     android:title="@string/music"
+     android:icon="@drawable/music_icon"/>
 
  <item android:id="@+id/more"
      android:title="@string/more"

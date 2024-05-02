@@ -154,9 +154,10 @@ class FavouriteActivity : AppCompatActivity() {
             // Update the adapter with the new list of favourite songs
             adapter.updateFavourites(favouriteSongs)
             // Reset the flag
-            favouritesChanged = false
+            favouritesChanged = true
             // Save favourite songs to SharedPreferences
             saveFavouriteSongs()
+            loadFavouriteSongs()
         }
 
             binding.shuffleBtnFA.setOnClickListener {

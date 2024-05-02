@@ -17,6 +17,8 @@
         android:layout_height="wrap_content"
         android:layout="@layout/favoueite_empty_state_layout"
         android:foregroundGravity="center"
+        android:layout_marginTop="100dp"
+
         android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/favouriteRV"

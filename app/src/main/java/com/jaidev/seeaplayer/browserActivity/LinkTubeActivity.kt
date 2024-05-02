@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -433,6 +432,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun exit(){
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle("Exit")
@@ -446,9 +446,6 @@ class LinkTubeActivity : AppCompatActivity() {
         val customDialog = builder.create()
         customDialog.show()
 
-        customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-        customDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            .setTextColor(Color.GREEN)
 
     }
 
@@ -498,7 +495,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
     fun rewardedIAd(){
         val adRequest = AdRequest.Builder().build()
-        RewardedInterstitialAd.load(this,"ca-app-pub-3940256099942544/5354046379",
+        RewardedInterstitialAd.load(this,"ca-app-pub-3504589383575544/3262210040",
             adRequest, object : RewardedInterstitialAdLoadCallback() {
                 override fun onAdLoaded(p0: RewardedInterstitialAd) {
                     rewardedInterstitialAd=p0

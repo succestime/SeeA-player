@@ -42,6 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout="@layout/recant_empty_state_layout"
                     android:foregroundGravity="center"
+                    android:layout_marginTop="100dp"
                     android:visibility="gone"/>
 
                 <androidx.recyclerview.widget.RecyclerView

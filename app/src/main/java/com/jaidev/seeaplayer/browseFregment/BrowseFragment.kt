@@ -346,8 +346,6 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                     linkRef.binding.progressBar.visibility = View.GONE
                     binding.webView.zoomOut()
                     // Save the visited page to history
-
-
                     val websiteTitle = HistoryManager.extractWebsiteTitle(url ?: "")
                     val favicon = view?.favicon
                     val timestamp = System.currentTimeMillis()
@@ -727,27 +725,6 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
         changeTab("Brave", browserFragment)
     }
 
-
-    private fun keyboard(){
-        val linkRef = requireActivity() as LinkTubeActivity
-        // Add a ViewTreeObserver to listen for keyboard visibility changes
-        linkRef.binding.root.viewTreeObserver.addOnGlobalLayoutListener {
-            val rect = Rect()
-            linkRef.binding.root.getWindowVisibleDisplayFrame(rect)
-            val screenHeight = linkRef.binding.root.height
-            val keypadHeight = screenHeight - rect.bottom
-            val isKeyboardVisible = keypadHeight > screenHeight * 0.15
-
-            // If the keyboard is not visible, hide the recyclerviewLayout
-            if (!isKeyboardVisible) {
-                binding.recyclerviewLayout.visibility = View.GONE
-
-            }else{
-                binding.recyclerviewLayout.visibility = View.VISIBLE
-
-            }
-        }
-    }
     fun onBackPressed(): Boolean {
         val webView = binding.webView
         return if (webView.canGoBack()) {

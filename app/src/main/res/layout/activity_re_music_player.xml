@@ -218,7 +218,7 @@
         android:layout_height="60dp"
         app:adSize="380x60"
         android:layout_gravity="center_horizontal"
-        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:adUnitId="ca-app-pub-3504589383575544/9433986288"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

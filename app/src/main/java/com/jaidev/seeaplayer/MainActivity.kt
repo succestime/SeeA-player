@@ -62,6 +62,10 @@ import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.databinding.ActivityMainBinding
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -73,7 +77,8 @@ class MainActivity : AppCompatActivity() {
     private  var runnable : Runnable? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
-
+    private var musicLoaded = false
+    private lateinit var musicFragment: Fragment // Define your music fragment
     private var checkedItem: Int = 0
     private var selected: String = ""
     private val CHECKED_ITEM = "checked_item"
@@ -134,7 +139,8 @@ class MainActivity : AppCompatActivity() {
         setActionBarGradient()
         // Check internet connectivity and show/hide the "Subscribe" TextView
         checkInternetConnection()
-
+        // Load music fragment in the background
+        loadMusicFragment()
 
        toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
@@ -168,6 +174,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun navView(){
         binding.navView.setNavigationItemSelectedListener {
 
@@ -251,7 +258,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         .create()
                     dialog.show()
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.RED)
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLACK)
                 }
 
                 R.id.exitNav -> {
@@ -267,8 +274,7 @@ class MainActivity : AppCompatActivity() {
                     val customDialog = builder.create()
                     customDialog.show()
 
-                    customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-                    customDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.GREEN)
+
                 }
             }
             true
@@ -285,6 +291,11 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.music -> {
+                        // Load music fragment only if it's not already loaded
+                        if (!musicLoaded) {
+                            musicFragment = musicNav()
+                            musicLoaded = true
+                        }
                         setFragment(musicNav())
                     }
 
@@ -863,5 +874,19 @@ private fun funRequestRuntimePermission(){
         Toast.makeText(this, "Tap again to exit", Toast.LENGTH_SHORT).show()
 
         Handler(Looper.getMainLooper()).postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
+    }
+
+    private fun loadMusicFragment() {
+        // Use a coroutine to load music data in the background
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                // Load music data here (e.g., getAllAudios())
+                // For example:
+              MusicListMA = getAllAudios()
+                // Other relevant initialization
+            }
+            // After loading, set the music fragment loaded flag to true
+            musicLoaded = true
+        }
     }
 }

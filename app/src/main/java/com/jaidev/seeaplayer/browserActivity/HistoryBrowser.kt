@@ -256,7 +256,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             val adRequest = AdRequest.Builder().build()
             AppOpenAd.load(
                 this,
-                "ca-app-pub-3940256099942544/9257395921",
+                "ca-app-pub-3504589383575544/5888373387",
                 adRequest,
                 AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
                 appOpenAdLoadCallback

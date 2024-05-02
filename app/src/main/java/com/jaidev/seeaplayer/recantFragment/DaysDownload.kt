@@ -28,13 +28,15 @@ import com.jaidev.seeaplayer.databinding.FragmentDaysDownloadBinding
 import java.util.concurrent.TimeUnit
 // Import statements go here
 
-class DaysDownload : Fragment(){
+class DaysDownload : Fragment() {
     private lateinit var binding: FragmentDaysDownloadBinding
     lateinit var adapter: RecentVideoAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     companion object {
         lateinit var currentFolderVideos: ArrayList<RecantVideo>
     }
+
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,7 +57,7 @@ class DaysDownload : Fragment(){
             return view
         }
 
-        // Permission already granted, load recent videos
+
         loadRecentVideos()
 
         val handler = Handler(Looper.getMainLooper())
@@ -63,13 +65,18 @@ class DaysDownload : Fragment(){
             binding.swipeRefreshVideo.isRefreshing = false // Hide the refresh indicator
         }, 2000) // 2000 milliseconds (2 seconds)
 
-
+// Set up SwipeRefreshLayout
         swipeRefreshLayout = binding.swipeRefreshVideo
 
+        swipeRefreshLayout.setOnRefreshListener {
+            loadRecentVideos()
+            swipeRefreshLayout.isRefreshing = false
+        }
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
         return view
     }
+
     private fun requestRuntimePermission(): Boolean {
         // Check for permission based on Android version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -130,7 +137,8 @@ class DaysDownload : Fragment(){
                 loadRecentVideos()
             } else {
                 // Permission denied, show a message or retry request
-                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG)
+                    .show()
             }
         } else if (requestCode == 14) {
             // Handle READ_EXTERNAL_STORAGE permission request result
@@ -139,16 +147,18 @@ class DaysDownload : Fragment(){
                 loadRecentVideos()
             } else {
                 // Permission denied, show a message or retry request
-                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG)
+                    .show()
             }
         }
     }
 
     private fun setSwipeRefreshBackgroundColor() {
-        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-            else -> false
-        }
+        val isDarkMode =
+            when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
 
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
@@ -158,8 +168,11 @@ class DaysDownload : Fragment(){
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
         }
     }
+
+
+
     @SuppressLint("SetTextI18n")
-    private fun loadRecentVideos(){
+    private fun loadRecentVideos() {
         val recantVideos = getAllRecantVideos(requireContext())
         val sevenDaysAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)
         val sortedRecentVideos = recantVideos.filter { it.timestamp >= sevenDaysAgo }
@@ -173,7 +186,9 @@ class DaysDownload : Fragment(){
         } else {
             binding.emptyStateLayout.visibility = View.GONE
         }
+
     }
+
 
 
     private fun getAllRecantVideos(context: Context): ArrayList<RecantVideo> {
@@ -203,7 +218,7 @@ class DaysDownload : Fragment(){
             val durationC = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
             val timestampC = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
             val pathC = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
-            val sizeC =it.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
+            val sizeC = it.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
 
             while (it.moveToNext()) {
                 val title = it.getString(titleC)
@@ -214,7 +229,7 @@ class DaysDownload : Fragment(){
                 val path = it.getString(pathC)
                 val artUri = Uri.parse("content://media/external/video/media/$id")
 
-                val video = RecantVideo(title, timestamp, id, duration, path, artUri , size )
+                val video = RecantVideo(title, timestamp, id, duration, path, artUri, size)
                 recantVList.add(video)
             }
         }
@@ -222,6 +237,6 @@ class DaysDownload : Fragment(){
         return recantVList
     }
 
-
-
 }
+
+

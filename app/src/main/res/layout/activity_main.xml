@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             app:itemTextColor="@color/light_gray"
             app:menu="@menu/bottom_items"
-            android:background="#012437"
+            app:backgroundTint="#012437"
             app:labelVisibilityMode="labeled"/>
 
 
