@@ -28,7 +28,8 @@
                 android:layout_height="match_parent"
                 android:background="#77000000"
                 android:visibility="invisible"
-                app:yt_playerView="@id/playerView" >
+                app:yt_playerView="@id/playerView">
+
 
             </com.github.vkay94.dtpv.youtube.YouTubeOverlay>
         </com.github.vkay94.dtpv.DoubleTapPlayerView>
@@ -163,6 +164,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

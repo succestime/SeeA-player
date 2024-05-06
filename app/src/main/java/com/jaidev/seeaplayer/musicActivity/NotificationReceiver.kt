@@ -60,7 +60,7 @@ class NotificationReceiver:BroadcastReceiver() {
     private fun playMusic(){
         PlayerMusicActivity.isPlaying = true
         PlayerMusicActivity.musicService!!.mediaPlayer!!.start()
-        PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_pause_notification)
+        PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_pause_24)
         PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
         //for handling app crash during notification play - pause btn (While app opened through intent)
         try{ NowPlaying.binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24) }catch (_: Exception){}
@@ -69,7 +69,7 @@ class NotificationReceiver:BroadcastReceiver() {
     private fun pauseMusic(){
         PlayerMusicActivity.isPlaying = false
         PlayerMusicActivity.musicService!!.mediaPlayer!!.pause()
-        PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_play_notification)
+        PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_play)
         PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
         //for handling app crash during notification play - pause btn (While app opened through intent)
         try{ NowPlaying.binding.playPauseBtnNP.setIconResource(R.drawable.round_play) }catch (_: Exception){}

@@ -23,15 +23,6 @@ class BookmarkActivity : AppCompatActivity() {
         binding.rvBookmarks.layoutManager = LinearLayoutManager(this)
         binding.rvBookmarks.adapter = BookmarkAdapter(this , isActivity = true)
 
-        supportActionBar?.apply {
-            setBackgroundDrawable(
-                ContextCompat.getDrawable(
-                    this@BookmarkActivity,
-                    R.drawable.background_actionbar
-                )
-            )
-        }
-
         setActionBarGradient()
         allBookMarkLayout = binding.allBookmarkLayout
 
@@ -57,18 +48,56 @@ class BookmarkActivity : AppCompatActivity() {
     }
 
     private fun setActionBarGradient() {
-        // Check if light mode is applied
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Set gradient background for action bar
-          supportActionBar?.apply {
+        // Check the current night mode
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Light mode is applied
+            supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
-                       this@BookmarkActivity,
+                        this@BookmarkActivity,
                         R.drawable.background_actionbar_light
                     )
                 )
             }
-
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
+            supportActionBar?.apply {
+                setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        this@BookmarkActivity,
+                        R.drawable.background_actionbar
+                    )
+                )
+            }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@BookmarkActivity,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@BookmarkActivity,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
+            }
         }
     }
 }

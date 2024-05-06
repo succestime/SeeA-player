@@ -426,16 +426,21 @@ class MusicAdapter(
                                 selectedItems.clear()
                                 mode?.finish()
                                 notifyDataSetChanged()
+                                // Dismiss action mode
+                                actionMode?.finish()
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
                                 // User clicked Cancel, dismiss dialog
                                 dialog.dismiss()
                             }
                             .show()
+
                     }
                     return true
+
                 }
                 // Add more action mode items as needed
+
             }
             return false
         }
@@ -474,6 +479,9 @@ class MusicAdapter(
         val chooser = Intent.createChooser(shareIntent, "Share Files")
         chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooser)
+
+        // Dismiss action mode
+        actionMode?.finish()
     }
 
     private fun renameMusic(position: Int, newName: String) {
@@ -515,7 +523,8 @@ class MusicAdapter(
             }
         dialogRF = dialogBuilder.create()
         dialogRF.show()
-
+        // Dismiss action mode
+        actionMode?.finish()
     }
 
 

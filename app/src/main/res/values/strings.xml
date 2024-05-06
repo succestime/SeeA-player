@@ -61,7 +61,7 @@
     <string name="min_30"> 30 Minutes</string>
     <string name="min_60"> 60 Minutes</string>
     <string name="song_img">Song Image</string>
-    <string name="playlist_name">Playlist Name</string>
+    <string name="playlist_name">Image Name</string>
     <string name="playlist_delete"> Delete</string>
     <string name="user_name"> Your Name</string>
     <string name="add_song"> Add</string>

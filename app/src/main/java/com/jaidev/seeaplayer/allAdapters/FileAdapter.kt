@@ -638,6 +638,9 @@ class FileAdapter(
         val chooser = Intent.createChooser(shareIntent, "Share Files")
         chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooser)
+
+        // Dismiss action mode
+        actionMode?.finish()
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -676,6 +679,9 @@ class FileAdapter(
 
         // Notify adapter of the changes
         notifyDataSetChanged()
+
+        // Dismiss action mode
+        actionMode?.finish()
     }
 
     private fun formatFileSize(fileSize: Long): String {

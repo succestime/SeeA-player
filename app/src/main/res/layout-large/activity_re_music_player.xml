@@ -25,7 +25,7 @@
             android:src="@drawable/round_back"
         android:layout_gravity="center"
             android:background="?attr/selectableItemBackground"
-            android:layout_marginStart="10dp"
+
             android:contentDescription="@string/back_btn"
             android:padding="10dp" />
 
@@ -36,6 +36,7 @@
             android:text="@string/seea_music_player"
             android:textColor="@color/cool_blue"
             android:textSize="20sp"
+            android:maxLines="1"
             android:layout_marginEnd="60dp"
             android:gravity="center"
             tools:ignore="NestedWeights"
@@ -65,7 +66,8 @@
         android:padding="5dp"
 
         android:layout_gravity="center"
-        android:src="@drawable/music_speaker_three"
+        android:src="@drawable/music_g"
+        android:scaleType="centerCrop"
         app:shapeAppearanceOverlay="@style/curved"
         app:strokeColor="@color/cool_blue"
         app:strokeWidth="2dp"/>
@@ -74,15 +76,83 @@
     <TextView
         android:id="@+id/songNamePA"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="80dp"
         android:layout_marginHorizontal="20dp"
         android:text="@string/song_name"
         android:textSize="18sp"
+        android:maxLines="2"
         android:gravity="center"
-
-
         android:textIsSelectable="true" />
 
+
+    <!--    Seekbar & TextViews for it-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="15dp"
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+
+            >
+
+
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBarPA"
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:thumb="@drawable/custom_seekbar_thumb"
+                android:progressDrawable="@drawable/custom_seekbar_progress"
+                tools:ignore="NestedWeights" />
+        </LinearLayout>
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tvSeekBarStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/start_tv"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvSeekBarEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/end_tv"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
     <!--    Floating Buttons for Previous, Pause & Next-->
     <LinearLayout
         android:layout_width="match_parent"
@@ -123,45 +193,11 @@
 
     </LinearLayout>
 
-    <!--    Seekbar & TextViews for it-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="20dp"
-        android:layout_weight="1"
-        >
-
-        <TextView
-            android:id="@+id/tvSeekBarStart1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="15sp"
-            android:text="@string/start_tv"
-            android:gravity="center"/>
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/seekBarRPA"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            tools:ignore="NestedWeights" />
-
-        <TextView
-            android:id="@+id/tvSeekBarEnd2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="15sp"
-            android:text="@string/end_tv"
-            android:gravity="center"/>
-    </LinearLayout>
-
     <!--    Last Row for Various Player Options-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:orientation="horizontal"
         android:layout_weight="1">
 

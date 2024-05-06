@@ -34,7 +34,7 @@ class homeNav : Fragment() {
 
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
         adapter = VideoAdapter(requireContext(), MainActivity.videoList )
@@ -54,15 +54,19 @@ class homeNav : Fragment() {
         binding.searchRecyclerView.adapter = adapter
 
 
-        binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
 
-        binding.swipeRefreshFolder.setOnRefreshListener {
-            // Perform the refresh action here
-            refreshFolders()
-        }
 
         swipeRefreshLayout = binding.swipeRefreshFolder
 
+        binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
+
+        binding.swipeRefreshFolder.setOnRefreshListener {
+            // Refresh logic for other components
+            foldersAdapter.notifyDataSetChanged()
+            binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
+            // Stop the refreshing animation
+            binding.swipeRefreshFolder.isRefreshing = false
+        }
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
 
@@ -94,11 +98,7 @@ class homeNav : Fragment() {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun refreshFolders() {
-        binding.swipeRefreshFolder.isRefreshing = false
-        foldersAdapter.notifyDataSetChanged()
-    }
+
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_view_menu, menu)

@@ -32,8 +32,8 @@
             android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/DownloadRV"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginHorizontal="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </FrameLayout>

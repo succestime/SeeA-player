@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.browserActivity.checkForInternet
 import com.jaidev.seeaplayer.databinding.BookmarkViewBinding
@@ -25,6 +25,7 @@ class BookmarkAdapter(private val context: Context, private val isActivity: Bool
         :RecyclerView.ViewHolder((binding?.root ?: bindingL?.root)!!) {
         val image = (binding?.bookmarkIcon ?: bindingL?.bookmarkIcon)!!
         val name = (binding?.bookmarkName ?: bindingL?.bookmarkName)!!
+
         val root = (binding?.root ?: bindingL?.root)!!
     }
 

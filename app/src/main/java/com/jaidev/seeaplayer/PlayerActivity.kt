@@ -146,7 +146,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
-
+        releasePlayer()
 
 
         // Set up your ExoPlayer instance and attach it to the CustomPlayerView
@@ -181,17 +181,17 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         directPlayVideoFromGallery()
     }
 
-private fun someIdes(){
-    videoTitle = findViewById(R.id.videoTitle)
-    playPauseBtn = findViewById(R.id.playPauseBtn)
-    fullScreenBtn = findViewById(R.id.fullScreenBtn)
-    durationChangeTextView = findViewById(R.id.durationChangeTextView)
-    durationChangeTextView.visibility = View.GONE
+    private fun someIdes(){
+        videoTitle = findViewById(R.id.videoTitle)
+        playPauseBtn = findViewById(R.id.playPauseBtn)
+        fullScreenBtn = findViewById(R.id.fullScreenBtn)
+        durationChangeTextView = findViewById(R.id.durationChangeTextView)
+        durationChangeTextView.visibility = View.GONE
 
-    nightMode = findViewById(R.id.night_mode)
-    recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
-    eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
-}
+        nightMode = findViewById(R.id.night_mode)
+        recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
+        eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
+    }
     private fun directPlayVideoFromGallery(){
         try {
             if (intent.data?.scheme.contentEquals("content")) {
@@ -229,19 +229,19 @@ private fun someIdes(){
 
     }
 
-    private fun initializePlayerWithUri(uri: Uri) {
-        // Release any existing player resources
-        releasePlayer()
-
-        // Initialize ExoPlayer with the shared video URI
-        player = SimpleExoPlayer.Builder(this).build()
-        binding.playerView.player = player
-
-        val mediaItem = MediaItem.fromUri(uri)
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.play()
-    }
+//    private fun initializePlayerWithUri(uri: Uri) {
+//        // Release any existing player resources
+//        releasePlayer()
+//
+//        // Initialize ExoPlayer with the shared video URI
+//        player = SimpleExoPlayer.Builder(this).build()
+//        binding.playerView.player = player
+//
+//        val mediaItem = MediaItem.fromUri(uri)
+//        player.setMediaItem(mediaItem)
+//        player.prepare()
+//        player.play()
+//    }
 
     private fun releasePlayer() {
         player.release()
@@ -383,9 +383,15 @@ private fun someIdes(){
                         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             playbackIconsAdapter.notifyDataSetChanged()
+                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.VISIBLE
+
                         } else if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                             playbackIconsAdapter.notifyDataSetChanged()
+
+                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.GONE
                         }
                     }
 
@@ -648,6 +654,18 @@ private fun someIdes(){
 
         findViewById<ImageButton>(R.id.backBtn).setOnClickListener {
             finish()
+        }
+        findViewById<ImageButton>(R.id.back10secondBtn).setOnClickListener {
+            val currentPosition = player.currentPosition
+            val newPosition = maxOf(0L, currentPosition - 10000) // Rewind by 10 seconds
+            player.seekTo(newPosition)
+        }
+
+        findViewById<ImageButton>(R.id.forward10secondBtn).setOnClickListener {
+            val duration = player.duration
+            val currentPosition = player.currentPosition
+            val newPosition = minOf(duration, currentPosition + 10000) // Forward by 10 seconds
+            player.seekTo(newPosition)
         }
 
         playPauseBtn.setOnClickListener {

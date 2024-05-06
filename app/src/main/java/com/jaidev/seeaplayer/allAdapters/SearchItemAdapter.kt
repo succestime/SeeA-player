@@ -108,7 +108,12 @@ class SearchItemAdapter(private val context: Context, private val historyItem: H
 
     private fun fillTitleInTextUrl(title: String) {
         val linkTubeRef = context as LinkTubeActivity
-        linkTubeRef.binding.btnTextUrl.setText(title)
+        val editText = linkTubeRef.binding.btnTextUrl
+        editText.setText(title)
+        editText.setSelection(editText.text.length)
+
+
+
     }
 }
 

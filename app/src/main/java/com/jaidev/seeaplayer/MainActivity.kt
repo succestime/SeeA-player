@@ -75,7 +75,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var adapter: VideoAdapter
     private  var runnable : Runnable? = null
-    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var
+            drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private var musicLoaded = false
     private lateinit var musicFragment: Fragment // Define your music fragment
@@ -118,15 +119,11 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SuspiciousIndentation", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val sharedPreferences = this.getSharedPreferences("themes", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.apply()
 
-        when (getCheckedItem()) {
-            0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -150,7 +147,7 @@ class MainActivity : AppCompatActivity() {
        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
 
-
+//
         drawerLayout = binding.drawerLayoutMA
         // Set the background color of SwipeRefreshLayout based on app theme
 
@@ -158,6 +155,8 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutNav = findViewById<LinearLayout>(R.id.linearLayoutNav)
 
         setDrawerLayoutBackgroundColor()
+
+
 
 
 // Check if the service needs to be started
@@ -416,7 +415,7 @@ private fun funRequestRuntimePermission(){
         return lastScanTime == null || currentTime - lastScanTime >= scanInterval
     }
 
-    private fun getLastScanTime(): Long? {
+    private fun getLastScanTime(): Long {
         // Retrieve the last scan time from SharedPreferences
         val sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
         return sharedPreferences.getLong("lastScanTime", 0)
@@ -435,6 +434,7 @@ private fun funRequestRuntimePermission(){
         transaction.disallowAddToBackStack()
         transaction.commit()
     }
+
 
 
     private fun requestRuntimePermission(): Boolean {
@@ -585,12 +585,9 @@ private fun funRequestRuntimePermission(){
                         }
                         .create()
                     dialog.show()
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.RED)
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLACK)
                     true
                 }
-
-
-
                 else -> false
             }
         }

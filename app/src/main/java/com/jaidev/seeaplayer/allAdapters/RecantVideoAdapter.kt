@@ -335,6 +335,8 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
         val chooser = Intent.createChooser(shareIntent, "Share Files")
         chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooser)
+        // Dismiss action mode
+        actionMode?.finish()
     }
 
 

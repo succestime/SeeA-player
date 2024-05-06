@@ -77,7 +77,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     private var mInterstitialAd: InterstitialAd? = null
     private var tempText: CharSequence? = null
     private lateinit var fileListAdapter: SearchItemAdapter
-    private var isRecyclerViewLayoutVisible = false
+    private var isLoadingPage = false // Add this variabl
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
 
@@ -210,8 +210,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                 linkRef.binding.btnTextUrl.requestFocus()
                 binding.recyclerviewLayout.visibility = View.VISIBLE
             }
-//            linkRef.binding.btnTextUrl.requestFocus()
-//            binding.recyclerviewLayout.visibility = View.VISIBLE
+
         }
 
 // Before loading the webpage, check for network connectivity
@@ -336,6 +335,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
 
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
+                    isLoadingPage = true
                     linkRef.binding.progressBar.progress = 0
                     linkRef.binding.progressBar.visibility = View.VISIBLE
 
@@ -343,6 +343,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
+                    isLoadingPage = false
                     linkRef.binding.progressBar.visibility = View.GONE
                     binding.webView.zoomOut()
                     // Save the visited page to history
@@ -533,8 +534,10 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == intent?.action) {
                 val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                // Handle download completion
-
+                // Remove the notification
+                val notificationManager =
+                    context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(downloadId.toInt())
             }
         }
     }
@@ -569,8 +572,9 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
         when (result.type) {
             WebView.HitTestResult.IMAGE_TYPE -> {
                 menu.add("View Image")
+                menu.add("Download Image")
                 menu.add("Save Image")
-                menu.add("Share")
+                menu.add("Share Image")
                 menu.add("Close")
             }
 
@@ -607,7 +611,13 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                 changeTab(url.toString(), BrowseFragment(url.toString()), isBackground = true)
             }
 
-
+            "Download Image" -> {
+                if (imgUrl != null) {
+                    // Start download if the image URL is available
+                    val fileExtension = if (imgUrl.endsWith(".png")) "png" else "jpg"
+                    startDownload(imgUrl, "image.$fileExtension", fileExtension)
+                }
+            }
             "View Image" ->{
                 if(imgUrl != null) {
                     if (imgUrl.contains("base64")) {
@@ -651,7 +661,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                 }
             }
 
-            "Share" -> {
+            "Share Image" -> {
                 val tempUrl = url ?: imgUrl
                 if(tempUrl != null){
                     if(tempUrl.contains("base64")){
@@ -725,17 +735,30 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
         changeTab("Brave", browserFragment)
     }
 
-    fun onBackPressed(): Boolean {
+ fun onBackPressed(): Boolean {
         val webView = binding.webView
-        return if (webView.canGoBack()) {
+        return if (isLoadingPage) {
+            true // Back press handled within the fragment
+        } else if (webView.canGoBack()) {
             webView.goBack()
             true // Back press handled within the fragment
         } else {
             false // Back press not handled within the fragment
         }
     }
+    fun isLoading(): Boolean {
+        return binding.webView.progress != 100
+    }
+//    fun onBackPressed(): Boolean {
+//        val webView = binding.webView
+//        return if (webView.canGoBack()) {
+//            webView.goBack()
+//            true // Back press handled within the fragment
+//        } else {
+//            false // Back press not handled within the fragment
+//        }
+//    }
 
 }
 
-// Inside your BrowseFragment class
 

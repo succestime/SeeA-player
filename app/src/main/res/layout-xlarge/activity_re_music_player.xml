@@ -19,13 +19,12 @@
         <!--    Back Button-->
         <ImageButton
             android:id="@+id/backBtnPA"
-            android:layout_width="50dp"
+            android:layout_width="80dp"
             android:layout_height="80dp"
             app:tint="?android:attr/textColorPrimary"
             android:src="@drawable/round_back"
         android:layout_gravity="center"
             android:background="?attr/selectableItemBackground"
-            android:layout_marginStart="20dp"
             android:contentDescription="@string/back_btn"
             android:padding="10dp" />
 
@@ -63,24 +62,98 @@
         android:layout_margin="20dp"
         android:padding="5dp"
         android:layout_gravity="center"
-        android:src="@drawable/music_speaker_three"        app:shapeAppearanceOverlay="@style/curved"
+        android:src="@drawable/music_g"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/curved"
         app:strokeColor="@color/cool_blue"
         app:strokeWidth="2dp"/>
 
     <!--    Current Song Name-->
+
+
+    <!--    Seekbar & TextViews for it-->
     <TextView
         android:id="@+id/songNamePA"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_marginHorizontal="20dp"
-        android:text="@string/song_name"
-        android:textSize="18sp"
+        android:maxLines="2"
         android:gravity="center"
+        android:text="@string/song_name"
+        android:textIsSelectable="true"
 
 
-        android:textIsSelectable="true" />
+        android:textSize="18sp" />
 
-    <!--    Floating Buttons for Previous, Pause & Next-->
+    <!--    Seekbar & TextViews for it-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="15dp"
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+
+            >
+
+
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBarPA"
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:thumb="@drawable/custom_seekbar_thumb"
+                android:progressDrawable="@drawable/custom_seekbar_progress"
+                tools:ignore="NestedWeights" />
+        </LinearLayout>
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tvSeekBarStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/start_tv"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvSeekBarEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/end_tv"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="150dp"
@@ -120,45 +193,12 @@
 
     </LinearLayout>
 
-    <!--    Seekbar & TextViews for it-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="20dp"
-        android:layout_weight="1"
-        >
-
-        <TextView
-            android:id="@+id/tvSeekBarStart1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="15sp"
-            android:text="@string/start_tv"
-            android:gravity="center"/>
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/seekBarRPA"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            tools:ignore="NestedWeights" />
-
-        <TextView
-            android:id="@+id/tvSeekBarEnd2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="15sp"
-            android:text="@string/end_tv"
-            android:gravity="center"/>
-    </LinearLayout>
-
     <!--    Last Row for Various Player Options-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:orientation="horizontal"
+        android:layout_marginTop="30dp"
         android:layout_weight="1">
 
         <!--        Repeat Button-->
@@ -210,9 +250,9 @@
     </LinearLayout>
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
-        android:layout_width="450dp"
-        android:layout_height="60dp"
-        app:adSize="450x60"
+        android:layout_width="700dp"
+        android:layout_height="80dp"
+        app:adSize="700x80"
         android:layout_gravity="center_horizontal"
         app:adUnitId="ca-app-pub-3504589383575544/9433986288"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"

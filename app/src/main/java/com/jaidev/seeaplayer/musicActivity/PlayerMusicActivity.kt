@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.media.audiofx.AudioEffect
 import android.media.audiofx.LoudnessEnhancer
@@ -15,7 +14,6 @@ import android.os.IBinder
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -194,8 +192,6 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                     }
                 val customDialog = builder.create()
                 customDialog.show()
-                customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-                customDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.GREEN)
             }
         }
 

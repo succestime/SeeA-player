@@ -61,11 +61,12 @@ android:layout_margin="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalLine">
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/monthlyBox"
             android:layout_width="60dp"
             android:layout_height="40dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:background="@drawable/square_box_bg_browser"
             android:clickable="true"
             android:focusable="true"
@@ -301,7 +302,7 @@ android:layout_margin="15dp"
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="380dp"
-        android:layout_height="140dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         app:adSize="380x140"

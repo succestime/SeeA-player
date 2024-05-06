@@ -33,18 +33,6 @@
                 android:visibility="invisible"
                 app:yt_playerView="@id/playerView" >
 
-                <TextView
-                    android:id="@+id/durationChangeTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/durationChangeTextView"
-                    android:textColor="#DCD7D7"
-                    android:visibility="gone"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    tools:layout_editor_absoluteX="153dp"
-                    tools:layout_editor_absoluteY="331dp" />
 
             </com.github.vkay94.dtpv.youtube.YouTubeOverlay>
         </com.github.vkay94.dtpv.DoubleTapPlayerView>
@@ -80,6 +68,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
+
+    <TextView
+        android:id="@+id/durationChangeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="#DCD7D7"
+        android:textSize="24sp"
+        android:visibility="gone"
+
+        android:textStyle="bold"
+        android:text="@string/durationChangeTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/frameLayout" />
+
 
 
     CardView for Volume SeekBar
@@ -202,6 +207,3 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-

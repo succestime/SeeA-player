@@ -58,6 +58,7 @@ import com.jaidev.seeaplayer.browseFregment.HomeFragment
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsBtn
 import com.jaidev.seeaplayer.dataClass.Bookmark
+import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.dataClass.Tab
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.databinding.ActivityLinkTubeBinding
@@ -86,7 +87,7 @@ class LinkTubeActivity : AppCompatActivity() {
         lateinit var myPager : ViewPager2
         lateinit var tabsBtn : MaterialTextView
         const val REQUEST_CODE_SPEECH_INPUT = 2000
-
+        const val MAX_HISTORY_SIZE = 150
         private const val TABS_LIST_KEY = "tabs_list"
 
     }
@@ -101,13 +102,13 @@ class LinkTubeActivity : AppCompatActivity() {
         binding = ActivityLinkTubeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         rewardedIAd()
         initializeView()
         initializeBinding()
         getAllBookmarks()
-
         // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
@@ -461,7 +462,19 @@ class LinkTubeActivity : AppCompatActivity() {
             .show()
     }
 
-
+    private fun checkHistorySize() {
+        if (HistoryManager.getHistorySize(this) >= MAX_HISTORY_SIZE) {
+            val builder = MaterialAlertDialogBuilder(this)
+            builder.setTitle("Delete History Items")
+                .setMessage("The history has reached its maximum capacity. Delete some items?")
+                .setPositiveButton("Delete") { _, _ ->
+                    startActivity(Intent(this, HistoryBrowser::class.java))
+                    finish()
+                }
+            val customDialog = builder.create()
+            customDialog.show()
+        }
+    }
 
     fun speak() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -563,16 +576,21 @@ class LinkTubeActivity : AppCompatActivity() {
 
         if (!handled) {
             // If back press is not handled by the current fragment, perform default behavior
-            when {
-                binding.myPager.currentItem != 0 -> {
-                    tabsList.removeAt(binding.myPager.currentItem)
-                    binding.myPager.adapter?.notifyDataSetChanged()
-                    binding.myPager.currentItem = tabsList.size - 1
+            if (currentFragment is BrowseFragment && currentFragment.isLoading()) {
+                // If the current fragment is a BrowseFragment and a page is loading, do nothing
+            } else {
+                when {
+                    binding.myPager.currentItem != 0 -> {
+                        tabsList.removeAt(binding.myPager.currentItem)
+                        binding.myPager.adapter?.notifyDataSetChanged()
+                        binding.myPager.currentItem = tabsList.size - 1
+                    }
+                    else -> super.onBackPressed()
                 }
-                else -> super.onBackPressed()
             }
         }
     }
+
 
     private inner class TabsAdapter(fa: FragmentManager, lc: Lifecycle) :
         FragmentStateAdapter(fa, lc) {
@@ -664,6 +682,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        checkHistorySize()
         printJob?.let {
             when{
                 it.isCompleted -> Snackbar.make(binding.root, "Successful -> ${it.info.label}", 4000).show()

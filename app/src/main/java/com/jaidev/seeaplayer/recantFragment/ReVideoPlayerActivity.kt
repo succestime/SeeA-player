@@ -350,9 +350,14 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             playbackIconsAdapter.notifyDataSetChanged()
+                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.VISIBLE
+
                         } else if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                             playbackIconsAdapter.notifyDataSetChanged()
+                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.GONE
                         }
                     }
                     4 -> {
@@ -599,7 +604,18 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         findViewById<ImageButton>(R.id.backBtn).setOnClickListener {
           finish()
         }
+        findViewById<ImageButton>(R.id.back10secondBtn).setOnClickListener {
+            val currentPosition = player.currentPosition
+            val newPosition = maxOf(0L, currentPosition - 10000) // Rewind by 10 seconds
+            player.seekTo(newPosition)
+        }
 
+        findViewById<ImageButton>(R.id.forward10secondBtn).setOnClickListener {
+            val duration = player.duration
+            val currentPosition = player.currentPosition
+            val newPosition = minOf(duration, currentPosition + 10000) // Forward by 10 seconds
+            player.seekTo(newPosition)
+        }
 
         playPauseBtn.setOnClickListener {
             if (player.isPlaying) {

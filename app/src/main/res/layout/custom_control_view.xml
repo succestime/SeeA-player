@@ -142,6 +142,23 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
+
+        <ImageButton
+            android:id="@+id/back10secondBtn"
+            android:layout_width="85dp"
+            android:layout_height="65dp"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:contentDescription="@string/next_btn"
+            android:focusable="true"
+            android:src="@drawable/round_replay_10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/prevBtn"
+            app:layout_constraintEnd_toStartOf="@id/playPauseBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
         <ImageButton
             android:id="@+id/playPauseBtn"
             android:layout_width="85dp"
@@ -154,6 +171,23 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/nextBtn"
             app:layout_constraintStart_toEndOf="@+id/prevBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/forward10secondBtn"
+            android:layout_width="85dp"
+            android:layout_height="65dp"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:contentDescription="@string/next_btn"
+            android:focusable="true"
+            android:src="@drawable/round_forward_10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/playPauseBtn"
+            app:layout_constraintEnd_toStartOf="@id/nextBtn"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 

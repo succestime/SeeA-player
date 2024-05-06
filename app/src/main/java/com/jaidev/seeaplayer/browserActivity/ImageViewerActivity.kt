@@ -121,8 +121,8 @@ class ImageViewerActivity : AppCompatActivity() {
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -130,6 +130,34 @@ class ImageViewerActivity : AppCompatActivity() {
                         R.drawable.background_actionbar
                     )
                 )
+            }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@ImageViewerActivity,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@ImageViewerActivity,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
             }
         }
     }

@@ -16,8 +16,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
-
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
         android:name=".ApplicationClass"
@@ -32,17 +31,27 @@
         android:supportsRtl="true"
         android:theme="@style/coolBlueNav"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31"
-        >
+        tools:targetApi="31">
+
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3504589383575544~6864519496"/>
+            android:value="ca-app-pub-3504589383575544~6864519496" />
 
         <activity
             android:name=".browserActivity.HistoryBrowser"
             android:exported="false"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".browserActivity.ImageViewerActivity"
             android:exported="false" />
@@ -60,9 +69,6 @@
         <activity
             android:name=".browserActivity.FileActivity"
             android:exported="false" />
-
-
-
         <activity
             android:name=".Subscription.SeeaEduProcess"
             android:exported="false"
@@ -132,7 +138,6 @@
             tools:ignore="LockedOrientationActivity">
 
         </activity>
-
         <activity
             android:name=".recantFragment.ReVideoPlayerActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
@@ -171,12 +176,12 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:launchMode="singleTask"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
+
         </activity>
 
         <service android:name=".Services.MusicService" />

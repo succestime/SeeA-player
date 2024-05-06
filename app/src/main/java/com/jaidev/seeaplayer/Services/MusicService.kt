@@ -209,7 +209,7 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
             mediaPlayer?.prepare()
 
             PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
-            showNotification(R.drawable.round_pause_notification)
+            showNotification(R.drawable.round_pause_24)
             PlayerMusicActivity.binding.tvSeekBarStart.text =
                 formatDuration(mediaPlayer!!.currentPosition.toLong())
             PlayerMusicActivity.binding.tvSeekBarEnd.text =
@@ -249,8 +249,8 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
 
         // Proceed with reSeekSetup() function
         runnable = Runnable {
-            ReMusicPlayerActivity.binding.tvSeekBarStart1.text = formatDuration(mediaPlayer!!.currentPosition.toLong())
-            ReMusicPlayerActivity.binding.seekBarRPA.progress = mediaPlayer!!.currentPosition
+            ReMusicPlayerActivity.binding.tvSeekBarStart.text = formatDuration(mediaPlayer!!.currentPosition.toLong())
+            ReMusicPlayerActivity.binding.seekBarPA.progress = mediaPlayer!!.currentPosition
             Handler(Looper.getMainLooper()).postDelayed(runnable, 200)
         }
         Handler(Looper.getMainLooper()).postDelayed(runnable, 0)
@@ -280,14 +280,14 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
             NowPlaying.binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
             PlayerMusicActivity.isPlaying = false
             mediaPlayer?.pause()
-            showNotification(R.drawable.round_play_notification)
+            showNotification(R.drawable.round_play)
         } else {
             //play music
             PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
             NowPlaying.binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
             PlayerMusicActivity.isPlaying = true
             mediaPlayer?.start()
-            showNotification(R.drawable.round_pause_notification)
+            showNotification(R.drawable.round_pause_24)
         }
         //update playback state for notification
         mediaSession.setPlaybackState(getPlayBackState())

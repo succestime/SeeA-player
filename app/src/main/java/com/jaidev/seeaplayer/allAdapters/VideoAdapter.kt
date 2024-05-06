@@ -315,6 +315,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
         dialogRF = dialogBuilder.create()
         dialogRF.show()
+
     }
     private fun renameVideo(position: Int, newName: String) {
         val music = videoList[position]
@@ -420,12 +421,15 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     } else {
                         Toast.makeText(context, "Please select only one video to rename", Toast.LENGTH_SHORT).show()
                     }
+                    // Dismiss action mode
+                    actionMode?.finish()
                     return true
                 }
 
                 R.id.shareMulti -> {
                     shareSelectedFiles()
-
+                    // Dismiss action mode
+                    actionMode?.finish()
                 }
                 R.id.deleteMulti -> {
                     if (selectedItems.isNotEmpty()) {
@@ -451,6 +455,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                 selectedItems.clear()
                                 mode?.finish()
                                 notifyDataSetChanged()
+                                // Dismiss action mode
+                                actionMode?.finish()
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
                                 // User clicked Cancel, dismiss dialog
@@ -460,6 +466,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
 
                     }
+
                     return true
                 }
 
@@ -489,6 +496,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                 File(videoData.path)
             )
             uris.add(fileUri)
+
         }
 
         // Create an ACTION_SEND intent to share multiple files

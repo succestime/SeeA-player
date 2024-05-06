@@ -27,7 +27,7 @@
         <TextView
             android:id="@+id/videoName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:padding="8dp"
             android:text="Video Title"
             android:textSize="16sp"
@@ -56,7 +56,7 @@
             <ImageButton
                 android:id="@+id/MoreChoose"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:background="@android:color/transparent"
                 android:src="@drawable/icon_dark"

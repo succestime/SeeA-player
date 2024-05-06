@@ -175,8 +175,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         // Read the stored value for sortByNewestFirst (defaulting to true if not found)
         sortByNewestFirst = sharedPreferences.getBoolean("sortByNewestFirst", true)
-        dialogBinding.switchNewFiles.isChecked = !sortByNewestFirst
-        dialogBinding.switchOldFiles.isChecked = sortByNewestFirst
+        dialogBinding.switchNewFiles.isChecked = sortByNewestFirst
+        dialogBinding.switchOldFiles.isChecked = !sortByNewestFirst
 
         val switchListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
             when (buttonView.id) {
@@ -192,7 +192,6 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
                 }
             }
         }
-
 
         dialogBinding.switchNewFiles.setOnCheckedChangeListener(switchListener)
         dialogBinding.switchOldFiles.setOnCheckedChangeListener(switchListener)

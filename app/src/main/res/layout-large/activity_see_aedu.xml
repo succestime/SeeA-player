@@ -144,6 +144,35 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.1" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout_editor_absoluteX="-4dp"
+                tools:layout_editor_absoluteY="0dp">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+
+                    app:layout_constraintBottom_toTopOf="@+id/dotIndictor"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <me.relex.circleindicator.CircleIndicator3
+                    android:id="@+id/dotIndictor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -183,26 +212,6 @@
 
         </androidx.cardview.widget.CardView>
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="110dp"
-            android:layout_marginEnd="5dp"
-
-
-            />
-
-        <me.relex.circleindicator.CircleIndicator3
-            android:id="@+id/dotIndictor"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="100dp"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:visibility="visible" />
     </androidx.cardview.widget.CardView>
 
 

@@ -35,5 +35,6 @@ class FoldersAdapter(private val context: Context, private var foldersList: Arra
         return foldersList.size
     }
 
+
 }
 

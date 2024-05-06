@@ -22,9 +22,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.dataClass.VideoData
@@ -44,9 +42,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
     private val PREF_LAYOUT_TYPE = "pref_layout_type"
     private val LAYOUT_TYPE_GRID = "grid"
     private val LAYOUT_TYPE_LIST = "list"
-        lateinit var mAdView: AdView
-        private var rewardedInterstitialAd : RewardedInterstitialAd? = null
-
     companion object {
         lateinit var currentFolderVideos: ArrayList<VideoData>
     }

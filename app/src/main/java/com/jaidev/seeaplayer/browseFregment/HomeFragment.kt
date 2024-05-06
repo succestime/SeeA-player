@@ -4,6 +4,7 @@ package com.jaidev.seeaplayer.browseFregment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -42,18 +43,20 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         binding = FragmentHomeBinding.bind(view)
 
-        val rootView = view.rootView
+        // Show the keyboard explicitly
 
-        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+        // Check if the keyboard is visible
+        val rootView = view?.rootView
+        rootView?.viewTreeObserver?.addOnGlobalLayoutListener {
             val rect = Rect()
             rootView.getWindowVisibleDisplayFrame(rect)
             val screenHeight = rootView.height
             val keypadHeight = screenHeight - rect.bottom
             val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+
+            // Update the visibility of RecyclerView based on keyboard visibility
             binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
         }
-
-
         return view
     }
 
@@ -189,7 +192,12 @@ class HomeFragment : Fragment() {
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(5)
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 5)
+        // Determine screen size
+        val isTablet = resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE
+        // Set appropriate GridLayoutManager
+        val spanCount = if (isTablet) 5 else 3
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
+
         binding.recyclerView.adapter = BookmarkAdapter(requireContext())
 
         if (LinkTubeActivity.bookmarkList.size < 1)

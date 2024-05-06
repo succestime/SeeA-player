@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.media.audiofx.AudioEffect
 import android.net.Uri
@@ -15,7 +14,6 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -73,10 +71,10 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 musicService!!.mediaPlayer!!.prepare()
                 musicService!!.mediaPlayer!!.start()
                 isPlaying = true
-                binding.tvSeekBarStart1.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-                binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
-                binding.seekBarRPA.progress = 0
-                binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
+                binding.tvSeekBarStart.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+                binding.tvSeekBarEnd.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+                binding.seekBarPA.progress = 0
+                binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
                 binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
                 updateNextMusicTitle()
                 musicService!!.mediaPlayer!!.setOnCompletionListener(this@Companion)
@@ -121,7 +119,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         binding.nextBtnPA.setOnClickListener {
             prevNextSong(increment = true)
         }
-        binding.seekBarRPA.setOnSeekBarChangeListener(object  : OnSeekBarChangeListener{
+        binding.seekBarPA.setOnSeekBarChangeListener(object  : OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) musicService!!.mediaPlayer!!.seekTo(progress)
             }
@@ -178,8 +176,6 @@ class ReMusicPlayerActivity : AppCompatActivity()
                     }
                 val customDialog = builder.create()
                 customDialog.show()
-                customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-                customDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.GREEN)
             }
         }
 
@@ -233,10 +229,10 @@ class ReMusicPlayerActivity : AppCompatActivity()
             musicService!!.mediaPlayer!!.prepare()
             musicService!!.mediaPlayer!!.start()
             isPlaying = true
-            binding.tvSeekBarStart1.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-            binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
-            binding.seekBarRPA.progress = 0
-            binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
+            binding.tvSeekBarStart.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+            binding.tvSeekBarEnd.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+            binding.seekBarPA.progress = 0
+            binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
             binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
             updateNextMusicTitle()
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
@@ -258,10 +254,10 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
             "ReNowPlaying" -> {
                 setLayout()
-                binding.tvSeekBarStart1.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-                binding.tvSeekBarEnd2.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
-                binding.seekBarRPA.max = musicService!!.mediaPlayer!!.duration
-                binding.seekBarRPA.progress = musicService!!.mediaPlayer!!.currentPosition
+                binding.tvSeekBarStart.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+                binding.tvSeekBarEnd.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+                binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
+                binding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
             }
             "DaysMusic" -> {
                 val intent = Intent(this, MusicService::class.java)

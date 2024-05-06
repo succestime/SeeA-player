@@ -99,9 +99,8 @@
                    android:layout_height="match_parent"
                    android:layout_marginTop="5dp"
                    android:layout_marginStart="2dp"
-
+                   android:layout_margin="5dp"
                    android:paddingBottom="69dp"
-                   android:scrollbarThumbVertical="@drawable/scroll_bar_icon"
                    android:scrollbars="vertical"
                    />
            </LinearLayout>

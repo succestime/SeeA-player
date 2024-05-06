@@ -24,7 +24,6 @@
             android:layout_height="match_parent"
             android:text="@string/min_15"
             android:textSize="18sp"
-            android:textColor="@color/black"
             android:padding="8dp"/>
     </LinearLayout>
 
@@ -45,7 +44,6 @@
             android:layout_height="match_parent"
             android:text="@string/min_30"
             android:textSize="18sp"
-            android:textColor="@color/black"
             android:padding="8dp"/>
     </LinearLayout>
 
@@ -66,7 +64,6 @@
             android:layout_height="match_parent"
             android:text="@string/min_60"
             android:textSize="18sp"
-            android:textColor="@color/black"
             android:padding="8dp"/>
     </LinearLayout>
 

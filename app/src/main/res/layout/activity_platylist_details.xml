@@ -21,10 +21,8 @@
             android:id="@+id/playlistImgPD"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/speaker" />
-
-
-
+            android:scaleType="centerCrop"
+            android:src="@drawable/music_speaker_three" />
 
 
     </LinearLayout>
@@ -41,9 +39,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="5dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:gravity="start"
-            android:layout_marginTop="10dp"
             android:text="@string/playlist_name"
             android:textSize="15sp" />
 
@@ -51,8 +49,8 @@
             android:id="@+id/shuffleBtnPD"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
             android:backgroundTint="@color/gray"
             android:visibility="invisible"
             app:icon="@drawable/shuffle_icon"
@@ -66,25 +64,29 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/cool_blue"
-        app:layout_constraintTop_toBottomOf="@id/linearLayoutDetails"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/linearLayoutDetails" />
+
+
+    <!--for buttons-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlistDetailsRV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="330dp"
+        android:layout_margin="10dp"
         android:layout_marginStart="2dp"
-        android:scrollbarThumbVertical="@drawable/scroll_bar_icon"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="330dp"
         android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout8" />
 
-
-    <!--for buttons-->
     <LinearLayout
+        android:id="@+id/linearLayout9"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:orientation="horizontal"
@@ -102,8 +104,7 @@
             android:drawableTop="@drawable/add_music_icon"
             android:text="@string/add_song"
             android:textAllCaps="false"
-            android:textColor="?attr/colorPrimary"
-            />
+            android:textColor="?attr/colorPrimary" />
 
         <!--Remove Button-->
         <Button

@@ -28,7 +28,9 @@ object HistoryManager {
         saveHistoryList(historyList, context)
     }
 
-
+    fun getHistorySize(context: Context): Int {
+        return getHistoryList(context).size
+    }
     fun getHistoryList(context: Context): List<HistoryItem> {
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val historySet = sharedPreferences.getStringSet(HISTORY_PREF_KEY, setOf()) ?: setOf()

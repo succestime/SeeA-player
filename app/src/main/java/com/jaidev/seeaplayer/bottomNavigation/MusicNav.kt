@@ -57,7 +57,6 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
-        //  FavoritesManager.loadFavorites(requireContext())
         binding.musicRV.setHasFixedSize(true)
         binding.musicRV.setItemViewCacheSize(10)
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())

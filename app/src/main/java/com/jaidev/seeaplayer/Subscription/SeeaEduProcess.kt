@@ -31,7 +31,7 @@ class SeeaEduProcess : AppCompatActivity() {
     private fun initializeBinding(){
         val items = listOf("Months", "Years")
         val itemsNull = listOf("Null")
-        val itemsMonth = listOf("Month (1)", "Months (Quarterly)")
+        val itemsMonth = listOf("Month (1)", "Months (Quarterly)" , "Months (Half - Yearly)")
         val itemsYear = listOf("Annual", "Biennial")
         val itemsQuantity = listOf("1","2","3","4","5","6","7","8",
             "9","10","11","12","13","14","15","16","17","18","19","20")
@@ -48,8 +48,7 @@ class SeeaEduProcess : AppCompatActivity() {
         // Default adapter
 
         binding.autoComplete.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
-            val selectedItem = items[i]
-            val timeAdapter = when(selectedItem) {
+            val timeAdapter = when(items[i]) {
                 "Months" -> adapterMonth
                 "Years" -> adapterYear
                 else -> adapterMonth // Default to monthly if nothing else
@@ -94,13 +93,17 @@ class SeeaEduProcess : AppCompatActivity() {
             binding.totalAmount.text = amount // Set the calculated amount to the TextView
         }
 
-
         binding.timeComplete.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
             if (binding.autoComplete.text.toString().isEmpty()) {
                 binding.timeComplete.setAdapter(adapterNull)
                 Toast.makeText(this, "Please select an item first", Toast.LENGTH_SHORT).show()
             } else {
-                val itemSelected = items[i]
+                val selectedItem = binding.autoComplete.text.toString()
+                val itemSelected = when (selectedItem) {
+                    "Months" -> itemsMonth[i]
+                    "Years" -> itemsYear[i]
+                    else -> "" // Handle default case if needed
+                }
                 Toast.makeText(this, "Item: $itemSelected", Toast.LENGTH_SHORT).show()
             }
         }
@@ -117,7 +120,8 @@ class SeeaEduProcess : AppCompatActivity() {
     private fun calculateAmount(time: String, quantity: Int): String {
         val amount = when (time) {
             "Month (1)" -> 25 * quantity
-            "Months (Quarterly)" -> 149 * quantity
+            "Months (Quarterly)" -> 75 * quantity
+            "Months (Half - Yearly)" -> 149 * quantity
             "Annual" -> 299 * quantity
             "Biennial" -> 599 * quantity
             else -> 0 // Default case

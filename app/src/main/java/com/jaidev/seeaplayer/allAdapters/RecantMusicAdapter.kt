@@ -256,6 +256,8 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
                                 selectedItems.clear()
                                 mode?.finish()
                                 notifyDataSetChanged()
+                                // Dismiss action mode
+                                actionMode?.finish()
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
                                 // User clicked Cancel, dismiss dialog
@@ -302,6 +304,9 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         val chooser = Intent.createChooser(shareIntent, "Share Files")
         chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooser)
+
+        // Dismiss action mode
+        actionMode?.finish()
     }
     private fun showSingleDeleteConfirmation(position: Int) {
         val video = musicReList[position]
