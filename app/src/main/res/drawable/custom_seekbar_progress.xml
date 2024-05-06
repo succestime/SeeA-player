@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- custom_seekbar_progress.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background -->
+    <item android:id="@android:id/background">
+        <shape>
+            <solid android:color="#B1B0B0" />
+            <corners android:radius="3dp" /> <!-- Adjust corner radius if needed -->
+            <size android:height="3dp" />
+        </shape>
+    </item>
+
+    <!-- Progress -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <solid android:color="@color/teal_200" />
+                <corners android:radius="3dp" /> <!-- Adjust corner radius if needed -->
+                <size android:height="3dp" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>
