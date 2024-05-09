@@ -340,7 +340,6 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             // Show a toast or handle the error as appropriate
         }
     }
-
     private fun openFile(fileItem: FileItem) {
         try {
             if (fileItem.fileType == FileType.VIDEO) {
