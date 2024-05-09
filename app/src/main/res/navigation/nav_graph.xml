@@ -17,9 +17,10 @@
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right" />
+
         <action
-            android:id="@+id/action_moreNav_to_profile"
-            app:destination="@id/profile"
+            android:id="@+id/action_moreNav_to_moreSettingNav"
+            app:destination="@id/moreSettingNav"
             app:enterAnim="@anim/from_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
@@ -30,9 +31,9 @@
         android:name="com.jaidev.seeaplayer.Subscription.SeeAOne"
         android:label="activity_see_aone"
         tools:layout="@layout/activity_see_aone" />
-    <fragment
-        android:id="@+id/profile"
-        android:name="com.jaidev.seeaplayer.profile"
-        android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+
+    <activity
+        android:id="@+id/moreSettingNav"
+        android:name="com.jaidev.seeaplayer.MoreSettingNav"
+        android:label="MoreSettingNav" />
 </navigation>

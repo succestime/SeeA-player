@@ -1,7 +1,6 @@
 package com.jaidev.seeaplayer.browserActivity
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
@@ -10,15 +9,16 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.webkit.MimeTypeMap
 import android.widget.CompoundButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.jaidev.seeaplayer.PlayerFileActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.FileAdapter
 import com.jaidev.seeaplayer.dataClass.FileDownloader
@@ -47,6 +48,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     private var isEditTextVisible = false
     private var sortByNewestFirst = true // Default to sort by newest first
     lateinit var mAdView: AdView
+    private var isFileItemClicked = false
+    private lateinit var swipeRefreshLayout: ConstraintLayout
     companion object {
 
         private val DOWNLOADS_DIRECTORY = Environment.DIRECTORY_DOWNLOADS
@@ -98,8 +101,25 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         binding.totalFile.text = "Total Downloaded files : ${fileList.size}"
 
         selectBox(binding.monthlyBox)
+
+        swipeRefreshLayout = binding.fileActivityLayout
+        setSwipeRefreshBackgroundColor()
     }
 
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
     private fun thread(){
         thread {
             val websiteUrl = "https://www.google.com" // Replace with the target website URL
@@ -118,6 +138,16 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         }
 
     }
+
+
+    private fun openPlayerActivity(videoUri: String, videoTitle: String) {
+        val intent = Intent(this, PlayerFileActivity::class.java).apply {
+            putExtra("videoUri", videoUri)
+            putExtra("videoTitle", videoTitle)
+        }
+        startActivity(intent)
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeBinding(){
@@ -288,97 +318,98 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
 
     override fun onItemClick(fileItem: FileItem) {
-        if (fileItem.fileType == FileType.IMAGE) {
-            openImageFile(fileItem)
+        if (fileItem.fileType == FileType.VIDEO || fileItem.fileType == FileType.AUDIO) {
+            // For video or audio file, open PlayerFileActivity
+            val videoUri = Uri.fromFile(File(fileItem.filePath)).toString() // Convert file path to URI string
+            openPlayerActivity(videoUri, fileItem.fileName) // Assuming fileItem.fileName contains the video title
         } else {
+            // For other file types, open the file as usual
             openFile(fileItem)
-
         }
     }
+
     private fun openImageFile(fileItem: FileItem) {
-        val intent = Intent(this, ImageViewerActivity::class.java).apply {
-            putExtra("imagePath", fileItem.filePath)
+        try {
+            val intent = Intent(this, ImageViewerActivity::class.java).apply {
+                putExtra("imagePath", fileItem.filePath)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Log the error
+            Log.e("ImageLoading", "Error opening image file: ${e.message}")
+            // Show a toast or handle the error as appropriate
         }
-        startActivity(intent)
     }
 
-    @SuppressLint("ObsoleteSdkInt")
     private fun openFile(fileItem: FileItem) {
-        val file = File(fileItem.filePath)
-        val fileUri = FileProvider.getUriForFile(
-            this,
-            "${packageName}.provider",
-            file
-        )
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(fileUri, getMimeType(fileItem.filePath))
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-
-            // Add FLAG_ACTIVITY_NEW_TASK for starting activity outside of an existing task
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-            // Handle opening URLs in a web browser
-            if (getMimeType(fileItem.filePath) == "text/html") {
-                data = fileUri // Set data to the URL
+        try {
+            if (fileItem.fileType == FileType.VIDEO) {
+                // For video files, open directly in the video player activity
+                val videoUri = Uri.fromFile(File(fileItem.filePath)).toString()
+                openPlayerActivity(videoUri, fileItem.fileName)
+            } else if (fileItem.fileType == FileType.IMAGE) {
+                // For image files, open directly in the image viewer activity
+                openImageFile(fileItem)
             } else {
-                // Grant permission to install packages if the APK is from a content:// URI
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
-                    putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, packageName)
+                // For other file types, use default handling
+                val file = File(fileItem.filePath)
+                val fileUri = FileProvider.getUriForFile(
+                    this,
+                    "${packageName}.provider",
+                    file
+                )
+                val intent = Intent().apply {
+                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    action = Intent.ACTION_VIEW
+                    setDataAndType(fileUri, getMimeType(fileItem.filePath))
+                }
+
+                // Check if there's any app that can handle this intent
+                val activities = packageManager.queryIntentActivities(intent, 0)
+                val isIntentSafe = activities.isNotEmpty()
+
+                if (isIntentSafe) {
+                    startActivity(intent)
+                } else {
+                    // Handle case where no app can handle the file type
+                    // You can implement your custom handling here, such as showing a toast message
                 }
             }
-        }
-
-        // Check if there's any app that can handle this intent
-        val activities = packageManager.queryIntentActivities(intent, 0)
-        val isIntentSafe = activities.isNotEmpty()
-
-        if (isIntentSafe) {
-            startActivity(intent)
-        } else {
-            // Handle case where no app can handle the file type
-        }
-
-        val mimeType = "image/jpeg"  // Example MIME type
-        val fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
-
-        // Start download based on MIME type
-        if (mimeType.startsWith("image/")) {
-            startDownload(this, "https://example.com/image.jpg", "image", fileExtension, mimeType)
-
-        } else if (mimeType.startsWith("video/")) {
-            startDownload(this, "https://example.com/video.mp4", "video", fileExtension, mimeType)
+        } catch (e: Exception) {
+            // Log the error
+            Log.e("FileOpening", "Error opening file: ${e.message}")
+            // Show a toast or handle the error as appropriate
         }
     }
 
 
-    private fun startDownload(context: Context, url: String, fileName: String, fileExtension: String?, mimeType: String?) {
-        val request = DownloadManager.Request(Uri.parse(url))
-            .setTitle(fileName)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$fileName.$fileExtension")
-            .setMimeType(mimeType ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension))
-
-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        downloadManager.enqueue(request)
-    }
 
 
+
+
+
+//    private fun startDownload(context: Context, url: String, fileName: String, fileExtension: String?, mimeType: String?) {
+//        val request = DownloadManager.Request(Uri.parse(url))
+//            .setTitle(fileName)
+//            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$fileName.$fileExtension")
+//            .setMimeType(mimeType ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension))
+//
+//        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+//        downloadManager.enqueue(request)
+//    }
+
+
+    @SuppressLint("DefaultLocale")
     private fun getMimeType(filePath: String): String? {
         val extension = filePath.substringAfterLast('.', "")
         return when (extension.toLowerCase()) {
-            "pdf" -> "application/pdf"
-            "apk", "zip" -> "application/vnd.android.package-archive" // APK and ZIP both have the same MIME type
+            "pdf", "pdfa", "pdfxml", "fdf", "xfdf", "pdfx", "pdp" , "PPT", "pptx"-> "application/pdf"
+            "jpg", "jpeg", "png", "gif", "svg" , "webp" -> "image/*"
             "mp4", "3gp", "mkv", "webm" -> "video/*"
             "mp3", "wav", "ogg" -> "audio/*"
-            "jpg", "jpeg", "png", "gif" , "svg"-> "image/*"
-            else -> {
-                // Check if it's a URL file
-                if (filePath.startsWith("http://google.com") || filePath.startsWith("https://google.com")) {
-                    "text/html"
-                } else {
-                    null
-                }
-            }
+            "apk", "zip" -> "application/vnd.android.package-archive"
+            "html", "htm" -> "text/html"
+            else -> null
         }
     }
 
@@ -485,13 +516,12 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     }
     private fun getFileType(fileExtension: String): FileType {
         return when (fileExtension) {
-            "pdf" ,"pdfa", "pdfxml", "fdf", "xfdf", "pdfx", "pdp"-> FileType.PDF
-            "jpg", "jpeg", "png", "gif" , "svg"-> FileType.IMAGE
+            "pdf" ,"pdfa", "pdfxml", "fdf", "xfdf", "pdfx", "pdp" , "PPT" ,"pptx" -> FileType.PDF
+            "jpg", "jpeg", "png", "gif" , "svg" ,"webp" -> FileType.IMAGE
             "mp4", "3gp", "mkv", "webm" -> FileType.VIDEO
             "mp3", "wav", "ogg"  -> FileType.AUDIO
-            "apk","zip" -> FileType.APK // Handle APK file type
-            "html", "htm" -> FileType.WEBSITE // Handle WEBSITE file type (HTML)
-            // Add more file types as needed
+            "apk","zip" -> FileType.APK
+            "html", "htm" -> FileType.WEBSITE
             else -> FileType.UNKNOWN
         }
     }
@@ -506,10 +536,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             val fileName: String
 
             // Check if the webpage contains a PDF file link
-            if (doc.select("a[href$=.pdf], a[href$=.pdfa], a[href$=.pdfxml], a[href$=.fdf], " +
-                        "a[href$=.xfdf], a[href$=.pdfx], a[href$=.pdp]").isNotEmpty()) {
-                fileUrl = doc.select("a[href$=.pdf], a[href$=.pdfa], a[href$=.pdfxml], a[href$=.fdf], " +
-                        "a[href$=.xfdf], a[href$=.pdfx], a[href$=.pdp]").attr("href")
+            if (doc.select("a[href$=.pdf], a[href$=.pdfa], a[href$=.pdfxml], a[href$=.fdf], a[href$=.xfdf], a[href$=.pdfx], a[href$=.pdp] , a[href$=.PPT], a[href$=.pptx]").isNotEmpty()) {
+                fileUrl = doc.select("a[href$=.pdf], a[href$=.pdfa], a[href$=.pdfxml], a[href$=.fdf], a[href$=.xfdf], a[href$=.pdfx], a[href$=.pdp], a[href$=.PPT], a[href$=.pptx] ").attr("href")
                 fileName = fileUrl.substringAfterLast('/')
                 return Pair(fileUrl, fileName)
             }
@@ -522,8 +550,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             }
 
             // Check if the webpage contains an image file link (e.g., JPG, PNG)
-            if (doc.select("a[href$=.jpg], a[href$=.jpeg], a[href$=.png] , a[href$=.svg]").isNotEmpty()) {
-                fileUrl = doc.select("a[href$=.jpg], a[href$=.jpeg], a[href$=.png]  , a[href$=.svg]" ).attr("href")
+            if (doc.select("a[href$=.jpg], a[href$=.jpeg], a[href$=.png] , a[href$=.svg] , a[href$=.webp]" ).isNotEmpty()) {
+                fileUrl = doc.select("a[href$=.jpg], a[href$=.jpeg], a[href$=.png]  , a[href$=.svg]  a[href$=.webp] , " ).attr("href")
                 fileName = fileUrl.substringAfterLast('/')
                 return Pair(fileUrl, fileName)
             }

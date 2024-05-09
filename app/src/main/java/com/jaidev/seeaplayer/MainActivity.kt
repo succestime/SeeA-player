@@ -9,7 +9,6 @@ import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -52,7 +51,6 @@ import com.jaidev.seeaplayer.Subscription.SeeAOne
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.bottomNavigation.downloadNav
 import com.jaidev.seeaplayer.bottomNavigation.homeNav
-import com.jaidev.seeaplayer.browserActivity.FileActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.dataClass.Folder
 import com.jaidev.seeaplayer.dataClass.Music
@@ -124,13 +122,10 @@ class MainActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.apply()
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupActionBar()
-        navView()
         bottomNav()
         funRequestRuntimePermission()
         setActionBarGradient()
@@ -151,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = binding.drawerLayoutMA
         // Set the background color of SwipeRefreshLayout based on app theme
 
-        navView = binding.navView
+
         val linearLayoutNav = findViewById<LinearLayout>(R.id.linearLayoutNav)
 
         setDrawerLayoutBackgroundColor()
@@ -173,112 +168,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    @SuppressLint("ResourceAsColor")
-    private fun navView(){
-        binding.navView.setNavigationItemSelectedListener {
 
-            when (it.itemId) {
-                R.id.settingsNav -> {
-                    val intent = Intent(this@MainActivity, More::class.java)
-                    startActivity(intent)
-
-                }
-
-                R.id.downloadsNav -> {
-                    val intent = Intent(this@MainActivity, FileActivity::class.java)
-                    startActivity(intent)
-
-                }
-
-                R.id.searchNav -> {
-                    val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
-                    startActivity(intent)
-                }
-                R.id.themesNav -> {
-                    val themes = resources.getStringArray(R.array.theme)
-                    val builder = MaterialAlertDialogBuilder(this)
-                    builder.setTitle("Select Theme")
-                    builder.setSingleChoiceItems(
-                        R.array.theme,
-                        getCheckedItem()
-                    ) { dialogInterface: DialogInterface, i: Int ->
-                        selected = themes[i]
-                        checkedItem = i
-                    }
-
-                    builder.setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int ->
-                        if (selected == null) {
-                            selected = themes[i]
-                            checkedItem = i
-                        }
-
-                        when (selected) {
-                            "System Default" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                            "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-                        }
-                        setCheckedItem(checkedItem)
-                    }
-
-                    builder.setNegativeButton("Cancel") { dialogInterface: DialogInterface, i: Int ->
-                        dialogInterface.dismiss()
-                    }
-
-                    val dialog = builder.create()
-                    dialog.show()
-
-                }
-
-                R.id.sortOrderNav -> {
-                    val menuItems = arrayOf(
-                        "Latest",
-                        "Oldest",
-                        "Name(A to Z)",
-                        "Name(Z to A)",
-                        "File Size(Smallest)",
-                        "File Size(Largest)"
-                    )
-                    var value = sortValue
-                    val dialog = MaterialAlertDialogBuilder(this)
-                        .setTitle("Sort By")
-                        .setPositiveButton("OK") { _, _ ->
-                            val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE).edit()
-                            sortEditor.putInt("sortValue", value)
-                            sortEditor.apply()
-
-                            //for restarting app
-                            finish()
-                            startActivity(intent)
-
-                        }
-                        .setSingleChoiceItems(menuItems, sortValue) { _, pos ->
-                            value = pos
-                        }
-                        .create()
-                    dialog.show()
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLACK)
-                }
-
-                R.id.exitNav -> {
-                    val builder = MaterialAlertDialogBuilder(this)
-                    builder.setTitle("Exit")
-                        .setMessage("Do you want to exit the app?")
-                        .setPositiveButton("Yes") { _, _ ->
-                            exitApplication()
-                        }
-                        .setNegativeButton("No") { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                    val customDialog = builder.create()
-                    customDialog.show()
-
-
-                }
-            }
-            true
-        }
-    }
 
     private fun bottomNav(){
         binding.bottomNav.setOnItemSelectedListener {
@@ -399,11 +289,9 @@ private fun funRequestRuntimePermission(){
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             drawerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
-            navView.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
         } else {
             // Light mode is enabled, set background color to white
             drawerLayout.setBackgroundColor(resources.getColor(android.R.color.white))
-            navView.setBackgroundColor(resources.getColor(R.color.light_navBar))
         }
     }
     private fun shouldStartService(): Boolean {
@@ -457,6 +345,7 @@ private fun funRequestRuntimePermission(){
                     arrayOf(
                         Manifest.permission.READ_MEDIA_VIDEO,
                         Manifest.permission.READ_MEDIA_AUDIO ,
+                        READ_EXTERNAL_STORAGE,
                         Manifest.permission.POST_NOTIFICATIONS ,
                     ),
                     13
@@ -473,7 +362,7 @@ private fun funRequestRuntimePermission(){
                     WRITE_EXTERNAL_STORAGE
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 13)
+                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE ,  READ_EXTERNAL_STORAGE,), 13)
                 return false
             }
             return true

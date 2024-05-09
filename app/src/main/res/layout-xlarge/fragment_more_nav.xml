@@ -67,15 +67,16 @@ android:background="#294653"
 
                                 <ImageView
                                     android:layout_width="30dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="center_horizontal"
+                                    android:layout_height="30dp"
+                                    android:layout_gravity="center_vertical"
                                     android:layout_marginStart="25dp"
                                     android:src="@drawable/user_svgrepo_com" />
 
 
                                 <TextView
                                     android:id="@+id/userDetails"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
                                     android:layout_height="match_parent"
                                     android:layout_marginStart="10dp"
                                     android:textColor="@color/white"
@@ -84,6 +85,14 @@ android:background="#294653"
                                     android:textSize="25sp" />
 
 
+                                <ImageButton
+                                    android:layout_width="30dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginEnd="10dp"
+                                    android:background="@android:color/transparent"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/round_navigate_next"
+                                    app:tint="@color/white" />
 
 
 
@@ -276,14 +285,15 @@ android:background="#294653"
 
                 <ImageView
                     android:layout_width="30dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="25dp"
                     android:src="@drawable/theme_svgrepo_com" />
 
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="match_parent"
 android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
@@ -291,6 +301,14 @@ android:layout_marginStart="10dp"
                     android:textColor="@color/white"
                     android:textSize="25sp" />
 
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
 
 
 
@@ -325,15 +343,17 @@ android:layout_marginStart="10dp"
 
                 <ImageView
                     android:layout_width="30dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="25dp"
                     app:tint="@color/white"
                     android:src="@drawable/ic_settings" />
 
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/Settings"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
 
@@ -343,6 +363,14 @@ android:layout_marginStart="10dp"
                     android:textSize="25sp" />
 
 
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
 
 
             </LinearLayout>
@@ -379,14 +407,15 @@ android:layout_marginStart="10dp"
 
                 <ImageView
                     android:layout_width="30dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="25dp"
-                    android:layout_gravity="center_horizontal"
                     android:src="@drawable/rupee_currency" />
 
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
 
@@ -395,6 +424,14 @@ android:layout_marginStart="10dp"
                     android:textColor="@color/white"
                     android:textSize="25sp" />
 
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
 
 
             </LinearLayout>
@@ -431,17 +468,18 @@ android:layout_marginStart="10dp"
 
                 <ImageView
                     android:layout_width="30dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="25dp"
                     android:tint="@color/white"
-                    android:layout_gravity="center_horizontal"
                     android:src="@drawable/exit_icon"
                     tools:ignore="UseAppTint" />
 
 
                 <TextView
                     android:id="@+id/signOut"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
@@ -450,6 +488,14 @@ android:layout_marginStart="10dp"
                     android:textSize="25sp" />
 
 
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
 
 
             </LinearLayout>

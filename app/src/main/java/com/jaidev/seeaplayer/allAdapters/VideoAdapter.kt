@@ -44,7 +44,7 @@ import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import java.io.File
 
-class VideoAdapter(private val context: Context, private var videoList: ArrayList<VideoData>,private val isFolder: Boolean = false,private val isRecantVideo: Boolean = false)
+class VideoAdapter(private val context: Context, private var videoList: ArrayList<VideoData>,private val isFolder: Boolean = false,private val isDownloadVideo: Boolean = false)
     : RecyclerView.Adapter<VideoAdapter.MyHolder>() {
 
     private var newPosition = 0
@@ -146,9 +146,15 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                         PlayerActivity.pipStatus = 2
                         sendIntent(pos = position, ref = "SearchVideos")
                     }
+//                    isDownloadVideo -> {
+//                        PlayerActivity.pipStatus = 3
+//                        sendIntent(pos = position , ref = "LinkTubeDownload")
+//
+//                    }
                     videoList[position].id == PlayerActivity.nowPlayingId -> {
                         sendIntent(pos = position, ref = "NowPlaying")
                     }
+
                     else -> {
                         // Only play the video without enabling selection
                         sendIntent(pos = position, ref = "NormalClick")

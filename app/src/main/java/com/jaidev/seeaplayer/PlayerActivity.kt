@@ -261,6 +261,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         recyclerViewIcons.layoutManager = layoutManager
         recyclerViewIcons.adapter = playbackIconsAdapter
         playbackIconsAdapter.notifyDataSetChanged()
+
         playbackIconsAdapter.setOnItemClickListener(object : PlaybackIconsAdapter.OnItemClickListener {
             @SuppressLint("Range", "SourceLockedOrientationActivity")
             override fun onItemClick(position: Int) {
@@ -700,7 +701,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.round_repeat)
             } else {
                 repeat = true
-                player.repeatMode = Player.REPEAT_MODE_ONE
+               player.repeatMode = Player.REPEAT_MODE_ONE
                 findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.round_repeat_on)
             }
         }

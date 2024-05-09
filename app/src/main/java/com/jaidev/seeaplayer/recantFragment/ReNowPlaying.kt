@@ -18,7 +18,7 @@ import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.dataClass.reSetSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentReNowPlayingBinding
 
-class ReNowPlaying : Fragment()  {
+class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener   {
     lateinit var adapter: RecantMusicAdapter
     companion object{
        @SuppressLint("StaticFieldLeak")
@@ -38,7 +38,8 @@ class ReNowPlaying : Fragment()  {
 
     private fun initializeBinding(){
         binding.playPauseBtnNP.setOnClickListener {
-            if(ReMusicPlayerActivity.isPlaying){ pauseMusic() }
+            if(ReMusicPlayerActivity.isPlaying){ pauseMusic()
+               }
             else {
                 playMusic()
             }
@@ -80,8 +81,8 @@ class ReNowPlaying : Fragment()  {
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
-            if(ReMusicPlayerActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon)
-            else binding.playPauseBtnNP.setIconResource(R.drawable.play_music_icon)
+            if(ReMusicPlayerActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+            else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
 
         }
     }
@@ -89,19 +90,41 @@ class ReNowPlaying : Fragment()  {
     private fun playMusic(){
         ReMusicPlayerActivity.isPlaying = true
         ReMusicPlayerActivity.musicService!!.mediaPlayer!!.start()
-        binding.playPauseBtnNP.setIconResource(R.drawable.ic_pause_icon)
+        binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+
 //        ReMusicPlayerActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
     }
     private fun pauseMusic(){
         ReMusicPlayerActivity.isPlaying = false
         ReMusicPlayerActivity.musicService!!.mediaPlayer!!.pause()
-        binding.playPauseBtnNP.setIconResource(R.drawable.play_music_icon)
+        binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+
 //        ReMusicPlayerActivity.musicService!!.showNotification(R.drawable.play_music_icon)
     }
+    override fun onMusicDeleted() {
+        // Check if the NowPlaying fragment is currently visible
+        if (isVisible) {
+            // Refresh the UI with the current playing music or take any other necessary action
+            refreshNowPlayingUI()
+        }
+    }
 
+    private fun refreshNowPlayingUI() {
 
+        if (ReMusicPlayerActivity.isPlaying) {
 
+          binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
 
+        } else {
+        binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+        }
+        ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+        Glide.with(requireContext())
+            .asBitmap()
+            .load(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].albumArtUri)
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+            .into(binding.songImgNP)
+    }
 
 
 }

@@ -57,7 +57,10 @@ class moreNav : Fragment() {
             auth.signOut()
             binding.userDetails.text = updateData()
         }
-
+binding.Settingslayout.setOnClickListener {
+    // Internet is connected, navigate to the desired destination
+    it.findNavController().navigate(R.id.action_moreNav_to_moreSettingNav)
+}
         binding.subscribePlans.setOnClickListener {
             if (checkConnection(requireContext())) {
                 // Internet is connected, navigate to the desired destination
@@ -67,8 +70,6 @@ class moreNav : Fragment() {
                 Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
             }
         }
-
-
 
         binding.appThemelayout.setOnClickListener {
             showDialog()

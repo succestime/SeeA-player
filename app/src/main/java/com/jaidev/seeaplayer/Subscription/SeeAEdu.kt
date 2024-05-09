@@ -5,10 +5,8 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.viewpager2.widget.ViewPager2
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.Model
 import com.jaidev.seeaplayer.allAdapters.MyDotAdapter
@@ -43,13 +41,13 @@ class SeeAEdu : AppCompatActivity() {
         val indicator: CircleIndicator3 = findViewById(R.id.dotIndictor)
         indicator.setViewPager(binding.viewPager)
 
-        // Set listener for page change callback
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-//                updateDotIndector(position)
-            }
-        })
+//        // Set listener for page change callback
+//        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+//            override fun onPageSelected(position: Int) {
+//                super.onPageSelected(position)
+////                updateDotIndector(position)
+//            }
+//        })
 
         //Automatically scroll ViewPager2
         startAutoScroll()
@@ -76,19 +74,11 @@ class SeeAEdu : AppCompatActivity() {
         return networkInfo != null && networkInfo.isConnected
     }
 
-    private fun createDotIndictor(count: Int) {
-        for (i in 0 until count) {
-            val dot = ImageView(this)
-            dot.setImageResource(R.drawable.dot_selector)
-            binding.dotIndictor.addView(dot)
-        }
-    }
-
-//    private fun updateDotIndector(position: Int) {
-//        for (i in 0 until binding.dotIndictor.childCount) {
-//            val dot = binding.dotIndictor.getChildAt(i) as View
-//
-//            dot.isSelected = i == position
+//    private fun createDotIndictor(count: Int) {
+//        for (i in 0 until count) {
+//            val dot = ImageView(this)
+//            dot.setImageResource(R.drawable.dot_selector)
+//            binding.dotIndictor.addView(dot)
 //        }
 //    }
 

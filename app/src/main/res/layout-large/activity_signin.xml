@@ -6,21 +6,33 @@
     android:background="#011B29"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".signin">
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/textView"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:cardCornerRadius="50dp"
         android:layout_marginTop="40dp"
+        app:cardBackgroundColor="@android:color/transparent"
         android:background="@drawable/circle"
         android:src="@mipmap/ic_logo_o"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_logo_o"
+            android:scaleType="centerCrop" />
+
+    </androidx.cardview.widget.CardView>
 
     <EditText
         android:id="@+id/userName"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="50dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/curver"
         android:ems="10"
@@ -34,13 +46,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.479"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
 
     <EditText
         android:id="@+id/emailResister"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="50dp"
         android:layout_marginTop="15dp"
         android:background="@drawable/curver"
         android:ems="10"
@@ -61,7 +73,7 @@
     <EditText
         android:id="@+id/passwordResister"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="50dp"
         android:layout_marginStart="40dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="40dp"
@@ -98,20 +110,21 @@
         android:id="@+id/clickSinin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="140dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="48dp"
         android:text="@string/already_login_chick_here"
         android:textColor="@color/gray"
-
         android:textStyle="italic"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/googleBtn"
+        app:layout_constraintHorizontal_bias="0.503"
+
+        app:layout_constraintStart_toStartOf="@+id/googleBtn"
         app:layout_constraintTop_toBottomOf="@+id/googleBtn" />
 
     <TextView
         android:id="@+id/login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="48dp"
         android:text="@string/activity_signIn_login"
         android:textColor="@color/cool_blue"
         app:layout_constraintEnd_toEndOf="parent"

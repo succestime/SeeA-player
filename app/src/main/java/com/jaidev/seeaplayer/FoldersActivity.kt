@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.format.DateUtils
@@ -282,29 +279,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
 
         return true
     }
-        @SuppressLint("ObsoleteSdkInt")
-        fun checkForInternet(context: Context): Boolean {
-            val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val network = connectivityManager.activeNetwork ?: return false
-                val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-
-                return when {
-                    activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                    activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                    else -> false
-                }
-            } else {
-                @Suppress("DEPRECATION") val networkInfo =
-                    connectivityManager.activeNetworkInfo ?: return false
-                @Suppress("DEPRECATION")
-                return networkInfo.isConnected
-            }
-
-
-        }
     @SuppressLint("Range")
     fun getAllVideos(folderId: String): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
@@ -431,32 +406,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         MainActivity.adapterChanged= false
     }
 
-//        private fun loadRewardedAdAndStartPlayerActivity() {
-//            val adRequest = AdRequest.Builder().build()
-//            RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest,
-//                object : RewardedInterstitialAdLoadCallback() {
-//                    override fun onAdLoaded(ad: RewardedInterstitialAd) {
-//                        rewardedInterstitialAd = ad
-//                        showRewardedAdAndStartPlayerActivity()
-//                        startPlayerActivity()
-//
-//                    }
-//
-//                    override fun onAdFailedToLoad(adError: LoadAdError) {
-//                        rewardedInterstitialAd = null
-//                        // If ad fails to load, start PlayerActivity without showing the ad
-//                        startPlayerActivity()
-//                    }
-//                })
-//        }
-//
-//        private fun showRewardedAdAndStartPlayerActivity() {
-//            rewardedInterstitialAd?.show(this@FoldersActivity, object : OnUserEarnedRewardListener {
-//                override fun onUserEarnedReward(p0: RewardItem) {
-//                    // Handle reward if needed
-//                }
-//            })
-//        }
 
         private fun startPlayerActivity() {
 

@@ -18,10 +18,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.textfield.TextInputEditText
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.Services.FileItemPreferences
@@ -135,14 +135,14 @@ class FileAdapter(
     // ViewHolder for Image type
     inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageView: ImageView = itemView.findViewById(R.id.musicBrowserImage)
-        private val fileSelectImageView: ImageButton = itemView.findViewById(R.id.multiMusicIcon)
-        private val fileIconImageView: ImageView = itemView.findViewById(R.id.musicBrowserImage)
+
 
         fun bind(fileItem: FileItem) {
-            Glide.with(context)
+            Glide.with(itemView.context)
                 .load(fileItem.artUri) // Assuming artUri contains the image URI
                 .placeholder(R.drawable.image_browser) // Placeholder image while loading
                 .error(R.drawable.image_browser) // Image to display on error
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache both original & resized image
                 .into(imageView)
 
             if (selectedItems.contains(adapterPosition)) {
@@ -175,8 +175,7 @@ class FileAdapter(
         private val videoNameTextView: TextView = itemView.findViewById(R.id.videoBrowserName)
         private val durationTextView: TextView = itemView.findViewById(R.id.durationBrowser)
         private val videoMoreTextView: ImageButton = itemView.findViewById(R.id.MoreVideoChoose)
-        private val fileSelectImageView: ImageButton = itemView.findViewById(R.id.multiVideoIcon)
-        private val fileIconImageView: CardView = itemView.findViewById(R.id.videoBrowserCard)
+
 
         init {
             videoMoreTextView.setOnClickListener {

@@ -203,15 +203,16 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
 
         linkRef.binding.btnTextUrl.setOnClickListener {
-            // Request focus for btnTextUrl
             if (binding.recyclerviewLayout.visibility == View.VISIBLE) {
                 binding.recyclerviewLayout.visibility = View.GONE
             } else {
-                linkRef.binding.btnTextUrl.requestFocus()
+
+                fillTitleInTextUrl()
                 binding.recyclerviewLayout.visibility = View.VISIBLE
             }
-
         }
+
+
 
 // Before loading the webpage, check for network connectivity
         if (checkForInternet(requireContext())) {
@@ -295,13 +296,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
 
 
         binding.webView.apply {
-//            settings.javaScriptEnabled = true
-//            settings.setSupportZoom(true)
-//            settings.builtInZoomControls = true
-//         settings.displayZoomControls = false
-//            settings.userAgentString = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4501.0 Mobile Safari/537.36"
-//       settings.useWideViewPort = true
-//        settings.loadWithOverviewMode = true
+
 
             webViewClient = object : WebViewClient() {
 
@@ -440,6 +435,15 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = fileListAdapter
         }
+    }
+
+    private fun fillTitleInTextUrl() {
+        val linkTubeRef = context as LinkTubeActivity
+        val editText = linkTubeRef.binding.btnTextUrl
+        editText.setSelection(editText.text.length)
+
+
+
     }
     @SuppressLint("Range")
     private fun startDownload(url: String, fileName: String, fileExtension: String?) {

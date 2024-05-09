@@ -31,7 +31,7 @@
             android:padding="8dp"
             android:text="Video Title"
             android:textSize="16sp"
-            android:maxLines="2"
+            android:maxLines="1"
             android:ellipsize="end" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,7 +43,7 @@
                 android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:padding="5dp"
                 android:text="00:00"
                 android:textColor="#0759E1"
                 android:textStyle="bold"
@@ -60,6 +60,7 @@
                 android:layout_gravity="center_vertical"
                 android:background="@android:color/transparent"
                 android:src="@drawable/icon_dark"
+                android:padding="3dp"
                 android:layout_marginEnd="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -35,6 +36,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
     private lateinit var emptyStateLayout: ViewStub // Add reference to emptyStateLayout
     private var appOpenAd : AppOpenAd? = null
     private var isAdDisplayed = false
+    private lateinit var swipeRefreshLayout: ConstraintLayout
     companion object{
         val historyItems: MutableList<HistoryItem> = mutableListOf()
     }
@@ -59,9 +61,23 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         // Show empty state layout based on history list size
         updateEmptyStateVisibility()
         initializeBinding()
-
+        swipeRefreshLayout = binding.historyActivityLayout
+        setSwipeRefreshBackgroundColor()
     }
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
 
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeBinding(){
 

@@ -89,12 +89,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:text="@string/duration"
+
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -102,13 +102,12 @@
             android:id="@+id/textView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:layout_toEndOf="@+id/exo_position"
             android:text="@string/semi_colon"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/exo_position"
             app:layout_constraintEnd_toStartOf="@+id/exo_duration"
             app:layout_constraintTop_toTopOf="parent" />
@@ -119,10 +118,9 @@
             android:layout_height="wrap_content"
             android:text="@string/loading"
             android:textColor="@color/white"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textView6"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -212,7 +210,7 @@
 
         <ImageButton
             android:id="@+id/fullScreenBtn"
-            android:layout_width="65dp"
+            android:layout_width="50dp"
             android:layout_height="65dp"
             android:background="?android:selectableItemBackground"
             android:clickable="true"
@@ -226,7 +224,7 @@
 
         <ImageButton
             android:id="@+id/repeatBtn"
-            android:layout_width="65dp"
+            android:layout_width="50dp"
             android:layout_height="65dp"
             android:background="?android:selectableItemBackground"
             android:clickable="true"

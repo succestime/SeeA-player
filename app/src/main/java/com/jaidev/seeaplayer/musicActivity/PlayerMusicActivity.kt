@@ -250,8 +250,8 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 binding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
                 binding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
                 binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
-                if(isPlaying) binding.playPauseBtnPA.setIconResource(R.drawable.ic_pause_icon)
-                else binding.playPauseBtnPA.setIconResource(R.drawable.play_music_icon)
+                if(isPlaying) binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
+                else binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
             }
             "MusicAdapter" -> {
                 val intent = Intent(this, MusicService::class.java)
@@ -342,10 +342,8 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
           musicService!!.showNotification(R.drawable.round_pause_24)
             updateNextMusicTitle()
-            binding.tvSeekBarStart.text =
-                formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-            binding.tvSeekBarEnd.text =
-                formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+            binding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+            binding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
             binding.seekBarPA.progress = 0
       binding.seekBarPA.max = 100 // Or any smaller value you desire
             binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration

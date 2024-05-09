@@ -17,11 +17,15 @@ private lateinit var navController: NavController
         super.onCreate(savedInstanceState)
         binding = ActivityMoreBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Enable the Up button
 
     }
 
     override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
         navController = findNavController(R.id.navHostFragmentContainerView)
         return navController.navigateUp() ||super.onSupportNavigateUp()
     }
+
+
 }

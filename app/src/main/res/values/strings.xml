@@ -196,4 +196,9 @@
     <string name="clear_data_dialog_title">Are you sure , you want to clear all the browsing data?</string>
     <string name="clear_data_dialog_message">If you clear the browsing data, it will not be recoverable.</string>
     <string name="related_to_recant_searches">Related to recant searches</string>
+    <string name="short_order">Short Order</string>
+    <string name="link_tube_setting">Link Tube</string>
+    <string name="downloads_files_settings">Downloads Files</string>
+    <string name="history_settings">History</string>
+    <string name="help">Help</string>
 </resources>

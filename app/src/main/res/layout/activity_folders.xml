@@ -147,7 +147,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
             android:visibility="invisible"
-            app:icon="@drawable/ic_play_icon"
+            app:icon="@drawable/round_play"
             app:iconSize="60dp"
             app:iconTint="@color/cool_blue"
             app:layout_constraintBottom_toBottomOf="parent"

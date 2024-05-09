@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.ActivityImageViewerBinding
 import java.io.File
@@ -32,17 +35,82 @@ class ImageViewerActivity : AppCompatActivity() {
 
         // Load the image into the PhotoView
         if (!imagePath.isNullOrBlank()) {
-            val bitmap = BitmapFactory.decodeFile(imagePath)
+            // Define target width and height
+            val targetWidth = 1024 // Specify the desired target width
+            val targetHeight = 1024 // Specify the desired target height
+            // Decode the image file to get its dimensions
+            val options = BitmapFactory.Options().apply {
+                // Set inJustDecodeBounds to true to only decode the image dimensions without loading the full bitmap into memory
+                inJustDecodeBounds = true
+            }
+            BitmapFactory.decodeFile(imagePath, options)
+
+            // Calculate the sample size to scale down the image
+            val sampleSize =
+                calculateSampleSize(options.outWidth, options.outHeight, targetWidth, targetHeight)
+
+            // Set the sample size in BitmapFactory options
+            val bitmapOptions = BitmapFactory.Options().apply {
+                inSampleSize = sampleSize
+            }
+
+            // Decode the image file with the scaled sample size
+            val bitmap = BitmapFactory.decodeFile(imagePath, bitmapOptions)
             binding.photoView.setImageBitmap(bitmap)
         }
-
+        loadImage()
         setActionBarGradient()
+
+//        // Set click listener for the image
+//        binding.photoView.setOnClickListener {
+//            showImageOptionsPopup()
+//        }
     }
 
+    private fun loadImage() {
+        if (!imagePath.isNullOrBlank()) {
+            val file = File(imagePath!!)
+            if (file.exists()) {
+                Glide.with(this)
+                    .load(Uri.fromFile(file))
+                    .apply(
+                        RequestOptions()
+                            .placeholder(R.drawable.image_browser) // Placeholder image while loading
+                            .error(R.drawable.image_browser) // Image to display on error
+                            .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache both original & resized image
+                    )
+                    .into(binding.photoView)
+            } else {
+                // Handle the case where the image file doesn't exist
+                // You can show a placeholder image or a message to the user
+                binding.photoView.setImageResource(R.drawable.image_browser)
+            }
+        }
+    }
+
+
+    private fun calculateSampleSize(imageWidth: Int, imageHeight: Int, targetWidth: Int, targetHeight: Int): Int {
+        var inSampleSize = 1
+
+        if (imageHeight > targetHeight || imageWidth > targetWidth) {
+            val halfHeight = imageHeight / 2
+            val halfWidth = imageWidth / 2
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= targetHeight && (halfWidth / inSampleSize) >= targetWidth) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
+    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.image_menu, menu)
         return true
     }
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -63,25 +131,6 @@ class ImageViewerActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-    private fun shareImage() {
-        // Check if imagePath is valid
-        if (!imagePath.isNullOrBlank()) {
-            // Create a Uri from the imagePath
-            val imageUri = getImageUri(imagePath)
-
-            // Create an intent with ACTION_SEND to share the image
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "image/*"
-                putExtra(Intent.EXTRA_STREAM, imageUri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-
-            // Start the activity to show the share dialog
-            startActivity(Intent.createChooser(shareIntent, "Share Image"))
-        }
-    }
-
-
     private fun showOpenWithPopupMenu() {
         // Check if imagePath is valid
         if (!imagePath.isNullOrBlank()) {
@@ -107,6 +156,61 @@ class ImageViewerActivity : AppCompatActivity() {
             openWithPopupMenu.show()
         }
     }
+
+    private fun openImageWithDefaultApp() {
+        // Check if imagePath is valid
+        if (!imagePath.isNullOrBlank()) {
+            // Create an intent to view the image with the default app
+            val imageUri = getImageUri(imagePath)
+            val openIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(imageUri, "image/*")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            // Verify that there is an activity to handle the intent
+            if (openIntent.resolveActivity(packageManager) != null) {
+                // Show app chooser dialog to handle the intent
+                val chooserIntent = Intent.createChooser(openIntent, "Open with")
+                startActivity(chooserIntent)
+            }
+        }
+    }
+    private fun shareImage() {
+        // Check if imagePath is valid
+        if (!imagePath.isNullOrBlank()) {
+            // Create a Uri from the imagePath
+            val imageUri = getImageUri(imagePath)
+
+            // Create an intent with ACTION_SEND to share the image
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "image/*"
+                putExtra(Intent.EXTRA_STREAM, imageUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            // Start the activity to show the share dialog
+            startActivity(Intent.createChooser(shareIntent, "Share Image"))
+        }
+    }
+
+//    private fun openImageWithDefaultApp() {
+//        // Check if imagePath is valid
+//        if (!imagePath.isNullOrBlank()) {
+//            // Create an intent to view the image with the default app
+//            val imageUri = getImageUri(imagePath)
+//            val openIntent = Intent(Intent.ACTION_VIEW).apply {
+//                setDataAndType(imageUri, "image/*")
+//                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            }
+//
+//            // Verify that there is an activity to handle the intent
+//            if (openIntent.resolveActivity(packageManager) != null) {
+//                // Show app chooser dialog to handle the intent
+//                val chooserIntent = Intent.createChooser(openIntent, "Open with")
+//                startActivity(chooserIntent)
+//            }
+//        }
+//    }
 
     private fun setActionBarGradient() {
         // Check the current night mode
@@ -161,29 +265,6 @@ class ImageViewerActivity : AppCompatActivity() {
             }
         }
     }
-    private fun openImageWithDefaultApp() {
-        // Check if imagePath is valid
-        if (!imagePath.isNullOrBlank()) {
-            // Create an intent to view the image with the default app
-            val imageUri = getImageUri(imagePath)
-            val openIntent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(imageUri, "image/*")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-
-            // Verify that there is an activity to handle the intent
-            if (openIntent.resolveActivity(packageManager) != null) {
-                // Show app chooser dialog to handle the intent
-                val chooserIntent = Intent.createChooser(openIntent, "Open with")
-                startActivity(chooserIntent)
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setActionBarGradient()
-    }
 
     private fun getImageUri(imagePath: String?): Uri? {
         return imagePath?.let {
@@ -195,5 +276,4 @@ class ImageViewerActivity : AppCompatActivity() {
             )
         }
     }
-
 }

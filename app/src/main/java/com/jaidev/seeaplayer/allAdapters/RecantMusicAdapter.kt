@@ -39,6 +39,9 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
 
+    interface MusicDeleteListener {
+        fun onMusicDeleted()
+    }
 
     class MyAdapter(binding: RecantMusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
         var title = binding.songName

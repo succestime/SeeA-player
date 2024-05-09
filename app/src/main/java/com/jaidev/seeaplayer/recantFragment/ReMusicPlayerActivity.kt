@@ -258,6 +258,8 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 binding.tvSeekBarEnd.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
                 binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
                 binding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
+                if(isPlaying) binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
+                else binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
             }
             "DaysMusic" -> {
                 val intent = Intent(this, MusicService::class.java)
@@ -280,6 +282,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
     private fun pauseMusic() {
         isPlaying = false
         binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
+
         musicService!!.mediaPlayer!!.pause()
 
 

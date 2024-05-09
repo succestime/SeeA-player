@@ -65,17 +65,18 @@
                                 android:orientation="horizontal">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="center_horizontal"
+                                    android:layout_width="25dp"
+                                    android:layout_height="25sp"
+                                    android:layout_gravity="center_vertical"
                                     android:layout_marginStart="25dp"
                                     android:src="@drawable/user_svgrepo_com" />
 
 
                                 <TextView
                                     android:id="@+id/userDetails"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="0dp"
                                     android:layout_height="match_parent"
+                                    android:layout_weight="1"
                                     android:layout_marginStart="10dp"
                                     android:textColor="@color/white"
 
@@ -83,7 +84,14 @@
                                     android:text="@string/login_or_signin"
                                     android:textSize="20sp" />
 
-
+                                <ImageButton
+                                    android:layout_width="30dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginEnd="10dp"
+                                    android:background="@android:color/transparent"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/round_navigate_next"
+                                    app:tint="@color/white" />
 
 
                             </LinearLayout>
@@ -287,8 +295,9 @@
 
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
               android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/app_theme"
@@ -296,7 +305,14 @@
                     android:textSize="20sp" />
 
 
-
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
 
             </LinearLayout>
 
@@ -338,15 +354,24 @@
 
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/Settings"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/more_nav_settings"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
-
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
             </LinearLayout>
 
 
@@ -388,8 +413,9 @@
 
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                    android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/my_subscriptions"
@@ -397,7 +423,14 @@
                     android:textSize="20sp" />
 
 
-
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -430,24 +463,33 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="25dp"
+                    android:layout_height="25sp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="25dp"
                     android:tint="@color/white"
-                    android:layout_gravity="center_horizontal"
                     android:src="@drawable/exit_icon"
                     tools:ignore="UseAppTint" />
 
                 <TextView
                     android:id="@+id/signOut"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
                     android:gravity="center_vertical"
                     android:text="@string/sign_out"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
             </LinearLayout>
 
 
