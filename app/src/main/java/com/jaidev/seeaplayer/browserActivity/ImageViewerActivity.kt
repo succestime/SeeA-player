@@ -9,6 +9,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
@@ -21,7 +22,7 @@ import java.io.File
 class ImageViewerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityImageViewerBinding
     private var imagePath: String? = null
-
+    private lateinit var swipeRefreshLayout: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
@@ -60,12 +61,27 @@ class ImageViewerActivity : AppCompatActivity() {
         }
         loadImage()
         setActionBarGradient()
+        swipeRefreshLayout = binding.ImageViewerActivity
 
-//        // Set click listener for the image
-//        binding.photoView.setOnClickListener {
-//            showImageOptionsPopup()
-//        }
+        // Set the background color of SwipeRefreshLayout based on app theme
+        setSwipeRefreshBackgroundColor()
     }
+
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
+
 
     private fun loadImage() {
         if (!imagePath.isNullOrBlank()) {

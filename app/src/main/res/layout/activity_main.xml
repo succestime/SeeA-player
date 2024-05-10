@@ -28,9 +28,7 @@
             android:id="@+id/bottomNav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:itemTextColor="@color/light_gray"
             app:menu="@menu/bottom_items"
-            app:backgroundTint="#012437"
             app:labelVisibilityMode="labeled"/>
 
 

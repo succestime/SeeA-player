@@ -107,7 +107,7 @@ class FileAdapter(
 
 // Update item view background based on selection
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_background) // Set your custom selected background
+                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
             } else {
                 itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
             }
@@ -146,7 +146,7 @@ class FileAdapter(
                 .into(imageView)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_image_background) // Set your custom selected background
+                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
             } else {
                 itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
             }
@@ -226,7 +226,7 @@ class FileAdapter(
             videoNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_background) // Set your custom selected background
+                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
             } else {
                 itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
             }
@@ -304,7 +304,7 @@ class FileAdapter(
             audioNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_background) // Set your custom selected background
+                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
             } else {
                 itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
             }
@@ -382,7 +382,7 @@ class FileAdapter(
             websiteNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_background) // Set your custom selected background
+                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
             } else {
                 itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
             }
@@ -460,7 +460,7 @@ class FileAdapter(
             apkNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_background) // Set your custom selected background
+                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
             } else {
                 itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
             }

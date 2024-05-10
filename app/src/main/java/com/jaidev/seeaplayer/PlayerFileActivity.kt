@@ -82,6 +82,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
     private var isLocked: Boolean = false
     private var isPlaying: Boolean = false
     private var repeat: Boolean = false
+    private var audioManager: AudioManager? = null
     private lateinit var binding: ActivityPlayerFileBinding
     private var isFullscreen: Boolean = false
     private lateinit var gestureDetectorCompat: GestureDetectorCompat
@@ -230,7 +231,7 @@ player.play()
         iconModelArrayList.add(IconModel(R.drawable.round_nights_stay,"Night Mode", android.R.color.white))
         iconModelArrayList.add(IconModel(R.drawable.round_speed,"Speed", android.R.color.white))
         iconModelArrayList.add(IconModel(R.drawable.round_screen_rotation,"Rotate", android.R.color.white))
-        iconModelArrayList.add(IconModel(R.drawable.round_volume_off,"Rotate", android.R.color.white))
+        iconModelArrayList.add(IconModel(R.drawable.round_volume_off,"Mute", android.R.color.white))
         nightMode = findViewById(R.id.night_mode)
         recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
         eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
@@ -355,21 +356,23 @@ player.play()
                         }
                     }
 
-                   4 ->{     setupSleepTimer()   }
+                   4 ->{
+                       if (mute) {
+                           player.setVolume(100F)
+                           iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute")
+                           playbackIconsAdapter.notifyDataSetChanged()
+                           mute = false
+                       } else {
+                           player.setVolume(0F)
+                           iconModelArrayList[position] =
+                               IconModel(R.drawable.round_volume_up, "Unmute")
+                           playbackIconsAdapter.notifyDataSetChanged()
+                           mute = true
+                       }
+                   }
 
                     5 -> {
-                        if (mute) {
-                            player.setVolume(100F)
-                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute")
-                            playbackIconsAdapter.notifyDataSetChanged()
-                            mute = false
-                        } else {
-                            player.setVolume(0F)
-                            iconModelArrayList[position] =
-                                IconModel(R.drawable.round_volume_up, "Unmute")
-                            playbackIconsAdapter.notifyDataSetChanged()
-                            mute = true
-                        }
+                        setupSleepTimer()
                     }
 
                    6 -> {
@@ -392,6 +395,13 @@ player.play()
                     7 -> {
                         if (eqContainer.visibility == View.GONE) {
                             eqContainer.visibility = View.VISIBLE
+                        } else {
+                            // Check if the fragment is already added
+                            val fragment = supportFragmentManager.findFragmentById(R.id.eqFrame)
+                            if (fragment != null) {
+                                // Fragment is already added, no need to replace it again
+                                return
+                            }
                         }
                         val sessionId = player.audioSessionId
                         Settings.isEditing = false
@@ -406,7 +416,6 @@ player.play()
 
                         playbackIconsAdapter.notifyDataSetChanged()
                     }
-
 
                     else -> {
                         // Handle any other positions if needed
@@ -551,15 +560,26 @@ player.play()
             // For example, you might display a toast message or perform some other action
         }
     }
-//    private fun releasePlayer() {
-//        player.release()
-//        // You may need to release other player resources here
-//    }
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.eqFrame)
+        if (eqContainer.visibility == View.GONE) {
+            super.onBackPressed()
+        } else {
+            if (fragment != null && fragment.isVisible && eqContainer.visibility == View.VISIBLE) {
+                eqContainer.visibility = View.GONE
+            } else {
+                player.release()
+                super.onBackPressed()
+            }
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
         player.pause()
         player.release()
 
+       audioManager?.abandonAudioFocus(this)
 
     }
 
@@ -571,7 +591,14 @@ player.play()
         if (isPlayingBeforePause) {
             player.play()
         }
+        if (audioManager == null) audioManager =
+            getSystemService(Context.AUDIO_SERVICE) as AudioManager
+      audioManager!!.requestAudioFocus(
+            this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN
+        )
     }
+
+
     override fun onPause() {
         super.onPause()
         if (player.isPlaying) {
@@ -727,4 +754,6 @@ player.play()
         val color = Color.parseColor("#011B29")
         return ColorDrawable(color)
     }
+
+
 }

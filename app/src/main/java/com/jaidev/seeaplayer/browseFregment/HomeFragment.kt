@@ -4,7 +4,6 @@ package com.jaidev.seeaplayer.browseFregment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -16,7 +15,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.internal.ViewUtils.hideKeyboard
 import com.jaidev.seeaplayer.R
@@ -26,6 +24,7 @@ import com.jaidev.seeaplayer.browserActivity.BookmarkActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.changeTab
 import com.jaidev.seeaplayer.browserActivity.checkForInternet
+import com.jaidev.seeaplayer.dataClass.Bookmark
 import com.jaidev.seeaplayer.dataClass.SearchTitle
 import com.jaidev.seeaplayer.dataClass.SearchTitleStore
 import com.jaidev.seeaplayer.databinding.FragmentHomeBinding
@@ -42,9 +41,9 @@ class HomeFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         binding = FragmentHomeBinding.bind(view)
-
+        saveDefaultBookmarks()
         // Show the keyboard explicitly
-
+        addDefaultBookmarks()
         // Check if the keyboard is visible
         val rootView = view?.rootView
         rootView?.viewTreeObserver?.addOnGlobalLayoutListener {
@@ -59,7 +58,37 @@ class HomeFragment : Fragment() {
         }
         return view
     }
+    private fun saveDefaultBookmarks() {
+        val bookmarkTitles = listOf("Wikipedia", "Google", "YouTube")
+        val bookmarkUrls = listOf("https://en.wikipedia.org", "https://www.google.com", "https://www.youtube.com")
 
+        val sharedPreferences = requireContext().getSharedPreferences("DefaultBookmarks", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        for (i in bookmarkTitles.indices) {
+            val title = bookmarkTitles[i]
+            val url = bookmarkUrls[i]
+
+            editor.putString(title, url)
+        }
+
+        editor.apply()
+    }
+    private fun addDefaultBookmarks() {
+        val sharedPreferences = requireContext().getSharedPreferences("DefaultBookmarks", Context.MODE_PRIVATE)
+
+        val defaultBookmarkTitles = listOf("Wikipedia", "Google", "YouTube")
+
+        for (title in defaultBookmarkTitles) {
+            val url = sharedPreferences.getString(title, "")
+            if (!url.isNullOrEmpty()) {
+                val bookmarkExists = LinkTubeActivity.bookmarkList.any { it.name == title && it.url == url }
+                if (!bookmarkExists) {
+                    LinkTubeActivity.bookmarkList.add(Bookmark(title, url))
+                }
+            }
+        }
+    }
     @SuppressLint("RestrictedApi")
     override fun onResume() {
         super.onResume()
@@ -192,11 +221,10 @@ class HomeFragment : Fragment() {
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(5)
-        // Determine screen size
-        val isTablet = resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE
-        // Set appropriate GridLayoutManager
-        val spanCount = if (isTablet) 5 else 3
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
+
+// Set layout manager to scroll horizontally
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
 
         binding.recyclerView.adapter = BookmarkAdapter(requireContext())
 

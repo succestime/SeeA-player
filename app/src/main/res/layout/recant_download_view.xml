@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:layout_marginBottom="5dp"
+    android:layout_height="55dp"
+    android:layout_marginBottom="3dp"
     android:clickable="true"
     android:focusable="true"
     android:background="?attr/selectableItemBackground">
@@ -18,7 +18,8 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/videoImage"
             android:layout_width="80dp"
-            android:layout_height="70dp"
+            android:layout_height="55dp"
+            android:scaleType="centerCrop"
             android:layout_alignParentBottom="true"
             android:layout_gravity="center"
             android:contentDescription="video_image"
@@ -65,7 +66,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="68dp"
+        android:layout_height="55dp"
         android:layout_weight="1"
         android:paddingHorizontal="2dp"
         android:orientation="vertical">
@@ -91,7 +92,7 @@
     <ImageButton
         android:id="@+id/MoreChoose"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="match_parent"
         android:src="@drawable/icon_dark"
         app:tint="?android:attr/textColorPrimary"
         android:layout_marginVertical="15dp"

@@ -28,7 +28,7 @@ class downloadNav : Fragment() {
         adapter = ReDownloadAdapter(supportFragmentManager , lifecycle  )
 
 
-     binding.myTabLayout.addTab( binding.myTabLayout.newTab().setText("Recant Download"))
+     binding.myTabLayout.addTab( binding.myTabLayout.newTab().setText("Recant Video"))
         binding.myTabLayout.addTab( binding.myTabLayout.newTab().setText("Recant Music"))
         binding.viewPagerDownload.adapter = adapter
 

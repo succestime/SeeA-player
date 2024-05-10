@@ -33,7 +33,6 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -73,8 +72,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var adapter: VideoAdapter
     private  var runnable : Runnable? = null
-    private lateinit var
-            drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private var musicLoaded = false
     private lateinit var musicFragment: Fragment // Define your music fragment
@@ -128,6 +126,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBar()
         bottomNav()
         funRequestRuntimePermission()
+        setBottomLayoutBackgroundColor()
         setActionBarGradient()
         // Check internet connectivity and show/hide the "Subscribe" TextView
         checkInternetConnection()
@@ -260,7 +259,7 @@ private fun funRequestRuntimePermission(){
         val networkInfo = connectivityManager.activeNetworkInfo
         val isInternetConnected = networkInfo != null && networkInfo.isConnected
 
-        val subscribeTextView = supportActionBar?.customView?.findViewById<CardView>(R.id.connectivityCardView)
+        val subscribeTextView = supportActionBar?.customView?.findViewById<LinearLayout>(R.id.connectivityCardView)
         if (isInternetConnected) {
             subscribeTextView?.visibility = View.VISIBLE
         } else {
@@ -268,16 +267,7 @@ private fun funRequestRuntimePermission(){
         }
     }
 
-    private fun getCheckedItem(): Int {
-        return this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
-            .getInt(CHECKED_ITEM, checkedItem)
-    }
-    private fun setCheckedItem(i: Int) {
-        this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
-            .edit()
-            .putInt(CHECKED_ITEM, i)
-            .apply()
-    }
+
     @SuppressLint("ResourceType")
     private fun setDrawerLayoutBackgroundColor() {
 
@@ -292,6 +282,28 @@ private fun funRequestRuntimePermission(){
         } else {
             // Light mode is enabled, set background color to white
             drawerLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+        }
+    }
+
+    @SuppressLint("ResourceType")
+    private fun setBottomLayoutBackgroundColor() {
+
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            binding.bottomNav.setBackgroundColor(resources.getColor(R.color.light_bottom_navBar))
+            binding.bottomNav.itemTextColor = ContextCompat.getColorStateList(this@MainActivity, R.color.white)
+
+
+        } else {
+            // Light mode is enabled, set background color to white
+            binding.bottomNav.setBackgroundColor(resources.getColor(android.R.color.white))
+            binding.bottomNav.itemTextColor = ContextCompat.getColorStateList(this@MainActivity, R.color.black)
+
         }
     }
     private fun shouldStartService(): Boolean {

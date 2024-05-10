@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="F_black">#332F2F</color>
     <color name="white">#FFFFFFFF</color>
+
     <color name="purple_200">#CC7B1FA2</color>
     <color name="purple_500">#9C27B0</color>
     <color name="purple_700">#7B1FA2</color>
@@ -39,10 +40,12 @@
     <color name="dark_yellow">#FF7F7F00</color>
     <color name="light_dark">#74000000</color>
     <color name="dark_cool_blue">#F2032C42</color>
+    <color name="dark_F_cool_blue">#0F4D6C</color>
     <color name="green_primary">#00FF00</color> <!-- Change this to your desired green color -->
     <color name="black_statusBar">#0F4D6C</color> <!-- Change this to your desired green color -->
     <color name="light_statusBar">#8ACDF3</color> <!-- Change this to your desired green color -->
     <color name="light_navBar">#C4E2F3</color> <!-- Change this to your desired green color -->
+    <color name="light_bottom_navBar">#012437</color> <!-- Change this to your desired green color -->
 
 
     <color name="icon_light_color">#000000</color> <!-- Black color for light mode -->
