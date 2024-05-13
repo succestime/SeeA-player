@@ -12,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.browserActivity.FileActivity
-import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.databinding.ActivityMoreSettingNavBinding
 
@@ -27,6 +26,7 @@ private lateinit var binding:ActivityMoreSettingNavBinding
         binding = ActivityMoreSettingNavBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setActionBarGradient()
+        supportActionBar?.title = "Settings"
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Enable the Up button
 
         binding.appThemelayout.setOnClickListener {
@@ -72,15 +72,14 @@ binding.mySubscribeLayout.setOnClickListener {
             startActivity(intent)
         }
 
-      binding.histroySettings.setOnClickListener {
-          val intent = Intent(this@MoreSettingNav, HistoryBrowser::class.java)
-          startActivity(intent)
-      }
-        binding.aboutSettings.setOnClickListener {
-            val intent = Intent(this@MoreSettingNav, HistoryBrowser::class.java)
+        binding.feedBackLayout.setOnClickListener {
+            val intent = Intent(this@MoreSettingNav, FeedBackActivity::class.java)
             startActivity(intent)
         }
-
+        binding.AboutSeeAPlayer.setOnClickListener {
+            val intent = Intent(this@MoreSettingNav, AboutApp::class.java)
+            startActivity(intent)
+        }
         swipeRefreshLayout = binding.relativeLayoutMore
         setSwipeRefreshBackgroundColor()
     }

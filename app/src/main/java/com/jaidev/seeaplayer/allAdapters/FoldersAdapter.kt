@@ -12,17 +12,17 @@ import com.jaidev.seeaplayer.dataClass.Folder
 import com.jaidev.seeaplayer.databinding.FoldersViewBinding
 
 
-class FoldersAdapter(private val context: Context, private var foldersList: ArrayList<Folder>) : RecyclerView.Adapter<FoldersAdapter.MyHOlder>() {
-    class MyHOlder(binding: FoldersViewBinding) : RecyclerView.ViewHolder(binding.root) {
+class FoldersAdapter(private val context: Context, private var foldersList: ArrayList<Folder>) : RecyclerView.Adapter<FoldersAdapter.MyHolder>() {
+    class MyHolder(binding: FoldersViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val folderName = binding.folderNameFV
         val root = binding.root
     }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHOlder {
-        return  MyHOlder(FoldersViewBinding.inflate(LayoutInflater.from(context),parent,false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
+        return  MyHolder(FoldersViewBinding.inflate(LayoutInflater.from(context),parent,false))
     }
 
     @SuppressLint("SuspiciousIndentation")
-    override fun onBindViewHolder(holder: MyHOlder, position: Int) {
+    override fun onBindViewHolder(holder: MyHolder, position: Int) {
         holder.folderName.text = foldersList[position].folderName
         holder.root.setOnClickListener {
             val intent = Intent(context, FoldersActivity::class.java)

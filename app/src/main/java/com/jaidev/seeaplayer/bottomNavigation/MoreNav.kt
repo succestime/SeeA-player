@@ -38,7 +38,7 @@ class moreNav : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_more_nav, container, false)
         binding = FragmentMoreNavBinding.bind(view)
-        (activity as AppCompatActivity).supportActionBar?.title = "SeeA Player"
+        (activity as AppCompatActivity).supportActionBar?.title = "Settings"
 
         auth = FirebaseAuth.getInstance()
 

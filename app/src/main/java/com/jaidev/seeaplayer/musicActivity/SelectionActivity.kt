@@ -23,7 +23,7 @@ class SelectionActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.hide()
         binding.selectionRV.setHasFixedSize(true)
-        binding.selectionRV.setItemViewCacheSize(13)
+        binding.selectionRV.setItemViewCacheSize(30)
         binding.selectionRV.layoutManager = LinearLayoutManager(this,)
         adapter = MusicAdapter(this, MainActivity.MusicListMA,  selectionActivity = true )
         binding.selectionRV.adapter = adapter

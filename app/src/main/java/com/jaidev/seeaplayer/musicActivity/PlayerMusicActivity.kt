@@ -329,8 +329,6 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
     }
 
-
-
     private fun createMediaPlayer() {
         try {
             if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()

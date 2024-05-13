@@ -22,7 +22,6 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -43,7 +42,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.Services.FolderDetectionService
 import com.jaidev.seeaplayer.Subscription.SeeAOne
@@ -73,12 +71,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: VideoAdapter
     private  var runnable : Runnable? = null
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var navView: NavigationView
+
     private var musicLoaded = false
     private lateinit var musicFragment: Fragment // Define your music fragment
-    private var checkedItem: Int = 0
-    private var selected: String = ""
-    private val CHECKED_ITEM = "checked_item"
+
 
     private var mInterstitialAd: InterstitialAd? = null
     private var doubleBackToExitPressedOnce = false
@@ -528,9 +524,9 @@ private fun funRequestRuntimePermission(){
             sortList[sortValue]
         )
         if (cursor != null)
-            if (cursor.moveToFirst()) {
+            if (cursor.moveToFirst())
                 do {
-                    try {
+
                         val titleC =
                             cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE))
                         val idC =
@@ -567,26 +563,21 @@ private fun funRequestRuntimePermission(){
 
                             if (file.exists()) tempList.add(video)
 
-                        } catch (_: Exception) {
-                        }
-                        // for adding folders and watching that not duplicate folder should add
-                        if (!tempFolderList.contains(folderC)) {
-                            tempFolderList.add(folderC)
-                            folderList.add(Folder(id = folderIdC, folderName = folderC))
-                        }
-
-                    } catch (e: Exception) {
-                        Log.e("VideoLoadError", "Error loading video: ${e.message}", e)
-                    }
+                            // for adding folders and watching that not duplicate folder should add
+                            if (!tempFolderList.contains(folderC)) {
+                                tempFolderList.add(folderC)
+                                folderList.add(Folder(id = folderIdC, folderName = folderC))
+                            }
+                        } catch (_: Exception) {}
                 } while (cursor.moveToNext())
-                cursor.close()
-            }
+            cursor?.close()
         // Remove folders with 0 or null videos
         folderList.removeAll { folder ->
             tempList.none { video -> video.folderName == folder.folderName }
         }
         return tempList
     }
+
 
     @SuppressLint("Range", "SuspiciousIndentation")
     fun getAllAudios(): ArrayList<Music> {

@@ -37,6 +37,8 @@ import android.webkit.DownloadListener
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -75,7 +77,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
     var webIcon: Bitmap? = null
     private var mInterstitialAd: InterstitialAd? = null
-    private var tempText: CharSequence? = null
     private lateinit var fileListAdapter: SearchItemAdapter
     private var isLoadingPage = false // Add this variabl
     companion object {
@@ -91,9 +92,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             fileIconResId: Int
         )
 
-        fun onDownloadProgress(downloadId: Long, bytesDownloaded: Long, totalBytes: Long)
-
-        fun onDownloadCompleted(downloadId: Long)
     }
 
 
@@ -154,6 +152,14 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     override fun onResume() {
         super.onResume()
         registerDownloadReceiver()
+        binding.webView.apply {
+            // Enable JavaScript
+            settings.javaScriptEnabled = true
+            settings.javaScriptCanOpenWindowsAutomatically = true
+            settings.builtInZoomControls = true
+            settings.displayZoomControls = false
+            settings.setSupportZoom(true)
+        }
         tabsList[myPager.currentItem].name =
             binding.webView.url.toString()
         LinkTubeActivity.tabsBtn.text = tabsList.size.toString()
@@ -303,13 +309,12 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                 // Inside your WebViewClient implementation
                 override fun onReceivedError(
                     view: WebView?,
-                    errorCode: Int,
-                    description: String?,
-                    failingUrl: String?
+                    request: WebResourceRequest?,
+                    error: WebResourceError?
                 ) {
-                    super.onReceivedError(view, errorCode, description, failingUrl)
-                    Log.e("WebViewError", "Error loading $failingUrl: $description (error code: $errorCode)")
-                    // Handle error gracefully, e.g., show an error message to the user
+                    // Handle the error, e.g., display an error message or load a default page.
+                    // For example:
+                    view?.loadUrl("about:blank") // Load a blank page
                 }
 
                 override fun onLoadResource(view: WebView?, url: String?) {
@@ -355,6 +360,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
 
             }
             webChromeClient = object : WebChromeClient() {
+
                 override fun onReceivedIcon(view: WebView?, icon: Bitmap?) {
                     super.onReceivedIcon(view, icon)
                     try {
@@ -753,15 +759,6 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
     fun isLoading(): Boolean {
         return binding.webView.progress != 100
     }
-//    fun onBackPressed(): Boolean {
-//        val webView = binding.webView
-//        return if (webView.canGoBack()) {
-//            webView.goBack()
-//            true // Back press handled within the fragment
-//        } else {
-//            false // Back press not handled within the fragment
-//        }
-//    }
 
 }
 

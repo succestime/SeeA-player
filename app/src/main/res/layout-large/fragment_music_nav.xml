@@ -102,7 +102,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_margin="10dp"
                     android:layout_marginStart="2dp"
-                    android:paddingBottom="69dp"
+                    android:paddingBottom="55dp"
                     android:scrollbars="vertical"
                     />
             </LinearLayout>
@@ -112,12 +112,14 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nowPlaying"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:name="com.jaidev.seeaplayer.musicActivity.NowPlaying"
-            tools:layout="@layout/fragment_now_playing" />
+            tools:layout="@layout/fragment_now_playing"
+
+            />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

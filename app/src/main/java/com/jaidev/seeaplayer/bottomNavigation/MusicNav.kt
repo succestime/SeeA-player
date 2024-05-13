@@ -71,7 +71,6 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
             // Perform the refresh action here
             refreshMusic()
         }
-
         if (MusicListMA.isEmpty()) {
             binding.musicemptyStateLayout.visibility = View.VISIBLE
         } else {
