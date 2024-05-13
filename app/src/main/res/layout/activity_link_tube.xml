@@ -43,7 +43,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
                 app:tint="@color/white"
-                android:src="@drawable/back_browser"
+                android:src="@drawable/round_arrow_back"
                 tools:ignore="RedundantDescriptionCheck" />
             <ImageButton
                 android:id="@+id/forwardBrowserBtn"
@@ -55,7 +55,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
                 app:tint="@color/white"
-                android:src="@drawable/forward_browser"
+                android:src="@drawable/round_arrow_forward"
                 tools:ignore="RedundantDescriptionCheck" />
 
 
@@ -259,7 +259,7 @@
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
-                android:src="@drawable/back_browser"
+                android:src="@drawable/round_arrow_back"
                 android:visibility="visible"
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
@@ -271,7 +271,7 @@
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
-                android:src="@drawable/forward_browser"
+                android:src="@drawable/round_arrow_forward"
                 android:visibility="visible"
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />

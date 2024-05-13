@@ -1,4 +1,4 @@
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.LogSignIn
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivityLoginBinding
 
@@ -30,7 +32,7 @@ class login : AppCompatActivity() {
             if (email.isNotEmpty() && password.isNotEmpty())
               moreNav.auth.signInWithEmailAndPassword(email , password).addOnCompleteListener {
                     if (it.isSuccessful){
-                        startActivity(Intent(this,MainActivity::class.java))
+                        startActivity(Intent(this, MainActivity::class.java))
                     }
                 }.addOnFailureListener {
                     Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()

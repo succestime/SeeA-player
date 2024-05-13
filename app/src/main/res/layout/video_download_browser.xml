@@ -48,17 +48,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:visibility="visible"
-                    android:src="@drawable/play_music_icon"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-                <ImageView
-                    android:id="@+id/iconPauseView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:visibility="gone"
-                    android:src="@drawable/ic_pause_icon"
+                    android:src="@drawable/round_play"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity() {
         // Set the background color of SwipeRefreshLayout based on app theme
 
 
-        val linearLayoutNav = findViewById<LinearLayout>(R.id.linearLayoutNav)
+
 
         setDrawerLayoutBackgroundColor()
 

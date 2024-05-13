@@ -1,4 +1,4 @@
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.Settings
 
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.ActivityFeedBackBinding
 
 class FeedBackActivity : AppCompatActivity() {

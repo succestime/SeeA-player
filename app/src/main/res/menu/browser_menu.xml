@@ -49,12 +49,12 @@
             />
     <item
         android:id="@+id/fullScreen"
-        android:icon="@drawable/ic_fullscreen_icon"
+        android:icon="@drawable/round_fullscreen"
         android:title="FullScreen"
         />
     <item
         android:id="@+id/share"
-        android:icon="@drawable/ic_share_icon"
+        android:icon="@drawable/round_share_music"
         android:title="Share"
 
         />

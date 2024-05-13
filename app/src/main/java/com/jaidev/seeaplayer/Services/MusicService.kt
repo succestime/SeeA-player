@@ -135,9 +135,9 @@ class MusicService:Service(), AudioManager.OnAudioFocusChangeListener {
                 .setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC)
                 .setOnlyAlertOnce(true)
                 .addAction(R.drawable.round_previous, "Previous", prevPendingIntent)
-                .addAction(R.drawable.replay_10, "Replay", replayPendingIntent)
+                .addAction(R.drawable.round_replay_10, "Replay", replayPendingIntent)
                 .addAction(playPauseBtn, "Play", playPendingIntent)
-                .addAction(R.drawable.forward_10, "Froward", forwardPendingIntent)
+                .addAction(R.drawable.round_forward_10, "Froward", forwardPendingIntent)
                 .addAction(R.drawable.round_next, "Next", nextPendingIntent)
                 .build()
 

@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_margin="16dp"
     android:id="@+id/feedBackActivity"
-    tools:context=".FeedBackActivity">
+    tools:context=".Settings.FeedBackActivity">
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/topicFA"

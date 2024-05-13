@@ -407,7 +407,7 @@
                 android:layout_alignEnd="@+id/view"
                 android:layout_marginTop="12dp"
 
-                android:src="@drawable/next_more_icon" />
+                android:src="@drawable/round_navigate_next" />
         </RelativeLayout>
 
         <Button

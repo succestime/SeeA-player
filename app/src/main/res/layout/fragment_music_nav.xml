@@ -61,7 +61,8 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:contentDescription="@string/favourites_btn"
-                    android:drawableTop="@drawable/favorite_icon"
+                   android:drawableTint="@color/cool_pink"
+                    android:drawableTop="@drawable/round_favorite_music"
                     android:text="@string/favourites_btn"
                     android:textAllCaps="false"
 

@@ -4,7 +4,6 @@
     <item
         android:id="@+id/searchView"
         android:title="@string/enter_video_name"
-        android:iconTint="@color/white"
         android:icon="@drawable/search_icon"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />

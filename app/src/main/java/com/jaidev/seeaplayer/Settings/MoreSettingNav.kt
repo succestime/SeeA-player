@@ -1,4 +1,4 @@
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.Settings
 
 import android.app.AlertDialog
 import android.content.Context
@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browserActivity.FileActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.databinding.ActivityMoreSettingNavBinding

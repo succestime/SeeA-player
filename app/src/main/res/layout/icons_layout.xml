@@ -11,7 +11,7 @@
         android:scaleType="centerInside"
         android:layout_centerHorizontal="true"
         android:background="@drawable/ripple_circle"
-        android:src="@drawable/ic_lock_icon"
+        android:src="@drawable/round_lock_open"
         />
 
     <TextView

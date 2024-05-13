@@ -57,12 +57,16 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+
                     android:src="@drawable/ic_delete_icon"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/delete"
+                    android:layout_gravity="center_vertical"
+
                     android:layout_marginStart="30dp"
                     android:textSize="25sp"/>
 
@@ -81,12 +85,16 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_share_icon"/>
+                    android:layout_gravity="center_vertical"
+
+                    android:src="@drawable/info_share"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/share"
+                    android:layout_gravity="center_vertical"
+
                     android:layout_marginStart="30dp"
                     android:textSize="25sp"/>
 
@@ -104,12 +112,15 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+
                     android:src="@drawable/info_speaker"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/info"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="30dp"
                     android:textSize="24sp"/>
 

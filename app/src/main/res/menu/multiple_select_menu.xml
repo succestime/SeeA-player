@@ -4,7 +4,7 @@
 
     <item android:id="@+id/shareMultiBrowser"
         android:title="Share"
-        android:icon="@drawable/ic_share_icon"
+        android:icon="@drawable/info_share"
         app:showAsAction="always"
         />
     <item android:id="@+id/deleteMultiBrowser"

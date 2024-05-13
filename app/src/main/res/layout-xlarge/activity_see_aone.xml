@@ -462,7 +462,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="10dp"
 
-            android:src="@drawable/next_more_icon"/>
+            android:src="@drawable/round_navigate_next"/>
     </RelativeLayout>
 
     <Button

@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.FragmentMoreNavBinding
 import com.jaidev.seeaplayer.loadSmallMediumSizeNativeAds
-import com.jaidev.seeaplayer.signin
+import com.jaidev.seeaplayer.LogSignIn.signin
 
 class moreNav : Fragment() {
     private lateinit var binding : FragmentMoreNavBinding

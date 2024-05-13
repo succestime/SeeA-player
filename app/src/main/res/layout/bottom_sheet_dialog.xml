@@ -15,7 +15,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_timer_icon"
+            android:src="@drawable/round_timer_music"
             app:tint="@color/cool_pink"
             android:layout_margin="8dp"
             android:contentDescription="@string/min_15" />
@@ -35,7 +35,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_timer_icon"
+            android:src="@drawable/round_timer_music"
             app:tint="@color/cool_pink"
             android:layout_margin="8dp"
             android:contentDescription="@string/min_30" />
@@ -55,7 +55,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_timer_icon"
+            android:src="@drawable/round_timer_music"
             app:tint="@color/cool_pink"
             android:layout_margin="8dp"
             android:contentDescription="@string/min_60" />

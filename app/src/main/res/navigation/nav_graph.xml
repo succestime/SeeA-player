@@ -34,6 +34,6 @@
 
     <activity
         android:id="@+id/moreSettingNav"
-        android:name="com.jaidev.seeaplayer.MoreSettingNav"
+        android:name="com.jaidev.seeaplayer.Settings.MoreSettingNav"
         android:label="MoreSettingNav" />
 </navigation>

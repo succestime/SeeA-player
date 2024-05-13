@@ -51,7 +51,6 @@
                     android:layout_marginTop="5dp"
                     android:layout_margin="10dp"
                     android:paddingBottom="69dp"
-                    android:scrollbarThumbVertical="@drawable/scroll_bar_icon"
                     android:scrollbars="vertical"
                     />
             </LinearLayout>

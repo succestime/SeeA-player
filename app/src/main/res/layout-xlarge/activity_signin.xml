@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="#011B29"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".signin">
+    tools:context=".LogSignIn.signin">
 
 
     <androidx.cardview.widget.CardView
@@ -15,7 +15,6 @@
         app:cardCornerRadius="50dp"
         android:layout_marginTop="100dp"
         app:cardBackgroundColor="@android:color/transparent"
-        android:background="@drawable/circle"
         android:src="@mipmap/ic_logo_o"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

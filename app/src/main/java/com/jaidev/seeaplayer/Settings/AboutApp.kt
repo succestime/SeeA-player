@@ -1,17 +1,18 @@
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.Settings
 
 import android.os.Bundle
-import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.ActivityAboutAppBinding
 
 class AboutApp : AppCompatActivity() {
     private lateinit var binding: ActivityAboutAppBinding
-    private lateinit var swipeRefreshLayout: LinearLayout
+    private lateinit var swipeRefreshLayout: ScrollView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAboutAppBinding.inflate(layoutInflater)

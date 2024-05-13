@@ -65,7 +65,7 @@
         android:layout_marginTop="10dp"
         android:backgroundTint="@android:color/transparent"
         android:contentDescription="@string/lock"
-        android:src="@drawable/ic_lock_open_icon"
+        android:src="@drawable/round_lock_open"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
@@ -120,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/vol_icon"
-            android:src="@drawable/volume_icon"
+            android:src="@drawable/round_volume_up"
             android:layout_gravity="center"
             android:contentDescription="@string/vol_icon" />
 

@@ -11,7 +11,7 @@
 
     <item android:id="@+id/shareMulti"
         android:title="Share"
-        android:icon="@drawable/ic_share_icon"
+        android:icon="@drawable/info_share"
         app:showAsAction="ifRoom"
         tools:ignore="MissingClass"
         />

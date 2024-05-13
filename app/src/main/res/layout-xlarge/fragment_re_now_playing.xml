@@ -36,24 +36,26 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentEnd="true"
-        app:icon="@drawable/next_icon"
+        app:icon="@drawable/round_navigate_next"
         app:iconTint="@color/white"
         android:backgroundTint="#F2053853"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="20dp"/>
+        android:layout_marginEnd="20dp"
+        app:iconSize="35dp"/>
 
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/playPauseBtnNP"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        app:icon="@drawable/play_music_icon"
+        app:icon="@drawable/round_play"
         app:iconTint="@color/white"
         android:layout_centerVertical="true"
         android:backgroundTint="#F2053853"
         android:layout_toStartOf="@id/nextBtnNP"
         android:layout_marginHorizontal="5dp"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginEnd="10dp"
+        app:iconSize="35dp"/>
 
     <TextView
         android:id="@+id/songNameNP"
