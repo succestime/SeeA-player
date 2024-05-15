@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_height="55dp"
+    android:layout_marginTop="3dp"
+    android:id="@+id/multyLayout"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/playlistImage"
+                android:layout_width="100dp"
+                android:layout_height="55dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.455"
+                android:src="@mipmap/ic_logo_o"
+                app:shapeAppearanceOverlay="@style/curved"
+                android:scaleType="centerCrop" />
+
+
+
+
+
+        <TextView
+            android:id="@+id/newIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/background_new_indicator"
+            android:padding="4dp"
+            android:text="NEW"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingHorizontal="2dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/playlistName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="video title"
+            android:gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="3dp"
+            android:maxLines="1"
+            android:layout_gravity="center_vertical"/>
+
+<!--        <TextView-->
+<!--            android:id="@+id/totalVideosDuration"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textColor="@color/cool_blue"-->
+<!--            android:textStyle="bold"-->
+<!--            android:layout_marginTop="1dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:text="0 videos"/>-->
+    </LinearLayout>
+
+
+
+
+    <ImageButton
+        android:id="@+id/playlistDelete"
+        android:layout_width="25dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginVertical="15dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="35dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_delete_icon"
+        app:tint="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UseAppTint" />
+
+</LinearLayout>
+
