@@ -23,7 +23,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             app:tint="?android:attr/textColorPrimary"
-            android:src="@drawable/round_back"
+            android:src="@drawable/round_keyboard_arrow_down"
             android:layout_gravity="center"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/back_btn"

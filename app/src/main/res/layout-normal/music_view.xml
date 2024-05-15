@@ -73,17 +73,31 @@
 
     </LinearLayout>
 
-   <ImageButton
-       android:id="@+id/MoreChoose2"
-       android:layout_width="wrap_content"
-       android:layout_height="match_parent"
-       android:src="@drawable/icon_dark"
-       app:tint="?android:attr/textColorPrimary"
-       android:layout_marginVertical="18dp"
-       android:background="@android:color/transparent"
-       tools:ignore="UseAppTint">
+    <ImageButton
+        android:id="@+id/MoreChoose2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/icon_dark"
+        app:tint="?android:attr/textColorPrimary"
+        android:layout_marginVertical="18dp"
+        android:visibility="visible"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint">
 
-   </ImageButton>
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/playlistChoose2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/icon_dark"
+        app:tint="?android:attr/textColorPrimary"
+        android:visibility="gone"
+        android:layout_marginVertical="18dp"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint">
+
+    </ImageButton>
 
 
 </LinearLayout>

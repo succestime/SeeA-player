@@ -38,7 +38,7 @@ class FavouriteActivity : AppCompatActivity() {
         binding = ActivityFavouriteBinding.inflate(layoutInflater)
         supportActionBar?.title = "Favourite"
         setContentView(binding.root)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Enable the Up button
         favouriteSongs = checkPlaylist(favouriteSongs)
         binding.favouriteRV.setHasFixedSize(true)
         binding.favouriteRV.setItemViewCacheSize(13)
@@ -54,6 +54,12 @@ class FavouriteActivity : AppCompatActivity() {
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
         loadFavouriteSongs()
+    }
+
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     private fun shuffleEmpty(){

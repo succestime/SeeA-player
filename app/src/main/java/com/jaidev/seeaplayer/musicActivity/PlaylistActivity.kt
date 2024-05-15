@@ -39,6 +39,7 @@ class PlaylistActivity : AppCompatActivity() {
         binding = ActivityPlaylistBinding.inflate(layoutInflater)
         supportActionBar?.title = "Playlist"
         setContentView(binding.root)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Enable the Up button
         loadAd()
 
         binding.playlistRV.setHasFixedSize(true)
@@ -58,6 +59,10 @@ class PlaylistActivity : AppCompatActivity() {
 
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
 
 
     private fun setSwipeRefreshBackgroundColor() {
@@ -138,7 +143,7 @@ class PlaylistActivity : AppCompatActivity() {
             .setTitle("Playlist Details")
             .setPositiveButton("ADD"){ dialog, _ ->
                 val playlistName = binder.playlistName.text
-                val createdBy = binder.yourName.text
+                val createdBy = binder.playlistName.text
                 if(playlistName != null && createdBy != null)
                     if(playlistName.isNotEmpty() && createdBy.isNotEmpty())
                     {

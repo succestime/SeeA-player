@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_height="75dp"
-    android:layout_marginTop="2dp"
+    android:layout_height="70dp"
+    android:layout_marginTop="3dp"
     android:id="@+id/multyLayout"
     android:clickable="true"
     android:focusable="true"
@@ -16,36 +16,21 @@
         android:layout_height="wrap_content"
         >
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/playlistImage"
-            android:layout_width="100dp"
-            android:layout_height="80dp"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="center"
-            android:contentDescription="video_image"
-            android:src="@mipmap/ic_logo_o"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/curved" />
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/playlistImage"
+                android:layout_width="100dp"
+                android:layout_height="70dp"
+                android:src="@mipmap/ic_logo_o"
+                app:shapeAppearanceOverlay="@style/curved"
+                android:scaleType="centerCrop"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
 
-        <ImageView
-            android:id="@+id/multiIcon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/complete_svgrepo_com"
-            android:gravity="center"
-            android:backgroundTint="@color/red"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-
-            android:visibility="gone">
-
-        </ImageView>
+                app:layout_constraintVertical_bias="0.455"/>
 
         <TextView
             android:id="@+id/newIndicator"
@@ -81,6 +66,7 @@
             android:text="video title"
             android:gravity="center_vertical"
             android:layout_marginTop="5dp"
+            android:layout_marginStart="3dp"
             android:maxLines="1"
             android:layout_gravity="center_vertical"/>
 

@@ -23,7 +23,7 @@
             android:id="@+id/backBtnPA"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/round_back"
+            android:src="@drawable/round_keyboard_arrow_down"
             app:tint="?android:attr/textColorPrimary"
             android:background="?attr/selectableItemBackground"
             android:layout_marginStart="5dp"

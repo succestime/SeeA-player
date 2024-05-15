@@ -32,32 +32,32 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:boxStrokeColor="@color/cool_blue"
-        app:boxBackgroundMode="filled"
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:boxStrokeColor="@color/cool_blue"-->
+<!--        app:boxBackgroundMode="filled"-->
 
-        android:layout_marginHorizontal="16sp"
-        android:layout_marginTop="10dp"
-        app:startIconDrawable="@drawable/playlist_icon"
-        app:startIconTint="@color/cool_blue"
-        android:hint="@string/user_name"
+<!--        android:layout_marginHorizontal="16sp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        app:startIconDrawable="@drawable/playlist_icon"-->
+<!--        app:startIconTint="@color/cool_blue"-->
+<!--        android:hint="@string/user_name"-->
 
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        >
+<!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--        >-->
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/yourName"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:singleLine="true"
-            android:inputType="text"
-            android:maxLength="40"
+<!--        <com.google.android.material.textfield.TextInputEditText-->
+<!--            android:id="@+id/yourName"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:singleLine="true"-->
+<!--            android:inputType="text"-->
+<!--            android:maxLength="40"-->
 
-            />
+<!--            />-->
 
-    </com.google.android.material.textfield.TextInputLayout>
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
 
 
 

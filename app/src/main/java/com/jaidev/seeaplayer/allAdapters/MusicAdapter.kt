@@ -17,6 +17,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
@@ -24,6 +25,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
@@ -91,6 +93,7 @@ class MusicAdapter(
         val image = binding.musicViewImage
         val root = binding.root
         val more = binding.MoreChoose2
+        val playlstM = binding.playlistChoose2
         val button = binding.multiIcon
     }
 
@@ -118,11 +121,17 @@ class MusicAdapter(
         }
         // Handle item selection based on selectionActivity flag
         if (selectionActivity) {
+            holder.more.visibility = View.GONE // Hide the more view in selection activity
+            holder.playlstM.visibility = View.GONE // Hide the more view in selection activity
+
             holder.root.setOnClickListener {
                 // Toggle selection of the item on single click
                 toggleSelection(position)
             }
         } else {
+            holder.more.visibility = View.VISIBLE // Show the more view when not in selection activity
+            holder.playlstM.visibility = View.GONE // Show the more view when not in selection activity
+
             holder.root.setOnLongClickListener {
                 // Start selection mode on long click
                 toggleSelection(position)
@@ -162,6 +171,24 @@ class MusicAdapter(
             playlistDetails -> {
                 holder.root.setOnClickListener {
                     sendIntent(ref = "PlaylistDetailsAdapter", pos = position)
+                }
+                holder.playlstM.visibility = View.VISIBLE // Show the more view when not in selection activity
+                holder.more.visibility = View.GONE // Show the more view when not in selection activity
+
+                holder.playlstM.setOnClickListener { view ->
+                    val popupMenu = PopupMenu(context, view)
+                    popupMenu.inflate(R.menu.playlist_remove)
+                    popupMenu.setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.remove_item -> {
+                                // Handle the removal of the item from the playlist
+                                removeItemFromPlaylist(position)
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                    popupMenu.show()
                 }
             }
 
@@ -319,6 +346,10 @@ class MusicAdapter(
         return musicList.size
     }
 
+    private fun removeItemFromPlaylist(position: Int) {
+        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(position)
+        notifyItemRangeChanged(position, musicList.size)
+    }
 
 
     private fun addSong(song: Music): Boolean{

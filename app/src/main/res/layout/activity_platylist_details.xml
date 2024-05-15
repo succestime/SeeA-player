@@ -54,7 +54,6 @@
             android:backgroundTint="@color/gray"
             android:visibility="invisible"
             app:icon="@drawable/shuffle_icon"
-            app:iconTint="@color/black"
             app:strokeColor="@color/cool_blue" />
 
     </LinearLayout>

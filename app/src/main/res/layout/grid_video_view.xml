@@ -17,12 +17,19 @@
 
         >
 
-        <ImageView
-            android:id="@+id/videoImage"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:src="@mipmap/ic_logo_o" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/videoImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@mipmap/ic_logo_o"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.455"/>
+
+
 
         <TextView
             android:id="@+id/videoName"
