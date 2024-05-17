@@ -30,12 +30,19 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp">
+                android:layout_margin="16dp"
+                android:textColorHint="#FFFFFF"
+                app:boxStrokeColor="@color/white"
+                app:hintTextColor="#FFFFFF"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+
+                >
                 <AutoCompleteTextView
                     android:id="@+id/auto_complete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/item_label"
+                    android:textColor="@color/white"
                     android:inputType="none" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -65,13 +72,20 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp">
+                android:layout_margin="16dp"
+                android:textColorHint="#FFFFFF"
+                app:boxStrokeColor="@color/white"
+                app:hintTextColor="#FFFFFF"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+
+                >
 
                 <AutoCompleteTextView
                     android:id="@+id/time_complete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/time_label"
+                    android:textColor="@color/white"
                     android:inputType="none" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -89,13 +103,20 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp">
+                android:layout_margin="16dp"
+                android:textColorHint="#FFFFFF"
+                app:boxStrokeColor="@color/white"
+                app:hintTextColor="#FFFFFF"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+
+                >
 
                 <AutoCompleteTextView
                     android:id="@+id/quantity_complete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/quantity_label"
+                    android:textColor="@color/white"
                     android:inputType="none" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -115,7 +136,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="100dp"
-                app:cardCornerRadius="20dp">
+                app:cardCornerRadius="3dp">
 
                 <Button
                     android:id="@+id/showAmount"

@@ -35,14 +35,15 @@ class PlaylistDetails : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Enable the Up button
         currentPlaylistPos = intent.extras?.get("index") as Int
-        try{
+        try {
             PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist =
-            checkPlaylist(playlist = PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist)}
-        catch(_: Exception){}
+                checkPlaylist(playlist = PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist)
+        } catch (_: Exception) {}
+
         binding.playlistDetailsRV.setHasFixedSize(true)
         binding.playlistDetailsRV.setItemViewCacheSize(13)
-        binding.playlistDetailsRV.layoutManager = LinearLayoutManager(this,)
-        adapter = MusicAdapter(this, PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist,  playlistDetails = true)
+        binding.playlistDetailsRV.layoutManager = LinearLayoutManager(this)
+        adapter = MusicAdapter(this, PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist, playlistDetails = true)
         binding.playlistDetailsRV.adapter = adapter
 
         shuffleAddRemove()
@@ -52,6 +53,7 @@ class PlaylistDetails : AppCompatActivity() {
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
     }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
@@ -73,21 +75,21 @@ class PlaylistDetails : AppCompatActivity() {
 
         // Disable click events for removeAllPD
         binding.removeAllPD.setOnClickListener {
-
             val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle("Remove")
                 .setMessage("Do you want to remove all songs from playlist?")
-                .setPositiveButton("Yes"){ dialog, _ ->
+                .setPositiveButton("Yes") { dialog,_ ->
                     PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist.clear()
                     adapter.refreshPlaylist()
                     dialog.dismiss()
                 }
-                .setNegativeButton("No"){dialog, _ ->
+                .setNegativeButton("No") { dialog, _ ->
                     dialog.dismiss()
                 }
             val customDialog = builder.create()
             customDialog.show()
         }
+
 
     }
 
@@ -166,8 +168,7 @@ class PlaylistDetails : AppCompatActivity() {
         binding.moreInfoPD.text = "Total ${adapter.itemCount} Songs.\n\n" +
                 "Created On: ${PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].createdOn}"
 
-        if(adapter.itemCount > 0)
-        {
+        if (adapter.itemCount > 0) {
             Glide.with(this)
                 .load(PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist[0].artUri)
                 .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
@@ -175,5 +176,5 @@ class PlaylistDetails : AppCompatActivity() {
             binding.shuffleBtnPD.visibility = View.VISIBLE
         }
         adapter.notifyDataSetChanged()
-         }
+    }
 }

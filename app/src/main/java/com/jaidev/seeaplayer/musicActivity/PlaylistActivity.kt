@@ -34,6 +34,10 @@ class PlaylistActivity : AppCompatActivity() {
     companion object{
         var musicPlaylist : MusicPlaylist = MusicPlaylist()
     }
+
+    // SharedPreferences keys
+    private val PLAYLIST_PREFS = "playlist_prefs"
+    private val PLAYLIST_KEY = "playlists"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlaylistBinding.inflate(layoutInflater)
@@ -64,6 +68,7 @@ class PlaylistActivity : AppCompatActivity() {
         return true
     }
 
+    // Load playlists from SharedPreferences
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -168,7 +173,6 @@ class PlaylistActivity : AppCompatActivity() {
             }
             musicPlaylist.ref.add(tempPlaylist)
 
-            // Save updated playlists to SharedPreferences
 
             adapter.refreshPlaylist()
         }
@@ -178,7 +182,6 @@ class PlaylistActivity : AppCompatActivity() {
         } else {
             binding.emptyStateLayout.visibility = View.GONE
         }
-
     }
 
     fun loadAd(){

@@ -35,13 +35,6 @@
         android:title="Bookmarks"
 
         />
-<!--    <item-->
-<!--        android:id="@+id/recantTabs"-->
-<!--        android:icon="@drawable/recant_tab_browser"-->
-<!--        android:title="Recant Tabs"-->
-
-<!--        />-->
-
         <item
             android:id="@+id/desktop"
             android:icon="@drawable/ic_laptop"
@@ -49,12 +42,12 @@
             />
     <item
         android:id="@+id/fullScreen"
-        android:icon="@drawable/round_fullscreen"
+        android:icon="@drawable/baseline_fullscreen"
         android:title="FullScreen"
         />
     <item
         android:id="@+id/share"
-        android:icon="@drawable/round_share_music"
+        android:icon="@drawable/round_share_browser"
         android:title="Share"
 
         />
