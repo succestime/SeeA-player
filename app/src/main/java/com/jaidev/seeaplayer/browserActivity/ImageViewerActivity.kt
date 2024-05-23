@@ -209,25 +209,6 @@ class ImageViewerActivity : AppCompatActivity() {
         }
     }
 
-//    private fun openImageWithDefaultApp() {
-//        // Check if imagePath is valid
-//        if (!imagePath.isNullOrBlank()) {
-//            // Create an intent to view the image with the default app
-//            val imageUri = getImageUri(imagePath)
-//            val openIntent = Intent(Intent.ACTION_VIEW).apply {
-//                setDataAndType(imageUri, "image/*")
-//                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//            }
-//
-//            // Verify that there is an activity to handle the intent
-//            if (openIntent.resolveActivity(packageManager) != null) {
-//                // Show app chooser dialog to handle the intent
-//                val chooserIntent = Intent.createChooser(openIntent, "Open with")
-//                startActivity(chooserIntent)
-//            }
-//        }
-//    }
-
     private fun setActionBarGradient() {
         // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()

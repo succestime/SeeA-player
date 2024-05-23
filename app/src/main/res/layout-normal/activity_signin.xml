@@ -102,6 +102,7 @@
         android:layout_marginRight="100dp"
         android:background="@drawable/curver"
         android:text="@string/activity_signin"
+        android:textAllCaps="false"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/passwordResister"
         app:layout_constraintHorizontal_bias="0.496"

@@ -318,13 +318,20 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
 
     override fun onItemClick(fileItem: FileItem) {
-        if (fileItem.fileType == FileType.VIDEO || fileItem.fileType == FileType.AUDIO) {
-            // For video or audio file, open PlayerFileActivity
-            val videoUri = Uri.fromFile(File(fileItem.filePath)).toString() // Convert file path to URI string
-            openPlayerActivity(videoUri, fileItem.fileName) // Assuming fileItem.fileName contains the video title
-        } else {
-            // For other file types, open the file as usual
-            openFile(fileItem)
+        when (fileItem.fileType) {
+            FileType.VIDEO -> {
+                // For video file, open PlayerFileActivity
+                val videoUri = Uri.fromFile(File(fileItem.filePath)).toString()
+                openPlayerActivity(videoUri, fileItem.fileName)
+            }
+            FileType.AUDIO -> {
+                // Handle audio files differently, for example, play them directly using a media player
+                openFile(fileItem)
+            }
+            else -> {
+                // For other file types, open the file as usual
+                openFile(fileItem)
+            }
         }
     }
 

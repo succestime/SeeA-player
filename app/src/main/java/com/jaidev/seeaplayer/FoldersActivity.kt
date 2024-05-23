@@ -230,7 +230,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
                         }
                         .create()
                     dialog.show()
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.RED)
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLACK)
                     true
                 }
 

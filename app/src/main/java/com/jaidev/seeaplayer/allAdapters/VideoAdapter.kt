@@ -2,6 +2,7 @@ package com.jaidev.seeaplayer.allAdapters
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -9,6 +10,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
@@ -185,12 +187,38 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             // Set click listeners for dialog buttons
             bindingMf.shareBtn.setOnClickListener {
                 dialog.dismiss()
-                val shareIntent = Intent()
-                shareIntent.action = Intent.ACTION_SEND
+
+                // Create an ACTION_SEND intent to share the video
+                val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
                 shareIntent.type = "video/*"
                 shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoList[position].path))
-                startActivity(context, Intent.createChooser(shareIntent, "Sharing Video"), null)
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                // Get the list of apps that can handle the intent
+                val packageManager = context.packageManager
+                val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
+                val excludedComponents = mutableListOf<ComponentName>()
+
+
+                // Iterate through the list and exclude your app
+                for (resolvedActivity in resolvedActivityList) {
+                    if (resolvedActivity.activityInfo.packageName == context.packageName) {
+                        excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+                    }
+                }
+
+                // Create a chooser intent
+                val chooserIntent = Intent.createChooser(shareIntent, "Sharing Video")
+
+                // Exclude your app from the chooser intent
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+                }
+
+                chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(context, chooserIntent, null)
             }
+
 
             bindingMf.infoBtn.setOnClickListener {
                 dialog.dismiss()
@@ -495,26 +523,44 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
         // Iterate through selectedItems to get selected file items
         for (position in selectedItems) {
-            val videoData = videoList[position]
+            val music = videoList[position]
             val fileUri = FileProvider.getUriForFile(
                 context,
                 context.applicationContext.packageName + ".provider",
-                File(videoData.path)
+                File(music.path)
             )
             uris.add(fileUri)
-
         }
 
         // Create an ACTION_SEND intent to share multiple files
         val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
-        shareIntent.type = "*/*"
+        shareIntent.type = "video/*"
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-        // Start the intent chooser to share multiple files
-        val chooser = Intent.createChooser(shareIntent, "Share Files")
-        chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(chooser)
+        // Get the list of apps that can handle the intent
+        val packageManager = context.packageManager
+        val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
+        val excludedComponents = mutableListOf<ComponentName>()
+
+        // Iterate through the list and exclude your app
+        for (resolvedActivity in resolvedActivityList) {
+            if (resolvedActivity.activityInfo.packageName == context.packageName) {
+                excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+            }
+        }
+
+        // Create a chooser intent
+        val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
+
+        // Exclude your app from the chooser intent
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+
+        chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(chooserIntent)
+
+        // Dismiss action mode
+        actionMode?.finish()
     }
 
 

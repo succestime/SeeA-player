@@ -8,6 +8,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.os.Bundle
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -17,24 +18,31 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.ActivitySeeaEduProcessBinding
 
 class SeeaEduProcess : AppCompatActivity() {
-    private lateinit var binding : ActivitySeeaEduProcessBinding
+    private lateinit var binding: ActivitySeeaEduProcessBinding
+    private var isTimeSelected = false
+    private var isTimeHintRed = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide the status bar
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+        supportActionBar?.hide()
         binding = ActivitySeeaEduProcessBinding.inflate(layoutInflater)
         supportActionBar?.hide()
         setContentView(binding.root)
         initializeBinding()
-
-
     }
 
-    private fun initializeBinding(){
+    private fun initializeBinding() {
         val items = listOf("Months", "Years")
         val itemsNull = listOf("Null")
-        val itemsMonth = listOf("Month (1)", "Months (Quarterly)" , "Months (Half - Yearly)")
+        val itemsMonth = listOf("Month (1)", "Months (Quarterly)", "Months (Half - Yearly)")
         val itemsYear = listOf("Annual", "Biennial")
-        val itemsQuantity = listOf("1","2","3","4","5","6","7","8",
-            "9","10","11","12","13","14","15","16","17","18","19","20")
+        val itemsQuantity = listOf("1", "2", "3", "4", "5", "6", "7", "8",
+            "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20")
 
         val adapter = ArrayAdapter(this, R.layout.list_item_process, items)
         val adapterMonth = ArrayAdapter(this, R.layout.list_item_process, itemsMonth)
@@ -48,7 +56,15 @@ class SeeaEduProcess : AppCompatActivity() {
         // Default adapter
 
         binding.autoComplete.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
-            val timeAdapter = when(items[i]) {
+            if (isTimeSelected) {
+                highlightBox(binding.timeComplete)
+                setHintColor(binding.timeComplete, Color.RED)
+                isTimeHintRed = true
+                Toast.makeText(this, "Select again in the Membership days menu", Toast.LENGTH_LONG).show()
+            }
+            isTimeSelected = false // Reset the flag as we are changing the main selection
+
+            val timeAdapter = when (items[i]) {
                 "Months" -> adapterMonth
                 "Years" -> adapterYear
                 else -> adapterMonth // Default to monthly if nothing else
@@ -56,7 +72,7 @@ class SeeaEduProcess : AppCompatActivity() {
             binding.timeComplete.setAdapter(timeAdapter)
         }
 
-        binding.showAmount.setOnClickListener {
+        binding.payButton.setOnClickListener {
             val autoText = binding.autoComplete.text.toString()
             val timeText = binding.timeComplete.text.toString()
             val quantityText = binding.quantityComplete.text.toString()
@@ -70,13 +86,15 @@ class SeeaEduProcess : AppCompatActivity() {
                 resetBox(binding.autoComplete)
             }
 
-            if (timeText.isEmpty()) {
+            if (timeText.isEmpty() || !isTimeSelectionValid(autoText, timeText)) {
                 highlightBox(binding.timeComplete)
                 setHintColor(binding.timeComplete, Color.RED)
-                Toast.makeText(this, "Select the Time", Toast.LENGTH_SHORT).show()
+                isTimeHintRed = true
+                Toast.makeText(this, "Select the correct Time", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             } else {
                 resetBox(binding.timeComplete)
+                isTimeHintRed = false
             }
 
             if (quantityText.isEmpty()) {
@@ -88,9 +106,7 @@ class SeeaEduProcess : AppCompatActivity() {
                 resetBox(binding.quantityComplete)
             }
 
-            val quantitySelected = quantityText.toInt()
-            val amount = calculateAmount(timeText, quantitySelected)
-            binding.totalAmount.text = amount // Set the calculated amount to the TextView
+
         }
 
         binding.timeComplete.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
@@ -98,36 +114,49 @@ class SeeaEduProcess : AppCompatActivity() {
                 binding.timeComplete.setAdapter(adapterNull)
                 Toast.makeText(this, "Please select an item first", Toast.LENGTH_SHORT).show()
             } else {
+                isTimeSelected = true // Set the flag when a time item is selected
                 val selectedItem = binding.autoComplete.text.toString()
                 val itemSelected = when (selectedItem) {
                     "Months" -> itemsMonth[i]
                     "Years" -> itemsYear[i]
                     else -> "" // Handle default case if needed
                 }
-                Toast.makeText(this, "Item: $itemSelected", Toast.LENGTH_SHORT).show()
+                if (itemSelected.isNotEmpty()) {
+                    resetBox(binding.timeComplete)
+                    isTimeHintRed = false
+                }
             }
         }
 
-
         binding.quantityComplete.onItemClickListener = AdapterView.OnItemClickListener { adapterView, _, i, _ ->
             val itemSelected = adapterView.getItemAtPosition(i)
-            Toast.makeText(this, "Item: $itemSelected", Toast.LENGTH_SHORT).show()
         }
-
     }
 
+//    private fun isTimeSelectionValid(autoText: String, timeText: String): Boolean {
+//
+//    }
 
-    private fun calculateAmount(time: String, quantity: Int): String {
-        val amount = when (time) {
-            "Month (1)" -> 25 * quantity
-            "Months (Quarterly)" -> 75 * quantity
-            "Months (Half - Yearly)" -> 149 * quantity
-            "Annual" -> 299 * quantity
-            "Biennial" -> 599 * quantity
-            else -> 0 // Default case
+    private fun isTimeSelectionValid(autoText: String, timeText: String): Boolean {
+        return when (autoText) {
+            "Months" -> timeText.startsWith("Month")
+            "Years" -> timeText.startsWith("Annual") || timeText.startsWith("Biennial")
+            else -> false
         }
-        return "₹ $amount"
     }
+
+//    private fun calculateAmount(time: String, quantity: Int): String {
+//        val amount = when (time) {
+//            "Month (1)" -> 25 * quantity
+//            "Months (Quarterly)" -> 75 * quantity
+//            "Months (Half - Yearly)" -> 149 * quantity
+//            "Annual" -> 299 * quantity
+//            "Biennial" -> 599 * quantity
+//            else -> 0 // Default case
+//        }
+//        return "₹ $amount"
+//    }
+
     private fun highlightBox(autoCompleteTextView: AutoCompleteTextView) {
         val shape = ShapeDrawable(RectShape())
         shape.paint.style = Paint.Style.STROKE
@@ -137,11 +166,19 @@ class SeeaEduProcess : AppCompatActivity() {
     }
 
 
-private fun resetBox(autoCompleteTextView: AutoCompleteTextView) {
-    autoCompleteTextView.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-    autoCompleteTextView.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+//    private fun resetBox(autoCompleteTextView: AutoCompleteTextView) {
+//
+//    }
+    private fun resetBox(autoCompleteTextView: AutoCompleteTextView) {
+        autoCompleteTextView.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+        autoCompleteTextView.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+        if (isTimeHintRed) {
+            setHintColor(autoCompleteTextView, Color.RED)
+        } else {
+            setHintColor(autoCompleteTextView, Color.GRAY) // Reset to default hint color
+        }
+    }
 
-}
     private fun setHintColor(autoCompleteTextView: AutoCompleteTextView, color: Int) {
         val colorStateList = ColorStateList.valueOf(color)
         autoCompleteTextView.setHintTextColor(colorStateList)

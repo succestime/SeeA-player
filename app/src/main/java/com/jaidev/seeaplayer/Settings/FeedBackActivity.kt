@@ -12,44 +12,51 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.ActivityFeedBackBinding
 
 class FeedBackActivity : AppCompatActivity() {
-    private lateinit var binding:ActivityFeedBackBinding
+    private lateinit var binding: ActivityFeedBackBinding
     private lateinit var swipeRefreshLayout: LinearLayout
+
+    companion object {
+        private const val EMAIL_REQUEST_CODE = 1
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFeedBackBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.title = "Feedback"
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
         binding.sendFA.setOnClickListener {
             val feedbackMsg = binding.feedbackMsgFA.text.toString()
             val subject = binding.topicFA.text.toString()
             val email = binding.emailFA.text.toString()
 
             if (feedbackMsg.isNotEmpty() && subject.isNotEmpty()) {
-                val emailIntent = Intent(Intent.ACTION_SENDTO)
-                emailIntent.data = Uri.parse("mailto:")
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("seeaplayer1019@gmail.com"))
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback to SeeA Player: $subject")
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "Feedback message: $feedbackMsg\nUser's email: $email")
-                emailIntent.putExtra(Intent.EXTRA_TEXT, """
-                    Hello,
-                    
-                    Topic: $subject
-                    
-                    ${if (email.isNotEmpty()) "User's Email: $email\n" else ""}
-                    
-                    Feedback: $feedbackMsg
-                    
-                    ////////////////////***** SeeA Player Feedback *****////////////////////
-                    
-                    Regards,
-                    SeeA Player
-                """.trimIndent())
+                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:")
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf("seeaplayer1019@gmail.com"))
+                    putExtra(Intent.EXTRA_SUBJECT, "Feedback to SeeA Player: $subject")
+                    putExtra(Intent.EXTRA_TEXT, """
+                        Hello,
+                        
+                        Topic: $subject
+                        
+                        ${if (email.isNotEmpty()) "User's Email: $email\n" else ""}
+                        
+                        Feedback: $feedbackMsg
+                        
+                        ////////////////////***** SeeA Player Feedback *****////////////////////
+                        
+                        Regards,
+                        SeeA Player
+                    """.trimIndent())
+                    setPackage("com.google.android.gm") // This restricts the intent to the Gmail app
+                }
 
                 try {
-                    startActivity(Intent.createChooser(emailIntent, "Send feedback via..."))
+                    startActivityForResult(emailIntent, EMAIL_REQUEST_CODE)
                 } catch (e: Exception) {
-                    Toast.makeText(this, "No email clients installed.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Gmail app is not installed.", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(this, "Please fill out all fields.", Toast.LENGTH_SHORT).show()
@@ -58,14 +65,14 @@ class FeedBackActivity : AppCompatActivity() {
 
         setActionBarGradient()
         swipeRefreshLayout = binding.feedBackActivity
-
-        // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
     }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
+
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -73,64 +80,44 @@ class FeedBackActivity : AppCompatActivity() {
         }
 
         if (isDarkMode) {
-            // Dark mode is enabled, set background color to #012030
             swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
         } else {
-            // Light mode is enabled, set background color to white
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
         }
     }
+
     private fun setActionBarGradient() {
-        // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()
         if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
             supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FeedBackActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
+                setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar_light))
             }
         } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
             supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FeedBackActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
+                setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar))
             }
         } else {
-            // System Default mode is applied
             val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
                 android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
                 else -> false
             }
-            // Set the ActionBar color based on the System Default mode
             if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
                 supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@FeedBackActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
+                    setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar))
                 }
             } else {
-                // System Default mode is light
                 supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@FeedBackActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
+                    setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar_light))
                 }
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == EMAIL_REQUEST_CODE) {
+            Toast.makeText(this, "Thank you for your feedback. Your feedback is successfully sent to SeeA Player.", Toast.LENGTH_LONG).show()
+            finish() // Finish the activity
         }
     }
 }

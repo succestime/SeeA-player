@@ -12,6 +12,8 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="100dp"
         android:layout_height="match_parent">
 
         <com.github.vkay94.dtpv.DoubleTapPlayerView

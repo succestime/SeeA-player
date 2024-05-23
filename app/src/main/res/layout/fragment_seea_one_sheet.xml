@@ -29,7 +29,6 @@
         android:hint="@string/enter_seea1ne_membership_code"
         android:padding="8dp"
         android:paddingStart="20dp"
-        android:textColor="#000000"
         android:textSize="14sp"
         tools:ignore="RtlSymmetry" />
 

@@ -37,39 +37,33 @@ class AboutApp : AppCompatActivity() {
 // Set text style to bold for specific words
         var aboutPara1 = resources.getString(R.string.about_para_1)
         aboutPara1 = aboutPara1.replace("SeeA Player", "<b>SeeA Player</b>")
-        aboutPara1 = aboutPara1.replace("WhiteMarbles Group", "<b>WhiteMarbles Group</b>")
+        aboutPara1 = aboutPara1.replace("PowerOI Group", "<b>PowerOI Group</b>")
         textView1.text = HtmlCompat.fromHtml(aboutPara1, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         var aboutPara2 = resources.getString(R.string.about_para_2)
         aboutPara2 = aboutPara2.replace("SeeA Player", "<b>SeeA Player</b>")
-        aboutPara2 = aboutPara2.replace("WhiteMarbles Group", "<b>WhiteMarbles Group</b>")
+        aboutPara2 = aboutPara2.replace("PowerOI Group", "<b>PowerOI Group</b>")
         textView2.text = HtmlCompat.fromHtml(aboutPara2, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         var aboutPara3 = resources.getString(R.string.about_para_3)
         aboutPara3 = aboutPara3.replace("SeeA Player", "<b>SeeA Player</b>")
-        aboutPara3 = aboutPara3.replace("WhiteMarbles Group", "<b>WhiteMarbles Group</b>")
+        aboutPara3 = aboutPara3.replace("PowerOI Group", "<b>PowerOI Group</b>")
         textView3.text = HtmlCompat.fromHtml(aboutPara3, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         var aboutPara4 = resources.getString(R.string.about_para_4)
         aboutPara4 = aboutPara4.replace("SeeA Player", "<b>SeeA Player</b>")
-        aboutPara4 = aboutPara4.replace("WhiteMarbles Group", "<b>WhiteMarbles Group</b>")
+        aboutPara4 = aboutPara4.replace("PowerOI Group", "<b>PowerOI Group</b>")
         textView4.text = HtmlCompat.fromHtml(aboutPara4, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         var aboutPara5 = resources.getString(R.string.about_para_5)
         aboutPara5 = aboutPara5.replace("SeeA Player", "<b>SeeA Player</b>")
-        aboutPara5 = aboutPara5.replace("WhiteMarbles Group", "<b>WhiteMarbles Group</b>")
+        aboutPara5 = aboutPara5.replace("PowerOI Group", "<b>PowerOI Group</b>")
         textView5.text = HtmlCompat.fromHtml(aboutPara5, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         var aboutPara6 = resources.getString(R.string.about_para_6)
         aboutPara6 = aboutPara6.replace("SeeA Player", "<b>SeeA Player</b>")
-        aboutPara6 = aboutPara6.replace("WhiteMarbles Group", "<b>WhiteMarbles Group</b>")
+        aboutPara6 = aboutPara6.replace("PowerOI Group", "<b>PowerOI Group</b>")
         textView6.text = HtmlCompat.fromHtml(aboutPara6, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
-// Add similar lines for other TextViews
-
-
-
-
 
     }
     override fun onSupportNavigateUp(): Boolean {

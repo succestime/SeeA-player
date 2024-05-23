@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="50dp">
+        tools:layout_editor_absoluteY="100dp">
 
         <com.github.vkay94.dtpv.DoubleTapPlayerView
             android:id="@+id/playerView"
@@ -39,6 +39,14 @@
 
             </com.github.vkay94.dtpv.youtube.YouTubeOverlay>
         </com.github.vkay94.dtpv.DoubleTapPlayerView>
+        <TextView
+            android:id="@+id/volumePercentageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:visibility="gone"/>
 
         <View
             android:id="@+id/night_mode"
@@ -171,6 +179,7 @@
         android:id="@+id/adsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

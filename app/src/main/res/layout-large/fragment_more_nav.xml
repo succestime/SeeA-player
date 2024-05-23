@@ -434,7 +434,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/sign_out"
+        android:id="@+id/signOut"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@+id/mySubscribeLayout"
@@ -467,7 +467,6 @@
                     tools:ignore="UseAppTint" />
 
                 <TextView
-                    android:id="@+id/signOut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
 

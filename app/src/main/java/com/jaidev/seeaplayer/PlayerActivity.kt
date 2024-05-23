@@ -3,6 +3,7 @@ package com.jaidev.seeaplayer
 import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.PictureInPictureParams
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -22,7 +23,6 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -33,6 +33,7 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bullhead.equalizer.EqualizerFragment
@@ -120,11 +121,10 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         var pipStatus: Int = 0
         private var brightness: Int = 0
         private var volume: Int = 0
-        private const val MAX_DURATION_CHANGE = 10 * 1000L // Maximum duration change in milliseconds
+        private const val MAX_DURATION_CHANGE = 180 * 1000L // Maximum duration change in milliseconds
         private const val SWIPE_THRESHOLD = 50 // Swipe threshold in pixels
         private const val MAX_PROGRESS = 100
 
-        const val MINIMUM_DISTANCE = 100
 
     }
 
@@ -134,7 +134,13 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
+        // Clear the FLAG_FULLSCREEN flag to show the status bar
+        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        // Make the status bar transparent
+        window.statusBarColor = Color.BLACK
+        // Hide the action bar if you have one
+        supportActionBar?.hide()
+//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -157,17 +163,25 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         val mediaItem = MediaItem.fromUri("your_video_url_here")
         player.setMediaItem(mediaItem)
         player.prepare()
-
+        // Get the received intent
+        val receivedIntent = intent
+        if (receivedIntent != null && Intent.ACTION_SEND == receivedIntent.action) {
+            val sharedUri = receivedIntent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            sharedUri?.let {
+                // Handle the shared video URI
+                handleIntentData(it)
+            }
+        }
 
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
-        // for immersive mode
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, binding.root).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
+//        // for immersive mode
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
+//        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+//            controller.hide(WindowInsetsCompat.Type.systemBars())
+//            controller.systemBarsBehavior =
+//                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//        }
 
 
         dialogProperties = DialogProperties()
@@ -192,56 +206,158 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
         eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
     }
-    private fun directPlayVideoFromGallery(){
+    private fun directPlayVideoFromGallery() {
         try {
-            if (intent.data?.scheme.contentEquals("content")) {
+            // Get the action and data from the intent
+            val intentAction = intent.action
+            val intentData = intent.data
+
+            if (intentAction != null && (intentAction == Intent.ACTION_VIEW || intentAction == Intent.ACTION_SEND)) {
                 playerList = ArrayList()
                 position = 0
-                val cursor = contentResolver.query(
-                    intent.data!!,
-                    arrayOf(MediaStore.Video.Media.DATA, MediaStore.Video.Media.DATE_ADDED),
-                    null,
-                    null,
-                    null
-                )
-                cursor?.let {
-                    it.moveToFirst()
-                    val path = it.getString(it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
-                    val file = File(path)
-                    val dateAddedMillis = it.getLong(it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED))
-                    val video = VideoData(
-                        id = "", title = file.name, duration = 0L,
-                        artUri = Uri.fromFile(file), path = path, size = "", folderName = "", dateAdded =dateAddedMillis, isNew = true
-                    )
-                    playerList.add(video)
-                    cursor.close()
+
+                when (intentAction) {
+                    Intent.ACTION_VIEW -> {
+                        // Handle ACTION_VIEW intent
+                        intentData?.let {
+                            handleIntentData(it)
+                        }
+                    }
+                    Intent.ACTION_SEND -> {
+                        // Handle ACTION_SEND intent
+                        val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                        uri?.let {
+                            handleIntentData(it)
+                        }
+                    }
                 }
-                createPlayer()
-                initializeBinding()
+
+                if (playerList.isNotEmpty()) {
+                    playFirstVideo()
+                    initializeBinding()
+                } else {
+                    Toast.makeText(this, "Failed to load video", Toast.LENGTH_SHORT).show()
+                    initializeLayout()
+                    initializeBinding()
+                }
             } else {
+                // Fallback if no intent data
                 initializeLayout()
                 initializeBinding()
             }
-
         } catch (e: Exception) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
-
     }
 
-//    private fun initializePlayerWithUri(uri: Uri) {
-//        // Release any existing player resources
-//        releasePlayer()
-//
-//        // Initialize ExoPlayer with the shared video URI
-//        player = SimpleExoPlayer.Builder(this).build()
-//        binding.playerView.player = player
-//
-//        val mediaItem = MediaItem.fromUri(uri)
-//        player.setMediaItem(mediaItem)
-//        player.prepare()
-//        player.play()
-//    }
+    private fun playFirstVideo() {
+        val player = SimpleExoPlayer.Builder(this).build()
+        binding.playerView.player = player
+        val firstVideo = playerList[0]
+        val mediaItem = MediaItem.fromUri(firstVideo.artUri)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.playWhenReady = true
+    }
+
+
+    private fun handleIntentData(uri: Uri) {
+        when (uri.scheme) {
+            "content" -> {
+                // Handle content URIs (e.g., from the gallery)
+                val videoData = getVideoDataFromUri(uri)
+                videoData?.let { playerList.add(it) }
+            }
+            "file" -> {
+                // Handle file URIs (e.g., from file explorers or "Open with")
+                val path = uri.path
+                path?.let {
+                    val file = File(it)
+                    val video = VideoData(
+                        id = "",
+                        title = file.name,
+                        duration = 0L,
+                        artUri = Uri.fromFile(file),
+                        path = it,
+                        size = "",
+                        folderName = "",
+                        dateAdded = file.lastModified(),
+                        isNew = true
+                    )
+                    playerList.add(video)
+                }
+            }
+            else -> {
+                // Handle other URI schemes (e.g., custom schemes)
+                val path = getPathFromUri(uri)
+                path?.let {
+                    val file = File(it)
+                    val video = VideoData(
+                        id = "",
+                        title = file.name,
+                        duration = 0L,
+                        artUri = uri,
+                        path = it,
+                        size = "",
+                        folderName = "",
+                        dateAdded = file.lastModified(),
+                        isNew = true
+                    )
+                    playerList.add(video)
+                }
+            }
+        }
+    }
+
+    private fun getVideoDataFromUri(uri: Uri): VideoData? {
+        return try {
+            val documentFile = DocumentFile.fromSingleUri(this, uri)
+            documentFile?.let {
+                val path = getPathFromUri(uri)
+                val file = File(path ?: "")
+                val video = VideoData(
+                    id = "",
+                    title = documentFile.name ?: "Unknown",
+                    duration = 0L,
+                    artUri = uri,
+                    path = path ?: "",
+                    size = documentFile.length().toString(),
+                    folderName = file.parent ?: "",
+                    dateAdded = documentFile.lastModified(),
+                    isNew = true
+                )
+                video
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun getPathFromUri(uri: Uri): String? {
+        var path: String? = null
+        val projection = arrayOf(MediaStore.Video.Media._ID, MediaStore.Video.Media.DISPLAY_NAME)
+        contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID))
+                val displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME))
+                val contentUri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+                path = getRealPathFromUri(contentUri)
+            }
+        }
+        return path
+    }
+
+    private fun getRealPathFromUri(uri: Uri): String? {
+        var path: String? = null
+        val projection = arrayOf(MediaStore.Video.Media.DATA)
+        contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
+            }
+        }
+        return path
+    }
 
     private fun releasePlayer() {
         player.release()
@@ -625,7 +741,11 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 seekBarFeature()
               createPlayer()
             }
-
+//            "shareActivity" -> {
+//                playerList = ArrayList()
+//                playerList.addAll(FoldersActivity.currentFolderVideos)
+//                createPlayer()
+//            }
 
         }
     }
@@ -1193,7 +1313,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 val increase = distanceY > 0
                 val newValue = if (increase) brightness + 1 else brightness - 1
                 if (newValue in 0..15) brightness = newValue
-                //  setScreenBrightness(brightness)
+                  setScreenBrightness(brightness)
             } else {
                 val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                 val increase = distanceY > 0

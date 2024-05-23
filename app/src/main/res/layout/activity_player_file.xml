@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     xmlns:tools="http://schemas.android.com/tools">
 
 
@@ -10,7 +11,10 @@
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="7dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="100dp">
 
         <com.github.vkay94.dtpv.DoubleTapPlayerView
             android:id="@+id/playerView"
@@ -176,7 +180,7 @@
             android:layout_height="250dp"
 
             app:adSize="250x250"
-            app:adUnitId="ca-app-pub-3504589383575544/4783676285"
+            app:adUnitId="ca-app-pub-3504589383575544/5360256747"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

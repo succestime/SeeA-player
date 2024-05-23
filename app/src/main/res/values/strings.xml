@@ -135,15 +135,15 @@
     <string name="sign_out">Sign Out</string>
     <string name="enter_your_email">Enter your Email</string>
     <string name="password">Password</string>
-    <string name="login">Login</string>
+    <string name="login">Sign Up</string>
     <string name="if_you_want_to_sinin_by_another_id_click_hare">If you want to SinIn by another ID click hare</string>
     <string name="signin">SignIn ?</string>
     <string name="username">UserName</string>
     <string name="enter_your_signin_email">Enter your Email</string>
     <string name="signIn_password">Password</string>
-    <string name="activity_signin">SignIn</string>
+    <string name="activity_signin">Sign In</string>
     <string name="already_login_chick_here">Already LogIn chick here</string>
-    <string name="activity_signIn_login">LogIN?</string>
+    <string name="activity_signIn_login">Sign Up?</string>
     <string name="seeA">SeeA</string>
     <string name="edu">Edu.</string>
     <string name="_140">₹ 149</string>
@@ -203,17 +203,17 @@
     <string name="help">Help</string>
     <string name="about_para_1">Welcome to SeeA Player, the innovative amalgamation of cutting-edge technology and educational convenience. Developed with a keen understanding of the challenges faced by students in offline learning environments such as institutes, tuitions, and libraries, our app revolutionizes the way students access and engage with educational content.</string>
 
-    <string name="about_para_2" >At SeeA Player, we recognize the precious commodity of time in a student\'s life. That\'s why we\'ve meticulously crafted a multifaceted solution that seamlessly integrates three essential components:a versatile video player, a dynamic music player, and a personalized Google search browser.This powerful trifecta empowers students to optimize their learning experiences, efficiently navigate through diverse educational resources,and delve deep into their academic pursuits with unparalleled ease.</string>
+    <string name="about_para_2">At SeeA Player, we recognize the precious commodity of time in a student\'s life. That\'s why we\'ve meticulously crafted a multifaceted solution that seamlessly integrates three essential components:a versatile video player, a dynamic music player, and a personalized Google search browser.This powerful trifecta empowers students to optimize their learning experiences, efficiently navigate through diverse educational resources,and delve deep into their academic pursuits with unparalleled ease.</string>
 
     <string name="about_para_3">Our video player offers a robust platform for accessing educational videos, lectures, and tutorials, providing students with visual aids that complement their learning objectives.Meanwhile, our music player enhances concentration and focus, offering curated playlists and customizable features tailored to individual study preferences. Additionally, our custom Google search browser facilitates seamless exploration of online educational materials, ensuring that students have instant access to a wealth of knowledge at their fingertips.</string>
 
 
-    <string name="about_para_4" >Driven by a commitment to fostering academic excellence and facilitating learning beyond the confines of traditional classrooms, SeeA Player is more than just a tool—it\'s a catalyst for educational empowerment. By harnessing the power of technology, we strive to level the playing field, enabling students from all walks of life to unlock their full potential and achieve their academic goals.</string>
+    <string name="about_para_4">Driven by a commitment to fostering academic excellence and facilitating learning beyond the confines of traditional classrooms, SeeA Player is more than just a tool—it\'s a catalyst for educational empowerment. By harnessing the power of technology, we strive to level the playing field, enabling students from all walks of life to unlock their full potential and achieve their academic goals.</string>
 
 
     <string name="about_para_5">Join us on this transformative journey as we revolutionize the landscape of education, one download at a time. Experience the future of learning with SeeA Player , where innovation meets inspiration, and knowledge knows no bounds.</string>
 
-    <string name="about_para_6">"SeeA Player is proudly provided by [ WhiteMarbles Group ] , a dedicated team committed to advancing education and empowering students worldwide.With a passion for innovation and a deep understanding of the needs of learners,our organization strives to create impactful solutions that make learning accessible and enjoyable for all. SeeA Player was meticulously developed by our team of experienced software engineers , who combined their expertise to create a seamless and user-friendly platform designed to enhance the educational experience for students everywhere. At [ WhiteMarbles Group ] , we believe in the transformative power of technology to shape the future of education, and we are honored to be a part of your academic journey."</string>
+    <string name="about_para_6">"SeeA Player is proudly provided by [ PowerOI Group ] , a dedicated team committed to advancing education and empowering students worldwide.With a passion for innovation and a deep understanding of the needs of learners,our organization strives to create impactful solutions that make learning accessible and enjoyable for all. SeeA Player was meticulously developed by our team of experienced software engineers , who combined their expertise to create a seamless and user-friendly platform designed to enhance the educational experience for students everywhere. At [ PowerOI Group ] , we believe in the transformative power of technology to shape the future of education, and we are honored to be a part of your academic journey."</string>
 
 
 </resources>

@@ -11,7 +11,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivitySigninBinding
@@ -32,7 +31,7 @@ class signin : AppCompatActivity() {
         val googleSignInClient = GoogleSignIn.getClient(this,gso)
 
         binding.login.setOnClickListener {
-            startActivity(Intent(this , login::class.java))
+            startActivity(Intent(this , SignUp::class.java))
             finish()
         }
         setActionBarGradient()
@@ -53,8 +52,9 @@ class signin : AppCompatActivity() {
                             user?.updateProfile(profileUpdates)
                                 ?.addOnCompleteListener { updateProfileTask ->
                                     if (updateProfileTask.isSuccessful) {
-                                        startActivity(Intent(this, MainActivity::class.java))
                                         Toast.makeText(this, "SignIn Successful", Toast.LENGTH_LONG).show()
+                                        finish()
+
                                     } else {
                                         // Handle failure to update profile
                                         Toast.makeText(this, "Failed to update profile", Toast.LENGTH_LONG).show()
@@ -94,7 +94,7 @@ private fun firebaseAuthWithGoogle(idToken : String){
     moreNav.auth.signInWithCredential(credential)
         .addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
-                startActivity(Intent(this , MainActivity::class.java))
+                Toast.makeText(this, "SignIn Successful", Toast.LENGTH_LONG).show()
                 finish()
             }
         }.addOnFailureListener {
@@ -107,23 +107,51 @@ private fun firebaseAuthWithGoogle(idToken : String){
         val nightMode = AppCompatDelegate.getDefaultNightMode()
         if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
             // Light mode is applied
-       supportActionBar?.apply {
+            supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
-                       this@signin,
+                        this@signin,
                         R.drawable.background_actionbar_light
                     )
                 )
             }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
-          supportActionBar?.apply {
+        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Dark mode is applied
+            supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
-                     this@signin,
+                        this@signin,
                         R.drawable.background_actionbar
                     )
                 )
+            }
+        } else {
+            // System Default mode is applied
+            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            // Set the ActionBar color based on the System Default mode
+            if (isSystemDefaultDarkMode) {
+                // System Default mode is dark
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@signin,
+                            R.drawable.background_actionbar
+                        )
+                    )
+                }
+            } else {
+                // System Default mode is light
+                supportActionBar?.apply {
+                    setBackgroundDrawable(
+                        ContextCompat.getDrawable(
+                            this@signin,
+                            R.drawable.background_actionbar_light
+                        )
+                    )
+                }
             }
         }
     }

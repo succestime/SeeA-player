@@ -23,7 +23,6 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -124,7 +123,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         var pipStatus: Int = 0
         private var brightness: Int = 0
         private var volume: Int = 0
-        private const val MAX_DURATION_CHANGE = 10 * 1000L // Maximum duration change in milliseconds
+        private const val MAX_DURATION_CHANGE = 180 * 1000L // Maximum duration change in milliseconds
         private const val SWIPE_THRESHOLD = 50 // Swipe threshold in pixels
         private const val MAX_PROGRESS = 100
 
@@ -134,8 +133,13 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     @SuppressLint("ObsoleteSdkInt", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRePlayerBinding.inflate(layoutInflater)
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
+        // Clear the FLAG_FULLSCREEN flag to show the status bar
+        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        // Make the status bar transparent
+        window.statusBarColor = Color.BLACK
+        // Hide the action bar if you have one
+        supportActionBar?.hide()
+//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -143,7 +147,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         binding = ActivityRePlayerBinding.inflate(layoutInflater)
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
-
+        initializePlayer()
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         // banner ads
@@ -151,7 +155,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         mAdView.loadAd(adRequest)
 
 
-        initializePlayer()
+
 
         videoTitle = findViewById(R.id.videoTitle)
         playPauseBtn = findViewById(R.id.playPauseBtn)
@@ -162,15 +166,19 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         nightMode = findViewById(R.id.night_mode)
         recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
         eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
+
+        // Set up your ExoPlayer instance and attach it to the CustomPlayerView
+        val player = SimpleExoPlayer.Builder(this).build()
+        binding.playerView.player = player
+
+        // Set media item and prepare the player
+        val mediaItem = MediaItem.fromUri("your_video_url_here")
+        player.setMediaItem(mediaItem)
+        player.prepare()
+
+
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
-        // for immersive mode
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, binding.root).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
         dialogProperties = DialogProperties()
         filePickerDialog = FilePickerDialog(this@ReVideoPlayerActivity)
         filePickerDialog.setTitle("Select a Subtitle File")
@@ -874,8 +882,6 @@ binding.adsRemove.setOnClickListener {
                 binding.playerView.isDoubleTapEnabled = true
                 gestureDetectorCompat.onTouchEvent(motionEvent)
                 if (motionEvent.action == MotionEvent.ACTION_UP) {
-
-
                     // for immersive mode
                     WindowCompat.setDecorFitsSystemWindows(window, false)
                     WindowInsetsControllerCompat(window, binding.root).let { controller ->
@@ -957,7 +963,12 @@ binding.adsRemove.setOnClickListener {
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-
+                        WindowCompat.setDecorFitsSystemWindows(window, false)
+                        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+                            controller.hide(WindowInsetsCompat.Type.systemBars())
+                            controller.systemBarsBehavior =
+                                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        }
                         if (isSwipingToChangeDuration) {
                             // Get the displayed duration text from the TextView
                             val displayedText = durationChangeTextView.text.toString()
@@ -1135,7 +1146,7 @@ binding.adsRemove.setOnClickListener {
                 val increase = distanceY > 0
                 val newValue = if (increase) brightness + 1 else brightness - 1
                 if (newValue in 0..15) brightness = newValue
-//                setScreenBrightness(brightness)
+             setScreenBrightness(brightness)
             } else {
                 val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                 val increase = distanceY > 0

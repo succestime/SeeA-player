@@ -19,10 +19,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
+import com.jaidev.seeaplayer.LogSignIn.signin
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.FragmentMoreNavBinding
 import com.jaidev.seeaplayer.loadSmallMediumSizeNativeAds
-import com.jaidev.seeaplayer.LogSignIn.signin
 
 class moreNav : Fragment() {
     private lateinit var binding : FragmentMoreNavBinding
@@ -54,9 +54,9 @@ class moreNav : Fragment() {
         }
 
         binding.signOut.setOnClickListener {
-            auth.signOut()
-            binding.userDetails.text = updateData()
+            showSignOutDialog()
         }
+
 binding.Settingslayout.setOnClickListener {
     // Internet is connected, navigate to the desired destination
     it.findNavController().navigate(R.id.action_moreNav_to_moreSettingNav)
@@ -113,7 +113,7 @@ binding.Settingslayout.setOnClickListener {
 
     private fun updateData(): String {
 
-        return "Name : ${auth.currentUser?.displayName}"
+        return "User : ${auth.currentUser?.displayName}"
 
     }
 
@@ -218,9 +218,30 @@ binding.Settingslayout.setOnClickListener {
         }
     }
 
+    private fun showSignOutDialog() {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle("Want to sign out?")
+        builder.setMessage("Do you want to Sign Out from the app? . If yes, click on the Sign Out button.")
+        builder.setPositiveButton("Sign Out") { _, _ ->
+            auth.signOut()
+            binding.userDetails.text = updateData()
+            startActivity(Intent(requireContext(), signin::class.java))
+            requireActivity().finish()
+
+        }
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
+    }
 
     override fun onResume() {
         super.onResume()
+        binding.templateView?.let {
+            loadSmallMediumSizeNativeAds(requireContext(),R.string.small_medium_native_ads,
+                it
+            )
+        }
         binding.userDetails.text = updateData()
         setActionBarGradient()
     }

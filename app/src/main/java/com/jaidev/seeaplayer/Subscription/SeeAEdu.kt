@@ -2,6 +2,7 @@ package com.jaidev.seeaplayer.Subscription
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
@@ -22,6 +23,10 @@ class SeeAEdu : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Make the status bar transparent
+        window.statusBarColor = Color.BLACK
+        // Hide the action bar if you have one
+        supportActionBar?.hide()
         binding = ActivitySeeAeduBinding.inflate(layoutInflater)
         supportActionBar?.hide()
         setContentView(binding.root)
@@ -41,15 +46,6 @@ class SeeAEdu : AppCompatActivity() {
         val indicator: CircleIndicator3 = findViewById(R.id.dotIndictor)
         indicator.setViewPager(binding.viewPager)
 
-//        // Set listener for page change callback
-//        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-//            override fun onPageSelected(position: Int) {
-//                super.onPageSelected(position)
-////                updateDotIndector(position)
-//            }
-//        })
-
-        //Automatically scroll ViewPager2
         startAutoScroll()
 
         binding.SeeAoneActivity.setOnClickListener {

@@ -2,6 +2,7 @@ package com.jaidev.seeaplayer.Subscription
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -14,6 +15,11 @@ class SeeAOne : AppCompatActivity() {
     private var selectedBox: View? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Make the status bar transparent
+        window.statusBarColor = Color.BLACK
+        // Hide the action bar if you have one
+        supportActionBar?.hide()
         binding = ActivitySeeAoneBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()

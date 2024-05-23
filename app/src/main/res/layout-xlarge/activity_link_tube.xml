@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".browserActivity.LinkTubeActivity">
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#373636"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/homeBrowserBtn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:visibility="visible"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="1dp"
+                android:src="@drawable/home_browse"
+                tools:ignore="RedundantDescriptionCheck"
+                app:tint="@color/white" />
+            <ImageButton
+                android:id="@+id/backBrowserBtn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:visibility="visible"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="1dp"
+                app:tint="@color/white"
+                android:src="@drawable/round_arrow_back"
+                tools:ignore="RedundantDescriptionCheck" />
+            <ImageButton
+                android:id="@+id/forwardBrowserBtn"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:visibility="visible"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="1dp"
+                app:tint="@color/white"
+                android:src="@drawable/round_arrow_forward"
+                tools:ignore="RedundantDescriptionCheck" />
+
+
+
+            <LinearLayout
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="visible"
+                android:background="@drawable/custom_brower_home"
+                android:weightSum="10"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:id="@+id/btnTextUrlLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="2dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:elevation="2dp"
+                    >
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/webIcon"
+                            android:layout_width="25dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginStart="@dimen/car_ui_padding_2"
+                            android:src="@drawable/search_icon"
+                            app:tint="@color/white"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                         />
+
+
+                    <EditText
+                        android:id="@+id/btnTextUrl"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/enter_url"
+                        android:imeOptions="actionGo"
+                        android:inputType="textAutoComplete"
+                        android:paddingEnd="5dp"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/white"
+                        tools:ignore="RtlSymmetry" />
+
+                    <ImageButton
+        android:id="@+id/crossBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/browser_clear"
+        android:background="@android:color/transparent"
+        android:layout_marginEnd="2dp"
+        app:tint="@color/white"
+        android:visibility="gone"
+     />
+                    <ImageButton
+                        android:id="@+id/googleMicBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/google_mic"
+                        android:background="@android:color/transparent"
+                        android:visibility="gone"
+                        app:tint="@color/white"
+                        android:layout_marginEnd="2dp"
+                        />
+
+                    <ImageButton
+                        android:id="@+id/bookMarkBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_bookmark"
+                        android:background="@android:color/transparent"
+                        android:visibility="gone"
+                        app:tint="@color/white"
+                        android:layout_margin="5dp"
+                        />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tabBtn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/custom_tabs_textview"
+                android:gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="1dp"
+                android:text="@string/one_browse"
+                android:textColor="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
+
+            <ImageButton
+                android:id="@+id/moreBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/go_btn"
+                android:src="@drawable/icon_dark"
+                app:tint="@color/white"
+                android:layout_marginStart="5dp"
+                tools:ignore="RedundantDescriptionCheck" />
+
+        </LinearLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/textColorPrimary"
+            android:scaleY="0.5"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/myPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_bias="1.0" />
+
+
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="750dp"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:adSize="750x70"
+        app:adUnitId="ca-app-pub-3504589383575544/9715937751"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </com.google.android.gms.ads.AdView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#373636"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/bottomMediaBrowser"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/folder_icon"
+                android:visibility="visible"
+                app:tint="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
+            <ImageButton
+                android:id="@+id/searchBrowser"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/search_icon"
+                android:visibility="visible"
+                app:tint="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
+
+
+
+
+            <ImageButton
+                android:id="@+id/bottomBackBrowser"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/round_arrow_back"
+                android:visibility="visible"
+                app:tint="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
+
+            <ImageButton
+                android:id="@+id/bottomForwardBrowser"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/round_arrow_forward"
+                android:visibility="visible"
+                app:tint="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
+
+            <ImageButton
+                android:id="@+id/bottomHomeBrowser"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/home_browse"
+                android:visibility="visible"
+                app:tint="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
+            <ImageButton
+                android:id="@+id/bottomMoreBrowser"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/icon_dark"
+                android:visibility="visible"
+                app:tint="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
