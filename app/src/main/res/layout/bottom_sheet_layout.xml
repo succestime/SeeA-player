@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#121212">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fullDownloadLinearLayout"
+        android:background="#121212">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="28dp"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/round_arrow_down_"
+            app:layout_constraintBottom_toTopOf="@+id/urlname"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/urlname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="jkhaffdj"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/musicLabel"
+            app:layout_constraintEnd_toStartOf="@id/urlImage"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/urlImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="20dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_logo_o"
+            app:layout_constraintBottom_toTopOf="@+id/musicLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <!-- Music Section -->
+        <TextView
+            android:id="@+id/musicLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Music"
+            android:layout_marginStart="10dp"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/musicGroup"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <RadioGroup
+            android:id="@+id/musicGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <RadioButton
+                android:id="@+id/fast128k"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackground"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/music_player_song_svgrepo_com"
+                android:paddingEnd="10dp"
+                android:text="Fast (128K)"
+                android:textColor="#FFFFFF"
+                >
+
+            </RadioButton>
+
+            <RadioButton
+                android:id="@+id/classic70k"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackground"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/music_player_song_svgrepo_com"
+                android:paddingEnd="10dp"
+                android:text="Classic MP3 (70K) "
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/classic128k"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackground"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/music_player_song_svgrepo_com"
+                android:paddingEnd="10dp"
+                android:text="Classic MP3 (128K)"
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/classic160k"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackground"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/music_player_song_svgrepo_com"
+                android:paddingEnd="10dp"
+                android:text="Classic MP3 (160K)"
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/classic320k"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackground"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/music_player_song_svgrepo_com"
+                android:paddingEnd="10dp"
+                android:text="Classic MP3 (320K) "
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/videoLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Video"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+            <RadioButton
+                android:id="@+id/videoFast144p"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/movie_videos_icon"
+                android:paddingEnd="10dp"
+                android:text="Fast (144p) Low\nPoor video quality"
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/videoFast240p"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/movie_videos_icon"
+                android:paddingEnd="10dp"
+                android:text="Fast (240p)\nLow video quality"
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/fast360p"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:buttonTint="@color/radio_button_tint"
+                android:checked="true"
+                android:drawableEnd="@drawable/movie_videos_icon"
+                android:paddingEnd="10dp"
+                android:text="Fast (360p)\nNormal video quality"
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/fast480p"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/movie_videos_icon"
+                android:paddingEnd="10dp"
+                android:text="Fast (480p)\nNormal video quality"
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/high720p"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/movie_videos_icon"
+                android:paddingEnd="10dp"
+                android:text="High quality (720p)\nHigh and clear video quality"
+                android:textColor="#FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/high1080p"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="16dp"
+                android:buttonTint="@color/radio_button_tint"
+                android:drawableEnd="@drawable/movie_videos_icon"
+                android:paddingEnd="10dp"
+                android:text="High quality (1080p)\nFull HD and clear video quality"
+                android:textColor="#FFFFFF" />
+
+
+        </RadioGroup>
+
+
+
+        <!--        <RadioGroup-->
+        <!--            android:id="@+id/videoGroup"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="8dp"-->
+        <!--            android:layout_marginBottom="15dp"-->
+        <!--            app:layout_constraintBottom_toTopOf="@+id/constraintLayout5"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--          >-->
+
+        <!--          -->
+
+        <!--            -->
+        <!--        </RadioGroup>-->
+
+        <!-- Remember Choice Switch -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout5"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/downloadButton">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="Remember my choice"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </TextView>
+
+            <Switch
+                android:id="@+id/rememberChoice"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="12dp"
+                android:thumbTint="@color/radio_button_tint"
+                android:trackTint="@color/radio_button_tint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/downloadButton"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="#FFD700"
+            android:text="Download"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

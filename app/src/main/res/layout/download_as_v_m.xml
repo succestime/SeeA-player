@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="#121212"
+    android:padding="16dp"
+    tools:context=".DownloadVMActivity">
+
+    <LinearLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Download video as"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/music_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Music"
+            android:textColor="#B3B3B3"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/music_player_song_svgrepo_com"
+                android:contentDescription="Music Note"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
+                android:id="@+id/fast_music"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Fast"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/fast_music_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4.3MB"
+                android:textColor="#B3B3B3"
+                android:textSize="16sp"
+                android:layout_marginEnd="16dp"/>
+
+            <RadioButton
+                android:id="@+id/radio_fast_music"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#FFFFFF"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/music_player_song_svgrepo_com"
+                android:contentDescription="Music Note"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
+                android:id="@+id/classic_music"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Classic MP3"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/classic_music_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4.8MB"
+                android:textColor="#B3B3B3"
+                android:textSize="16sp"
+                android:layout_marginEnd="16dp"/>
+
+            <RadioButton
+                android:id="@+id/radio_classic_music"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#FFFFFF"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/video_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video"
+            android:textColor="#B3B3B3"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/movie_videos_icon"
+                android:contentDescription="Video"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
+                android:id="@+id/fast_video"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Fast (360p)"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/fast_video_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7.6MB"
+                android:textColor="#B3B3B3"
+                android:textSize="16sp"
+                android:layout_marginEnd="16dp"/>
+
+            <RadioButton
+                android:id="@+id/radio_fast_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#FFFFFF"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/movie_videos_icon"
+                android:contentDescription="Video"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
+                android:id="@+id/high_quality_video"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="High quality (720p)"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/high_quality_video_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12.9MB"
+                android:textColor="#B3B3B3"
+                android:textSize="16sp"
+                android:layout_marginEnd="16dp"/>
+
+            <RadioButton
+                android:id="@+id/radio_high_quality_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#FFFFFF"/>
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/more_formats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginBottom="16dp"
+                    android:drawablePadding="8dp"
+                    android:text="More formats"
+                    android:textColor="#B3B3B3"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/allFormats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="16dp"
+                    android:drawableEnd="@drawable/round_navigate_next"
+                    android:drawablePadding="8dp"
+                    android:text="All"
+                    android:textColor="#B3B3B3"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:padding="16dp"
+        android:background="#000000">
+
+        <!-- Music Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Music"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:paddingBottom="8dp"/>
+
+        <!-- Music Options -->
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fast (128K)\nM4A, best choice for mobile phone"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Classic MP3 (70K) Low\nSupport Bluetooth speaker, mobile phone, car, watch etc."
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Classic MP3 (128K)\nSupport Bluetooth speaker, mobile phone, car, watch etc."
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Classic MP3 (160K)\nSupport Bluetooth speaker, mobile phone, car, watch etc."
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Classic MP3 (320K) Slow\nSupport Bluetooth speaker, mobile phone, car, watch etc."
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="16dp"/>
+        </RadioGroup>
+
+        <!-- Video Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:paddingBottom="8dp"/>
+
+        <!-- Video Options -->
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fast (144p) Low\nPoor video quality"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fast (240p)\nLow quality for quick play"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fast (360p)\nNormal quality for quick play"
+                android:textColor="#FFFFFF"
+                android:checked="true"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fast (480p)\nNormal quality for quick play"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="High quality (720p)\nClear view and quick play"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="High quality (1080p)\nHigh details for full screen play"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="16dp"/>
+        </RadioGroup>
+
+        <!-- Remember Choice Switch -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Remember my choice"
+                android:textColor="#FFFFFF"/>
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/download_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Download"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#333333"
+        android:padding="12dp"
+        android:textSize="16sp"/>
+</LinearLayout>

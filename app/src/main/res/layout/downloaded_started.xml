@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#424040"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Icon at the top center -->
+    <ImageView
+        android:id="@+id/downloadIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@mipmap/ic_logo_o"
+ android:layout_gravity="center_horizontal"
+    android:layout_marginBottom="8dp"
+    android:contentDescription="SeeA Player"/>
+
+    <!-- Message below the icon -->
+    <TextView
+        android:id="@+id/downloadMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Download started!"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/downloadIcon"
+
+        android:layout_marginBottom="16dp"/>
+
+    <!-- "Not now" button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <Button
+        android:id="@+id/notNowButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/curver_download_two"
+        android:text="Not now"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_toStartOf="@id/viewButton"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- "View" button -->
+    <Button
+        android:id="@+id/viewButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/curver_download"
+        android:text="View"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:layout_toEndOf="@id/notNowButton"
+        android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+</LinearLayout>
