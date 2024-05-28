@@ -49,12 +49,13 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    @SuppressLint("SetTextI18n", "MissingInflatedId")
+    @SuppressLint("SetTextI18n", "MissingInflatedId", "NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
         binding.musicRV.setHasFixedSize(true)
@@ -68,9 +69,10 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
 
 
         binding.swipeRefreshMusic.setOnRefreshListener {
-            // Perform the refresh action here
-            refreshMusic()
+            checkForNewMusic()
+            binding.swipeRefreshMusic.isRefreshing = false
         }
+
         if (MusicListMA.isEmpty()) {
             binding.musicemptyStateLayout.visibility = View.VISIBLE
         } else {
@@ -102,6 +104,22 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
     }
 
 
+    @SuppressLint("SetTextI18n")
+    private fun checkForNewMusic() {
+        val updatedMusicList = getAllAudios() // Implement this method to fetch the updated music list
+        if (updatedMusicList.size != MusicListMA.size) {
+            MusicListMA.clear()
+            MusicListMA.addAll(updatedMusicList)
+            adapter.updateMusicList(MusicListMA)
+            binding.TotalMusics.text = "Total Musics : ${MusicListMA.size}"
+
+            if (MusicListMA.isEmpty()) {
+                binding.musicemptyStateLayout.visibility = View.VISIBLE
+            } else {
+                binding.musicemptyStateLayout.visibility = View.GONE
+            }
+        }
+    }
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -267,21 +285,15 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
         return tempList
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun refreshMusic() {
-        binding.swipeRefreshMusic.isRefreshing = false
 
-
-
-        adapter.notifyDataSetChanged()
-    }
     @SuppressLint("SetTextI18n")
     override fun onMusicDeleted() {
-        val tempList = getAllAudios()
+        val tempList = MainActivity.MusicListMA
         adapter.updateMusicList(tempList)
 
         binding.TotalMusics.text = "Total Musics : ${tempList.size}"
     }
+
 
 
     @Deprecated("Deprecated in Java")

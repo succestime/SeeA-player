@@ -1,3 +1,4 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
@@ -537,11 +538,11 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                         setupBoosterDialog()
                     }
 
-                   8-> {
-                       setupPIPMode()
+                    8-> {
+                        setupPIPMode()
                     }
 
-                   9 -> {
+                    9 -> {
                         dialogProperties.selection_mode = DialogConfigs.SINGLE_MODE
                         dialogProperties.extensions = arrayOf(".srt")
                         dialogProperties.root = File("/storage/emulated/0")
@@ -702,7 +703,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 // dialog.dismiss()
                 binding.playerView.showController()
                 playVideo()
-               pipStatus = 0
+                pipStatus = 0
             } else {
                 val intent = Intent(
                     "android.settings.PICTURE_IN_PICTURE_SETTINGS",
@@ -733,13 +734,13 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             }
             "NowPlaying" -> {
                 speed = 1.0f
-              videoTitle.text = playerList[position].title
-              videoTitle.isSelected = true
+                videoTitle.text = playerList[position].title
+                videoTitle.isSelected = true
                 binding.playerView.player = player
                 doubleTapEnable()
                 playInFullscreen(enable = isFullscreen)
                 seekBarFeature()
-              createPlayer()
+                createPlayer()
             }
 //            "shareActivity" -> {
 //                playerList = ArrayList()
@@ -821,7 +822,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.round_repeat)
             } else {
                 repeat = true
-               player.repeatMode = Player.REPEAT_MODE_ONE
+                player.repeatMode = Player.REPEAT_MODE_ONE
                 findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.round_repeat_on)
             }
         }
@@ -887,7 +888,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
         loudnessEnhancer.enabled = true
 
-       nowPlayingId = playerList[position].id
+        nowPlayingId = playerList[position].id
 
         seekBarFeature()
         binding.playerView.setControllerVisibilityListener {
@@ -993,7 +994,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         if(isInPictureInPictureMode){ playVideo()
             playPauseBtn.setImageResource(R.drawable.round_pause_24)
 
-       } else {
+        } else {
             pauseVideo()
             playPauseBtn.setImageResource(R.drawable.round_pause_24)
 
@@ -1002,8 +1003,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
     override fun onDestroy() {
         super.onDestroy()
-       player.pause()
-       player.release()
+        player.pause()
+        player.release()
         audioManager?.abandonAudioFocus(this)
 
     }
@@ -1313,7 +1314,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 val increase = distanceY > 0
                 val newValue = if (increase) brightness + 1 else brightness - 1
                 if (newValue in 0..15) brightness = newValue
-                  setScreenBrightness(brightness)
+                setScreenBrightness(brightness)
             } else {
                 val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                 val increase = distanceY > 0

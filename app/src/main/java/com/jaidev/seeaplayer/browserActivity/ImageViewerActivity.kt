@@ -2,6 +2,7 @@ package com.jaidev.seeaplayer.browserActivity
 
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.drawable.PictureDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -15,6 +16,7 @@ import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.caverock.androidsvg.SVG
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.ActivityImageViewerBinding
 import java.io.File
@@ -27,12 +29,20 @@ class ImageViewerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         // Enable up button in ActionBar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Image Viewer"
 
         // Retrieve the image path from Intent extras
         imagePath = intent.getStringExtra("imagePath")
+
+        // Set the ActionBar title to the image name
+        imagePath?.let {
+            val fileName = File(it).name
+            supportActionBar?.title = fileName
+        } ?: run {
+            supportActionBar?.title = "Image Viewer"
+        }
 
         // Load the image into the PhotoView
         if (!imagePath.isNullOrBlank()) {
@@ -47,8 +57,7 @@ class ImageViewerActivity : AppCompatActivity() {
             BitmapFactory.decodeFile(imagePath, options)
 
             // Calculate the sample size to scale down the image
-            val sampleSize =
-                calculateSampleSize(options.outWidth, options.outHeight, targetWidth, targetHeight)
+            val sampleSize = calculateSampleSize(options.outWidth, options.outHeight, targetWidth, targetHeight)
 
             // Set the sample size in BitmapFactory options
             val bitmapOptions = BitmapFactory.Options().apply {
@@ -59,6 +68,7 @@ class ImageViewerActivity : AppCompatActivity() {
             val bitmap = BitmapFactory.decodeFile(imagePath, bitmapOptions)
             binding.photoView.setImageBitmap(bitmap)
         }
+
         loadImage()
         setActionBarGradient()
         swipeRefreshLayout = binding.ImageViewerActivity
@@ -66,6 +76,7 @@ class ImageViewerActivity : AppCompatActivity() {
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
     }
+
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -87,15 +98,13 @@ class ImageViewerActivity : AppCompatActivity() {
         if (!imagePath.isNullOrBlank()) {
             val file = File(imagePath!!)
             if (file.exists()) {
-                Glide.with(this)
-                    .load(Uri.fromFile(file))
-                    .apply(
-                        RequestOptions()
-                            .placeholder(R.drawable.image_browser) // Placeholder image while loading
-                            .error(R.drawable.image_browser) // Image to display on error
-                            .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache both original & resized image
-                    )
-                    .into(binding.photoView)
+                if (imagePath!!.endsWith(".svg", ignoreCase = true)) {
+                    // Load SVG image
+                    loadSvgImage(file)
+                } else {
+                    // Load regular image
+                    loadRegularImage(file)
+                }
             } else {
                 // Handle the case where the image file doesn't exist
                 // You can show a placeholder image or a message to the user
@@ -103,6 +112,34 @@ class ImageViewerActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun loadSvgImage(file: File) {
+        // Load SVG image using AndroidSVG library
+        try {
+            val svg = SVG.getFromInputStream(file.inputStream())
+            val drawable = PictureDrawable(svg.renderToPicture())
+            binding.photoView.setImageDrawable(drawable)
+        } catch (e: Exception) {
+            // Handle any exceptions
+            e.printStackTrace()
+            // Show placeholder image on error
+            binding.photoView.setImageResource(R.drawable.image_browser)
+        }
+    }
+
+    private fun loadRegularImage(file: File) {
+        // Load regular image using Glide
+        Glide.with(this)
+            .load(Uri.fromFile(file))
+            .apply(
+                RequestOptions()
+                    .placeholder(R.drawable.image_browser) // Placeholder image while loading
+                    .error(R.drawable.image_browser) // Image to display on error
+                    .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache both original & resized image
+            )
+            .into(binding.photoView)
+    }
+
 
 
     private fun calculateSampleSize(imageWidth: Int, imageHeight: Int, targetWidth: Int, targetHeight: Int): Int {

@@ -159,7 +159,7 @@ class FileAdapter(
             itemView.setOnClickListener {
                 if (actionMode != null) {
                     // If action mode is active, toggle selection as usual
-                  toggleMultpleSelection(position)
+                    toggleMultpleSelection(position)
 
                 } else {
                     itemClickListener.onItemClick(fileItem)
@@ -168,7 +168,7 @@ class FileAdapter(
             }
         }
 
-        }
+    }
 
     // ViewHolder for Video type
     inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

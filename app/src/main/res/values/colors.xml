@@ -13,6 +13,7 @@
     <color name="cool_green">#00C853</color>
     <color name="textColor">#fff</color>
     <color name="titleColor">#fff</color>
+    <color name="transparent">#00000000</color>
 
     <color name="colorPrimary">#1b272c</color>
     <color name="dialog_custom_color">#3C3A3A</color>

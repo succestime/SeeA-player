@@ -166,7 +166,10 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
         binding.webView.setDownloadListener { url, _, _, mimeType, _ ->
             // Determine the file extension based on MIME type
-            val fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+            val fileExtension = when {
+                mimeType.equals("image/svg+xml", ignoreCase = true) -> "svg"
+                else -> MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+            }
 
             // Extract the filename from the URL
             val fileName = URLUtil.guessFileName(url, null, fileExtension)
@@ -174,7 +177,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             // Check the file type and initiate appropriate download action
             if (!mimeType.isNullOrBlank() && !fileExtension.isNullOrBlank()) {
                 when {
-                    mimeType.startsWith("application/pdf") -> {
+                    mimeType.equals("application/pdf", ignoreCase = true) -> {
                         startDownload(url, "document.pdf", fileExtension)
                     }
                     mimeType.startsWith("video/") -> {
@@ -182,8 +185,8 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                         startDownload(url, "video.mp4", fileExtension)
                     }
                     mimeType.startsWith("image/") -> {
-                        // Assuming the filename is 'image.jpg' for demonstration
-                        startDownload(url, "image.jpg", fileExtension)
+                        // Use the correct file extension for images
+                        startDownload(url, fileName, fileExtension)
                     }
                     else -> {
                         // Handle other file types here if needed
@@ -195,6 +198,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                 Log.e("DownloadListener", "Invalid MIME type or file extension")
             }
         }
+
         val linkRef = requireActivity() as LinkTubeActivity
 
         var frag: BrowseFragment? = null
@@ -484,9 +488,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
 
         val notification = notificationBuilder.build()
         notificationManager.notify(downloadId.toInt(), notification)
-
-
-        }
+    }
 
 
 
@@ -495,14 +497,17 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
         return when (fileExtension?.toLowerCase()) {
             "pdf" -> FileType.PDF
             "jpg" -> FileType.IMAGE
+            "jpeg" -> FileType.IMAGE
+            "png" -> FileType.IMAGE
+            "svg" -> FileType.IMAGE
             "mp4" -> FileType.VIDEO
             "mp3" -> FileType.AUDIO
             "html" -> FileType.WEBSITE
             "apk" -> FileType.APK
-
             else -> FileType.UNKNOWN
         }
     }
+
 
     private fun getIconResId(fileExtension: String?): Int {
         return when (getFileType(fileExtension)) {
@@ -512,12 +517,9 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
             FileType.AUDIO -> R.drawable.music_download_browser
             FileType.APK -> R.drawable.pdf_image
             FileType.WEBSITE -> R.drawable.pdf_image
-
-
             else -> R.drawable.image_browser
         }
     }
-
 
     @SuppressLint("ObsoleteSdkInt")
     private fun createNotificationChannel(notificationManager: NotificationManager) {

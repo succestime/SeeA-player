@@ -36,6 +36,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     private var musicLoaded = false
     private lateinit var musicFragment: Fragment // Define your music fragment
 
-
+    private lateinit var navController: NavController
     private var mInterstitialAd: InterstitialAd? = null
     private var doubleBackToExitPressedOnce = false
     companion object {
@@ -452,6 +453,7 @@ private fun funRequestRuntimePermission(){
         menuInflater.inflate(R.menu.sort_view, menu)
         // Find the item you want to hide
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
+        val downloadMenuItem = menu.findItem(R.id.downloads)
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
             // Handle the click event here
             when (item.itemId) {
@@ -475,7 +477,6 @@ private fun funRequestRuntimePermission(){
                             //for restarting app
                             finish()
                             startActivity(intent)
-
                         }
                         .setSingleChoiceItems(menuItems, sortValue) { _, pos ->
                             value = pos
@@ -488,9 +489,22 @@ private fun funRequestRuntimePermission(){
                 else -> false
             }
         }
+        downloadMenuItem.setOnMenuItemClickListener { item ->
+            // Handle the click event here
+            when (item.itemId) {
+                R.id.downloads -> {
+                    val intent = Intent(this, DownloadsActivity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+                    true
+                }
+                else -> false
+            }
+        }
 
         return true
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 

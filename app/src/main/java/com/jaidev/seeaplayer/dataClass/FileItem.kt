@@ -15,6 +15,7 @@ data class FileItem(
 ) {
 
 
+
     companion object {
 
         // Key for SharedPreferences
