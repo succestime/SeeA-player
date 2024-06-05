@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#1a1a1a"
+    android:paddingStart="16sp"
+    android:paddingBottom="16sp"
+    android:paddingEnd="16sp"
+  >
+    <ImageView
+        android:id="@+id/downIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/round_arrow_down_"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/tvSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Speed"
+        android:textSize="24sp"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/textview1"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:drawableTint="@color/cool_blue"
+        android:paddingEnd="15dp"
+        android:drawableEnd="@null"
+        android:gravity="center_vertical"
+        android:text="0.5X">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/textview2"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:drawableTint="@color/cool_blue"
+        android:paddingEnd="15dp"
+        android:drawableEnd="@null"
+        android:gravity="center_vertical"
+        android:text="0.75X">
+
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/textview3"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:drawableTint="@color/cool_blue"
+        android:paddingEnd="15dp"
+        android:drawableEnd="@null"
+        android:gravity="center_vertical"
+        android:text="1.0X (Default)">
+
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/textview4"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:drawableTint="@color/cool_blue"
+        android:paddingEnd="15dp"
+        android:drawableEnd="@null"
+        android:gravity="center_vertical"
+        android:text="1.25X">
+
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/textview5"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:drawableTint="@color/cool_blue"
+        android:paddingEnd="15dp"
+        android:drawableEnd="@null"
+        android:gravity="center_vertical"
+        android:text="1.5X">
+
+
+    </TextView>
+    <TextView
+        android:id="@+id/textview6"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:drawableTint="@color/cool_blue"
+        android:paddingEnd="15dp"
+        android:drawableEnd="@null"
+        android:gravity="center_vertical"
+        android:text="2.0X">
+
+
+    </TextView>
+
+</LinearLayout>

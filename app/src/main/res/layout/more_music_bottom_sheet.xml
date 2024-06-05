@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="16sp"
+
+    tools:context=".MoreMusicBottomSheet"
+    >
+    <ImageView
+        android:id="@+id/downIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="28dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/round_arrow_down_"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        app:shapeAppearanceOverlay="@style/curved"
+        android:src="@drawable/music_speaker_three"
+        app:layout_constraintTop_toBottomOf="@+id/downIcon"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="Thumbnail" />
+
+    <TextView
+        android:id="@+id/title_music"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="15dp"
+        android:text="Itachi Uchiha AMV-Infected(1080p)"
+        android:layout_marginStart="10dp"
+        android:textSize="18sp"
+        android:maxLines="1"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/thumbnail"
+        app:layout_constraintTop_toBottomOf="@+id/downIcon"
+        />
+
+    <TextView
+        android:id="@+id/subtitle_music"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="Anime Densetsu"
+        android:textColor="#B85A5A"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/title_music"
+        app:layout_constraintStart_toStartOf="@+id/title_music"
+        app:layout_constraintTop_toBottomOf="@+id/title_music" />
+
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#000000"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumbnail"
+        tools:layout_editor_absoluteX="16dp">
+
+    </View>
+
+    <LinearLayout
+        android:id="@+id/linearLayout15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        tools:layout_editor_absoluteX="16dp">
+
+
+        <TextView
+            android:id="@+id/share_text"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:drawableStart="@drawable/info_share"
+            android:drawablePadding="20dp"
+            android:focusable="true"
+            android:paddingStart="10dp"
+            android:gravity="center_vertical"
+            android:paddingTop="4dp"
+            android:text="Share"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/share"
+            app:layout_constraintStart_toStartOf="@+id/share"
+            app:layout_constraintTop_toBottomOf="@+id/share"
+            tools:ignore="RtlSymmetry" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout16"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout15"
+        tools:layout_editor_absoluteX="16dp">
+
+        <TextView
+            android:id="@+id/speed"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:paddingStart="10dp"
+            tools:ignore="RtlSymmetry"
+            android:background="?attr/selectableItemBackground"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="20dp"
+            android:textStyle="bold"
+            android:paddingTop="4dp"
+            android:text="Speed"
+            app:layout_constraintEnd_toEndOf="@+id/share"
+            app:layout_constraintStart_toStartOf="@+id/share"
+            app:layout_constraintTop_toBottomOf="@+id/share"
+            app:drawableStartCompat="@drawable/round_speed"
+            />
+
+<!--    <TextView-->
+<!--        android:id="@+id/hintSpeed"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:text="1.25X"-->
+<!--        android:textStyle="normal"-->
+<!--        >-->
+
+<!--    </TextView>-->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout17"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout16"
+        tools:layout_editor_absoluteX="16dp">
+
+        <TextView
+            android:id="@+id/repeat"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:paddingStart="10dp"
+            tools:ignore="RtlSymmetry"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="20dp"
+            android:textStyle="bold"
+            android:paddingTop="4dp"
+            android:text="Repeat"
+            app:layout_constraintEnd_toEndOf="@+id/share"
+            app:layout_constraintStart_toStartOf="@+id/share"
+            app:layout_constraintTop_toBottomOf="@+id/share"
+            app:drawableStartCompat="@drawable/baseline_repeat_24" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout18"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout17"
+        tools:layout_editor_absoluteX="16dp">
+
+        <TextView
+            android:id="@+id/equalizer"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="10dp"
+            tools:ignore="RtlSymmetry"
+            android:background="?attr/selectableItemBackground"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="20dp"
+            android:textStyle="bold"
+            android:paddingTop="4dp"
+            android:text="Equalizer"
+            app:layout_constraintEnd_toEndOf="@+id/share"
+            app:layout_constraintStart_toStartOf="@+id/share"
+            app:layout_constraintTop_toBottomOf="@+id/share"
+            app:drawableStartCompat="@drawable/baseline_equalizer_24" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout19"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout18"
+        tools:layout_editor_absoluteX="16dp">
+
+        <TextView
+            android:id="@+id/sleepTimer"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="10dp"
+            tools:ignore="RtlSymmetry"
+            android:background="?attr/selectableItemBackground"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="20dp"
+            android:textStyle="bold"
+            android:paddingTop="4dp"
+            android:text="Sleep timer"
+            app:layout_constraintEnd_toEndOf="@+id/share"
+            app:layout_constraintStart_toStartOf="@+id/share"
+            app:layout_constraintTop_toBottomOf="@+id/share"
+            app:drawableStartCompat="@drawable/round_sleep_timer" />
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

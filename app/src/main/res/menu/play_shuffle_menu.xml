@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_play"
+        android:icon="@drawable/round_play_music_menu"
+        android:title="Play all in order"/>
+    <item
+        android:id="@+id/action_shuffle"
+        android:icon="@drawable/round_shuffle"
+        android:title="Play all in Shuffle order"/>
+</menu>
