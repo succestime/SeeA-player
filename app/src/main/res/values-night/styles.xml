@@ -16,6 +16,7 @@
         <item name="actionModeStyle">@style/AppTheme.DarkActionMode</item>
 
     </style>
+
     <style name="TransparentActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -32,6 +33,11 @@
     <style name="AppTheme.DarkActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="background">@color/black_statusBar</item>
     </style>
+    <!-- res/values/styles.xml -->
+
+        <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
+            <item name="android:popupBackground">@drawable/popup_menu_background</item>
+        </style>
 
 
 

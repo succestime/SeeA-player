@@ -15,6 +15,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +32,7 @@ import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantMusicViewBinding
 import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
+import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity.Companion.binding
 import java.io.File
 
 class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<RecantMusic>, val isReMusic: Boolean = false,
@@ -39,6 +41,7 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
     private var newPosition = 0
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
+    private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
 
     interface MusicDeleteListener {
         fun onMusicDeleted()
@@ -75,12 +78,16 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         // Determine if the item is currently selected
         if (selectedItems.contains(position)) {
             // Set your custom selected background on the root view of the item
-            holder.root.setBackgroundResource(R.drawable.browser_selected_background)
+            holder.root.setBackgroundResource(R.drawable.video_selected_background)
         } else {
             // Reset to default background based on app theme
             holder.root.setBackgroundResource(android.R.color.transparent)
 
         }
+
+        // Hide or show the more button based on selection mode
+        holder.more.visibility = if (isSelectionModeEnabled) View.GONE else View.VISIBLE
+
         holder.root.setOnLongClickListener {
             toggleSelection(position)
             startActionMode()
@@ -91,6 +98,11 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
                 // If action mode is active, toggle selection as usual
                 toggleSelection(position)
             } else {
+                if (ReMusicPlayerActivity.isShuffleEnabled) {
+                    ReMusicPlayerActivity.isShuffleEnabled = false
+                    binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
+                    // If you need to perform any other actions when shuffle mode is disabled, add them here
+                }
                 when {
                     isReMusic -> {
                         val intent = Intent(context, ReMusicPlayerActivity::class.java)
@@ -193,9 +205,12 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
 
 
     // Start action mode for multi-select
+    @SuppressLint("NotifyDataSetChanged")
     private fun startActionMode() {
         if (actionMode == null) {
             actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
+            isSelectionModeEnabled = true // Enable selection mode
+            notifyDataSetChanged() // Update all item views to hide the "more" button
         }
         actionMode?.title = "${selectedItems.size} selected"
     }
@@ -281,6 +296,7 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
             // Clear selection and action mode
             selectedItems.clear()
             actionMode = null
+            isSelectionModeEnabled = false // Disable selection mode
             notifyDataSetChanged()
         }
     }

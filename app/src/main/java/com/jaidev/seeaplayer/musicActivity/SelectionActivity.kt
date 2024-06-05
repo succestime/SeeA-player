@@ -2,9 +2,11 @@
 package com.jaidev.seeaplayer.musicActivity
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
@@ -58,9 +60,16 @@ class SelectionActivity : AppCompatActivity() {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             selectionConstraintlayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
+
         } else {
             // Light mode is enabled, set background color to white
             selectionConstraintlayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+
         }
     }
 

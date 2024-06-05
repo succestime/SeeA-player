@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -47,7 +48,6 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         binding = ActivityHistoryBrowserBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-
         MobileAds.initialize(this){}
         loadAppOpenAd()
 
@@ -73,9 +73,14 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
         } else {
             // Light mode is enabled, set background color to white
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
         }
     }
     @SuppressLint("ClickableViewAccessibility")

@@ -86,9 +86,9 @@
                 android:paddingEnd="10dp"
                 android:text="Fast (128K)"
                 android:textColor="#FFFFFF"
-                >
+                android:drawablePadding="8dp" />
 
-            </RadioButton>
+
 
             <RadioButton
                 android:id="@+id/classic70k"
@@ -146,6 +146,7 @@
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 />
+
             <RadioButton
                 android:id="@+id/videoFast144p"
                 android:layout_width="match_parent"
@@ -213,22 +214,6 @@
         </RadioGroup>
 
 
-
-        <!--        <RadioGroup-->
-        <!--            android:id="@+id/videoGroup"-->
-        <!--            android:layout_width="0dp"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginTop="8dp"-->
-        <!--            android:layout_marginBottom="15dp"-->
-        <!--            app:layout_constraintBottom_toTopOf="@+id/constraintLayout5"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintStart_toStartOf="parent"-->
-        <!--          >-->
-
-        <!--          -->
-
-        <!--            -->
-        <!--        </RadioGroup>-->
 
         <!-- Remember Choice Switch -->
         <androidx.constraintlayout.widget.ConstraintLayout

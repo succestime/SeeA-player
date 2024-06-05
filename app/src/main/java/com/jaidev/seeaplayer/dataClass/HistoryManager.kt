@@ -12,10 +12,8 @@ object HistoryManager {
 
     fun addHistoryItem(item: HistoryItem, context: Context) {
         val historyList = getHistoryList(context).toMutableList()
-
         // Check if the item already exists in the history list based on URL
         val existingItem = historyList.find { it.url == item.url }
-
         if (existingItem != null) {
             // If the item already exists, remove it first
             historyList.remove(existingItem)
@@ -49,7 +47,6 @@ object HistoryManager {
             }
         }.sortedByDescending { it.timestamp } // Sort by timestamp in descending order (newest first)
     }
-
     private fun saveHistoryList(historyList: List<HistoryItem>, context: Context) {
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -90,16 +87,10 @@ object HistoryManager {
             saveHistoryList(historyList, context)
         }
     }
-
-
     fun clearHistory(context: Context) {
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.remove(HISTORY_PREF_KEY) // Remove the specific key storing history data
         editor.apply()
     }
-
-
-
-
 }

@@ -133,13 +133,9 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     @SuppressLint("ObsoleteSdkInt", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Clear the FLAG_FULLSCREEN flag to show the status bar
         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        // Make the status bar transparent
         window.statusBarColor = Color.BLACK
-        // Hide the action bar if you have one
         supportActionBar?.hide()
-//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -153,8 +149,6 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
-
-
 
 
         videoTitle = findViewById(R.id.videoTitle)
@@ -179,6 +173,13 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
 
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
+        // for immersive mode
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
         dialogProperties = DialogProperties()
         filePickerDialog = FilePickerDialog(this@ReVideoPlayerActivity)
         filePickerDialog.setTitle("Select a Subtitle File")

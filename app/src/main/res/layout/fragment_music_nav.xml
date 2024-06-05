@@ -26,14 +26,14 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/shuffleBtn"
+                    android:id="@+id/playandshuffleBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:contentDescription="@string/shuffle_btn"
-                    android:drawableTop="@drawable/shuffle_icon"
-                    android:text="@string/shuffle_btn"
+                    android:drawableTop="@drawable/play_icon"
+                    android:drawableTint="@color/cool_pink"                    android:text="@string/shuffle_btn"
                     android:textAllCaps="false"
                     android:textColor="?android:textColor"
                     />
@@ -100,8 +100,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="10dp"
-                    android:layout_margin="10dp"
-                    android:layout_marginStart="2dp"
+
                     android:paddingBottom="69dp"
                     android:scrollbars="vertical"
                     />

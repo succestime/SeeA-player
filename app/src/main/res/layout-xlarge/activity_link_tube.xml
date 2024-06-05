@@ -107,43 +107,69 @@
                         android:textColorHint="@color/white"
                         tools:ignore="RtlSymmetry" />
 
-                    <ImageButton
-        android:id="@+id/crossBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:src="@drawable/browser_clear"
-        android:background="@android:color/transparent"
-        android:layout_marginEnd="2dp"
-        app:tint="@color/white"
-        android:visibility="gone"
-     />
-                    <ImageButton
-                        android:id="@+id/googleMicBtn"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:src="@drawable/google_mic"
-                        android:background="@android:color/transparent"
-                        android:visibility="gone"
-                        app:tint="@color/white"
-                        android:layout_marginEnd="2dp"
-                        />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/gray"
+                            android:layout_marginEnd="2dp"/>
 
-                    <ImageButton
-                        android:id="@+id/bookMarkBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/ic_bookmark"
-                        android:background="@android:color/transparent"
-                        android:visibility="gone"
-                        app:tint="@color/white"
-                        android:layout_margin="5dp"
-                        />
+                        <ImageButton
+                            android:id="@+id/crossBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/browser_clear"
+                            android:background="@android:color/transparent"
+                            android:layout_marginEnd="2dp"
+                            app:tint="@color/white"
+                            android:visibility="gone" />
+
+
+                        <ImageButton
+                            android:id="@+id/googleMicBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/google_mic"
+                            android:background="@android:color/transparent"
+                            android:visibility="gone"
+                            app:tint="@color/white"
+                            android:layout_marginEnd="2dp" />
+
+                        <ImageButton
+                            android:id="@+id/bookMarkBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_bookmark"
+                            android:background="@android:color/transparent"
+                            android:visibility="gone"
+                            app:tint="@color/white"
+                            android:layout_margin="5dp"
+                            />
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
 
 
             </LinearLayout>
 
+            <ImageButton
+                android:id="@+id/topDownloadBrowser"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/download_browser"
+                android:visibility="gone"
+                app:tint="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
 
 
             <com.google.android.material.textview.MaterialTextView
@@ -198,11 +224,11 @@
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
-        android:layout_width="750dp"
+        android:layout_width="780dp"
         android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        app:adSize="750x70"
+        app:adSize="780x70"
         app:adUnitId="ca-app-pub-3504589383575544/9715937751"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
@@ -277,13 +303,13 @@
                 tools:ignore="RedundantDescriptionCheck" />
 
             <ImageButton
-                android:id="@+id/bottomHomeBrowser"
+                android:id="@+id/downloadBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
-                android:src="@drawable/home_browse"
+                android:src="@drawable/download_browser"
                 android:visibility="visible"
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />

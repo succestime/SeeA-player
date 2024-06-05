@@ -26,6 +26,17 @@
             android:src="@drawable/internat_browser"
             android:visibility="visible" />
 
+        <ImageButton
+            android:id="@+id/selected_complete"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/complete_svgrepo_select"
+            android:visibility="gone"
+            app:tint="#FFCF00" />
+
+
     </androidx.cardview.widget.CardView>
 
     <LinearLayout

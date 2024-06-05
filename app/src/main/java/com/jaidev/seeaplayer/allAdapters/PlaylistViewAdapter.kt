@@ -59,7 +59,7 @@ class PlaylistViewAdapter(private val context: Context, private var playlistList
             Glide.with(context)
                 .asBitmap()
                 .load(PlaylistActivity.musicPlaylist.ref[position].playlist[0].artUri)
-                .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+                .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
                 .into(holder.image)
         }
 

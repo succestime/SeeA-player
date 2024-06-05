@@ -1,6 +1,7 @@
 package com.jaidev.seeaplayer.browserActivity
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -41,9 +42,14 @@ class BookmarkActivity : AppCompatActivity() {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             allBookMarkLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
         } else {
             // Light mode is enabled, set background color to white
             allBookMarkLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
         }
     }
 

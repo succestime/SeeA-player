@@ -12,10 +12,11 @@
 <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/songImgNP"
         android:layout_width="70dp"
-        android:layout_height="50dp"
+
     android:scaleType="centerCrop"
-        android:layout_marginVertical="5dp"
-    android:layout_marginStart="5dp"
+    android:layout_height="55dp"
+    app:shapeAppearanceOverlay="@style/curved_image_nowPlaying"
+
     android:src="@drawable/music_speaker_three"/>
 
 

@@ -80,6 +80,9 @@ class MainActivity : AppCompatActivity() {
     private var mInterstitialAd: InterstitialAd? = null
     private var doubleBackToExitPressedOnce = false
     companion object {
+
+            private const val PREFS_NAME = "speed_preferences"
+
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
         lateinit var videoList: ArrayList<VideoData>
@@ -112,11 +115,16 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SuspiciousIndentation", "RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val sharedPreferences = this.getSharedPreferences("themes", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.apply()
 
+        // Clear the saved speed when the app starts
+        val sharedPreferencesMusic = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        with(sharedPreferencesMusic.edit()) {
+            clear()
+            apply()
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -294,12 +302,14 @@ private fun funRequestRuntimePermission(){
             // Dark mode is enabled, set background color to #012030
             binding.bottomNav.setBackgroundColor(resources.getColor(R.color.light_bottom_navBar))
             binding.bottomNav.itemTextColor = ContextCompat.getColorStateList(this@MainActivity, R.color.white)
-
-
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.light_bottom_navBar)
         } else {
             // Light mode is enabled, set background color to white
             binding.bottomNav.setBackgroundColor(resources.getColor(android.R.color.white))
             binding.bottomNav.itemTextColor = ContextCompat.getColorStateList(this@MainActivity, R.color.black)
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
 
         }
     }

@@ -104,9 +104,15 @@ binding.Settingslayout.setOnClickListener {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             relativeLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            activity?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), R.color.dark_cool_blue)
+
         } else {
             // Light mode is enabled, set background color to white
             relativeLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            activity?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), android.R.color.white)
+            activity?.window?.decorView?.systemUiVisibility = activity?.window?.decorView?.systemUiVisibility?.or(
+                View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            )!!
         }
     }
 

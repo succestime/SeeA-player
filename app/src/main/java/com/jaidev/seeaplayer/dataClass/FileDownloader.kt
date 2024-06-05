@@ -10,13 +10,14 @@ import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
+import java.io.File
 
 object FileDownloader {
 
     private var downloadManager: DownloadManager? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    fun downloadFile(context: Context, fileUrl: String, fileName: String) {
+    fun downloadFile(context: Context, fileUrl: String, fileName: String, websiteName: String) {
         downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
         val request = DownloadManager.Request(Uri.parse(fileUrl))
@@ -25,7 +26,10 @@ object FileDownloader {
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
             .setMimeType("image/svg+xml")  // Explicitly setting the MIME type for SVG files
-
+        // Save the website name alongside the file
+        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+        val sharedPreferences = context.getSharedPreferences("FileMetadata", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString(file.absolutePath, websiteName).apply()
         val downloadId = downloadManager?.enqueue(request)
 
         // Register a BroadcastReceiver to receive the download complete event
@@ -68,4 +72,6 @@ object FileDownloader {
         // Register the BroadcastReceiver
         context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
+
+
 }

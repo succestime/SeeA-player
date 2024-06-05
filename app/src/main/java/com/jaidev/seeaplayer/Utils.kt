@@ -60,3 +60,5 @@ fun View.gone(){
 fun View.visible(){
     visibility = View.VISIBLE
 }
+
+

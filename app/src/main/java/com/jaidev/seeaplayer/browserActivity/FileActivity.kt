@@ -94,10 +94,6 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         fileListAdapter.notifyDataSetChanged()
 
         // Additional setup and initialization...
-
-
-
-
         binding.totalFile.text = "Total Downloaded files : ${fileList.size}"
 
         selectBox(binding.monthlyBox)
@@ -115,23 +111,31 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
         } else {
             // Light mode is enabled, set background color to white
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
         }
     }
+
+
+
     private fun thread(){
         thread {
             val websiteUrl = "https://www.google.com" // Replace with the target website URL
 
-            val fileDetails = fetchFileDetailsFromWebsite(websiteUrl)
+            val fileDetailsWithWebsiteName = fetchFileDetailsFromWebsite(websiteUrl)
 
-            // Check if file details are retrieved successfully
-            if (fileDetails != null) {
-                val (fileUrl, fileName) = fileDetails
+            // Check if file details and website name are retrieved successfully
+            if (fileDetailsWithWebsiteName != null) {
+                val (fileUrl, fileName, websiteName) = fileDetailsWithWebsiteName
 
-                // Start the file download using the obtained file URL and filename
-                FileDownloader.downloadFile(this@FileActivity, fileUrl, fileName)
+                // Start the file download using the obtained file URL, filename, and website name
+                FileDownloader.downloadFile(this@FileActivity, fileUrl, fileName, websiteName)
             } else {
                 // Handle error or display a message if file details retrieval fails
             }
@@ -320,21 +324,38 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     override fun onItemClick(fileItem: FileItem) {
         when (fileItem.fileType) {
             FileType.VIDEO -> {
-                // For video file, open PlayerFileActivity
                 val videoUri = Uri.fromFile(File(fileItem.filePath)).toString()
                 openPlayerActivity(videoUri, fileItem.fileName)
             }
             FileType.AUDIO -> {
-                // Handle audio files differently, for example, play them directly using a media player
+                openFile(fileItem)
+            }
+            FileType.IMAGE -> {
+                openImageFile(fileItem)
+            }
+            FileType.MHTML-> {  // Modified case for .mhtml and unknown files
+                openMhtmlFile(fileItem)
+            }
+            FileType.UNKNOWN -> {
                 openFile(fileItem)
             }
             else -> {
-                // For other file types, open the file as usual
                 openFile(fileItem)
             }
         }
     }
-
+    private fun openMhtmlFile(fileItem: FileItem) {
+        try {
+            val intent = Intent(this, OfflineMhtmlActivity::class.java).apply {
+                putExtra("filePath", fileItem.filePath)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Log the error
+            Log.e("FileOpening", "Error opening .mhtml file: ${e.message}")
+            // Show a toast or handle the error as appropriate
+        }
+    }
     private fun openImageFile(fileItem: FileItem) {
         try {
             val intent = Intent(this, ImageViewerActivity::class.java).apply {
@@ -349,36 +370,38 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     }
     private fun openFile(fileItem: FileItem) {
         try {
-            if (fileItem.fileType == FileType.VIDEO) {
-                // For video files, open directly in the video player activity
-                val videoUri = Uri.fromFile(File(fileItem.filePath)).toString()
-                openPlayerActivity(videoUri, fileItem.fileName)
-            } else if (fileItem.fileType == FileType.IMAGE) {
-                // For image files, open directly in the image viewer activity
-                openImageFile(fileItem)
-            } else {
-                // For other file types, use default handling
-                val file = File(fileItem.filePath)
-                val fileUri = FileProvider.getUriForFile(
-                    this,
-                    "${packageName}.provider",
-                    file
-                )
-                val intent = Intent().apply {
-                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    action = Intent.ACTION_VIEW
-                    setDataAndType(fileUri, getMimeType(fileItem.filePath))
+            when (fileItem.fileType) {
+                FileType.VIDEO -> {
+                    val videoUri = Uri.fromFile(File(fileItem.filePath)).toString()
+                    openPlayerActivity(videoUri, fileItem.fileName)
+                }
+                FileType.IMAGE -> {
+                    openImageFile(fileItem)
                 }
 
-                // Check if there's any app that can handle this intent
-                val activities = packageManager.queryIntentActivities(intent, 0)
-                val isIntentSafe = activities.isNotEmpty()
+                else -> {
+                    val file = File(fileItem.filePath)
+                    val fileUri = FileProvider.getUriForFile(
+                        this,
+                        "${packageName}.provider",
+                        file
+                    )
+                    val intent = Intent().apply {
+                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        action = Intent.ACTION_VIEW
+                        setDataAndType(fileUri, getMimeType(fileItem.filePath))
+                    }
 
-                if (isIntentSafe) {
-                    startActivity(intent)
-                } else {
-                    // Handle case where no app can handle the file type
-                    // You can implement your custom handling here, such as showing a toast message
+                    // Check if there's any app that can handle this intent
+                    val activities = packageManager.queryIntentActivities(intent, 0)
+                    val isIntentSafe = activities.isNotEmpty()
+
+                    if (isIntentSafe) {
+                        startActivity(intent)
+                    } else {
+                        // Handle case where no app can handle the file type
+                        // You can implement your custom handling here, such as showing a toast message
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -388,37 +411,20 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         }
     }
 
-
-
-
-
-
-
-//    private fun startDownload(context: Context, url: String, fileName: String, fileExtension: String?, mimeType: String?) {
-//        val request = DownloadManager.Request(Uri.parse(url))
-//            .setTitle(fileName)
-//            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$fileName.$fileExtension")
-//            .setMimeType(mimeType ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension))
-//
-//        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-//        downloadManager.enqueue(request)
-//    }
-
-
     @SuppressLint("DefaultLocale")
     private fun getMimeType(filePath: String): String? {
         val extension = filePath.substringAfterLast('.', "")
         return when (extension.toLowerCase()) {
-            "pdf", "pdfa", "pdfxml", "fdf", "xfdf", "pdfx", "pdp" , "PPT", "pptx"-> "application/pdf"
-            "jpg", "jpeg", "png", "gif", "svg" , "webp" -> "image/*"
+            "pdf", "pdfa", "pdfxml", "fdf", "xfdf", "pdfx", "pdp", "ppt", "pptx" -> "application/pdf"
+            "jpg", "jpeg", "png", "gif", "svg", "webp" -> "image/*"
             "mp4", "3gp", "mkv", "webm" -> "video/*"
             "mp3", "wav", "ogg" -> "audio/*"
             "apk", "zip" -> "application/vnd.android.package-archive"
             "html", "htm" -> "text/html"
+            "mhtml", "mht" -> "multipart/related"  // MIME type for .mhtml files
             else -> null
         }
     }
-
 
 
     private fun toggleSelection(box: View) {
@@ -443,13 +449,12 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
                 }
                 binding.biennialBox -> {
                     // Filter and show only APK files
-                    val apkFiles = fileItems.filter { it.fileType == FileType.APK || it.fileType == FileType.WEBSITE || it.fileType == FileType.PDF }
+                    val apkFiles = fileItems.filter { it.fileType == FileType.APK || it.fileType == FileType.WEBSITE || it.fileType == FileType.PDF || it.fileType == FileType.MHTML || it.fileType == FileType.UNKNOWN}
                     fileListAdapter.filterList(apkFiles)
                 }
                 binding.monthlyBox -> {
                     fileListAdapter.filterList(fileItems)
                 }
-
                 else -> {
                     // Show all files when no specific box is selected (monthlyBox)
                     fileListAdapter.filterList(fileItems)
@@ -476,6 +481,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
     private fun retrieveDownloadedFiles(): List<FileItem> {
         val downloadedFiles = ArrayList<FileItem>()
+        val sharedPreferences = getSharedPreferences("FileMetadata", Context.MODE_PRIVATE)
+
         // Get the path to the Downloads directory
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         if (downloadsDir != null && downloadsDir.exists() && downloadsDir.isDirectory) {
@@ -494,7 +501,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
                         val artUri = file.toUri()
                         val lastModifiedTimestamp =file.lastModified() // Get last modified timestamp
                         val fileNewName = file.name
-                        val websiteName = "example.com" // Name of the website where the video was downloaded from
+                        val websiteName = sharedPreferences.getString(file.absolutePath, "unknown")
 
 
 
@@ -522,17 +529,18 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     }
     private fun getFileType(fileExtension: String): FileType {
         return when (fileExtension) {
-            "pdf" ,"pdfa", "pdfxml", "fdf", "xfdf", "pdfx", "pdp" , "PPT" ,"pptx" -> FileType.PDF
-            "jpg", "jpeg", "png", "gif" , "svg" ,"webp" -> FileType.IMAGE
+            "pdf", "pdfa", "pdfxml", "fdf", "xfdf", "pdfx", "pdp", "ppt", "pptx" -> FileType.PDF
+            "jpg", "jpeg", "png", "gif", "svg", "webp" -> FileType.IMAGE
             "mp4", "3gp", "mkv", "webm" -> FileType.VIDEO
-            "mp3", "wav", "ogg"  -> FileType.AUDIO
-            "apk","zip" -> FileType.APK
+            "mp3", "wav", "ogg" -> FileType.AUDIO
+            "apk", "zip" -> FileType.APK
             "html", "htm" -> FileType.WEBSITE
+            "mhtml", "mht" -> FileType.MHTML  // Add this line
             else -> FileType.UNKNOWN
         }
     }
 
-    private fun fetchFileDetailsFromWebsite(url: String): Pair<String, String>? {
+    private fun fetchFileDetailsFromWebsite(url: String): Triple<String, String, String>? {
         try {
             // Fetch the webpage content using Jsoup
             val doc: Document = Jsoup.connect(url).get()
@@ -540,31 +548,42 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             // Extract the file URL and filename from the webpage content based on file type
             val fileUrl: String
             val fileName: String
+            val websiteName: String
+
+            // Fetch the website name
+            websiteName = doc.title()
 
             // Check if the webpage contains a PDF file link
             if (doc.select("a[href$=.pdf], a[href$=.pdfa], a[href$=.pdfxml], a[href$=.fdf], a[href$=.xfdf], a[href$=.pdfx], a[href$=.pdp] , a[href$=.PPT], a[href$=.pptx]").isNotEmpty()) {
                 fileUrl = doc.select("a[href$=.pdf], a[href$=.pdfa], a[href$=.pdfxml], a[href$=.fdf], a[href$=.xfdf], a[href$=.pdfx], a[href$=.pdp], a[href$=.PPT], a[href$=.pptx] ").attr("href")
                 fileName = fileUrl.substringAfterLast('/')
-                return Pair(fileUrl, fileName)
+                return Triple(fileUrl, fileName, websiteName)
             }
 
             // Check if the webpage contains a video file link (e.g., MP4)
             if (doc.select("a[href$=.mp4]").isNotEmpty()) {
                 fileUrl = doc.select("a[href$=.mp4]").attr("href")
                 fileName = fileUrl.substringAfterLast('/')
-                return Pair(fileUrl, fileName)
+                return Triple(fileUrl, fileName, websiteName)
+            }
+
+            // Check if the webpage contains a video file link (e.g., MP4)
+            if (doc.select("a[href$=.mhtml], a[href$=.mht]").isNotEmpty()) {
+                fileUrl = doc.select("a[href$=.mhtml], a[href$=.mht]").attr("href")
+                fileName = fileUrl.substringAfterLast('/')
+                return Triple(fileUrl, fileName, websiteName)
             }
 
             // Check if the webpage contains an image file link (e.g., JPG, PNG)
             if (doc.select("a[href$=.jpg], a[href$=.jpeg], a[href$=.png] , a[href$=.svg] , a[href$=.webp]" ).isNotEmpty()) {
                 fileUrl = doc.select("a[href$=.jpg], a[href$=.jpeg], a[href$=.png]  , a[href$=.svg]  a[href$=.webp] , " ).attr("href")
                 fileName = fileUrl.substringAfterLast('/')
-                return Pair(fileUrl, fileName)
+                return Triple(fileUrl, fileName, websiteName)
             }
             if (doc.select("a[href$=.mp3], a[href$=.wav], a[href$=.ogg]").isNotEmpty()) {
                 fileUrl = doc.select("a[href$=.mp3], a[href$=.wav], a[href$=.ogg]").attr("href")
                 fileName = fileUrl.substringAfterLast('/')
-                return Pair(fileUrl, fileName)
+                return Triple(fileUrl, fileName, websiteName)
             }
 
             return null

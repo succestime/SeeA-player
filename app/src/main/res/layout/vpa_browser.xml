@@ -22,12 +22,20 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:src="@drawable/pdf_image"
             android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/pdf_image"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
+        <ImageButton
+            android:id="@+id/selected_complete"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/complete_svgrepo_select"
+            android:visibility="gone"
+            app:tint="#FFCF00" />
     </androidx.cardview.widget.CardView>
 
     <LinearLayout

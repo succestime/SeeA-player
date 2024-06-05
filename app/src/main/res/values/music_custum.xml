@@ -3,4 +3,16 @@
     <style name="curved">
         <item name="cornerSize">20%</item>
     </style>
+    <style name="curved_2">
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="curved_image_video">
+        <item name="cornerSize">10%</item>
+    </style>
+    <style name="curved_image_nowPlaying">
+        <item name="cornerSize">5%</item>
+    </style>
+    <style name="curved_image_nowPlaying_2">
+        <item name="cornerSize">3%</item>
+    </style>
 </resources>

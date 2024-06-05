@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" /> <!-- permission for android 13 -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -21,6 +21,7 @@
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:name=".ApplicationClass"
@@ -37,12 +38,21 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".browserActivity.OfflineMhtmlActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".TransparentActivity"
-            android:theme="@style/TransparentActivityTheme"
             android:exported="true"
+            android:label="SeeA Download"
             android:launchMode="singleInstance"
             android:taskAffinity=""
-            android:label="SeeA Download">
+            android:theme="@style/TransparentActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -51,19 +61,20 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".DownloadVMActivity"
             android:exported="true"
             android:label="SeeA Download">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.SEND" />-->
 
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.SEND" /> -->
 
-<!--                <data android:mimeType="text/plain" />-->
-<!--            </intent-filter>-->
+
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+
+
+            <!-- <data android:mimeType="text/plain" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".DownloadsActivity"

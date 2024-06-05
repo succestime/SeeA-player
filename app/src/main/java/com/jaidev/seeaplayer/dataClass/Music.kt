@@ -20,6 +20,7 @@ data class Music(val id : String, var title : String, val album : String,val art
                  , var artUri : Uri, val albumId : String
 ) {
 
+
 }
 
 

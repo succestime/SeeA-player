@@ -12,7 +12,6 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.print.PrintAttributes
 import android.print.PrintJob
 import android.print.PrintManager
@@ -25,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ShareCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -72,13 +72,15 @@ import java.util.Calendar
 import java.util.Locale
 
 class LinkTubeActivity : AppCompatActivity() {
-    lateinit var binding: ActivityLinkTubeBinding
+
     private var printJob : PrintJob? = null
     // Assuming 'this' is a valid Context from an Activity or Fragment
     lateinit var mAdView: AdView
     private var mInterstitialAd : InterstitialAd? = null
     private var rewardedInterstitialAd : RewardedInterstitialAd? = null
     private var tempText: CharSequence? = null
+    @SuppressLint("StaticFieldLeak")
+    lateinit var binding: ActivityLinkTubeBinding
     companion object {
         var tabsList: ArrayList<Tab> = ArrayList()
         private var isFullscreen: Boolean = true
@@ -117,6 +119,7 @@ class LinkTubeActivity : AppCompatActivity() {
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
 
+        setSwipeRefreshBackgroundColor()
 
         tabsList.add(Tab("Home",HomeFragment(), LinkTubeActivity()))
         binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
@@ -125,9 +128,6 @@ class LinkTubeActivity : AppCompatActivity() {
         tabsBtn = binding.tabBtn
 
         changeFullscreen(enable = true)
-
-
-
 
     }
 
@@ -272,9 +272,11 @@ class LinkTubeActivity : AppCompatActivity() {
         if (isTablet) {
             binding.backBrowserBtn.visibility = View.VISIBLE
             binding.forwardBrowserBtn.visibility = View.VISIBLE
+            binding.topDownloadBrowser.visibility = View.VISIBLE
         } else {
             binding.backBrowserBtn.visibility = View.GONE
             binding.forwardBrowserBtn.visibility = View.GONE
+            binding.topDownloadBrowser.visibility = View.GONE
         }
     }
 
@@ -321,7 +323,8 @@ class LinkTubeActivity : AppCompatActivity() {
                 }
 
             }
-
+            frag.binding.webView.reload()
+            frag.binding.swipeRefreshBrowser.isRefreshing = false
         }
 
     }
@@ -411,30 +414,26 @@ class LinkTubeActivity : AppCompatActivity() {
 
  }
 
-    private fun share(){
+    private fun share() {
         var frag: BrowseFragment? = null
         try {
-            frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
-        } catch (_: Exception) {
+            frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        val message = Handler().obtainMessage()
-        frag?.binding?.webView?.requestFocusNodeHref(message)
-        val url = message.data.getString("url")
+        val url = frag?.binding?.webView?.url
 
-        if (url != null) {
+        if (url != null && url.isNotEmpty()) {
+            // If URL is present, share the URL
             ShareCompat.IntentBuilder(this@LinkTubeActivity)
                 .setChooserTitle("Share URL")
                 .setType("text/plain")
                 .setText(url)
                 .startChooser()
         } else {
-            Snackbar.make(
-                binding.root,
-                "No URL available to share",
-                Snackbar.LENGTH_SHORT
-            ).show()
+            // If URL is not present, notify the user
+            Toast.makeText(this@LinkTubeActivity, "URL not found", Toast.LENGTH_SHORT).show()
         }
-
     }
 
     @SuppressLint("ResourceAsColor")
@@ -604,13 +603,30 @@ class LinkTubeActivity : AppCompatActivity() {
     }
 
 
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
 
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.link_tube_tab_color)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+
+
+        } else {
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.link_tube_tab_color)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+
+        }
+    }
     private fun initializeView() {
 
         binding.homeBrowserBtn.setOnClickListener {
             changeTab("Home", HomeFragment())
         }
-        binding.bottomHomeBrowser.setOnClickListener {
+        binding.downloadBrowser.setOnClickListener {
             changeTab("Home", HomeFragment())
         }
         binding.bottomMediaBrowser.setOnClickListener {

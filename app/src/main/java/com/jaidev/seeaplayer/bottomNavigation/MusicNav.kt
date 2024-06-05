@@ -19,6 +19,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -49,7 +50,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    @SuppressLint("SetTextI18n", "MissingInflatedId", "NotifyDataSetChanged")
+    @SuppressLint("SetTextI18n", "MissingInflatedId", "NotifyDataSetChanged", "ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -79,12 +80,41 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
             binding.musicemptyStateLayout.visibility = View.GONE
         }
 
-        binding.shuffleBtn.setOnClickListener {
-            val intent = Intent(requireContext() , PlayerMusicActivity::class.java)
-            intent.putExtra("index" , 0)
-            intent.putExtra("class" , "MusicNav")
-            startActivity(intent)
+        binding.playandshuffleBtn.setOnClickListener { view ->
+            val popupMenu = PopupMenu(requireContext(), view, 0, 0, R.style.CustomPopupMenu)
+            popupMenu.inflate(R.menu.play_shuffle_menu)
+            // Set icons to be visible
+            try {
+                val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+                fieldPopup.isAccessible = true
+                val popup = fieldPopup.get(popupMenu)
+                popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                    .invoke(popup, true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_play -> {
+                        val intent = Intent(requireContext() , PlayerMusicActivity::class.java)
+                        intent.putExtra("index" , 0)
+                        intent.putExtra("class" , "MusicNav2")
+                        startActivity(intent)
+                        true
+                    }
+                    R.id.action_shuffle -> {
+                        val intent = Intent(requireContext() , PlayerMusicActivity::class.java)
+                        intent.putExtra("index" , 0)
+                        intent.putExtra("class" , "MusicNav")
+                        startActivity(intent)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
         }
+
 
 
         binding.favouriteBtn.setOnClickListener {
@@ -102,7 +132,22 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
 
         return view
     }
+    // In musicNav fragment or a suitable place
+    private fun playMusicInSequence() {
+        if (MusicListMA.isNotEmpty()) {
+            // Start playing the first song
+            playMusicAtIndex(0)
+        }
+    }
 
+    private fun playMusicAtIndex(index: Int) {
+        if (index < MusicListMA.size) {
+            val intent = Intent(requireContext(), PlayerMusicActivity::class.java)
+            intent.putExtra("index", index)
+            intent.putExtra("class", "MusicNav")
+            startActivity(intent)
+        }
+    }
 
     @SuppressLint("SetTextI18n")
     private fun checkForNewMusic() {
@@ -130,9 +175,11 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+
         } else {
             // Light mode is enabled, set background color to white
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+
         }
     }
     private fun requestRuntimePermission(): Boolean {

@@ -14,7 +14,8 @@
     <color name="textColor">#fff</color>
     <color name="titleColor">#fff</color>
     <color name="transparent">#00000000</color>
-
+    <color name="place_holder_video">#252424</color>
+    <color name="primaryIconColor">#FF000000</color> <!-- Example color -->
     <color name="colorPrimary">#1b272c</color>
     <color name="dialog_custom_color">#3C3A3A</color>
     <color name="cool_pink">#E91E63</color>
@@ -47,6 +48,7 @@
     <color name="light_statusBar">#8ACDF3</color> <!-- Change this to your desired green color -->
     <color name="light_navBar">#C4E2F3</color> <!-- Change this to your desired green color -->
     <color name="light_bottom_navBar">#012437</color> <!-- Change this to your desired green color -->
+    <color name="link_tube_tab_color">#373636</color> <!-- Change this to your desired green color -->
 
 
     <color name="icon_light_color">#000000</color> <!-- Black color for light mode -->

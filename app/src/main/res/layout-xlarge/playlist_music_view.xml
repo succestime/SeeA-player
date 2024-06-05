@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_height="70dp"
-    android:layout_marginTop="3dp"
+    android:layout_height="65dp"
     android:id="@+id/multyLayout"
     android:clickable="true"
     android:focusable="true"
+    android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,22 +16,20 @@
         android:layout_height="wrap_content"
         >
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/playlistImage"
-                android:layout_width="100dp"
-                android:layout_height="70dp"
-                android:src="@mipmap/ic_logo_o"
-                app:shapeAppearanceOverlay="@style/curved"
-                android:scaleType="centerCrop"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
 
-                app:layout_constraintVertical_bias="0.455"/>
-
-
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/playlistImage"
+            android:layout_width="100dp"
+            android:layout_height="55dp"
+            app:shapeAppearanceOverlay="@style/curved_image_video"
+            android:scaleType="centerCrop"
+            android:background="@color/black"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.455"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -39,7 +37,7 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="55dp"
         android:layout_weight="1"
         android:paddingHorizontal="2dp"
         android:gravity="center_vertical"
@@ -56,15 +54,15 @@
             android:maxLines="1"
             android:layout_gravity="center_vertical"/>
 
-<!--        <TextView-->
-<!--            android:id="@+id/totalVideosDuration"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textColor="@color/cool_blue"-->
-<!--            android:textStyle="bold"-->
-<!--            android:layout_marginTop="1dp"-->
-<!--            android:layout_marginStart="5dp"-->
-<!--            android:text="0 videos"/>-->
+        <!--        <TextView-->
+        <!--            android:id="@+id/totalVideosDuration"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:textColor="@color/cool_blue"-->
+        <!--            android:textStyle="bold"-->
+        <!--            android:layout_marginTop="1dp"-->
+        <!--            android:layout_marginStart="5dp"-->
+        <!--            android:text="0 videos"/>-->
     </LinearLayout>
 
 

@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.FavouriteAdapter
 import com.jaidev.seeaplayer.dataClass.Music
@@ -90,9 +89,14 @@ class FavouriteActivity : AppCompatActivity() {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             favouritelayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
         } else {
             // Light mode is enabled, set background color to white
             favouritelayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
         }
     }
 
@@ -165,13 +169,6 @@ class FavouriteActivity : AppCompatActivity() {
             saveFavouriteSongs()
             loadFavouriteSongs()
         }
-
-            binding.shuffleBtnFA.setOnClickListener {
-                val intent = Intent(this, PlayerActivity::class.java)
-                intent.putExtra("index", 0)
-                intent.putExtra("class", "FavouriteShuffle")
-                startActivity(intent)
-            }
 
     }
     private fun saveFavouriteSongs() {

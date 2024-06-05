@@ -37,8 +37,6 @@ import android.webkit.DownloadListener
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -70,6 +68,9 @@ import com.jaidev.seeaplayer.dataClass.SearchTitle
 import com.jaidev.seeaplayer.dataClass.SearchTitleStore
 import com.jaidev.seeaplayer.databinding.FragmentBrowseBinding
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.UnsupportedEncodingException
+import java.net.URLDecoder
 
 
 class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener, HistoryAdapter.ItemClickListener {
@@ -81,7 +82,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     private var isLoadingPage = false // Add this variabl
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
-
     }
 
     interface DownloadListener {
@@ -93,8 +93,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         )
 
     }
-
-
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,27 +104,17 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         registerForContextMenu(binding.webView)
 
         binding.webView.apply {
-            // Check if the URL is valid or contains ".com"
-            when {
-                URLUtil.isValidUrl(urlNew) || urlNew.contains(".com", ignoreCase = true) -> {
-                    loadUrl(urlNew)
-                }
-                else -> {
-                    // If not valid, load a default search page with the query
-                    loadUrl("https://www.google.com/search?q=$urlNew")
-                }
+            when{
+                URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
+                urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
+                else -> loadUrl("https://www.google.com/search?q=$urlNew")
             }
 
-            // Enable JavaScript and other settings
             settings.javaScriptEnabled = true
-            settings.javaScriptCanOpenWindowsAutomatically = true
+            settings.setSupportZoom(true)
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
-            settings.setSupportZoom(true)
         }
-
-// Print the URL to logcat for verification
-        Log.d("WebViewURL", "URL to load: $urlNew")
 
         val rootView = view.rootView
 
@@ -146,24 +134,29 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
     }
 
+    private fun decodeUrl(url: String): String {
+        return try {
+            URLDecoder.decode(url, "UTF-8")
+        } catch (e: UnsupportedEncodingException) {
+            url // Return the original URL if decoding fails
+        }
+    }
+
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "ObsoleteSdkInt",
         "RestrictedApi"
     )
     override fun onResume() {
         super.onResume()
         registerDownloadReceiver()
-        binding.webView.apply {
-            // Enable JavaScript
-            settings.javaScriptEnabled = true
-            settings.javaScriptCanOpenWindowsAutomatically = true
-            settings.builtInZoomControls = true
-            settings.displayZoomControls = false
-            settings.setSupportZoom(true)
-        }
         tabsList[myPager.currentItem].name =
             binding.webView.url.toString()
         LinkTubeActivity.tabsBtn.text = tabsList.size.toString()
-
+        binding.webView.apply {
+            settings.javaScriptEnabled = true
+            settings.setSupportZoom(true)
+            settings.builtInZoomControls = true
+            settings.displayZoomControls = false
+        }
         binding.webView.setDownloadListener { url, _, _, mimeType, _ ->
             // Determine the file extension based on MIME type
             val fileExtension = when {
@@ -221,8 +214,9 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                 binding.recyclerviewLayout.visibility = View.VISIBLE
             }
         }
-
-
+        linkRef.binding.downloadBrowser.setOnClickListener {
+            initiateDownloadForCurrentPage()
+        }
 
 // Before loading the webpage, check for network connectivity
         if (checkForInternet(requireContext())) {
@@ -297,29 +291,17 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         }
 
 
-binding.swipeRefreshBrowser.setOnRefreshListener {
-    binding.webView.reload()
-    binding.swipeRefreshBrowser.isRefreshing = false
-}
-
-
-
+        binding.swipeRefreshBrowser.setOnRefreshListener {
+            binding.webView.reload()
+            binding.swipeRefreshBrowser.isRefreshing = false
+        }
 
         binding.webView.apply {
-
-
+            settings.javaScriptEnabled = true
+            settings.setSupportZoom(true)
+            settings.builtInZoomControls = true
+            settings.displayZoomControls = false
             webViewClient = object : WebViewClient() {
-
-                // Inside your WebViewClient implementation
-                override fun onReceivedError(
-                    view: WebView?,
-                    request: WebResourceRequest?,
-                    error: WebResourceError?
-                ) {
-                    // Handle the error, e.g., display an error message or load a default page.
-                    // For example:
-                    view?.loadUrl("about:blank") // Load a blank page
-                }
 
                 override fun onLoadResource(view: WebView?, url: String?) {
                     super.onLoadResource(view, url)
@@ -332,8 +314,8 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                     isReload: Boolean
                 ) {
                     super.doUpdateVisitedHistory(view, url, isReload)
-                    linkRef.binding.btnTextUrl.text = SpannableStringBuilder(url)
-                    tabsList[LinkTubeActivity.myPager.currentItem].name =
+                    linkRef.binding.btnTextUrl.text = SpannableStringBuilder(url?.let { decodeUrl(it) })
+                    tabsList[myPager.currentItem].name =
                         url.toString()
                 }
 
@@ -356,7 +338,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                     val timestamp = System.currentTimeMillis()
                     val historyItem = HistoryItem(url ?: "", websiteTitle, timestamp, favicon)
                     // Add history item to the HistoryManager
-                HistoryManager.addHistoryItem(historyItem, requireContext())
+                    HistoryManager.addHistoryItem(historyItem, requireContext())
                     // Update searchHintTitleRecyclerView here
                     updateSearchHintTitleRecyclerView()
                 }
@@ -400,22 +382,47 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                     super.onProgressChanged(view, newProgress)
                     linkRef.binding.progressBar.progress = newProgress
                 }
-
             }
-
             binding.webView.setOnTouchListener { _, motionEvent ->
                 linkRef.binding.root.onTouchEvent(motionEvent)
                 return@setOnTouchListener false
             }
-
         }
+    }
+    private fun downloadCurrentWebPage(url: String) {
+        // Sanitize the title to create a valid filename from urlNew
+        val sanitizedTitle = urlNew
+        // Add a .mht extension
+        val fileName = "${sanitizedTitle}- SeeA LinkTube.mhtml"
+        val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(destinationDir, fileName)
+        // Save the webpage to the file
+        binding.webView.saveWebArchive(file.absolutePath, false) { savedFile ->
+            if (savedFile != null) {
+                Toast.makeText(requireContext(), "Page saved as $fileName", Toast.LENGTH_SHORT).show()
+                Log.d("Downloaded URL", url)
+            } else {
+                Toast.makeText(requireContext(), "Failed to save page", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
-
-
+    // Call this function when the user initiates the download
+    private fun initiateDownloadForCurrentPage() {
+        // Get the current URL from the WebView
+        val currentUrl = binding.webView.url
+        if (currentUrl != null) {
+            downloadCurrentWebPage(currentUrl)
+        } else {
+            Toast.makeText(requireContext(), "Failed to get current URL", Toast.LENGTH_SHORT).show()
+        }
     }
 
 
+
     private fun performSearch(query: String) {
+        val linkRef = requireActivity() as LinkTubeActivity
+
         if (checkForInternet(requireContext())) {
             // Check if the title is already saved
             val isTitleSaved = SearchTitleStore.getTitles(requireContext()).any { it.title == query }
@@ -424,9 +431,8 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
                 // Create a SearchTitle object with the query and save it
                 val searchTitle = SearchTitle(query)
                 SearchTitleStore.addTitle(requireContext(), searchTitle)
-
             }
-
+            linkRef.binding.btnTextUrl.setText(decodeUrl(query)) // Set the decoded URL
             changeTab(query, BrowseFragment(query))
         } else {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
@@ -504,7 +510,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
             "mp3" -> FileType.AUDIO
             "html" -> FileType.WEBSITE
             "apk" -> FileType.APK
-            else -> FileType.UNKNOWN
+                        else -> FileType.UNKNOWN
         }
     }
 
@@ -517,6 +523,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
             FileType.AUDIO -> R.drawable.music_download_browser
             FileType.APK -> R.drawable.pdf_image
             FileType.WEBSITE -> R.drawable.pdf_image
+            FileType.MHTML -> R.drawable.pdf_image
             else -> R.drawable.image_browser
         }
     }
@@ -556,7 +563,6 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
     override fun onPause() {
         super.onPause()
         unregisterDownloadReceiver()
-      binding.recyclerviewLayout.visibility = View.GONE
         (requireActivity() as LinkTubeActivity).saveBookmarks()
         // for clearing all  webView data
 //        binding.webView.apply {
@@ -747,7 +753,7 @@ binding.swipeRefreshBrowser.setOnRefreshListener {
         changeTab("Brave", browserFragment)
     }
 
- fun onBackPressed(): Boolean {
+    fun onBackPressed(): Boolean {
         val webView = binding.webView
         return if (isLoadingPage) {
             true // Back press handled within the fragment

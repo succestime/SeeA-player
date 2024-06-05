@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
@@ -29,13 +30,10 @@ class ImageViewerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         // Enable up button in ActionBar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         // Retrieve the image path from Intent extras
         imagePath = intent.getStringExtra("imagePath")
-
         // Set the ActionBar title to the image name
         imagePath?.let {
             val fileName = File(it).name
@@ -87,9 +85,14 @@ class ImageViewerActivity : AppCompatActivity() {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
         } else {
             // Light mode is enabled, set background color to white
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
         }
     }
 
@@ -255,7 +258,7 @@ class ImageViewerActivity : AppCompatActivity() {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         this@ImageViewerActivity,
-                        R.drawable.background_actionbar_light
+                        R.color.light_statusBar
                     )
                 )
             }
@@ -265,7 +268,7 @@ class ImageViewerActivity : AppCompatActivity() {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         this@ImageViewerActivity,
-                        R.drawable.background_actionbar
+                        R.color.black_statusBar
                     )
                 )
             }
@@ -282,7 +285,7 @@ class ImageViewerActivity : AppCompatActivity() {
                     setBackgroundDrawable(
                         ContextCompat.getDrawable(
                             this@ImageViewerActivity,
-                            R.drawable.background_actionbar
+                            R.color.black_statusBar
                         )
                     )
                 }
@@ -292,7 +295,7 @@ class ImageViewerActivity : AppCompatActivity() {
                     setBackgroundDrawable(
                         ContextCompat.getDrawable(
                             this@ImageViewerActivity,
-                            R.drawable.background_actionbar_light
+                            R.color.light_statusBar
                         )
                     )
                 }

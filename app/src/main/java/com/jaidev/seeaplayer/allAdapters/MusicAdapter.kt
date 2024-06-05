@@ -42,6 +42,7 @@ import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.binding
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
 import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import java.io.File
@@ -53,8 +54,10 @@ class MusicAdapter(
     private var playlistDetails: Boolean = false,
     private val isMusic: Boolean = false,
     val selectionActivity: Boolean = false
+
 )
     : RecyclerView.Adapter<MusicAdapter.MyAdapter>() {
+    private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
 
     private var newPosition = 0
     private lateinit var dialogRF: AlertDialog
@@ -93,9 +96,8 @@ class MusicAdapter(
         val album = binding.songAlbum
         val image = binding.musicViewImage
         val root = binding.root
-        val more = binding.MoreChoose2
+        val more = binding.MoreChoose
         val playlstM = binding.playlistChoose2
-        val button = binding.multiIcon
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter {
@@ -113,10 +115,9 @@ class MusicAdapter(
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(holder.image)
 
-
         if (selectedItems.contains(position)) {
             // Set your custom selected background on the root view of the item
-            holder.root.setBackgroundResource(R.drawable.browser_selected_background)
+            holder.root.setBackgroundResource(R.drawable.video_selected_background)
         } else {
             holder.root.setBackgroundResource(android.R.color.transparent)
         }
@@ -126,13 +127,12 @@ class MusicAdapter(
             holder.playlstM.visibility = View.GONE // Hide the more view in selection activity
 
             holder.root.setOnClickListener {
-                // Toggle selection of the item on single click
                 toggleSelection(position)
             }
         } else {
-            holder.more.visibility = View.VISIBLE // Show the more view when not in selection activity
+            // Hide or show the more button based on selection mode
+            holder.more.visibility = if (isSelectionModeEnabled) View.GONE else View.VISIBLE
             holder.playlstM.visibility = View.GONE // Show the more view when not in selection activity
-
             holder.root.setOnLongClickListener {
                 // Start selection mode on long click
                 toggleSelection(position)
@@ -146,7 +146,11 @@ class MusicAdapter(
                 // If action mode is active, toggle selection as usual
                 toggleSelection(position)
             } else {
-
+                if (PlayerMusicActivity.isShuffleEnabled) {
+                    PlayerMusicActivity.isShuffleEnabled = false
+                    binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
+                    // If you need to perform any other actions when shuffle mode is disabled, add them here
+                }
                 when {
                     MainActivity.search -> sendIntent(
                         ref = "MusicAdapterSearch",
@@ -170,8 +174,20 @@ class MusicAdapter(
 
         when {
             playlistDetails -> {
+
                 holder.root.setOnClickListener {
-                    sendIntent(ref = "PlaylistDetailsAdapter", pos = position)
+                    if (actionMode != null) {
+                        // If action mode is active, toggle selection as usual
+                        toggleSelection(position)
+                    }else {
+                        sendIntent(ref = "PlaylistDetailsAdapter", pos = position)
+                    }
+                }
+                holder.root.setOnLongClickListener {
+                    // Start selection mode on long click
+                    toggleSelection(position)
+                    startActionMode()
+                    true
                 }
                 holder.playlstM.visibility = View.VISIBLE // Show the more view when not in selection activity
                 holder.more.visibility = View.GONE // Show the more view when not in selection activity
@@ -196,7 +212,7 @@ class MusicAdapter(
             selectionActivity ->{
                 holder.root.setOnClickListener {
                     if(addSong(musicList[position]))
-                        holder.root.setBackgroundResource(R.drawable.browser_selected_background)
+                        holder.root.setBackgroundResource(R.drawable.video_selected_background)
                     else
                         holder.root.setBackgroundResource(android.R.color.transparent)
 
@@ -386,9 +402,12 @@ class MusicAdapter(
 
 
     // Start action mode for multi-select
+    @SuppressLint("NotifyDataSetChanged")
     private fun startActionMode() {
         if (actionMode == null) {
             actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
+            isSelectionModeEnabled = true // Enable selection mode
+            notifyDataSetChanged() // Update all item views to hide the "more" button
         }
         actionMode?.title = "${selectedItems.size} selected"
     }
@@ -415,8 +434,7 @@ class MusicAdapter(
             val actionMode = mode
             when (item?.itemId) {
                 R.id.renameMulti -> {
-
-                  // Call the showRenameDialog method here
+                    // Call the showRenameDialog method here
                     if (selectedItems.size == 1) {
                         val selectedPosition = selectedItems.first()
                         val defaultName = musicList[selectedPosition].title
@@ -437,9 +455,15 @@ class MusicAdapter(
                 R.id.deleteMulti -> {
                     if (selectedItems.isNotEmpty()) {
                         // Build confirmation dialog
+                        val message = if (playlistDetails) {
+                            "Are you sure you want to delete these ${selectedItems.size} selected musics? This will permanently delete them."
+                        } else {
+                            "Are you sure you want to delete these ${selectedItems.size} selected musics?"
+                        }
+
                         AlertDialog.Builder(context)
                             .setTitle("Confirm Delete")
-                            .setMessage("Are you sure you want to delete these ${selectedItems.size} selected musics?")
+                            .setMessage(message)
                             .setPositiveButton("Delete") { _, _ ->
                                 // User clicked Delete, proceed with deletion
                                 val positionsToDelete = ArrayList(selectedItems)
@@ -458,21 +482,16 @@ class MusicAdapter(
                                 selectedItems.clear()
                                 mode?.finish()
                                 notifyDataSetChanged()
-                                // Dismiss action mode
-                                actionMode?.finish()
+                                musicDeleteListener?.onMusicDeleted()
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
-                                // User clicked Cancel, dismiss dialog
                                 dialog.dismiss()
                             }
                             .show()
-
                     }
                     return true
-
                 }
                 // Add more action mode items as needed
-
             }
             return false
         }
@@ -482,6 +501,7 @@ class MusicAdapter(
             // Clear selection and action mode
             selectedItems.clear()
             actionMode = null
+            isSelectionModeEnabled = false // Enable selection mode
             notifyDataSetChanged()
         }
     }

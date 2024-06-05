@@ -35,6 +35,7 @@ class FileAdapter(
     private val itemClickListener: OnItemClickListener,
 
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var isSelectionModeEnabled: Boolean = false // Variable to track selection mode
 
     interface OnItemClickListener {
         fun onItemClick(fileItem: FileItem)
@@ -56,10 +57,21 @@ class FileAdapter(
         private val fileNameTextView: TextView = itemView.findViewById(R.id.titleWebsiteView)
         private val fileSizeTextView: TextView = itemView.findViewById(R.id.WebsiteSizeView)
         private val fileMoreTextView: ImageButton = itemView.findViewById(R.id.iconMoreView)
+        private val fileTextView: ImageButton = itemView.findViewById(R.id.iconPdfView)
+        private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
 
         init {
             fileMoreTextView.setOnClickListener {
-                showPopupMenu()
+                if (isSelectionModeEnabled) {
+                    // If selection mode is active, toggle selection of the item
+                    toggleMultpleSelection(position)
+
+
+                } else {
+                    // Otherwise, show the popup menu
+                    showPopupMenu()
+
+                }
             }
         }
         private fun showPopupMenu() {
@@ -107,9 +119,11 @@ class FileAdapter(
 
 // Update item view background based on selection
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
+                fileSelectedTextView.visibility = View.VISIBLE
+                fileTextView.visibility = View.GONE
             } else {
-                itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
+                fileSelectedTextView.visibility = View.GONE
+                fileTextView.visibility = View.VISIBLE
             }
 
 
@@ -135,6 +149,7 @@ class FileAdapter(
     // ViewHolder for Image type
     inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageView: ImageView = itemView.findViewById(R.id.musicBrowserImage)
+        private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
 
 
         fun bind(fileItem: FileItem) {
@@ -146,9 +161,10 @@ class FileAdapter(
                 .into(imageView)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
+                fileSelectedTextView.visibility = View.VISIBLE
+
             } else {
-                itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
+                fileSelectedTextView.visibility = View.GONE
             }
 
             itemView.setOnLongClickListener {
@@ -175,13 +191,20 @@ class FileAdapter(
         private val videoNameTextView: TextView = itemView.findViewById(R.id.videoBrowserName)
         private val durationTextView: TextView = itemView.findViewById(R.id.durationBrowser)
         private val videoMoreTextView: ImageButton = itemView.findViewById(R.id.MoreVideoChoose)
-
+        private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
 
         init {
             videoMoreTextView.setOnClickListener {
-                showPopupMenu()
+                if (isSelectionModeEnabled) {
+                    // If selection mode is active, toggle selection of the item
+                    toggleMultpleSelection(position)
+                } else {
+                    // Otherwise, show the popup menu
+                    showPopupMenu()
+                }
             }
         }
+
         private fun showPopupMenu() {
             val popupMenu = PopupMenu(itemView.context, videoMoreTextView)
             popupMenu.menuInflater.inflate(R.menu.popup_menu_browser, popupMenu.menu)
@@ -226,9 +249,10 @@ class FileAdapter(
             videoNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
+                fileSelectedTextView.visibility = View.VISIBLE
+
             } else {
-                itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
+                fileSelectedTextView.visibility = View.GONE
             }
             itemView.setOnLongClickListener {
                 toggleMultpleSelection(position)
@@ -254,13 +278,20 @@ class FileAdapter(
         private val audioNameTextView: TextView = itemView.findViewById(R.id.titleAudioView)
         private val audioSizeTextView: TextView = itemView.findViewById(R.id.AudioSizeView)
         private val audioMoreTextView: ImageButton = itemView.findViewById(R.id.iconAudioView)
+        private val fileTextView: ImageButton = itemView.findViewById(R.id.iconImageView)
+        private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
 
         init {
             audioMoreTextView.setOnClickListener {
-                showPopupMenu()
+                if (isSelectionModeEnabled) {
+                    // If selection mode is active, toggle selection of the item
+                    toggleMultpleSelection(position)
+                } else {
+                    // Otherwise, show the popup menu
+                    showPopupMenu()
+                }
             }
         }
-
 
         private fun showPopupMenu() {
             val popupMenu = PopupMenu(itemView.context, audioMoreTextView)
@@ -304,9 +335,11 @@ class FileAdapter(
             audioNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
+                fileSelectedTextView.visibility = View.VISIBLE
+                fileTextView.visibility = View.GONE
             } else {
-                itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
+                fileSelectedTextView.visibility = View.GONE
+                fileTextView.visibility = View.VISIBLE
             }
             itemView.setOnLongClickListener {
                 toggleMultpleSelection(position)
@@ -327,14 +360,106 @@ class FileAdapter(
         }
     }
 
+    inner class WebpageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val websiteNameTextView: TextView = itemView.findViewById(R.id.titleWebApkView)
+        private val websiteSizeTextView: TextView = itemView.findViewById(R.id.WebApkSizeView)
+        private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
+        private val fileTextView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
+        private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+
+        init {
+            websiteMoreTextView.setOnClickListener {
+                if (isSelectionModeEnabled) {
+                    // If selection mode is active, toggle selection of the item
+                    toggleMultpleSelection(position)
+                } else {
+                    // Otherwise, show the popup menu
+                    showPopupMenu()
+                }
+            }
+        }
+
+
+        private fun showPopupMenu() {
+            val popupMenu = PopupMenu(itemView.context, websiteMoreTextView)
+            popupMenu.menuInflater.inflate(R.menu.popup_webpage_browser, popupMenu.menu)
+
+            // Set icons to be visible
+            try {
+                val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+                fieldPopup.isAccessible = true
+                val popup = fieldPopup.get(popupMenu)
+                popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                    .invoke(popup, true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.renameBrowser -> {
+                        showRenameDialog(adapterPosition)
+
+                    }
+                    R.id.deleteBrowser -> {
+                        deleteFile(adapterPosition) // Call deleteFile with correct position
+
+                    }
+
+
+                }
+                true
+            }
+
+            popupMenu.show()
+        }
+        fun bind(fileItem: FileItem) {
+            websiteNameTextView.text = fileItem.fileName
+            websiteSizeTextView.text = formatFileSize(fileItem.fileSize)
+            websiteNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
+
+            if (selectedItems.contains(adapterPosition)) {
+                fileSelectedTextView.visibility = View.VISIBLE
+                fileTextView.visibility = View.GONE
+            } else {
+                fileSelectedTextView.visibility = View.GONE
+                fileTextView.visibility = View.VISIBLE
+            }
+            itemView.setOnLongClickListener {
+                toggleMultpleSelection(position)
+
+                true
+            }
+            itemView.setOnClickListener {
+                if (actionMode != null) {
+                    // If action mode is active, toggle selection as usual
+                    toggleMultpleSelection(position)
+
+                } else {
+                    itemClickListener.onItemClick(fileItem)
+                }
+
+            }
+        }
+
+    }
+
     inner class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val websiteNameTextView: TextView = itemView.findViewById(R.id.titleWebApkView)
         private val websiteSizeTextView: TextView = itemView.findViewById(R.id.WebApkSizeView)
         private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
+        private val fileTextView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
+        private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
 
         init {
             websiteMoreTextView.setOnClickListener {
-                showPopupMenu()
+                if (isSelectionModeEnabled) {
+                    // If selection mode is active, toggle selection of the item
+                    toggleMultpleSelection(position)
+                } else {
+                    // Otherwise, show the popup menu
+                    showPopupMenu()
+                }
             }
         }
 
@@ -382,9 +507,11 @@ class FileAdapter(
             websiteNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
+                fileSelectedTextView.visibility = View.VISIBLE
+                fileTextView.visibility = View.GONE
             } else {
-                itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
+                fileSelectedTextView.visibility = View.GONE
+                fileTextView.visibility = View.VISIBLE
             }
             itemView.setOnLongClickListener {
                 toggleMultpleSelection(position)
@@ -409,13 +536,20 @@ class FileAdapter(
         private val apkNameTextView: TextView = itemView.findViewById(R.id.titleWebApkView)
         private val apkSizeTextView: TextView = itemView.findViewById(R.id.WebApkSizeView)
         private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
+        private val fileTextView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
+        private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
 
         init {
             websiteMoreTextView.setOnClickListener {
-                showPopupMenu()
+                if (isSelectionModeEnabled) {
+                    // If selection mode is active, toggle selection of the item
+                    toggleMultpleSelection(position)
+                } else {
+                    // Otherwise, show the popup menu
+                    showPopupMenu()
+                }
             }
         }
-
 
         private fun showPopupMenu() {
             val popupMenu = PopupMenu(itemView.context, websiteMoreTextView)
@@ -459,10 +593,13 @@ class FileAdapter(
             apkSizeTextView.text = formatFileSize(fileItem.fileSize)
             apkNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
+
             if (selectedItems.contains(adapterPosition)) {
-                itemView.setBackgroundResource(R.drawable.browser_selected_f_background) // Set your custom selected background
+                fileSelectedTextView.visibility = View.VISIBLE
+                fileTextView.visibility = View.GONE
             } else {
-                itemView.setBackgroundResource(android.R.color.transparent) // Reset to default background
+                fileSelectedTextView.visibility = View.GONE
+                fileTextView.visibility = View.VISIBLE
             }
 
             itemView.setOnLongClickListener {
@@ -503,8 +640,12 @@ class FileAdapter(
                 AudioViewHolder(audioView)
             }
             FileType.APK.ordinal -> {
-                val audioView = inflater.inflate(R.layout.vpa_browser, parent, false)
-                ApkViewHolder(audioView)
+                val apkView = inflater.inflate(R.layout.vpa_browser, parent, false)
+                ApkViewHolder(apkView)
+            }
+            FileType.MHTML.ordinal -> {
+                val MHTMLView = inflater.inflate(R.layout.webpage_browser, parent, false)
+                WebpageViewHolder(MHTMLView)
             }
             else -> {
                 val websiteView = inflater.inflate(R.layout.vpa_browser, parent, false)
@@ -530,6 +671,9 @@ class FileAdapter(
             }
             FileType.APK.ordinal -> {
                 (holder as ApkViewHolder).bind(fileItem)
+            }
+            FileType.MHTML.ordinal -> {
+                (holder as WebpageViewHolder).bind(fileItem)
             }
             else -> {
                 (holder as WebsiteViewHolder).bind(fileItem)
@@ -569,9 +713,12 @@ class FileAdapter(
 
 
     // Start action mode for multi-select
+    @SuppressLint("NotifyDataSetChanged")
     private fun startActionMode() {
         if (actionMode == null) {
             actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
+            isSelectionModeEnabled = true
+            notifyDataSetChanged()
         }
         actionMode?.title = "${selectedItems.size} selected"
     }
@@ -608,6 +755,7 @@ class FileAdapter(
             // Clear selection and action mode
             selectedItems.clear()
             actionMode = null
+            isSelectionModeEnabled = false
             notifyDataSetChanged()
 
 
@@ -712,18 +860,32 @@ class FileAdapter(
     private fun showRenameDialog(position: Int) {
         val oldFileItem = fileList[position]
 
+        // Separate the file name and the extension
+        val oldFileName = oldFileItem.fileName
+        val lastDotIndex = oldFileName.lastIndexOf('.')
+        val fileNameWithoutExtension = if (lastDotIndex != -1) {
+            oldFileName.substring(0, lastDotIndex)
+        } else {
+            oldFileName
+        }
+        val fileExtension = if (lastDotIndex != -1) {
+            oldFileName.substring(lastDotIndex)
+        } else {
+            ""
+        }
         // Inflate custom layout
         val dialogView = LayoutInflater.from(context).inflate(R.layout.rename_field, null)
         val editText = dialogView.findViewById<TextInputEditText>(R.id.renameField)
-        editText.setText(oldFileItem.fileName) // Use fileName for display in the EditText
+        editText.setText(fileNameWithoutExtension) // Display only the file name without the extension
 
         val dialog = AlertDialog.Builder(context)
             .setTitle("Rename File")
             .setMessage("Enter new name for the file:")
             .setView(dialogView)
             .setPositiveButton("Rename") { _, _ ->
-                val newFileName = editText.text.toString().trim()
-                if (newFileName.isNotEmpty()) {
+                val newFileNameWithoutExtension = editText.text.toString().trim()
+                if (newFileNameWithoutExtension.isNotEmpty()) {
+                    val newFileName = newFileNameWithoutExtension + fileExtension // Append the original extension
                     val oldFile = File(oldFileItem.filePath)
                     val parentDir = oldFile.parentFile
                     val newFile = File(parentDir, newFileName)

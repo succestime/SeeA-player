@@ -7,13 +7,15 @@ import android.graphics.Paint
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.ActivitySeeaEduProcessBinding
 
@@ -21,19 +23,17 @@ class SeeaEduProcess : AppCompatActivity() {
     private lateinit var binding: ActivitySeeaEduProcessBinding
     private var isTimeSelected = false
     private var isTimeHintRed = false
-
+    private lateinit var seeaeduprocess: RelativeLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide the status bar
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
         supportActionBar?.hide()
         binding = ActivitySeeaEduProcessBinding.inflate(layoutInflater)
         supportActionBar?.hide()
         setContentView(binding.root)
         initializeBinding()
+
+        seeaeduprocess = binding.seeAEduProcess
+        setSwipeRefreshBackgroundColor()
     }
 
     private fun initializeBinding() {
@@ -137,6 +137,27 @@ class SeeaEduProcess : AppCompatActivity() {
 //
 //    }
 
+
+
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            seeaeduprocess.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
+        } else {
+            // Light mode is enabled, set background color to white
+            seeaeduprocess.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+        }
+    }
     private fun isTimeSelectionValid(autoText: String, timeText: String): Boolean {
         return when (autoText) {
             "Months" -> timeText.startsWith("Month")

@@ -17,6 +17,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -42,6 +43,7 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
     private  var newPosition = 0
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
+    private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
 
     class MyAdapter(binding: RecantDownloadViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.videoName
@@ -70,18 +72,22 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
         Glide.with(context)
             .asBitmap()
             .load(videoReList[position].artUri)
-            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+            .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
             .into(holder.image)
 
         // Determine if the item is currently selected
         if (selectedItems.contains(position)) {
             // Set your custom selected background on the root view of the item
-            holder.root.setBackgroundResource(R.drawable.browser_selected_background)
+            holder.root.setBackgroundResource(R.drawable.video_selected_background)
         } else {
             // Reset to default background based on app theme
             holder.root.setBackgroundResource(android.R.color.transparent)
-
         }
+        // Hide or show the more button based on selection mode
+        holder.more.visibility = if (isSelectionModeEnabled) View.GONE else View.VISIBLE
+
+
+
         holder.root.setOnLongClickListener {
             toggleSelection(position)
             startActionMode()
@@ -91,6 +97,7 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             if (actionMode != null) {
                 // If action mode is active, toggle selection as usual
                 toggleSelection(position)
+
             } else {
                 when {
                     isRecantVideo -> {
@@ -191,8 +198,11 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
     private fun toggleSelection(position: Int) {
         if (selectedItems.contains(position)) {
             selectedItems.remove(position)
+
+
         } else {
             selectedItems.add(position)
+
         }
 
         if (selectedItems.isEmpty()) {
@@ -209,9 +219,13 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
 
 
     // Start action mode for multi-select
+    @SuppressLint("NotifyDataSetChanged")
     private fun startActionMode() {
         if (actionMode == null) {
             actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
+            isSelectionModeEnabled = true // Enable selection mode
+            notifyDataSetChanged() // Update all item views to hide the "more" button
+
         }
         actionMode?.title = "${selectedItems.size} selected"
     }
@@ -295,6 +309,7 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             // Clear selection and action mode
             selectedItems.clear()
             actionMode = null
+            isSelectionModeEnabled = false // Disable selection mode
             notifyDataSetChanged()
         }
     }

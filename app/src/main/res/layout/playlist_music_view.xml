@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_height="70dp"
-    android:layout_marginTop="3dp"
+    android:layout_height="65dp"
+    android:gravity="center_vertical"
     android:id="@+id/multyLayout"
     android:clickable="true"
     android:focusable="true"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
@@ -20,40 +21,24 @@
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/playlistImage"
                 android:layout_width="100dp"
-                android:layout_height="70dp"
-                android:src="@mipmap/ic_logo_o"
-                app:shapeAppearanceOverlay="@style/curved"
+                android:layout_height="55dp"
+                app:shapeAppearanceOverlay="@style/curved_image_video"
                 android:scaleType="centerCrop"
+                android:background="@color/black"
                 app:cardBackgroundColor="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-
                 app:layout_constraintVertical_bias="0.455"/>
 
-        <TextView
-            android:id="@+id/newIndicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:background="@drawable/background_new_indicator"
-            android:padding="4dp"
-            android:text="NEW"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="55dp"
         android:layout_weight="1"
         android:paddingHorizontal="2dp"
         android:gravity="center_vertical"

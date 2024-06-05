@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -26,14 +25,14 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/shuffleBtn"
+                    android:id="@+id/playandshuffleBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:contentDescription="@string/shuffle_btn"
-                    android:drawableTop="@drawable/shuffle_icon"
-                    android:textColor="?android:textColor"
+                    android:drawableTop="@drawable/play_icon"
+                    android:drawableTint="@color/cool_pink"                    android:textColor="?android:textColor"
                     android:text="@string/shuffle_btn"
                     android:textAllCaps="false"
 
@@ -100,9 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="5dp"
-                    android:layout_marginStart="2dp"
-                    android:layout_margin="5dp"
-                    android:paddingBottom="55dp"
+                    android:paddingBottom="60dp"
                     android:scrollbars="vertical"
                     />
             </LinearLayout>
@@ -112,7 +109,7 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nowPlaying"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="55dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

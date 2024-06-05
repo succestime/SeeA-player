@@ -19,6 +19,16 @@
             android:layout_height="150dp">
 
             <ImageButton
+                android:id="@+id/selected_complete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/complete_svgrepo_select"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="#FFCF00" />
+            <ImageButton
                 android:id="@+id/multiVideoIcon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"

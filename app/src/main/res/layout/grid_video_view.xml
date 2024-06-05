@@ -21,7 +21,7 @@
                 android:id="@+id/videoImage"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:src="@mipmap/ic_logo_o"
+                android:background="#252424"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

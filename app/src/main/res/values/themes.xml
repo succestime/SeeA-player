@@ -13,6 +13,7 @@
         <item name="android:statusBarColor" >#8ACDF3</item>
         <!--        <item name="android:actionBarStyle">@style/CustomActionBar</item>-->
         <item name="android:textColor">@color/black</item>
+
         <item name="actionModeStyle">@style/AppTheme.LightActionMode</item>
     </style>
     <style name="TransparentActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -22,6 +23,8 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">true</item>
     </style>
+
+
 
     <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
 <!--        <item name="android:windowFullscreen">true</item>-->
@@ -33,7 +36,9 @@
         <item name="background">@color/light_statusBar</item>
     </style>
 
-
+    <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/popup_menu_background</item>
+    </style>
 
     // theme for Navigation Drawer
     <style name="coolPinkNav" parent="Theme.MaterialComponents.Light.NoActionBar">

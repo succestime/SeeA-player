@@ -38,5 +38,6 @@ enum class FileType {
     AUDIO,
     WEBSITE,  // New type for website files
     APK,      // New type for APK files
+     MHTML,
     UNKNOWN
 }

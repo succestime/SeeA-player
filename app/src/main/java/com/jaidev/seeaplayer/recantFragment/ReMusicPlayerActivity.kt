@@ -6,15 +6,16 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.media.MediaPlayer
-import android.media.audiofx.AudioEffect
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -24,20 +25,21 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.ReMoreMusicBottomSheet
 import com.jaidev.seeaplayer.Services.MusicService
+import com.jaidev.seeaplayer.SpeedMusicBottomSheet
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.dataClass.reFormatDuration
 import com.jaidev.seeaplayer.databinding.ActivityReMusicPlayerBinding
 
 class ReMusicPlayerActivity : AppCompatActivity()
-    , ServiceConnection, MediaPlayer.OnCompletionListener
+    , ServiceConnection, MediaPlayer.OnCompletionListener , SpeedMusicBottomSheet.SpeedSelectionListener
 {
     lateinit var mAdView: AdView
-    private lateinit var reMusicPlayerLayout: LinearLayout
+    private lateinit var reMusicPlayerLayout: ConstraintLayout
     private var appOpenAd : AppOpenAd? = null
     companion object {
         // of PlayerActivity of this reMusicActivity
@@ -47,14 +49,17 @@ class ReMusicPlayerActivity : AppCompatActivity()
         var musicService : MusicService? = null
         private var isServiceBound = null
         var position: Int = -1
+        var min10: Boolean = false
         var min15: Boolean = false
+        var min20: Boolean = false
         var min30: Boolean = false
         var min60: Boolean = false
-
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: ActivityReMusicPlayerBinding
         var repeat: Boolean = false
         private var isAdDisplayed = false
+        var isShuffleEnabled = false
+        private lateinit var originalMusicListPA: ArrayList<RecantMusic> // Original playlist order
 
         fun updateNextMusicTitle() {
             val nextSongPosition = if (songPosition + 1 < MainActivity.musicRecantList.size) songPosition + 1 else 0 // Assuming looping back to the first song after reaching the end
@@ -112,6 +117,55 @@ class ReMusicPlayerActivity : AppCompatActivity()
             if (isPlaying) pauseMusic()
             else playMusic()
         }
+      binding.musicMoreFun.setOnClickListener {
+            // Create an instance of the BottomSheetFragment
+            val moreMusicBottomSheetFragment = ReMoreMusicBottomSheet()
+            // Show the BottomSheetFragment
+
+            moreMusicBottomSheetFragment.show(supportFragmentManager, moreMusicBottomSheetFragment.tag)
+
+        }
+        // Inside onCreate or wherever you initialize your layout and bindings
+        binding.shuffleBtnPA.setOnClickListener {
+            isShuffleEnabled = !isShuffleEnabled
+            // Change the color of the shuffle button based on the shuffle state
+            if (isShuffleEnabled) {
+                Toast.makeText(this, "Shuffle, play in shuffle order", Toast.LENGTH_SHORT).show()
+                binding.shuffleBtnPA.setImageResource(R.drawable.media_playlist_consecutive_svgrepo_com__1_)
+                binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
+                    R.color.cool_green))
+                // Shuffle the music list
+               originalMusicListPA = ArrayList(reMusicList) // Save original list
+                reMusicList.shuffle()
+
+                // Reset song position to start from the beginning
+                songPosition = 0
+                // Create and start playing music
+                createMediaPlayer()
+                // Update the layout with the current song details
+                setLayout()
+            } else {
+                Toast.makeText(this, "Play all in the order", Toast.LENGTH_SHORT).show()
+                binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
+                binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
+                    R.color.cool_pink))
+                // Find the current song in the original list and update the song position
+                val currentSong = reMusicList[songPosition]
+                reMusicList = ArrayList(originalMusicListPA)
+               songPosition = reMusicList.indexOf(currentSong)
+
+                // Create and start playing music from the current position in the original list order
+                setLayout()
+                createMediaPlayer()
+            }
+            val intent = Intent(this, MusicService::class.java)
+            bindService(intent, this, BIND_AUTO_CREATE)
+            startService(intent)
+        }
+
+    binding.songNamePA.isSelected = true
+
+
 
         binding.previousBtnPA.setOnClickListener {
             prevNextSong(increment = false)
@@ -132,61 +186,63 @@ class ReMusicPlayerActivity : AppCompatActivity()
         binding.repeatBtnPA.setOnClickListener {
             if (!repeat) {
                 repeat = true
+                Toast.makeText(this, "Repeat mode is on", Toast.LENGTH_SHORT).show()
                 binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
             } else {
                 repeat = false
+                Toast.makeText(this, "Repeat mode is off", Toast.LENGTH_SHORT).show()
                 binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_pink))
             }
         }
-        binding.equalizerBtnPA.setOnClickListener {
-            try {
-                val eqIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-                eqIntent.putExtra(
-                    AudioEffect.EXTRA_AUDIO_SESSION,
-                    musicService!!.mediaPlayer!!.audioSessionId
-                )
-                eqIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, baseContext.packageName)
-                eqIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
-                startActivityForResult( eqIntent, 13)
-            } catch (e: Exception) {
-                Toast.makeText(this, "Equalizer Feature not Supported!!", Toast.LENGTH_SHORT).show()
-            }
-        }
+//        binding.equalizerBtnPA.setOnClickListener {
+//            try {
+//                val eqIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
+//                eqIntent.putExtra(
+//                    AudioEffect.EXTRA_AUDIO_SESSION,
+//                    musicService!!.mediaPlayer!!.audioSessionId
+//                )
+//                eqIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, baseContext.packageName)
+//                eqIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+//                startActivityForResult( eqIntent, 13)
+//            } catch (e: Exception) {
+//                Toast.makeText(this, "Equalizer Feature not Supported!!", Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
-        binding.timerBtnPA.setOnClickListener {
-            val timer = min15 || min30 || min60
-            if (!timer) showBottomSheetDialog()
-            else {
-                val builder = MaterialAlertDialogBuilder(this)
-                builder.setTitle("Stop Timer")
-                    .setMessage("Do you want to stop timer?")
-                    .setPositiveButton("Yes") { _, _ ->
-                        min15 = false
-                        min30 = false
-                        min60 = false
-                        binding.timerBtnPA.setColorFilter(
-                            ContextCompat.getColor(
-                                this,
-                                R.color.cool_pink
-                            )
-                        )
-                    }
-                    .setNegativeButton("No") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                val customDialog = builder.create()
-                customDialog.show()
-            }
-        }
+//        binding.timerBtnPA.setOnClickListener {
+//            val timer = min15 || min30 || min60
+//            if (!timer) showBottomSheetDialog()
+//            else {
+//                val builder = MaterialAlertDialogBuilder(this)
+//                builder.setTitle("Stop Timer")
+//                    .setMessage("Do you want to stop timer?")
+//                    .setPositiveButton("Yes") { _, _ ->
+//                        min15 = false
+//                        min30 = false
+//                        min60 = false
+//                        binding.timerBtnPA.setColorFilter(
+//                            ContextCompat.getColor(
+//                                this,
+//                                R.color.cool_pink
+//                            )
+//                        )
+//                    }
+//                    .setNegativeButton("No") { dialog, _ ->
+//                        dialog.dismiss()
+//                    }
+//                val customDialog = builder.create()
+//                customDialog.show()
+//            }
+//        }
 
-        binding.shareBtnPA.setOnClickListener {
-            val shareIntent = Intent()
-            shareIntent.action = Intent.ACTION_SEND
-            shareIntent.type = "audio/*"
-            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(reMusicList[songPosition].path))
-            startActivity(Intent.createChooser(shareIntent, "Sharing Music File!!"))
-
-        }
+//        binding.shareBtnPA.setOnClickListener {
+//            val shareIntent = Intent()
+//            shareIntent.action = Intent.ACTION_SEND
+//            shareIntent.type = "audio/*"
+//            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(reMusicList[songPosition].path))
+//            startActivity(Intent.createChooser(shareIntent, "Sharing Music File!!"))
+//
+//        }
     }
     private fun   setMusicLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -197,9 +253,15 @@ class ReMusicPlayerActivity : AppCompatActivity()
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             reMusicPlayerLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
         } else {
             // Light mode is enabled, set background color to white
             reMusicPlayerLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+
         }
     }
 
@@ -212,13 +274,20 @@ class ReMusicPlayerActivity : AppCompatActivity()
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three)).centerCrop()
             .into(binding.songImgPA)
         binding.songNamePA.text = reMusicList[songPosition].title
+
         if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
             R.color.cool_green
-        ))
-        if(min15 || min30 || min60) binding.timerBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
-            R.color.cool_green
-        ))
+        ))else   binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
+            R.color.cool_pink))
 
+//        if(min15 || min30 || min60) binding.timerBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
+//            R.color.cool_green
+//        ))
+        if (isShuffleEnabled) binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
+            R.color.cool_green))else   binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
+            R.color.cool_pink))
+        if (!isShuffleEnabled)  binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
+        else binding.shuffleBtnPA.setImageResource(R.drawable.media_playlist_consecutive_svgrepo_com__1_)
 
     }
     private fun createMediaPlayer(){
@@ -238,7 +307,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
         }catch (e : Exception){return}
     }
-
+    fun getCurrentSong(): RecantMusic {
+        // Assuming you have a list of songs and a variable to store the current song position
+        val currentSongPosition = songPosition
+        return reMusicList[currentSongPosition]
+    }
     private fun initializeLayout(){
         songPosition =  intent.getIntExtra("index" , 0)
         when(intent.getStringExtra("class")){
@@ -248,6 +321,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 startService(intent)
                 reMusicList = ArrayList()
                 reMusicList.addAll(MainActivity.musicRecantList)
+              originalMusicListPA = ArrayList(reMusicList) // Save original list
                 setLayout()
 
             }
@@ -267,6 +341,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 startService(intent)
                 reMusicList = ArrayList()
                 reMusicList.addAll(MainActivity.musicRecantList)
+                originalMusicListPA = ArrayList(reMusicList) // Save original list
                 reMusicList.shuffle()
                 setLayout()
             }
@@ -352,7 +427,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         dialog.findViewById<LinearLayout>(R.id.min_15)?.setOnClickListener {
             Toast.makeText(baseContext, "Music will stop after 15 minutes", Toast.LENGTH_SHORT)
                 .show()
-            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
+//            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
             min15 = true
             Thread {
                 Thread.sleep((15 * 60000).toLong())
@@ -362,7 +437,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         dialog.findViewById<LinearLayout>(R.id.min_30)?.setOnClickListener {
             Toast.makeText(baseContext, "Music will stop after 30 minutes", Toast.LENGTH_SHORT)
                 .show()
-            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
+//            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
             min30 = true
             Thread {
                 Thread.sleep((30 * 60000).toLong())
@@ -372,7 +447,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         dialog.findViewById<LinearLayout>(R.id.min_60)?.setOnClickListener {
             Toast.makeText(baseContext, "Music will stop after 60 minutes", Toast.LENGTH_SHORT)
                 .show()
-            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
+//            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
             min60 = true
             Thread {
                 Thread.sleep((60 * 60000).toLong())
@@ -412,6 +487,17 @@ class ReMusicPlayerActivity : AppCompatActivity()
         super.onDestroy()
         loadAppOpenAd()
 
+    }
+
+    @SuppressLint("ObsoleteSdkInt")
+    override fun onSpeedSelected(speed: Float) {
+        musicService?.mediaPlayer?.let { mediaPlayer ->
+            if (mediaPlayer.isPlaying) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+                }
+            }
+        }
     }
 
 }

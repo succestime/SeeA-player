@@ -3,4 +3,13 @@
     <attr name="dialogTextColor" format="color"/>
     <attr name="dialogBtnBackground" format="color"/>
 
+
+
+        <!-- Add your existing styles here -->
+
+        <style name="CustomFABShape" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+            <item name="cornerSize">16dp</item> <!-- Adjust corner size as needed -->
+        </style>
+
+
 </resources>

@@ -5,8 +5,35 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
-
+    android:layout_margin="5dp">
+    <ImageView
+        android:id="@+id/downIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/round_arrow_down_"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:id="@+id/min_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="UseCompoundDrawables">
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/round_timer_music"
+            app:tint="@color/cool_pink"
+            android:layout_margin="8dp"
+            android:contentDescription="@string/min_10" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/min_10"
+            android:textSize="18sp"
+            android:padding="8dp"/>
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/min_15"
         android:layout_width="match_parent"
@@ -23,6 +50,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/min_15"
+            android:textSize="18sp"
+            android:padding="8dp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/min_20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="UseCompoundDrawables">
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/round_timer_music"
+            app:tint="@color/cool_pink"
+            android:layout_margin="8dp"
+            android:contentDescription="@string/min_20" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/min_20"
             android:textSize="18sp"
             android:padding="8dp"/>
     </LinearLayout>

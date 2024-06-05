@@ -176,13 +176,13 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
-//        // for immersive mode
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
-//        WindowInsetsControllerCompat(window, binding.root).let { controller ->
-//            controller.hide(WindowInsetsCompat.Type.systemBars())
-//            controller.systemBarsBehavior =
-//                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//        }
+        // for immersive mode
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
 
 
         dialogProperties = DialogProperties()
@@ -1335,5 +1335,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         lp.screenBrightness = d * value
         this.window.attributes = lp
     }
+
+
 
 }

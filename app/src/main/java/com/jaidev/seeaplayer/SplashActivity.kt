@@ -11,6 +11,7 @@ import android.text.SpannableString
 import android.text.style.StyleSpan
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import com.jaidev.seeaplayer.databinding.ActivitySplashBinding
 
 @SuppressLint("CustomSplashScreen")
@@ -31,6 +32,8 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 supportActionBar?.hide()
+// Set the system navigation bar color to dark_cool_blue
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
 
         // Create a SpannableString to set different styles for different parts of the text
         val spannableString = SpannableString("SeeA Player")
