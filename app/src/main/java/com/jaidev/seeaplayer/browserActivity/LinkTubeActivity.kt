@@ -12,10 +12,12 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.print.PrintAttributes
 import android.print.PrintJob
 import android.print.PrintManager
 import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.webkit.WebView
@@ -66,7 +68,9 @@ import com.jaidev.seeaplayer.databinding.ActivityLinkTubeBinding
 import com.jaidev.seeaplayer.databinding.BookmarkDialogBinding
 import com.jaidev.seeaplayer.databinding.TabViewBinding
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.net.URL
+import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -96,7 +100,7 @@ class LinkTubeActivity : AppCompatActivity() {
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    override fun onCreate(savedInstanceState: Bundle?) {
+    public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        setTheme(More.themesList[More.themeIndex])
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -109,17 +113,7 @@ class LinkTubeActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.hide()
 
-        MobileAds.initialize(this){}
-        mAdView = findViewById(R.id.adView)
-        rewardedIAd()
-        initializeView()
-        initializeBinding()
-        getAllBookmarks()
-        // banner ads
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
 
-        setSwipeRefreshBackgroundColor()
 
         tabsList.add(Tab("Home",HomeFragment(), LinkTubeActivity()))
         binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
@@ -131,7 +125,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
     }
 
-    private  fun initializeBinding(){
+    fun initializeBinding(){
         binding.googleMicBtn.setOnClickListener {
             speak()
         }
@@ -160,7 +154,6 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     R.id.history -> {
-
                         startActivity(Intent(this, HistoryBrowser::class.java))
                     }
 
@@ -175,10 +168,6 @@ class LinkTubeActivity : AppCompatActivity() {
                     R.id.bookmark -> {
                         bookMark()
                     }
-
-//                    R.id.recantTabs -> {
-//
-//                    }
 
                     R.id.desktop -> {
                         desktopMade()
@@ -627,7 +616,35 @@ class LinkTubeActivity : AppCompatActivity() {
             changeTab("Home", HomeFragment())
         }
         binding.downloadBrowser.setOnClickListener {
-            changeTab("Home", HomeFragment())
+            var frag: BrowseFragment? = null
+            try {
+                frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            // Get the current URL from the WebView
+            val currentUrl = frag?.binding?.webView?.url
+            if (currentUrl != null) {
+                downloadCurrentWebPage(currentUrl)
+            } else {
+                Toast.makeText(this@LinkTubeActivity, "No webpage to download", Toast.LENGTH_SHORT).show()
+            }// If URL is not present, notify the user
+        }
+
+        binding.topDownloadBrowser.setOnClickListener {
+            var frag: BrowseFragment? = null
+            try {
+                frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            // Get the current URL from the WebView
+            val currentUrl = frag?.binding?.webView?.url
+            if (currentUrl != null) {
+                downloadCurrentWebPage(currentUrl)
+            } else {
+                Toast.makeText(this@LinkTubeActivity, "No webpage to download", Toast.LENGTH_SHORT).show()
+            }// If URL is not present, notify the user
         }
         binding.bottomMediaBrowser.setOnClickListener {
             if (checkForInternet(this)) {
@@ -696,13 +713,65 @@ class LinkTubeActivity : AppCompatActivity() {
 
         }
     }
-    override fun onPause() {
-        super.onPause()
+
+    private fun downloadCurrentWebPage(url: String) {
+        var frag: BrowseFragment? = null
+        try {
+            frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Extracting the search query from the URL
+        val query = extractSearchQuery(url)
+        val decodedQuery = URLDecoder.decode(query, "UTF-8")
+        val fileName = "${decodedQuery?.replace("+", " ")} - SeeA LinkTube.mhtml"
+
+        val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(destinationDir, fileName)
+
+        // Save the webpage to the file
+        frag?.binding?.webView?.saveWebArchive(file.absolutePath, false) { savedFile ->
+            if (savedFile != null) {
+                Toast.makeText(this, "Page saved as $fileName", Toast.LENGTH_SHORT).show()
+                Log.d("Downloaded URL", url)
+            } else {
+                Toast.makeText(this, "Failed to save page", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
+
+    private fun extractSearchQuery(url: String): String? {
+        val queryIndex = url.indexOf("search?q=")
+        return if (queryIndex != -1) {
+            val startIndex = queryIndex + "search?q=".length
+            val endIndex = url.indexOf('&', startIndex)
+            if (endIndex != -1) {
+                url.substring(startIndex, endIndex)
+            } else {
+                url.substring(startIndex)
+            }
+        } else {
+            null
+        }
+    }
+
+
 
     override fun onResume() {
         super.onResume()
         checkHistorySize()
+        MobileAds.initialize(this){}
+        mAdView = findViewById(R.id.adView)
+        rewardedIAd()
+        initializeView()
+        initializeBinding()
+        getAllBookmarks()
+        // banner ads
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+        setSwipeRefreshBackgroundColor()
+
         printJob?.let {
             when{
                 it.isCompleted -> Snackbar.make(binding.root, "Successful -> ${it.info.label}", 4000).show()
@@ -764,16 +833,6 @@ class LinkTubeActivity : AppCompatActivity() {
             bookmarkList.addAll(list)
         }
     }
-
-    fun onPageStarted(url: String?) {
-
-    }
-
-    fun onPageFinished(url: String?) {
-
-    }
-
-
 }
 
 @SuppressLint("NotifyDataSetChanged")

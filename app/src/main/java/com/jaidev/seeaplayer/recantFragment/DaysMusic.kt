@@ -39,7 +39,7 @@ class DaysMusic : Fragment() {
         binding = FragmentDaysMusicBinding.bind(view)
 
         binding.MusicRV.setHasFixedSize(true)
-        binding.MusicRV.setItemViewCacheSize(13)
+        binding.MusicRV.setItemViewCacheSize(50)
         binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = RecantMusicAdapter(requireContext(), musicRecantList , isReMusic = true)
         binding.MusicRV.adapter = adapter

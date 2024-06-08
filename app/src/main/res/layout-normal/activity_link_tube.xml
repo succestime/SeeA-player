@@ -162,7 +162,6 @@
                 android:id="@+id/topDownloadBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:layout_marginStart="5dp"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"

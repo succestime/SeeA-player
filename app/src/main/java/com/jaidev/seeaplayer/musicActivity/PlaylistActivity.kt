@@ -2,6 +2,7 @@
 package com.jaidev.seeaplayer.musicActivity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +27,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class PlaylistActivity : AppCompatActivity() {
+class PlaylistActivity : AppCompatActivity() , PlaylistViewAdapter.OnItemClickListener{
     lateinit var binding: ActivityPlaylistBinding
     private lateinit var adapter : PlaylistViewAdapter
     private lateinit var playListLayout: ConstraintLayout
@@ -47,13 +48,14 @@ class PlaylistActivity : AppCompatActivity() {
         loadAd()
 
         binding.playlistRV.setHasFixedSize(true)
-        binding.playlistRV.setItemViewCacheSize(10)
+        binding.playlistRV.setItemViewCacheSize(50)
         binding.playlistRV.layoutManager = LinearLayoutManager(this@PlaylistActivity)
 
-        adapter = PlaylistViewAdapter(this , playlistList = musicPlaylist.ref )
+        adapter = PlaylistViewAdapter(this , playlistList = musicPlaylist.ref , this)
         binding.playlistRV.adapter = adapter
-        binding.addPlaylistBtn.setOnClickListener { customAlertDialog() }
-
+binding.addPlaylistBtn.setOnClickListener {
+    customAlertDialog()
+}
 
         setActionBarGradient()
         playListLayout = binding.playlistLayout
@@ -89,7 +91,13 @@ class PlaylistActivity : AppCompatActivity() {
 
         }
     }
-
+    override fun onItemClick(position: Int) {
+        val intent = Intent(this, PlaylistDetails::class.java)
+        intent.putExtra("index", position)
+        startActivity(intent)
+        // Add transition animation here
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+    }
     private fun setActionBarGradient() {
         // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()

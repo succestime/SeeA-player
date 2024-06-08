@@ -80,7 +80,7 @@
         android:src="@drawable/music_g"
         android:scaleType="centerCrop"
         app:shapeAppearanceOverlay="@style/curved_image_nowPlaying_2"
-        app:adUnitId="ca-app-pub-3504589383575544/8925600269"
+        app:adUnitId="ca-app-pub-3504589383575544/2057825034"
         app:layout_constraintBottom_toBottomOf="@+id/songImgPA"
         app:layout_constraintEnd_toEndOf="@+id/songImgPA"
         app:layout_constraintStart_toStartOf="@+id/songImgPA"

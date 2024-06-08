@@ -41,7 +41,7 @@ class PlaylistDetails : AppCompatActivity() {
         } catch (_: Exception) {}
 
         binding.playlistDetailsRV.setHasFixedSize(true)
-        binding.playlistDetailsRV.setItemViewCacheSize(13)
+        binding.playlistDetailsRV.setItemViewCacheSize(50)
         binding.playlistDetailsRV.layoutManager = LinearLayoutManager(this)
         adapter = MusicAdapter(this, PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist, playlistDetails = true)
         binding.playlistDetailsRV.adapter = adapter

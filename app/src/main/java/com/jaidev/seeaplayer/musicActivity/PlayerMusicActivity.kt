@@ -491,13 +491,12 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         if (requestCode == 13 || resultCode == RESULT_OK)
             return
     }
-
     fun loadAppOpenAd() {
         if (!isAdDisplayed) {
             val adRequest = AdRequest.Builder().build()
             AppOpenAd.load(
                 this,
-                "ca-app-pub-3504589383575544/4934384369",
+                "ca-app-pub-3504589383575544/3498264750",
                 adRequest,
                 AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
                 appOpenAdLoadCallback

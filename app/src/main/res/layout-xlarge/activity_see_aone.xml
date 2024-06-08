@@ -219,7 +219,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/quarterly_Box"
-                    android:layout_width="120dp"
+                    android:layout_width="130dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="135dp"

@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
     private var doubleBackToExitPressedOnce = false
     companion object {
 
-            private const val PREFS_NAME = "speed_preferences"
+        private const val PREFS_NAME = "speed_preferences"
 
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
@@ -138,19 +138,17 @@ class MainActivity : AppCompatActivity() {
         // Load music fragment in the background
         loadMusicFragment()
 
-       toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
+        toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
 
 
-       val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
 
 //
         drawerLayout = binding.drawerLayoutMA
         // Set the background color of SwipeRefreshLayout based on app theme
-
-
 
 
         setDrawerLayoutBackgroundColor()
@@ -184,11 +182,6 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.music -> {
-                        // Load music fragment only if it's not already loaded
-                        if (!musicLoaded) {
-                            musicFragment = musicNav()
-                            musicLoaded = true
-                        }
                         setFragment(musicNav())
                     }
 
@@ -213,30 +206,30 @@ class MainActivity : AppCompatActivity() {
             return@setOnItemSelectedListener true
         }
     }
-private fun funRequestRuntimePermission(){
-    if (requestRuntimePermission()) {
-        folderList = ArrayList()
-        videoList = getAllVideos()
-        MusicListMA = getAllAudios()
-        setFragment(homeNav())
+    private fun funRequestRuntimePermission(){
+        if (requestRuntimePermission()) {
+            folderList = ArrayList()
+            videoList = getAllVideos()
+            MusicListMA = getAllAudios()
+            setFragment(homeNav())
 
 //            FavoritesManager.loadFavorites(this@MainActivity)
 
-        runnable = Runnable {
-            if(dataChanged){
-                dataChanged = false
-                adapterChanged = true
+            runnable = Runnable {
+                if(dataChanged){
+                    dataChanged = false
+                    adapterChanged = true
+                }
+                Handler(Looper.getMainLooper()).postDelayed(runnable!!, 200)
             }
-            Handler(Looper.getMainLooper()).postDelayed(runnable!!, 200)
+            Handler(Looper.getMainLooper()).postDelayed(runnable!!, 0)
+        } else {
+            folderList = ArrayList()
+            videoList = ArrayList()
+            MusicListMA = getAllAudios()
+            setFragment(homeNav())
         }
-        Handler(Looper.getMainLooper()).postDelayed(runnable!!, 0)
-    } else {
-        folderList = ArrayList()
-        videoList = ArrayList()
-        MusicListMA = getAllAudios()
-        setFragment(homeNav())
     }
-}
     private fun setupActionBar() {
         supportActionBar?.setDisplayShowCustomEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -251,6 +244,7 @@ private fun funRequestRuntimePermission(){
 
         subscribeTextView.setOnClickListener {
             startActivity(Intent(this, SeeAOne::class.java))
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         }
 
         supportActionBar?.customView = customActionBarView
@@ -337,7 +331,7 @@ private fun funRequestRuntimePermission(){
     private fun setFragment(fragment: Fragment) {
         currentFragment = fragment
         val transaction = supportFragmentManager.beginTransaction()
-      transaction.replace(R.id.frameLayout, fragment)
+        transaction.replace(R.id.frameLayout, fragment)
         transaction.disallowAddToBackStack()
         transaction.commit()
     }
@@ -525,6 +519,14 @@ private fun funRequestRuntimePermission(){
         return super.onOptionsItemSelected(item)
     }
 
+    // Function to refresh folder list
+    fun refreshFolderList() {
+        folderList.clear()
+        videoList = getAllVideos() // Repopulate the videoList which also populates folderList
+        MusicListMA = getAllAudios() // Repopulate the music list if needed
+    }
+
+
 
     @SuppressLint("Range")
     fun getAllVideos(): ArrayList<VideoData> {
@@ -550,58 +552,55 @@ private fun funRequestRuntimePermission(){
         if (cursor != null)
             if (cursor.moveToFirst())
                 do {
+                    val titleC =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE))
+                    val idC =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID))
+                    val folderC =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
+                    val folderIdC =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_ID))
+                    val sizeC =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.SIZE))
+                    val pathC =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA))
+                    val durationC =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
+                            .toLong()
+                    val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
 
-                        val titleC =
-                            cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE))
-                        val idC =
-                            cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID))
-                        val folderC =
-                            cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
-                        val folderIdC =
-                            cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_ID))
-                        val sizeC =
-                            cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.SIZE))
-                        val pathC =
-                            cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA))
-                        val durationC =
-                            cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
-                                .toLong()
-                        val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
+                    try {
+                        val file = File(pathC)
+                        val artUriC = Uri.fromFile(file)
+                        val currentTimestamp = System.currentTimeMillis()
+                        val isNewVideo = currentTimestamp - dateAddedMillis <= DateUtils.DAY_IN_MILLIS
 
-                        try {
-                            val file = File(pathC)
-                            val artUriC = Uri.fromFile(file)
-                            val currentTimestamp = System.currentTimeMillis()
-                            val isNewVideo = currentTimestamp - dateAddedMillis <= DateUtils.DAY_IN_MILLIS
+                        val video = VideoData(
+                            title = titleC,
+                            id = idC,
+                            folderName = folderC,
+                            duration = durationC,
+                            size = sizeC,
+                            path = pathC,
+                            artUri = artUriC, dateAdded = dateAddedMillis, isNew =isNewVideo
+                        )
 
-                            val video = VideoData(
-                                title = titleC,
-                                id = idC,
-                                folderName = folderC,
-                                duration = durationC,
-                                size = sizeC,
-                                path = pathC,
-                                artUri = artUriC, dateAdded = dateAddedMillis, isNew =isNewVideo
-                            )
+                        if (file.exists()) tempList.add(video)
 
-
-                            if (file.exists()) tempList.add(video)
-
-                            // for adding folders and watching that not duplicate folder should add
-                            if (!tempFolderList.contains(folderC)) {
-                                tempFolderList.add(folderC)
-                                folderList.add(Folder(id = folderIdC, folderName = folderC))
-                            }
-                        } catch (_: Exception) {}
+                        // for adding folders and watching that not duplicate folder should add
+                        if (!tempFolderList.contains(folderC)) {
+                            tempFolderList.add(folderC)
+                            folderList.add(Folder(id = folderIdC, folderName = folderC))
+                        }
+                    } catch (_: Exception) {}
                 } while (cursor.moveToNext())
-            cursor?.close()
+        cursor?.close()
         // Remove folders with 0 or null videos
         folderList.removeAll { folder ->
             tempList.none { video -> video.folderName == folder.folderName }
         }
         return tempList
     }
-
 
     @SuppressLint("Range", "SuspiciousIndentation")
     fun getAllAudios(): ArrayList<Music> {
@@ -679,12 +678,6 @@ private fun funRequestRuntimePermission(){
 
         return tempList
     }
-    fun reloadVideos() {
-        videoList = getAllVideos() // Implement this method to get all videos
-        adapter.updateList(videoList)
-    }
-
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -708,7 +701,7 @@ private fun funRequestRuntimePermission(){
             }
         } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
             // Dark mode is applied
-          supportActionBar?.apply {
+            supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         this@MainActivity,
@@ -735,7 +728,7 @@ private fun funRequestRuntimePermission(){
                 }
             } else {
                 // System Default mode is light
-               supportActionBar?.apply {
+                supportActionBar?.apply {
                     setBackgroundDrawable(
                         ContextCompat.getDrawable(
                             this@MainActivity,
@@ -765,7 +758,7 @@ private fun funRequestRuntimePermission(){
 
         InterstitialAd.load(
             this,
-            "ca-app-pub-4270893888625106/2835817173",
+            "ca-app-pub-3504589383575544/9248821864",
             adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -795,7 +788,7 @@ private fun funRequestRuntimePermission(){
             withContext(Dispatchers.IO) {
                 // Load music data here (e.g., getAllAudios())
                 // For example:
-              MusicListMA = getAllAudios()
+                MusicListMA = getAllAudios()
                 // Other relevant initialization
             }
             // After loading, set the music fragment loaded flag to true
@@ -803,3 +796,4 @@ private fun funRequestRuntimePermission(){
         }
     }
 }
+

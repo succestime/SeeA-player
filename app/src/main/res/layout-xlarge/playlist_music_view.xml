@@ -21,6 +21,7 @@
             android:id="@+id/playlistImage"
             android:layout_width="100dp"
             android:layout_height="55dp"
+            android:layout_marginStart="10dp"
             app:shapeAppearanceOverlay="@style/curved_image_video"
             android:scaleType="centerCrop"
             android:background="@color/black"

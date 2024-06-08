@@ -24,6 +24,7 @@ import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.R
@@ -71,7 +72,8 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         Glide.with(context)
             .asBitmap()
             .load(musicReList[position].albumArtUri)
-            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three)).centerCrop()
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
             .into(holder.image)
 
 

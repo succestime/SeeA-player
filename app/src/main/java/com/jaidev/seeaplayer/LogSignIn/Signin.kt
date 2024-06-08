@@ -2,9 +2,11 @@ package com.jaidev.seeaplayer.LogSignIn
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -16,6 +18,7 @@ import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivitySigninBinding
 
 class signin : AppCompatActivity() {
+    private lateinit var swipeRefreshLayout: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        setTheme(More.themesList[More.themeIndex])
@@ -34,7 +37,6 @@ class signin : AppCompatActivity() {
             startActivity(Intent(this , SignUp::class.java))
             finish()
         }
-        setActionBarGradient()
 
         binding.createAccountBtn.setOnClickListener {
             val name = binding.userName.text.toString()
@@ -72,11 +74,15 @@ class signin : AppCompatActivity() {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show()
             }
         }
-
         binding.googleBtn.setOnClickListener {
             googleSignInClient.signOut()
             startActivityForResult(googleSignInClient.signInIntent,4)
         }
+
+        setActionBarGradient()
+
+        swipeRefreshLayout = binding.ActivitySignIN
+        setSwipeRefreshBackgroundColor()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -88,6 +94,26 @@ class signin : AppCompatActivity() {
             firebaseAuthWithGoogle(account.idToken!!)
         }
 
+    }
+
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+        }
     }
 private fun firebaseAuthWithGoogle(idToken : String){
     val credential = GoogleAuthProvider.getCredential(idToken , null)

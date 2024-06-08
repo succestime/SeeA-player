@@ -2,21 +2,32 @@ package com.jaidev.seeaplayer.LogSignIn
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivityLoginBinding
 
 class SignUp : AppCompatActivity() {
+    private lateinit var swipeRefreshLayout: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-        setActionBarGradient()
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.client_id))
+            .requestEmail()
+            .build()
+        val googleSignInClient = GoogleSignIn.getClient(this,gso)
 
         binding.Signin.setOnClickListener {
             startActivity(Intent(this , signin::class.java))
@@ -38,9 +49,57 @@ class SignUp : AppCompatActivity() {
                     Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()
                 }
         }
+        setActionBarGradient()
+
+        binding.googleBtn.setOnClickListener {
+            googleSignInClient.signOut()
+            startActivityForResult(googleSignInClient.signInIntent,4)
+        }
+
+        swipeRefreshLayout = binding.ActivitySignUp
+        setSwipeRefreshBackgroundColor()
     }
+    private fun firebaseAuthWithGoogle(idToken : String){
+        val credential = GoogleAuthProvider.getCredential(idToken , null)
+        moreNav.auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "SignIn Successful", Toast.LENGTH_LONG).show()
+                    finish()
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()
+            }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
+        if (requestCode == 4 && resultCode == RESULT_OK ){
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val account = task.getResult(ApiException::class.java)!!
+            firebaseAuthWithGoogle(account.idToken!!)
+        }
 
+    }
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+
+        if (isDarkMode) {
+            // Dark mode is enabled, set background color to #012030
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
+
+        } else {
+            // Light mode is enabled, set background color to white
+            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+        }
+    }
     private fun setActionBarGradient() {
         // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()

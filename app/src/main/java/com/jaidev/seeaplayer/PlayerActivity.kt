@@ -104,7 +104,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
     private lateinit var player: ExoPlayer
     lateinit var mAdView: AdView
-
     companion object {
         private var audioManager: AudioManager? = null
         private lateinit var player: ExoPlayer
@@ -154,8 +153,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         releasePlayer()
-
-
         // Set up your ExoPlayer instance and attach it to the CustomPlayerView
         val player = SimpleExoPlayer.Builder(this).build()
         binding.playerView.player = player
@@ -179,11 +176,10 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         // for immersive mode
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, binding.root).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.show(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-
 
         dialogProperties = DialogProperties()
         filePickerDialog = FilePickerDialog(this@PlayerActivity)
@@ -836,25 +832,26 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 playInFullscreen(enable = true)
             }
         }
-        binding.lockButton.setOnClickListener {
+        val lockBtn = findViewById<ImageButton>(R.id.lockButton)
+        lockBtn.setOnClickListener {
             if (!isLocked) {
                 // for hiding
                 isLocked = true
                 binding.playerView.hideController()
                 binding.playerView.useController = false
-                binding.lockButton.setImageResource(R.drawable.round_lock)
+                lockBtn.setImageResource(R.drawable.round_lock)
             } else {
                 // for showing
                 isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
-
-                binding.lockButton.setImageResource(R.drawable.round_lock_open)
+                lockBtn.setImageResource(R.drawable.round_lock_open)
             }
         }
 
     }
 
+    @SuppressLint("NewApi")
     private fun createPlayer() {
 
         try {
@@ -874,8 +871,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         player.prepare()
         playVideo()
 
-
-
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
@@ -891,19 +886,28 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         nowPlayingId = playerList[position].id
 
         seekBarFeature()
-        binding.playerView.setControllerVisibilityListener {
-            when {
-                isLocked -> binding.lockButton.visibility = View.VISIBLE
-                binding.playerView.isControllerVisible -> binding.lockButton.visibility =
-                    View.VISIBLE
+        binding.playerView.setControllerVisibilityListener { visibility ->
+            val lockBtn = findViewById<ImageButton>(R.id.lockButton)
 
-                else -> binding.lockButton.visibility = View.INVISIBLE
+            if (isLocked) {
+                lockBtn.visibility = View.VISIBLE
+            } else {
+                lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
             }
 
-
+            // Show or hide the status bar based on playerView visibility
+            if (binding.playerView.isControllerVisible) {
+                showStatusBar()
+            } else {
+                hideStatusBar()
+            }
         }
-
-
+        // Adjust player view padding for status bar
+        binding.playerView.setOnApplyWindowInsetsListener { view, insets ->
+            val systemWindowInsets = insets.systemWindowInsets
+            view.setPadding(0, systemWindowInsets.top, 0, systemWindowInsets.bottom)
+            insets
+        }
     }
 
     private fun playVideo() {
@@ -1046,27 +1050,19 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             if (!isLocked) {
                 binding.playerView.isDoubleTapEnabled = true
                 gestureDetectorCompat.onTouchEvent(motionEvent)
-
-                if (motionEvent.action == MotionEvent.ACTION_UP) {
-//                    binding.brightnessIcon?.visibility = View.GONE
-//                    binding.volumeIcon?.visibility = View.GONE
-                    // for immersive mode
-                    WindowCompat.setDecorFitsSystemWindows(window, false)
-                    WindowInsetsControllerCompat(window, binding.root).let { controller ->
-                        controller.hide(WindowInsetsCompat.Type.systemBars())
-                        controller.systemBarsBehavior =
-                            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    }
-                }
             }
-
-
-
 
             return@setOnTouchListener false
         }
+
+    }
+   fun showStatusBar() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
     }
 
+    private fun hideStatusBar() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+    }
     @SuppressLint("ClickableViewAccessibility")
     private fun setupSwipeGesture() {
         binding.playerView.setOnTouchListener { view, motionEvent ->

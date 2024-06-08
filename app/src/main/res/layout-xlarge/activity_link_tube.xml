@@ -116,7 +116,7 @@
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
                             android:background="@color/gray"
-                            android:layout_marginEnd="2dp"/>
+                            android:layout_marginEnd="10dp"/>
 
                         <ImageButton
                             android:id="@+id/crossBtn"
@@ -124,7 +124,7 @@
                             android:layout_height="match_parent"
                             android:src="@drawable/browser_clear"
                             android:background="@android:color/transparent"
-                            android:layout_marginEnd="2dp"
+                            android:layout_marginEnd="5dp"
                             app:tint="@color/white"
                             android:visibility="gone" />
 
@@ -137,7 +137,7 @@
                             android:background="@android:color/transparent"
                             android:visibility="gone"
                             app:tint="@color/white"
-                            android:layout_marginEnd="2dp" />
+                            android:layout_marginEnd="5dp" />
 
                         <ImageButton
                             android:id="@+id/bookMarkBtn"
@@ -147,7 +147,7 @@
                             android:background="@android:color/transparent"
                             android:visibility="gone"
                             app:tint="@color/white"
-                            android:layout_margin="5dp"
+                            android:layout_margin="10dp"
                             />
 
                     </LinearLayout>
@@ -160,9 +160,8 @@
 
             <ImageButton
                 android:id="@+id/topDownloadBrowser"
-                android:layout_width="40dp"
+                android:layout_width="45dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:layout_marginStart="5dp"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
@@ -170,7 +169,6 @@
                 android:visibility="gone"
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
-
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tabBtn"

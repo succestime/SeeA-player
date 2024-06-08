@@ -49,7 +49,7 @@
     // music player feature
     <string name="playlist_btn">Playlist</string>
     <string name="favourites_btn">Favourite</string>
-    <string name="shuffle_btn">Shuffle</string>
+    <string name="shuffle_btn">Play</string>
     <string name="total_songs">Total Songs</string>
     <string name="world_of_music">World Of Music</string>
     <string name="song_name">Song Name</string>
@@ -142,8 +142,9 @@
     <string name="enter_your_signin_email">Enter your Email</string>
     <string name="signIn_password">Password</string>
     <string name="activity_signin">Sign In</string>
-    <string name="already_login_chick_here">Already LogIn chick here</string>
-    <string name="activity_signIn_login">Sign Up?</string>
+    <string name="already_login_chick_here">Already have an account ?</string>
+    <string name="already_signin_chick_here">Don\'t have an account ?</string>
+    <string name="activity_signIn_login">Sign Up</string>
     <string name="seeA">SeeA</string>
     <string name="edu">Edu.</string>
     <string name="_140">₹ 149</string>
@@ -152,7 +153,7 @@
     <string name="_1ne_2">1NE</string>
     <string name="best_for_users_who_like_to_play_video_and_music_on_mobile_and_tablet">Best for users who like to play video and music on mobile and tablet</string>
     <string name="monthly_n_15">Monthly\n₹15</string>
-    <string name="quarterly_n_75">Quarterly\n₹75</string>
+    <string name="quarterly_n_75">Semiannual\n₹75</string>
     <string name="biennial_n_599">Biennial\n₹299</string>
     <string name="annual_n_149">Annual\n₹149</string>
     <string name="or">or</string>
@@ -219,6 +220,7 @@
     <string name="min_20">20 Minutes</string>
     <string name="checkmark">video download</string>
     <string name="share_via">Share link</string>
+    <string name="menu_iocns">Menu Icons</string>
 
 
 </resources>

@@ -1,4 +1,3 @@
-
 package com.jaidev.seeaplayer.dataClass
 
 import android.Manifest
@@ -7,10 +6,13 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.LayoutInflater
@@ -20,6 +22,7 @@ import android.widget.Button
 import android.widget.Switch
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -37,20 +40,25 @@ import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+
 @SuppressLint("UseSwitchCompatOrMaterialCode")
 class DownloadBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetLayoutBinding
     private lateinit var rememberChoice: Switch
+    private var downloadUrl: String? = null
+
     companion object {
         private const val ARG_TITLE = "title"
-        private const val ARG_IMAGE_URL = "image_url"
+        private const val ARG_DOWNLOAD_URL = "download_url"
         private const val STORAGE_PERMISSION_CODE = 1000
-        fun newInstance(title: String, imageUrl: String): DownloadBottomSheetFragment {
+        private const val NOTIFICATION_CHANNEL_ID = "download_channel"
+        private const val NOTIFICATION_ID = 1
+        fun newInstance(title: String, downloadUrl: String): DownloadBottomSheetFragment {
             val fragment = DownloadBottomSheetFragment()
             val args = Bundle()
             args.putString(ARG_TITLE, title)
-            args.putString(ARG_IMAGE_URL, imageUrl)
+            args.putString(ARG_DOWNLOAD_URL, downloadUrl)
             fragment.arguments = args
             return fragment
         }
@@ -58,7 +66,6 @@ class DownloadBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -91,23 +98,28 @@ class DownloadBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
         binding.downloadButton.setOnClickListener {
-//
-//            checkPermissionAndDownload(videoUrl)
+            val downloadUrl = this.downloadUrl
+            if (downloadUrl != null) {
+                checkPermissionAndDownload(downloadUrl)
+            } else {
+                Toast.makeText(requireContext(), "Download link not available", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val title = arguments?.getString(ARG_TITLE)
-        val imageUrl = arguments?.getString(ARG_IMAGE_URL)
+        downloadUrl = arguments?.getString(ARG_DOWNLOAD_URL)
 
         // Set the title and image using Glide
         binding.urlname.text = title
         Glide.with(this)
-            .load(imageUrl)
-            .placeholder(R.mipmap.ic_logo_o) // Placeholder image until loaded
-            .error(R.mipmap.ic_logo_o) // Error image if loading fails
+            .load(downloadUrl)
+            .placeholder(R.mipmap.ic_logo_o)
+            .error(R.mipmap.ic_logo_o)
             .into(binding.urlImage)
 
         return binding.root
     }
+
     private fun blinkBackground(view: View) {
         val colorFrom = ContextCompat.getColor(requireContext(), R.color.transparent) // Starting color
         val colorTo = Color.WHITE // Blinking color
@@ -119,6 +131,7 @@ class DownloadBottomSheetFragment : BottomSheetDialogFragment() {
 
         animator.start()
     }
+
     private fun showCustomDialog() {
         // Inflate the custom layout/view
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.downloaded_started, null)
@@ -174,6 +187,7 @@ class DownloadBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
     }
+
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         requireActivity().finish()
@@ -194,13 +208,20 @@ class DownloadBottomSheetFragment : BottomSheetDialogFragment() {
         if (requestCode == STORAGE_PERMISSION_CODE && grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Permission granted, start the download
-            downloadFile(arguments?.getString(ARG_IMAGE_URL) ?: "")
+            downloadFile(arguments?.getString(ARG_DOWNLOAD_URL) ?: "")
         } else {
             // Permission denied
             Toast.makeText(requireContext(), "Permission denied to write to storage", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun downloadFile(url: String) {
+        // Show a toast when the download starts
+        Toast.makeText(requireContext(), "Download started", Toast.LENGTH_SHORT).show()
+
+        // Show a notification when the download starts
+        showNotification("Download started", "Downloading your file...")
+
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -219,15 +240,47 @@ class DownloadBottomSheetFragment : BottomSheetDialogFragment() {
 
                     withContext(Dispatchers.Main) {
                         Toast.makeText(requireContext(), "File downloaded successfully: $fileName", Toast.LENGTH_SHORT).show()
+                        updateNotification("Download complete", "Your file has been downloaded.")
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(requireContext(), "Failed to download file", Toast.LENGTH_SHORT).show()
+                        updateNotification("Download failed", "There was an error downloading your file.")
                     }
                 }
             }
         }
     }
+
+    @SuppressLint("ObsoleteSdkInt")
+    private fun showNotification(title: String, content: String) {
+        val notificationManager = ContextCompat.getSystemService(requireContext(), NotificationManager::class.java) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, "Download Notifications", NotificationManager.IMPORTANCE_LOW)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(requireContext(), NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setSmallIcon(R.drawable.download_icon) // Replace with your own icon
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    private fun updateNotification(title: String, content: String) {
+        val notificationManager = ContextCompat.getSystemService(requireContext(), NotificationManager::class.java) as NotificationManager
+
+        val notification = NotificationCompat.Builder(requireContext(), NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setSmallIcon(R.drawable.download_icon) // Replace with your own icon
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
 }
-
-

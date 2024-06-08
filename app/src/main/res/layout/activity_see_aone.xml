@@ -262,7 +262,7 @@ android:layout_marginStart="5dp"
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/quarterly_Box"
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="100dp"
                 android:background="@drawable/square_box_bg_selector"
@@ -296,7 +296,7 @@ android:layout_marginStart="5dp"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/complete_svgrepo_com"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView12"
                     app:layout_constraintTop_toTopOf="parent" />

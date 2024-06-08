@@ -40,7 +40,7 @@ class FavouriteActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Enable the Up button
         favouriteSongs = checkPlaylist(favouriteSongs)
         binding.favouriteRV.setHasFixedSize(true)
-        binding.favouriteRV.setItemViewCacheSize(13)
+        binding.favouriteRV.setItemViewCacheSize(50)
         binding.favouriteRV.layoutManager = GridLayoutManager(this, 3)
         adapter = FavouriteAdapter(this, favouriteSongs)
         binding.favouriteRV.adapter = adapter

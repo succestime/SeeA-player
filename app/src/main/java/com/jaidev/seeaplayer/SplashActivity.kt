@@ -29,6 +29,7 @@ class SplashActivity : AppCompatActivity() {
             2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
 
+
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 supportActionBar?.hide()

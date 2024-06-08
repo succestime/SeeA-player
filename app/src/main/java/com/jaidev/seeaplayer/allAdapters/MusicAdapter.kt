@@ -33,6 +33,7 @@ import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
@@ -63,8 +64,7 @@ class MusicAdapter(
     private lateinit var dialogRF: AlertDialog
     private lateinit var sharedPreferences: SharedPreferences
 
-
-    // Tracks selected items
+    // Tracks selected item
     val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
 
@@ -107,13 +107,17 @@ class MusicAdapter(
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("NotifyDataSetChanged", "MissingInflatedId")
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
+
         holder.title.text = musicList[position].title
         holder.album.text = musicList[position].album
-        Glide.with(context)
-            .asBitmap()
-            .load(musicList[position].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
-            .into(holder.image)
+
+            Glide.with(context)
+                .asBitmap()
+                .load(musicList[position].artUri)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
+                .error(R.drawable.music_speaker_three) // Set error placeholder image resource
+                .into(holder.image)
 
         if (selectedItems.contains(position)) {
             // Set your custom selected background on the root view of the item

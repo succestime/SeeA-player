@@ -58,7 +58,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = MainActivity.folderList[position].folderName
         binding.videoRVFA.setHasFixedSize(true)
-        binding.videoRVFA.setItemViewCacheSize(10)
+        binding.videoRVFA.setItemViewCacheSize(200)
         adapter = VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true )
         binding.videoRVFA.adapter = adapter
         binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
@@ -190,7 +190,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
 
     @SuppressLint("SetTextI18n")
     override fun onVideoDeleted() {
-
+        MainActivity.videoList.clear()
         val position = intent.getIntExtra("position", 0)
         currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
         adapter.updateList(currentFolderVideos)
@@ -402,13 +402,14 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             }
         }
     }
-    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
+    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation", "SetTextI18n")
     override fun onResume() {
         super.onResume()
         setActionBarGradient()
         if(PlayerActivity.position != -1) {binding.nowPlayingBtn.visibility = View.VISIBLE}
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged= false
+        binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
     }
 
 

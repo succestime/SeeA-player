@@ -141,10 +141,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         }
         holder.root.setOnClickListener {
             if (actionMode != null) {
-                // If action mode is active, toggle selection as usual
                 toggleSelection(position)
             } else {
-                // Otherwise, play the video without enabling selection
                 when {
 
                     isFolder -> {
@@ -155,11 +153,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                         PlayerActivity.pipStatus = 2
                         sendIntent(pos = position, ref = "SearchVideos")
                     }
-//                    isDownloadVideo -> {
-//                        PlayerActivity.pipStatus = 3
-//                        sendIntent(pos = position , ref = "LinkTubeDownload")
-//
-//                    }
+
                     videoList[position].id == PlayerActivity.nowPlayingId -> {
                         sendIntent(pos = position, ref = "NowPlaying")
                     }
@@ -401,8 +395,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         videoList[position].title = newName
         notifyItemChanged(position)
     }
-    // Toggle selection for multi-select
-    // Toggle selection for multi-select
+
     private fun toggleSelection(position: Int) {
         if (selectedItems.contains(position)) {
             selectedItems.remove(position)
@@ -472,8 +465,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                 R.id.shareMulti -> {
                     shareSelectedFiles()
-                    // Dismiss action mode
-                    actionMode?.finish()
                 }
                 R.id.deleteMulti -> {
                     if (selectedItems.isNotEmpty()) {
@@ -528,50 +519,57 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         }
     }
 
-
     private fun shareSelectedFiles() {
         val uris = mutableListOf<Uri>()
 
         // Iterate through selectedItems to get selected file items
         for (position in selectedItems) {
-            val music = videoList[position]
-            val fileUri = FileProvider.getUriForFile(
-                context,
-                context.applicationContext.packageName + ".provider",
-                File(music.path)
-            )
-            uris.add(fileUri)
-        }
-
-        // Create an ACTION_SEND intent to share multiple files
-        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
-        shareIntent.type = "video/*"
-        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-        // Get the list of apps that can handle the intent
-        val packageManager = context.packageManager
-        val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
-        val excludedComponents = mutableListOf<ComponentName>()
-
-        // Iterate through the list and exclude your app
-        for (resolvedActivity in resolvedActivityList) {
-            if (resolvedActivity.activityInfo.packageName == context.packageName) {
-                excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+            val video = videoList[position]
+            try {
+                val fileUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.applicationContext.packageName}.provider",
+                    File(video.path)
+                )
+                uris.add(fileUri)
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+                Toast.makeText(context, "Failed to get URI for file: ${video.path}", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Create a chooser intent
-        val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
+        if (uris.isNotEmpty()) {
+            // Create an ACTION_SEND intent to share multiple files
+            val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+            shareIntent.type = "video/*"
+            shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-        // Exclude your app from the chooser intent
-        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+            // Get the list of apps that can handle the intent
+            val packageManager = context.packageManager
+            val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
+            val excludedComponents = mutableListOf<ComponentName>()
 
-        chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(chooserIntent)
+            // Iterate through the list and exclude your app
+            for (resolvedActivity in resolvedActivityList) {
+                if (resolvedActivity.activityInfo.packageName == context.packageName) {
+                    excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+                }
+            }
 
-        // Dismiss action mode
-        actionMode?.finish()
+            // Create a chooser intent
+            val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
+
+            // Exclude your app from the chooser intent
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+            }
+
+            chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(chooserIntent)
+        } else {
+            Toast.makeText(context, "No valid files to share", Toast.LENGTH_SHORT).show()
+        }
     }
 
 

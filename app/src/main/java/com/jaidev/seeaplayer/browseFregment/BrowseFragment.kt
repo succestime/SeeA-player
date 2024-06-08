@@ -68,7 +68,6 @@ import com.jaidev.seeaplayer.dataClass.SearchTitle
 import com.jaidev.seeaplayer.dataClass.SearchTitleStore
 import com.jaidev.seeaplayer.databinding.FragmentBrowseBinding
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 
@@ -92,7 +91,10 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             fileIconResId: Int
         )
 
+
     }
+
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -213,9 +215,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                 fillTitleInTextUrl()
                 binding.recyclerviewLayout.visibility = View.VISIBLE
             }
-        }
-        linkRef.binding.downloadBrowser.setOnClickListener {
-            initiateDownloadForCurrentPage()
         }
 
 // Before loading the webpage, check for network connectivity
@@ -389,36 +388,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             }
         }
     }
-    private fun downloadCurrentWebPage(url: String) {
-        // Sanitize the title to create a valid filename from urlNew
-        val sanitizedTitle = urlNew
-        // Add a .mht extension
-        val fileName = "${sanitizedTitle}- SeeA LinkTube.mhtml"
-        val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val file = File(destinationDir, fileName)
-        // Save the webpage to the file
-        binding.webView.saveWebArchive(file.absolutePath, false) { savedFile ->
-            if (savedFile != null) {
-                Toast.makeText(requireContext(), "Page saved as $fileName", Toast.LENGTH_SHORT).show()
-                Log.d("Downloaded URL", url)
-            } else {
-                Toast.makeText(requireContext(), "Failed to save page", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    // Call this function when the user initiates the download
-    private fun initiateDownloadForCurrentPage() {
-        // Get the current URL from the WebView
-        val currentUrl = binding.webView.url
-        if (currentUrl != null) {
-            downloadCurrentWebPage(currentUrl)
-        } else {
-            Toast.makeText(requireContext(), "Failed to get current URL", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
 
     private fun performSearch(query: String) {
         val linkRef = requireActivity() as LinkTubeActivity
@@ -564,19 +533,9 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         super.onPause()
         unregisterDownloadReceiver()
         (requireActivity() as LinkTubeActivity).saveBookmarks()
-        // for clearing all  webView data
-//        binding.webView.apply {
-//            clearMatches()
-//            clearHistory()
-//            clearFormData()
-//            clearSslPreferences()
-//            clearCache(true)
-//
-//            CookieManager.getInstance().removeAllCookies(null)
-//            WebStorage.getInstance().deleteAllData()
-//        }
+
     }
-    // Assuming this is in your BrowseFragment or similar place
+
 
 
 

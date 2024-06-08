@@ -2,10 +2,8 @@ package com.jaidev.seeaplayer.allAdapters
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -14,10 +12,15 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Playlist
 import com.jaidev.seeaplayer.databinding.PlaylistMusicViewBinding
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
-import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 
-class PlaylistViewAdapter(private val context: Context, private var playlistList : ArrayList<Playlist> ): RecyclerView.Adapter<PlaylistViewAdapter.MyAdapter>() {
+class PlaylistViewAdapter(private val context: Context,
+                          private var playlistList : ArrayList<Playlist> ,
+                          private val onItemClick: OnItemClickListener // Item click listener
 
+): RecyclerView.Adapter<PlaylistViewAdapter.MyAdapter>() {
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
     class MyAdapter(binding: PlaylistMusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val image = binding.playlistImage
         val name = binding.playlistName
@@ -41,7 +44,7 @@ class PlaylistViewAdapter(private val context: Context, private var playlistList
                 .setPositiveButton("Yes") { dialog, _ ->
                     PlaylistActivity.musicPlaylist.ref.removeAt(position)
                     refreshPlaylist()
-                 dialog.dismiss()
+                    dialog.dismiss()
                 }
                 .setNegativeButton("No") { dialog, _ ->
                     dialog.dismiss()
@@ -50,10 +53,7 @@ class PlaylistViewAdapter(private val context: Context, private var playlistList
             customDialog.show()
         }
         holder.root.setOnClickListener {
-
-            val intent = Intent(context , PlaylistDetails::class.java)
-            intent.putExtra("index" , position)
-            ContextCompat.startActivity(context , intent, null)
+            onItemClick.onItemClick(position) // Notify activity on item click
         }
         if (PlaylistActivity.musicPlaylist.ref[position].playlist.size > 0){
             Glide.with(context)
@@ -72,8 +72,8 @@ class PlaylistViewAdapter(private val context: Context, private var playlistList
     // for refreshing the Playlist when any new playlist add
     @SuppressLint("NotifyDataSetChanged")
     fun refreshPlaylist(){
-     playlistList = ArrayList()
-     playlistList.addAll(PlaylistActivity.musicPlaylist.ref)
-     notifyDataSetChanged()
- }
+        playlistList = ArrayList()
+        playlistList.addAll(PlaylistActivity.musicPlaylist.ref)
+        notifyDataSetChanged()
+    }
 }

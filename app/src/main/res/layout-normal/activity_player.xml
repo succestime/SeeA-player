@@ -57,17 +57,6 @@
     </FrameLayout>
 
 
-    <ImageButton
-        android:id="@+id/lockButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:backgroundTint="@android:color/transparent"
-        android:contentDescription="@string/lock"
-        android:src="@drawable/round_lock_open"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
-
     <TextView
         android:id="@+id/durationChangeTextView"
         android:layout_width="wrap_content"

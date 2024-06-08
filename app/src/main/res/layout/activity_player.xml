@@ -23,7 +23,6 @@
             android:layout_height="match_parent"
             android:background="@color/black"
             android:keepScreenOn="true"
-
             app:controller_layout_id="@layout/custom_control_view"
             app:dtpv_controller="@id/ytOverlay"
             app:show_buffering="always" >
@@ -71,18 +70,6 @@
     </FrameLayout>
 
 
-    <ImageButton
-        android:id="@+id/lockButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:backgroundTint="@android:color/transparent"
-        android:contentDescription="@string/lock"
-        android:src="@drawable/round_lock_open"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
 
 
     CardView for Volume SeekBar
@@ -204,7 +191,8 @@
             >
 
         </ImageButton>
-    </LinearLayout>
 
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

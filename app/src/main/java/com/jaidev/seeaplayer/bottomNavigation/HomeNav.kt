@@ -61,11 +61,8 @@ class homeNav : Fragment() {
         binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
 
         binding.swipeRefreshFolder.setOnRefreshListener {
-            // Refresh logic for other components
-            foldersAdapter.notifyDataSetChanged()
-            binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
-            // Stop the refreshing animation
-            binding.swipeRefreshFolder.isRefreshing = false
+
+            refreshFolderList()
         }
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
@@ -81,6 +78,26 @@ class homeNav : Fragment() {
 
         return binding.root
     }
+
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
+    private fun refreshFolderList() {
+        // Call the refresh function in MainActivity
+      (activity as MainActivity).refreshFolderList()
+        // Update the adapter with the new data
+        foldersAdapter.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
+
+        binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
+        swipeRefreshLayout.isRefreshing = false
+
+        if (MainActivity.folderList.isEmpty()) {
+            binding.videoEmptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.videoEmptyStateLayout.visibility = View.GONE
+        }
+    }
+
+
 
 
     private fun setSwipeRefreshBackgroundColor() {

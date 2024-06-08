@@ -176,7 +176,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         // for immersive mode
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, binding.root).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.show(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
@@ -672,24 +672,27 @@ binding.adsRemove.setOnClickListener {
                 playInFullscreen(enable = true)
             }
         }
-        binding.lockButton.setOnClickListener {
+      val lockBtn =   findViewById<ImageButton>(R.id.lockButton)
+
+        lockBtn.setOnClickListener {
             if (!isLocked) {
                 // for hiding
                 isLocked = true
                 binding.playerView.hideController()
                 binding.playerView.useController = false
-                binding.lockButton.setImageResource(R.drawable.round_lock)
+                lockBtn.setImageResource(R.drawable.round_lock)
             } else {
                 // for showing
                 isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
 
-                binding.lockButton.setImageResource(R.drawable.round_lock_open)
+                lockBtn.setImageResource(R.drawable.round_lock_open)
             }
         }
     }
 
+    @SuppressLint("NewApi")
     private fun createPlayer() {
 
         try {
@@ -726,16 +729,27 @@ binding.adsRemove.setOnClickListener {
         nowPlayingId = recantPlayerList[position].id
 
         seekBarFeature()
-        binding.playerView.setControllerVisibilityListener {
-            when {
-                isLocked -> binding.lockButton.visibility = View.VISIBLE
-                binding.playerView.isControllerVisible -> binding.lockButton.visibility =
-                    View.VISIBLE
+        binding.playerView.setControllerVisibilityListener { visibility ->
+            val lockBtn = findViewById<ImageButton>(R.id.lockButton)
 
-                else -> binding.lockButton.visibility = View.INVISIBLE
+            if (isLocked) {
+                lockBtn.visibility = View.VISIBLE
+            } else {
+                lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
             }
 
-
+            // Show or hide the status bar based on playerView visibility
+            if (binding.playerView.isControllerVisible) {
+                showStatusBar()
+            } else {
+                hideStatusBar()
+            }
+        }
+        // Adjust player view padding for status bar
+        binding.playerView.setOnApplyWindowInsetsListener { view, insets ->
+            val systemWindowInsets = insets.systemWindowInsets
+            view.setPadding(0, systemWindowInsets.top, 0, systemWindowInsets.bottom)
+            insets
         }
     }
 
@@ -882,15 +896,7 @@ binding.adsRemove.setOnClickListener {
             if (!isLocked) {
                 binding.playerView.isDoubleTapEnabled = true
                 gestureDetectorCompat.onTouchEvent(motionEvent)
-                if (motionEvent.action == MotionEvent.ACTION_UP) {
-                    // for immersive mode
-                    WindowCompat.setDecorFitsSystemWindows(window, false)
-                    WindowInsetsControllerCompat(window, binding.root).let { controller ->
-                        controller.hide(WindowInsetsCompat.Type.systemBars())
-                        controller.systemBarsBehavior =
-                            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    }
-                }
+
             }
 
 
@@ -898,6 +904,14 @@ binding.adsRemove.setOnClickListener {
 
             return@setOnTouchListener false
         }
+    }
+
+    private fun showStatusBar() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+    }
+
+    private fun hideStatusBar() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
     }
 
     @SuppressLint("ClickableViewAccessibility")
