@@ -22,45 +22,56 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
-                <Button
+                <TextView
                     android:id="@+id/playandshuffleBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/curver_music"
                     android:contentDescription="@string/shuffle_btn"
-                    android:drawableTop="@drawable/play_icon"
+                    android:drawableLeft="@drawable/play_icon"
                     android:drawableTint="@color/cool_pink"                    android:textColor="?android:textColor"
                     android:text="@string/shuffle_btn"
                     android:textAllCaps="false"
-
+                   android:padding="10dp"
                     />
 
-                <Button
-
+                <TextView
                     android:id="@+id/playlistBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
+                    android:background="@drawable/curver_music"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
                     android:contentDescription="@string/playlist_btn"
-                    android:drawableTop="@drawable/playlist_icon"
+                    android:drawableLeft="@drawable/playlist_icon"
                     android:text="@string/playlist_btn"
                     android:textAllCaps="false"
+                    android:padding="10dp"
                     android:textColor="?android:textColor"
                     />
 
-                <Button
+                <TextView
                     android:id="@+id/favouriteBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
+                    android:background="@drawable/curver_music"
+                   android:padding="10dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
                     android:contentDescription="@string/favourites_btn"
                     android:drawableTint="@color/cool_pink"
-                    android:drawableTop="@drawable/round_favorite_music"                    android:text="@string/favourites_btn"
+                    android:drawableLeft="@drawable/round_favorite_music"                    android:text="@string/favourites_btn"
                     android:textAllCaps="false"
                     android:textColor="?android:textColor"
 
@@ -76,32 +87,38 @@
                 android:orientation="vertical">
 
 
-                <TextView
-                    android:id="@+id/TotalMusics"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/total_songs"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
 
-                <ViewStub
-                    android:id="@+id/musicemptyStateLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout="@layout/music_nav_empty_state_layout"
-                    android:foregroundGravity="center"
-                    android:visibility="gone"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/musicRV"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:paddingBottom="60dp"
-                    android:scrollbars="vertical"
-                    />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <ViewStub
+                            android:id="@+id/musicemptyStateLayout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout="@layout/music_nav_empty_state_layout"
+                            android:foregroundGravity="center"
+                            android:visibility="gone"/>
+                        <TextView
+                            android:id="@+id/TotalMusics"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/total_songs"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/musicRV"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:paddingBottom="60dp"
+                            android:scrollbars="vertical"/>
+                    </LinearLayout>
+
+
             </LinearLayout>
 
         </LinearLayout>

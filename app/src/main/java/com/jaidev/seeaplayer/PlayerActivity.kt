@@ -46,6 +46,7 @@ import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -78,6 +79,7 @@ import kotlin.system.exitProcess
 class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener
     , GestureDetector.OnGestureListener
 {
+    private var isVideoPlaying = false
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var playPauseBtn: ImageButton
     private lateinit var fullScreenBtn: ImageButton
@@ -104,6 +106,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
     private lateinit var player: ExoPlayer
     lateinit var mAdView: AdView
+    private lateinit var gestureDetector: GestureDetector
     companion object {
         private var audioManager: AudioManager? = null
         private lateinit var player: ExoPlayer
@@ -758,6 +761,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     }
     override fun onPause() {
         super.onPause()
+        resetPlaybackSpeed()
         if (player.isPlaying) {
             isPlayingBeforePause = true
             player.pause()
@@ -767,7 +771,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             isPlayingBeforePause = false
         }
     }
-    @SuppressLint("SetTextI18n", "SuspiciousIndentation", "ObsoleteSdkInt")
+    @SuppressLint("SetTextI18n", "SuspiciousIndentation", "ObsoleteSdkInt",
+        "ClickableViewAccessibility"
+    )
     private fun initializeBinding() {
 
         findViewById<ImageButton>(R.id.backBtn).setOnClickListener {
@@ -778,6 +784,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             val newPosition = maxOf(0L, currentPosition - 10000) // Rewind by 10 seconds
             player.seekTo(newPosition)
         }
+
 
         findViewById<ImageButton>(R.id.forward10secondBtn).setOnClickListener {
             val duration = player.duration
@@ -835,22 +842,49 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         val lockBtn = findViewById<ImageButton>(R.id.lockButton)
         lockBtn.setOnClickListener {
             if (!isLocked) {
-                // for hiding
+                // For hiding
                 isLocked = true
-                binding.playerView.hideController()
                 binding.playerView.useController = false
+                binding.playerView.isDoubleTapEnabled = false
+                binding.playerView.hideController()
                 lockBtn.setImageResource(R.drawable.round_lock)
+                Handler().postDelayed({
+                    lockBtn.visibility = View.INVISIBLE
+                }, 2000)
             } else {
-                // for showing
+                // For showing
                 isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
                 lockBtn.setImageResource(R.drawable.round_lock_open)
+                lockBtn.visibility = View.VISIBLE
             }
+        }
+
+        binding.playerView.setOnClickListener {
+            // Show lock button if locked when touched
+            if (isLocked) {
+                lockBtn.visibility = View.VISIBLE
+                // Schedule to hide lock button after 2 seconds
+                Handler().postDelayed({
+                    lockBtn.visibility = View.INVISIBLE
+                }, 2000)
+            }else{
+                binding.playerView.isDoubleTapEnabled = true
+            }
+
+
         }
 
     }
 
+    private fun setPlaybackSpeed(speed: Float) {
+        player.playbackParameters = PlaybackParameters(speed)
+    }
+
+        private fun resetPlaybackSpeed() {
+        player.playbackParameters = PlaybackParameters(1.0f) // Normal speed
+    }
     @SuppressLint("NewApi")
     private fun createPlayer() {
 
@@ -1052,17 +1086,25 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 gestureDetectorCompat.onTouchEvent(motionEvent)
             }
 
+
+
             return@setOnTouchListener false
         }
 
+
     }
-   fun showStatusBar() {
+
+
+    private fun showStatusBar() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        binding.playerView.showController() // Show player controller
     }
 
     private fun hideStatusBar() {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        binding.playerView.hideController() // Hide player controller
     }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupSwipeGesture() {
         binding.playerView.setOnTouchListener { view, motionEvent ->

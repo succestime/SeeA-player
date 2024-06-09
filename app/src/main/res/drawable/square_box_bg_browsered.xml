@@ -5,6 +5,6 @@
     <stroke
         android:color="#5E5D5D"
     android:width="2dp"/>
-    <solid android:color="@color/white"/> <!-- Set your desired background color -->
+    <solid android:color="@color/black"/> <!-- Set your desired background color -->
     <corners android:radius="4dp"/> <!-- Adjust as needed -->
 </shape>

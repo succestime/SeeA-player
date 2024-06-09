@@ -55,7 +55,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
         adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true)
         adapter.setMusicDeleteListener(this)
         binding.musicRV.adapter = adapter
-        binding.TotalMusics.text = "Total Musics : ${MusicListMA.size}"
+        binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
 
         binding.swipeRefreshMusic.setOnRefreshListener {
             checkForNewMusic()
@@ -107,11 +107,15 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
 
         binding.favouriteBtn.setOnClickListener {
             startActivity(Intent(requireContext(), FavouriteActivity::class.java))
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         }
         binding.playlistBtn.setOnClickListener {
             startActivity(Intent(requireContext(), PlaylistActivity
             ::class.java))
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+
         }
+
 
         swipeRefreshLayout = binding.swipeRefreshMusic
 
@@ -128,7 +132,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
             MusicListMA.clear()
             MusicListMA.addAll(updatedMusicList)
             adapter.updateMusicList(MusicListMA)
-            binding.TotalMusics.text = "Total Musics : ${MusicListMA.size}"
+            binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
 
             if (MusicListMA.isEmpty()) {
                 binding.musicemptyStateLayout.visibility = View.VISIBLE
@@ -163,7 +167,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
             MusicListMA.clear()
             MusicListMA.addAll(updatedMusicList)
             adapter.updateMusicList(MusicListMA)
-            binding.TotalMusics.text = "Total Musics : ${MusicListMA.size}"
+            binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
 
             if (MusicListMA.isEmpty()) {
                 binding.musicemptyStateLayout.visibility = View.VISIBLE
@@ -204,16 +208,14 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
         super.onResume()
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
-      if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
+        if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged= false
         if (MusicListMA.isEmpty()) {
             binding.musicemptyStateLayout.visibility = View.VISIBLE
         } else {
             binding.musicemptyStateLayout.visibility = View.GONE
         }
-        binding.TotalMusics.text = "Total Musics : ${MusicListMA.size}"
+        binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
     }
-
-
 
 }

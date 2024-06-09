@@ -20,6 +20,7 @@ class PlaylistViewAdapter(private val context: Context,
 ): RecyclerView.Adapter<PlaylistViewAdapter.MyAdapter>() {
     interface OnItemClickListener {
         fun onItemClick(position: Int)
+
     }
     class MyAdapter(binding: PlaylistMusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val image = binding.playlistImage

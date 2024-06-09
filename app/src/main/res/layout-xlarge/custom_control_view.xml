@@ -44,18 +44,7 @@
             android:singleLine="true"
             android:marqueeRepeatLimit="marquee_forever"
             android:ellipsize="marquee"/>
-        <ImageButton
-            android:id="@+id/lockButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="10dp"
-            android:layout_gravity="center_vertical"
-            android:backgroundTint="@android:color/transparent"
-            android:contentDescription="@string/lock"
-            android:src="@drawable/round_lock_open"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+
     </LinearLayout>
 
 

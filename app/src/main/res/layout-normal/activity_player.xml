@@ -55,14 +55,28 @@
             tools:ignore="ObsoleteLayoutParam" />
 
     </FrameLayout>
-
+    <ImageButton
+        android:id="@+id/lockButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="7dp"
+        android:scaleType="centerInside"
+        android:background="@drawable/ripple_circle"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/lock"
+        android:src="@drawable/round_lock_open"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/durationChangeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textColor="#DCD7D7"
+        android:textColor="#4A4A4A"
         android:textSize="24sp"
         android:visibility="gone"
         android:textStyle="bold"

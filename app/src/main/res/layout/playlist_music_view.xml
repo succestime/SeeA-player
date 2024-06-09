@@ -24,6 +24,7 @@
                 android:layout_height="55dp"
                 app:shapeAppearanceOverlay="@style/curved_image_video"
                 android:scaleType="centerCrop"
+                android:layout_marginStart="10dp"
                 android:background="@color/black"
                 app:cardBackgroundColor="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"

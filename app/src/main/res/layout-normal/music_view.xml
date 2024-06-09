@@ -13,7 +13,7 @@
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/musicViewImage"
         android:layout_width="70dp"
-        android:layout_height="55dp"
+        android:layout_height="60dp"
         android:layout_marginStart="7dp"
         android:scaleType="centerCrop"
         android:src="@drawable/music_speaker_three"

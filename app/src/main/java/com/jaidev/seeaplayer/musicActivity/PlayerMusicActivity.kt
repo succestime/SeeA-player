@@ -345,6 +345,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
     private fun setLayout() {
         fIndex = favouriteChecker(musicListPA[songPosition].id)
+
         Glide.with(applicationContext)
             .load(musicListPA[songPosition].artUri)
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())

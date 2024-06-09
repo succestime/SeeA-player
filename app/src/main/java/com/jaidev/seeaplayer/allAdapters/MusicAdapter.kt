@@ -33,7 +33,6 @@ import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
@@ -114,9 +113,7 @@ class MusicAdapter(
             Glide.with(context)
                 .asBitmap()
                 .load(musicList[position].artUri)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
-                .error(R.drawable.music_speaker_three) // Set error placeholder image resource
                 .into(holder.image)
 
         if (selectedItems.contains(position)) {

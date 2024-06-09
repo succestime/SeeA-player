@@ -15,6 +15,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -322,6 +323,16 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
 
     override fun onItemClick(fileItem: FileItem) {
+        // Check if the file name contains " - Google Search" and has no extension
+        val fileName = fileItem.fileName
+        val hasNoExtension = !fileName.contains(".")
+        val isGoogleSearch = fileName.contains(" - Google Search")
+
+        if (hasNoExtension && isGoogleSearch) {
+            // Show a toast message that the file can't be opened
+            Toast.makeText(this, "File can't be open", Toast.LENGTH_SHORT).show()
+            return
+        }
         when (fileItem.fileType) {
             FileType.VIDEO -> {
                 val videoUri = Uri.fromFile(File(fileItem.filePath)).toString()
