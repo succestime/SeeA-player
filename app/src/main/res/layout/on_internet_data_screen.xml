@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+   >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/no_internet" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="16dp">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mobile data is off"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No data connection. Consider turning on mobile data or turning on Wi-Fi."
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/try_again_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:drawablePadding="25dp"
+        android:gravity="center_vertical"
+        android:paddingStart="15sp"
+        android:background="@color/white"
+        android:elevation="2dp"
+        android:textAllCaps="false"
+        android:text="Try again"
+        app:drawableStartCompat="@drawable/refresh_icon" />
+<View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@color/gray">
+
+</View>
+    <TextView
+        android:id="@+id/turn_on_mobile_data_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:drawablePadding="25dp"
+        android:elevation="2dp"
+android:paddingStart="15sp"
+        android:background="@drawable/curver_internet_recyclerview"
+        android:textAllCaps="false"
+        android:text="Turn on mobile data"
+        app:drawableStartCompat="@drawable/ic_settings" />
+</LinearLayout>
