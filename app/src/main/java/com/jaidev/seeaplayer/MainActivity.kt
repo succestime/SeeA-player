@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    @SuppressLint("SuspiciousIndentation", "RestrictedApi")
+    @SuppressLint("SuspiciousIndentation", "RestrictedApi", "CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sharedPreferences = this.getSharedPreferences("themes", Context.MODE_PRIVATE)
@@ -167,6 +167,8 @@ class MainActivity : AppCompatActivity() {
             loadAd()
             mInterstitialAd?.show(this)
         }
+
+
 
     }
 
@@ -332,7 +334,6 @@ class MainActivity : AppCompatActivity() {
         currentFragment = fragment
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frameLayout, fragment)
-        transaction.disallowAddToBackStack()
         transaction.commit()
     }
 
@@ -457,7 +458,6 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.sort_view, menu)
         // Find the item you want to hide
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
-        val downloadMenuItem = menu.findItem(R.id.downloads)
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
             // Handle the click event here
             when (item.itemId) {
@@ -493,19 +493,6 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        downloadMenuItem.setOnMenuItemClickListener { item ->
-            // Handle the click event here
-            when (item.itemId) {
-                R.id.downloads -> {
-                    val intent = Intent(this, DownloadsActivity::class.java)
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-                    true
-                }
-                else -> false
-            }
-        }
-
         return true
     }
 
@@ -601,6 +588,7 @@ class MainActivity : AppCompatActivity() {
         }
         return tempList
     }
+
 
     @SuppressLint("Range", "SuspiciousIndentation")
     fun getAllAudios(): ArrayList<Music> {

@@ -44,7 +44,6 @@ class TabAdapter(private val context: Context, private val dialog: AlertDialog
                 notifyDataSetChanged()
                 LinkTubeActivity.myPager.adapter?.notifyItemRemoved(position)
             }
-
         }
     }
 

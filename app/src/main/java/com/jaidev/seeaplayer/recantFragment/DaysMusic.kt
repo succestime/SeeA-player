@@ -43,7 +43,7 @@ class DaysMusic : Fragment() {
         binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = RecantMusicAdapter(requireContext(), musicRecantList , isReMusic = true)
         binding.MusicRV.adapter = adapter
-        binding.daysTotalMusics.text = "Recant Musics : 0"
+        binding.daysTotalMusics.text = "0 Musics"
         if (!requestRuntimePermission()) {
             // Permission not granted yet
             return view
@@ -188,7 +188,7 @@ swipeRefreshLayout.setOnRefreshListener {
         adapter.updateRecentMusics(reMusics)
 
         // Update the total music count text
-        binding.daysTotalMusics.text = "Total Musics : ${reMusics.size}"
+        binding.daysTotalMusics.text = "${reMusics.size} Musics"
 
         if (musicRecantList.isEmpty()) {
             binding.emptyStateLayout.visibility = View.VISIBLE

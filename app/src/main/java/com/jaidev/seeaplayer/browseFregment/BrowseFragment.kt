@@ -23,22 +23,29 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
+import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.util.Base64
 import android.util.Log
 import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
@@ -60,7 +67,6 @@ import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsList
 import com.jaidev.seeaplayer.browserActivity.changeTab
-import com.jaidev.seeaplayer.browserActivity.checkForInternet
 import com.jaidev.seeaplayer.dataClass.FileType
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
@@ -79,6 +85,10 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     private var mInterstitialAd: InterstitialAd? = null
     private lateinit var fileListAdapter: SearchItemAdapter
     private var isLoadingPage = false // Add this variabl
+    private lateinit var noInternetView: View
+    private val loadTimeout = 5000L // 5 seconds timeout
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var loadRunnable: Runnable
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
     }
@@ -95,7 +105,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     }
 
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "ObsoleteSdkInt")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -104,20 +114,61 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         val view = inflater.inflate(R.layout.fragment_browse, container, false)
         binding = FragmentBrowseBinding.bind(view)
         registerForContextMenu(binding.webView)
+// Inflate and set up the no internet view
 
         binding.webView.apply {
-            when{
-                URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
-                urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
-                else -> loadUrl("https://www.google.com/search?q=$urlNew")
-            }
+                when {
+                    URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
+                    urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
+                    else ->{
+                            loadUrl("https://www.google.com/search?q=$urlNew")
+                    }
+                }
 
             settings.javaScriptEnabled = true
             settings.setSupportZoom(true)
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
-        }
+            settings.domStorageEnabled = true // Enable DOM storage
+            settings.mediaPlaybackRequiresUserGesture = false // Auto-play media
 
+            // Enable cookies if needed
+            CookieManager.getInstance().setAcceptCookie(true)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+            }
+            webViewClient = object : WebViewClient() {
+
+                override fun onReceivedError(
+                    view: WebView?,
+                    errorCode: Int,
+                    description: String?,
+                    failingUrl: String?
+                ) {
+                    super.onReceivedError(view, errorCode, description, failingUrl)
+                    // Hide WebView
+                    binding.webView.visibility = View.GONE // Hide the WebView
+                    // Show custom error layout
+                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
+                }
+
+
+
+                override fun onReceivedHttpError(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                    errorResponse: WebResourceResponse?
+                ) {
+                    super.onReceivedHttpError(view, request, errorResponse)
+                    binding.webView.visibility = View.GONE // Hide the WebView
+                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
+                }
+
+
+            }
+
+
+        }
         val rootView = view.rootView
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener {
@@ -128,10 +179,12 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             val isKeyboardVisible = keypadHeight > screenHeight * 0.15
             if (!isKeyboardVisible) {
                 binding.recyclerviewLayout.visibility = View.GONE
+
             }
         }
 
-
+        setupNoInternetView()
+        checkAndDisableSwipeRefreshBasedOnUrl() // Check URL here
         return view
 
     }
@@ -143,7 +196,53 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             url // Return the original URL if decoding fails
         }
     }
+    private fun setupNoInternetView() {
+        binding.customErrorLayout.findViewById<TextView>(R.id.try_again_button).setOnClickListener {
+            retryLoadingPage()
+        }
 
+        // Handle turn on mobile data button
+        binding.customErrorLayout.findViewById<TextView>(R.id.turn_on_mobile_data_button).setOnClickListener {
+            val intent = Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)
+            if (intent.resolveActivity(requireContext().packageManager) != null) {
+                startActivity(intent)
+            } else {
+                Toast.makeText(requireContext(), "Unable to open mobile data settings", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showNoInternetView() {
+        binding.webView.visibility = View.GONE
+        if (binding.customErrorLayout.parent == null) {
+            (binding.root as ViewGroup).addView(binding.customErrorLayout)
+        }
+
+        binding.customErrorLayout.visibility = View.VISIBLE
+    }
+
+    private fun hideNoInternetView() {
+        binding.webView.visibility = View.VISIBLE
+        binding.customErrorLayout.visibility = View.GONE
+
+    }
+    // Check if internet is back on Try Again click
+    private fun retryLoadingPage() {
+        if (checkForInternet(requireContext())) {
+            binding.webView.reload()
+        } else {
+            showNoInternetView()
+        }
+    }
+
+
+
+
+    private fun checkForInternet(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "ObsoleteSdkInt",
         "RestrictedApi"
     )
@@ -158,6 +257,13 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             settings.setSupportZoom(true)
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
+            settings.domStorageEnabled = true // Enable DOM storage
+            settings.mediaPlaybackRequiresUserGesture = false // Auto-play media
+            // Enable cookies if needed
+            CookieManager.getInstance().setAcceptCookie(true)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+            }
         }
         binding.webView.setDownloadListener { url, _, _, mimeType, _ ->
             // Determine the file extension based on MIME type
@@ -291,8 +397,25 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
 
         binding.swipeRefreshBrowser.setOnRefreshListener {
-            binding.webView.reload()
+            if (checkForInternet(requireContext())) {
+                hideNoInternetView() // Hide the error layout if the internet is connected
+                if (binding.swipeRefreshBrowser.isEnabled) {
+                    binding.webView.reload()
+                }
+            } else {
+                showNoInternetView() // Show the error layout if there's no internet
+            }
             binding.swipeRefreshBrowser.isRefreshing = false
+        }
+
+
+        binding.webView.setOnTouchListener { view, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> binding.swipeRefreshBrowser.isEnabled = false
+                MotionEvent.ACTION_UP -> binding.swipeRefreshBrowser.isEnabled = true
+            }
+            view.onTouchEvent(motionEvent)
+            false
         }
 
         binding.webView.apply {
@@ -300,13 +423,40 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             settings.setSupportZoom(true)
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
+            settings.domStorageEnabled = true // Enable DOM storage
+            settings.mediaPlaybackRequiresUserGesture = false // Auto-play media
+
+            CookieManager.getInstance().setAcceptCookie(true)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+            }
             webViewClient = object : WebViewClient() {
-
-                override fun onLoadResource(view: WebView?, url: String?) {
-                    super.onLoadResource(view, url)
-
+                override fun onReceivedError(
+                    view: WebView?,
+                    errorCode: Int,
+                    description: String?,
+                    failingUrl: String?
+                ) {
+                    super.onReceivedError(view, errorCode, description, failingUrl)
+                    // Hide WebView
+                    binding.webView.visibility = View.GONE // Hide the WebView
+                    // Show custom error layout
+                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
                 }
 
+
+
+                override fun onReceivedHttpError(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                    errorResponse: WebResourceResponse?
+                ) {
+                    super.onReceivedHttpError(view, request, errorResponse)
+                    // Hide WebView
+                    binding.webView.visibility = View.GONE // Hide the WebView
+                    // Show custom error layout
+                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
+                }
                 override fun doUpdateVisitedHistory(
                     view: WebView?,
                     url: String?,
@@ -317,21 +467,11 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     tabsList[myPager.currentItem].name =
                         url.toString()
                 }
-
-                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                    super.onPageStarted(view, url, favicon)
-                    isLoadingPage = true
-                    linkRef.binding.progressBar.progress = 0
-                    linkRef.binding.progressBar.visibility = View.VISIBLE
-
-                }
-
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    super.onPageFinished(view, url)
+                override fun onPageCommitVisible(view: WebView?, url: String?) {
+                    super.onPageCommitVisible(view, url)
                     isLoadingPage = false
-                    linkRef.binding.progressBar.visibility = View.GONE
-                    binding.webView.zoomOut()
-                    // Save the visited page to history
+                    // Update swipe refresh state when the main content of the page is visible
+                    updateSwipeRefreshState(url)
                     val websiteTitle = HistoryManager.extractWebsiteTitle(url ?: "")
                     val favicon = view?.favicon
                     val timestamp = System.currentTimeMillis()
@@ -340,6 +480,51 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     HistoryManager.addHistoryItem(historyItem, requireContext())
                     // Update searchHintTitleRecyclerView here
                     updateSearchHintTitleRecyclerView()
+                    handler.removeCallbacks(loadRunnable)
+                    binding.progressBar.visibility = View.GONE
+                }
+
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    isLoadingPage = true
+                    linkRef.binding.progressBar.progress = 0
+                    linkRef.binding.progressBar.visibility = View.VISIBLE
+                    linkRef.binding.btnTextUrl.text = SpannableStringBuilder(url?.let { decodeUrl(it) })
+                    if (checkForInternet(requireContext())) {
+                        binding.webView.visibility = View.VISIBLE
+                        hideNoInternetView()
+                    } else {
+                        binding.webView.visibility = View.GONE
+                        showNoInternetView()
+                    }
+                    // Start the timeout countdown
+                    handler.postDelayed(loadRunnable, loadTimeout)
+                    binding.progressBar.visibility = View.VISIBLE
+
+                }
+
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    isLoadingPage = false
+                    linkRef.binding.progressBar.visibility = View.GONE
+                    binding.webView.zoomOut()
+                    updateSwipeRefreshState(url)
+                    val websiteTitle = HistoryManager.extractWebsiteTitle(url ?: "")
+                    val favicon = view?.favicon
+                    val timestamp = System.currentTimeMillis()
+                    val historyItem = HistoryItem(url ?: "", websiteTitle, timestamp, favicon)
+
+                    HistoryManager.addHistoryItem(historyItem, requireContext())
+                    updateSearchHintTitleRecyclerView()
+                    if (checkForInternet(requireContext())) {
+                        binding.webView.visibility = View.VISIBLE
+                        hideNoInternetView()
+                    } else {
+                        binding.webView.visibility = View.GONE
+                        showNoInternetView()
+                    }
+                    handler.removeCallbacks(loadRunnable)
+                    binding.progressBar.visibility = View.GONE
                 }
 
 
@@ -375,19 +560,50 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     super.onHideCustomView()
                     binding.webView.visibility = View.VISIBLE
                     binding.customView.visibility = View.GONE
+
                 }
 
                 override fun onProgressChanged(view: WebView?, newProgress: Int) {
                     super.onProgressChanged(view, newProgress)
+                    binding.progressBar.progress = newProgress
+                    if (newProgress == 100) {
+                        binding.progressBar.visibility = View.GONE
+                    } else {
+                        binding.progressBar.visibility = View.VISIBLE
+                    }
                     linkRef.binding.progressBar.progress = newProgress
+                    updateSwipeRefreshState(linkRef.binding.btnTextUrl.text.toString())
                 }
             }
             binding.webView.setOnTouchListener { _, motionEvent ->
                 linkRef.binding.root.onTouchEvent(motionEvent)
                 return@setOnTouchListener false
             }
+
+            loadRunnable = Runnable {
+                if (isLoadingPage) {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+            }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(loadRunnable)
+    }
+    private fun updateSwipeRefreshState(url: String?) {
+        val keywords = listOf("/reels/", "/comments/", "/story.", "/reel/", "/shorts/", "/watch?")
+        binding.swipeRefreshBrowser.isEnabled = !keywords.any { url?.contains(it, ignoreCase = true) == true }
+    }
+    private fun checkAndDisableSwipeRefreshBasedOnUrl() {
+        val linkRef = requireActivity() as LinkTubeActivity
+        val currentUrl = linkRef.binding.btnTextUrl.text.toString()
+
+        // Call updateSwipeRefreshState with the current URL
+        updateSwipeRefreshState(currentUrl)
+    }
+
 
     private fun performSearch(query: String) {
         val linkRef = requireActivity() as LinkTubeActivity
@@ -430,6 +646,8 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
 
     }
+
+
     @SuppressLint("Range")
     private fun startDownload(url: String, fileName: String, fileExtension: String?) {
         val downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager

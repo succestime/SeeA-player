@@ -30,7 +30,7 @@
                     android:id="@+id/daysTotalMusics"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"
                     android:text="Total Musics"
                     android:textSize="15sp"
@@ -48,17 +48,22 @@
                     android:id="@+id/MusicRV"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:paddingBottom="69dp"
+                    android:layout_marginTop="15dp"
+                    android:paddingBottom="60dp"
                     android:scrollbars="vertical"
                     />
             </LinearLayout>
 
 
 </LinearLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/shuffleBtn"

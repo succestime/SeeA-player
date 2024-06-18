@@ -58,7 +58,8 @@ class homeNav : Fragment() {
 
         swipeRefreshLayout = binding.swipeRefreshFolder
 
-        binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
+        binding.totalFolder.text = "${MainActivity.folderList.size} folders"
+
 
         binding.swipeRefreshFolder.setOnRefreshListener {
 
@@ -87,7 +88,7 @@ class homeNav : Fragment() {
         foldersAdapter.notifyDataSetChanged()
         adapter.notifyDataSetChanged()
 
-        binding.totalFolder.text = "Total Folders : ${MainActivity.folderList.size}"
+        binding.totalFolder.text = "${MainActivity.folderList.size} folders"
         swipeRefreshLayout.isRefreshing = false
 
         if (MainActivity.folderList.isEmpty()) {

@@ -1,7 +1,4 @@
-
-
 package com.jaidev.seeaplayer
-
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -27,8 +24,7 @@ import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
 
-
-class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
+class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
 
     private lateinit var binding: FragmentMusicNavBinding
     lateinit var adapter: MusicAdapter
@@ -55,91 +51,80 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
         adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true)
         adapter.setMusicDeleteListener(this)
         binding.musicRV.adapter = adapter
-        binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
 
         binding.swipeRefreshMusic.setOnRefreshListener {
-            checkForNewMusic()
             binding.swipeRefreshMusic.isRefreshing = false
         }
 
-        if (MusicListMA.isEmpty()) {
-            binding.musicemptyStateLayout.visibility = View.VISIBLE
-        } else {
-            binding.musicemptyStateLayout.visibility = View.GONE
-        }
+        updateEmptyState()
 
         binding.playandshuffleBtn.setOnClickListener { view ->
-            val popupMenu = PopupMenu(requireContext(), view, 0, 0, R.style.CustomPopupMenu)
-            popupMenu.inflate(R.menu.play_shuffle_menu)
-            // Set icons to be visible
-            try {
-                val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
-                fieldPopup.isAccessible = true
-                val popup = fieldPopup.get(popupMenu)
-                popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
-                    .invoke(popup, true)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            popupMenu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.action_play -> {
-                        val intent = Intent(requireContext() , PlayerMusicActivity::class.java)
-                        intent.putExtra("index" , 0)
-                        intent.putExtra("class" , "MusicNav2")
-                        startActivity(intent)
-                        true
-                    }
-                    R.id.action_shuffle -> {
-                        val intent = Intent(requireContext() , PlayerMusicActivity::class.java)
-                        intent.putExtra("index" , 0)
-                        intent.putExtra("class" , "MusicNav")
-                        startActivity(intent)
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popupMenu.show()
+            showPlayShuffleMenu(view)
         }
-
-
 
         binding.favouriteBtn.setOnClickListener {
             startActivity(Intent(requireContext(), FavouriteActivity::class.java))
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         }
         binding.playlistBtn.setOnClickListener {
-            startActivity(Intent(requireContext(), PlaylistActivity
-            ::class.java))
+            startActivity(Intent(requireContext(), PlaylistActivity::class.java))
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-
         }
 
-
         swipeRefreshLayout = binding.swipeRefreshMusic
-
-        // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
 
         return view
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun checkForNewMusic() {
+    @SuppressLint("NotifyDataSetChanged")
+    private fun refreshMusicList() {
         val updatedMusicList = ((activity as MainActivity).getAllAudios()) // Implement this method to fetch the updated music list
         if (updatedMusicList.size != MusicListMA.size) {
             MusicListMA.clear()
             MusicListMA.addAll(updatedMusicList)
             adapter.updateMusicList(MusicListMA)
-            binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
-
+adapter.notifyDataSetChanged()
             if (MusicListMA.isEmpty()) {
                 binding.musicemptyStateLayout.visibility = View.VISIBLE
             } else {
                 binding.musicemptyStateLayout.visibility = View.GONE
             }
         }
+    }
+
+    private fun showPlayShuffleMenu(view: View) {
+        val popupMenu = PopupMenu(requireContext(), view, 0, 0, R.style.CustomPopupMenu)
+        popupMenu.inflate(R.menu.play_shuffle_menu)
+        try {
+            val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+            fieldPopup.isAccessible = true
+            val popup = fieldPopup.get(popupMenu)
+            popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                .invoke(popup, true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_play -> {
+                    val intent = Intent(requireContext(), PlayerMusicActivity::class.java)
+                    intent.putExtra("index", 0)
+                    intent.putExtra("class", "MusicNav2")
+                    startActivity(intent)
+                    true
+                }
+                R.id.action_shuffle -> {
+                    val intent = Intent(requireContext(), PlayerMusicActivity::class.java)
+                    intent.putExtra("index", 0)
+                    intent.putExtra("class", "MusicNav")
+                    startActivity(intent)
+                    true
+                }
+                else -> false
+            }
+        }
+        popupMenu.show()
     }
 
     private fun setSwipeRefreshBackgroundColor() {
@@ -147,75 +132,54 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener  {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
         }
-
         if (isDarkMode) {
-            // Dark mode is enabled, set background color to #012030
             swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
-
         } else {
-            // Light mode is enabled, set background color to white
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
-
         }
     }
 
-
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("NotifyDataSetChanged")
     override fun onMusicDeleted() {
-        val updatedMusicList = ((activity as MainActivity).getAllAudios()) // Implement this method to fetch the updated music list
-        if (updatedMusicList.size != MusicListMA.size) {
-            MusicListMA.clear()
-            MusicListMA.addAll(updatedMusicList)
-            adapter.updateMusicList(MusicListMA)
-            binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
-
-            if (MusicListMA.isEmpty()) {
-                binding.musicemptyStateLayout.visibility = View.VISIBLE
-            } else {
-                binding.musicemptyStateLayout.visibility = View.GONE
-            }
-        }
+        refreshMusicList()
     }
 
-
+    private fun updateEmptyState() {
+        if (MusicListMA.isEmpty()) {
+            binding.musicemptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.musicemptyStateLayout.visibility = View.GONE
+        }
+    }
 
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_music_view, menu)
         val searchView = menu.findItem(R.id.searchMusicView)?.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean =true
+            override fun onQueryTextSubmit(query: String?): Boolean = true
             override fun onQueryTextChange(newText: String?): Boolean {
                 musicListSearch = ArrayList()
-                if (newText != null){
+                if (newText != null) {
                     val userInput = newText.lowercase()
                     for (song in MusicListMA)
                         if (song.title.lowercase().contains(userInput))
                             musicListSearch.add(song)
                     search = true
-                    adapter.updateMusicList(searchList = musicListSearch)
+                    adapter.updateMusicList(musicListSearch)
                 }
                 return true
             }
         })
-
-
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation", "SetTextI18n")
     override fun onResume() {
         super.onResume()
-        // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
-        MainActivity.adapterChanged= false
-        if (MusicListMA.isEmpty()) {
-            binding.musicemptyStateLayout.visibility = View.VISIBLE
-        } else {
-            binding.musicemptyStateLayout.visibility = View.GONE
-        }
-        binding.TotalMusics?.text = "Total Musics : ${MusicListMA.size}"
+        MainActivity.adapterChanged = false
+        updateEmptyState()
     }
-
 }

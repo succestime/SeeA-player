@@ -110,11 +110,14 @@ class MusicAdapter(
         holder.title.text = musicList[position].title
         holder.album.text = musicList[position].album
 
-            Glide.with(context)
-                .asBitmap()
-                .load(musicList[position].artUri)
-                .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
-                .into(holder.image)
+        Glide.with(context)
+            .load(musicList[position].artUri)
+            .apply(RequestOptions()
+                .placeholder(R.color.place_holder_video)  // Placeholder image while loading
+                .error(R.color.place_holder_video)  // Error image if loading fails
+                .centerCrop()  // Scale image to fill the view
+            )
+            .into(holder.image)
 
         if (selectedItems.contains(position)) {
             // Set your custom selected background on the root view of the item
@@ -621,6 +624,8 @@ class MusicAdapter(
         intent.putExtra("class", ref)
         startActivity(context, intent, null)
     }
+
+
     @SuppressLint("NotifyDataSetChanged")
     fun updateMusicList(searchList : ArrayList<Music>){
         musicList = ArrayList()
@@ -631,12 +636,9 @@ class MusicAdapter(
 
 
 
-
-
     @SuppressLint("NotifyDataSetChanged")
-    fun refreshPlaylist(){
+    fun refreshPlaylist() {
         musicList = ArrayList()
-//        musicList = PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist
         notifyDataSetChanged()
     }
 

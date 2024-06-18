@@ -1,6 +1,9 @@
 
 package com.jaidev.seeaplayer.browserActivity
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -18,9 +21,11 @@ import android.print.PrintJob
 import android.print.PrintManager
 import android.speech.RecognizerIntent
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.WebView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +33,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -37,6 +43,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -63,7 +70,6 @@ import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsBtn
 import com.jaidev.seeaplayer.dataClass.Bookmark
 import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.dataClass.Tab
-import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.databinding.ActivityLinkTubeBinding
 import com.jaidev.seeaplayer.databinding.BookmarkDialogBinding
 import com.jaidev.seeaplayer.databinding.TabViewBinding
@@ -75,14 +81,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+
 class LinkTubeActivity : AppCompatActivity() {
 
     private var printJob : PrintJob? = null
-    // Assuming 'this' is a valid Context from an Activity or Fragment
     lateinit var mAdView: AdView
     private var mInterstitialAd : InterstitialAd? = null
     private var rewardedInterstitialAd : RewardedInterstitialAd? = null
-    private var tempText: CharSequence? = null
     @SuppressLint("StaticFieldLeak")
     lateinit var binding: ActivityLinkTubeBinding
     companion object {
@@ -95,37 +100,106 @@ class LinkTubeActivity : AppCompatActivity() {
         lateinit var tabsBtn : MaterialTextView
         const val REQUEST_CODE_SPEECH_INPUT = 2000
         const val MAX_HISTORY_SIZE = 150
-        private const val TABS_LIST_KEY = "tabs_list"
 
     }
 
-    @SuppressLint("ObsoleteSdkInt")
+    @SuppressLint("ObsoleteSdkInt", "ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setTheme(More.themesList[More.themeIndex])
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES }
+
         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
         window.statusBarColor = Color.parseColor("#373636")
+
+        window.navigationBarColor = Color.parseColor("#373636")
 
         binding = ActivityLinkTubeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         supportActionBar?.hide()
+        rewardedIAd()
+        initializeView()
+        initializeBinding()
+        getAllBookmarks()
+        setSwipeRefreshBackgroundColor()
+        changeFullscreen(enable = true)
+        checkHistorySize()
+        MobileAds.initialize(this) {}
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+        mAdView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                binding.adsLayout.visibility = View.VISIBLE
+            }
+        }
+        // Initially set the adsLayout visibility to GONE until the ad is loaded
+        binding.adsLayout.visibility = View.GONE
 
-
-
-        tabsList.add(Tab("Home",HomeFragment(), LinkTubeActivity()))
+        tabsList.add(Tab("Home", HomeFragment(), LinkTubeActivity()))
         binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
         binding.myPager.isUserInputEnabled = false
         myPager = binding.myPager
         tabsBtn = binding.tabBtn
 
-        changeFullscreen(enable = true)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBarsInsets.left, systemBarsInsets.top, systemBarsInsets.right, 0)
+            insets
+        }
+        binding.bottomRightBrowser.setOnTouchListener { view, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    view.tag = Pair(view.x - event.rawX, view.y - event.rawY)
+                    true
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    val tag = view.tag as Pair<Float, Float>
+                    val newX = event.rawX + tag.first
+                    val newY = event.rawY + tag.second
+
+                    // Get the screen width and height
+                    val displayMetrics = resources.displayMetrics
+                    val screenWidth = displayMetrics.widthPixels
+                    val screenHeight = displayMetrics.heightPixels
+
+                    // Ensure the view does not go outside the screen boundaries
+                    val viewWidth = view.width
+                    val viewHeight = view.height
+
+                    val boundedX = when {
+                        newX < 0 -> 0f
+                        newX + viewWidth > screenWidth -> (screenWidth - viewWidth).toFloat()
+                        else -> newX
+                    }
+
+                    val boundedY = when {
+                        newY < 0 -> 0f
+                        newY + viewHeight > screenHeight -> (screenHeight - viewHeight).toFloat()
+                        else -> newY
+                    }
+
+                    view.animate()
+                        .x(boundedX)
+                        .y(boundedY)
+                        .setDuration(0)
+                        .start()
+                    true
+                }
+
+                else -> false
+            }
+        }
 
     }
 
-    fun initializeBinding(){
+
+        fun initializeBinding(){
         binding.googleMicBtn.setOnClickListener {
             speak()
         }
@@ -133,9 +207,6 @@ class LinkTubeActivity : AppCompatActivity() {
         binding.moreBtn.setOnClickListener {
             val popupMenu = PopupMenu(this@LinkTubeActivity, binding.moreBtn)
             popupMenu.menuInflater.inflate(R.menu.browser_menu, popupMenu.menu)
-
-
-// Set icons to be visible
             try {
                 val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
                 fieldPopup.isAccessible = true
@@ -188,73 +259,26 @@ class LinkTubeActivity : AppCompatActivity() {
             }
 
             popupMenu.show()
-
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+                val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                view.setPadding(systemBarsInsets.left, systemBarsInsets.top, systemBarsInsets.right, 0)
+                insets
+            }
         }
-        binding.bottomMoreBrowser.setOnClickListener {
-            val popupMenu = PopupMenu(this@LinkTubeActivity, binding.bottomMoreBrowser)
-            popupMenu.menuInflater.inflate(R.menu.browser_menu, popupMenu.menu)
-
-// Set icons to be visible
-            try {
-                val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
-                fieldPopup.isAccessible = true
-                val popup = fieldPopup.get(popupMenu)
-                popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
-                    .invoke(popup, true)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            popupMenu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.newTab -> {
-                        changeTab("Home", HomeFragment())
-                    }
-
-                    R.id.history -> {
-                        startActivity(Intent(this, HistoryBrowser::class.java))
-                    }
-
-                    R.id.download -> {
-                        startActivity(Intent(this, FileActivity::class.java))
-                    }
-                    R.id.save -> {
-                        save()
-                    }
-                    R.id.bookmark -> {
-                        bookMark()
-                    }
-                    R.id.desktop -> {
-                        desktopMade()
-                    }
-                    R.id.fullScreen -> {
-                        fullScreen()
-                    }
-                    R.id.share -> {
-                        share()
-
-                    }
-//
-//                    R.id.setting -> {
-//
-//                    }
-                    R.id.exit -> {
-                        exit()
-                    }
-                }
-                true
-            }
-
-            popupMenu.show()
-
-
+        binding.bottomLeftBrowser.setOnClickListener {
+            slideOutLinearLayout()
+        }
+        binding.bottomRightBrowserButton.setOnClickListener {
+            slideInLinearLayout()
         }
 
         binding.bookMarkBtn.setOnClickListener {
             bookMark()
         }
 
-
+        binding.adsRemove.setOnClickListener {
+            binding.adsLayout.visibility = View.GONE
+        }
         val isTablet = resources.configuration.smallestScreenWidthDp >= 600
 
         // Show or hide the buttons based on the device type
@@ -267,7 +291,87 @@ class LinkTubeActivity : AppCompatActivity() {
             binding.forwardBrowserBtn.visibility = View.GONE
             binding.topDownloadBrowser.visibility = View.GONE
         }
+
     }
+    @SuppressLint("Recycle")
+    private fun slideOutLinearLayout() {
+        val linearLayout5 = findViewById<LinearLayout>(R.id.linearLayout5)
+        val bottomRightBrowser = findViewById<LinearLayout>(R.id.bottomRightBrowser)
+        val screenWidth = resources.displayMetrics.widthPixels.toFloat()
+
+        // Find the banner ad view
+        val bannerAdView = findViewById<LinearLayout>(R.id.adsLayout)
+
+        // Create the ObjectAnimator to animate the translationX property of linearLayout5
+        val slideOutAnimator = ObjectAnimator.ofFloat(linearLayout5, "translationX", screenWidth)
+        slideOutAnimator.duration = 500 // Duration in milliseconds
+
+        // Create an AnimatorSet to play animations together
+        val animatorSet = AnimatorSet()
+        animatorSet.playTogether(slideOutAnimator)
+
+        // Start the animation
+        animatorSet.start()
+
+        // Set the visibility to gone after the animation and animate bottomRightBrowser
+        slideOutAnimator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+
+            override fun onAnimationEnd(animation: Animator) {
+                linearLayout5.visibility = View.GONE
+                // Set the banner ad visibility to GONE if linearLayout5 is GONE
+                bannerAdView?.visibility = View.GONE
+                // Now animate bottomRightBrowser to slide in from the right
+                bottomRightBrowser.visibility = View.VISIBLE
+                val slideInAnimator = ObjectAnimator.ofFloat(bottomRightBrowser, "translationX", screenWidth, 0f)
+                slideInAnimator.duration = 500 // Duration in milliseconds
+                slideInAnimator.start()
+            }
+            override fun onAnimationCancel(animation: Animator) {}
+
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
+    }
+    private fun slideInLinearLayout() {
+        val linearLayout5 = findViewById<LinearLayout>(R.id.linearLayout5)
+        val bottomRightBrowser = findViewById<LinearLayout>(R.id.bottomRightBrowser)
+        val screenWidth = resources.displayMetrics.widthPixels.toFloat()
+        // Find the banner ad view
+        val bannerAdView = findViewById<LinearLayout>(R.id.adsLayout)
+        // Animate bottomRightBrowser to slide out
+        val slideOutAnimatorBottom = ObjectAnimator.ofFloat(bottomRightBrowser, "translationX", 0f, screenWidth)
+        slideOutAnimatorBottom.duration = 500 // Duration in milliseconds
+        // Animate linearLayout5 to slide in
+        val slideInAnimatorLinearLayout = ObjectAnimator.ofFloat(linearLayout5, "translationX", screenWidth, 0f)
+        slideInAnimatorLinearLayout.duration = 500 // Duration in milliseconds
+        // Create an AnimatorSet to play animations together
+        val animatorSetReverse = AnimatorSet()
+        animatorSetReverse.playTogether(slideOutAnimatorBottom, slideInAnimatorLinearLayout)
+        // Start the reverse animation
+        animatorSetReverse.start()
+        // Set the visibility after the animation
+        slideOutAnimatorBottom.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+
+            override fun onAnimationEnd(animation: Animator) {
+                bottomRightBrowser.visibility = View.GONE
+                linearLayout5.visibility = View.VISIBLE
+                mAdView.adListener = object : AdListener() {
+                    override fun onAdLoaded() {
+                        bannerAdView?.visibility = View.VISIBLE
+                    }
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        bannerAdView?.visibility = View.GONE
+                    }
+                }
+            }
+
+            override fun onAnimationCancel(animation: Animator) {}
+
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
+    }
+
 
 
     private fun desktopMade(){
@@ -275,6 +379,10 @@ class LinkTubeActivity : AppCompatActivity() {
         try {
             frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
         } catch (_: Exception) {
+        }
+        if (frag?.binding?.webView?.url.isNullOrEmpty()) {
+            Toast.makeText(this@LinkTubeActivity, "First Open A Webpage \uD83D\uDE03", Toast.LENGTH_SHORT).show()
+            return
         }
         frag?.binding?.webView?.apply {
             val isTablet = resources.configuration.smallestScreenWidthDp >= 600
@@ -324,7 +432,10 @@ class LinkTubeActivity : AppCompatActivity() {
             frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
         } catch (_: Exception) {
         }
-
+        if (frag?.binding?.webView?.url.isNullOrEmpty()) {
+            Toast.makeText(this@LinkTubeActivity, "First Open A Website \uD83D\uDE03", Toast.LENGTH_SHORT).show()
+            return
+        }
         frag?.let {
             if (bookmarkIndex == -1) {
                 val viewB = layoutInflater.inflate(
@@ -388,20 +499,49 @@ class LinkTubeActivity : AppCompatActivity() {
                     .create()
                 dialogB.show()
             }
+
         }
     }
 
- private fun fullScreen(){
-     isFullscreen = if (isFullscreen) {
-         changeFullscreen(enable = false)
-         false
-     }
-     else {
-         changeFullscreen(enable = true)
-         true
-     }
+    private fun fullScreen(){
+        isFullscreen = if (isFullscreen) {
+            changeFullscreen(enable = false)
+            false
+        }
+        else {
+            changeFullscreen(enable = true)
+            true
+        }
 
- }
+    }
+
+    private fun changeFullscreen(enable: Boolean){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if(enable){
+            // Do not hide the status bar, only hide the navigation bar
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            WindowInsetsControllerCompat(window, binding.root).let { controller ->
+                controller.hide(WindowInsetsCompat.Type.navigationBars())
+                controller.show(WindowInsetsCompat.Type.statusBars())
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+
+        }else{
+            // Show the navigation bar, status bar remains visible
+            WindowCompat.setDecorFitsSystemWindows(window, true)
+            WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.navigationBars())
+            WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.statusBars())
+        }
+        } else {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+                val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                view.setPadding(systemBarsInsets.left, systemBarsInsets.top, systemBarsInsets.right, 0)
+                insets
+            }
+        }
+        // Ensure the navigation bar color is set
+        window.navigationBarColor = Color.parseColor("#373636")
+    }
 
     private fun share() {
         var frag: BrowseFragment? = null
@@ -431,7 +571,7 @@ class LinkTubeActivity : AppCompatActivity() {
         builder.setTitle("Exit")
             .setMessage("Do you want to exit the app?")
             .setPositiveButton("Yes") { _, _ ->
-                exitApplication()
+                finishAffinity() // This will finish all activities in the task
             }
             .setNegativeButton("No") { dialog, _ ->
                 dialog.dismiss()
@@ -442,6 +582,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun save(){
         var frag: BrowseFragment? = null
         try {
@@ -450,8 +591,9 @@ class LinkTubeActivity : AppCompatActivity() {
         }
         if (frag != null)
             saveAsPdf(web = frag.binding.webView)
-        else Snackbar.make(binding.root, "First Open A WebPage\uD83D\uDE03", 3000)
-            .show()
+        else
+            Toast.makeText(this@LinkTubeActivity, "First Open A WebPage \uD83D\uDE03", Toast.LENGTH_SHORT).show()
+
     }
 
     private fun checkHistorySize() {
@@ -649,7 +791,7 @@ class LinkTubeActivity : AppCompatActivity() {
         binding.bottomMediaBrowser.setOnClickListener {
             if (checkForInternet(this)) {
                 // Internet is available, proceed to show ad and navigate to MainActivity
-               rewardedIAd()
+                rewardedIAd()
                 rewardedInterstitialAd?.show(this, object : OnUserEarnedRewardListener {
                     override fun onUserEarnedReward(p0: RewardItem) {
                     }
@@ -745,7 +887,7 @@ class LinkTubeActivity : AppCompatActivity() {
         val queryIndex = url.indexOf("search?q=")
         return if (queryIndex != -1) {
             val startIndex = queryIndex + "search?q=".length
-            val endIndex = url.indexOf('&', startIndex)
+            val endIndex = findEndIndex(url, startIndex)
             if (endIndex != -1) {
                 url.substring(startIndex, endIndex)
             } else {
@@ -756,20 +898,32 @@ class LinkTubeActivity : AppCompatActivity() {
         }
     }
 
+    private fun findEndIndex(url: String, startIndex: Int): Int {
+        val delimiters = listOf('&', '#', ',', '=')
+        val indices = delimiters.map { url.indexOf(it, startIndex) }.filter { it != -1 }
+        return if (indices.isNotEmpty()) indices.minOrNull()!! else -1
+    }
+
+
 
 
     override fun onResume() {
         super.onResume()
-        checkHistorySize()
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
-        rewardedIAd()
-        initializeView()
-        initializeBinding()
-        getAllBookmarks()
+        window.navigationBarColor = Color.parseColor("#373636")
         // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
+        // Check if the banner ad is loaded
+        mAdView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                binding.adsLayout.visibility = View.VISIBLE
+            }
+
+        }
+        // Initially set the adsLayout visibility to GONE until the ad is loaded
+        binding.adsLayout.visibility = View.GONE
         setSwipeRefreshBackgroundColor()
 
         printJob?.let {
@@ -791,18 +945,8 @@ class LinkTubeActivity : AppCompatActivity() {
 
     }
 
-    private fun changeFullscreen(enable: Boolean){
-        if(enable){
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            WindowInsetsControllerCompat(window, binding.root).let { controller ->
-                controller.hide(WindowInsetsCompat.Type.systemBars())
-                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-        }else{
-            WindowCompat.setDecorFitsSystemWindows(window, true)
-            WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.systemBars())
-        }
-    }
+
+
 
     fun isBookmarked(url: String): Int{
         bookmarkList.forEachIndexed { index, bookmark ->
@@ -841,6 +985,7 @@ fun changeTab(url: String, fragment: Fragment , isBackground : Boolean = false) 
     myPager.adapter?.notifyDataSetChanged()
     tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
     if(!isBackground) myPager.currentItem = LinkTubeActivity.tabsList.size - 1
+
 
 }
 

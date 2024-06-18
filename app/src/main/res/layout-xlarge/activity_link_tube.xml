@@ -18,12 +18,12 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/homeBrowserBtn"
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
@@ -35,7 +35,7 @@
                 app:tint="@color/white" />
             <ImageButton
                 android:id="@+id/backBrowserBtn"
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
@@ -47,7 +47,7 @@
                 tools:ignore="RedundantDescriptionCheck" />
             <ImageButton
                 android:id="@+id/forwardBrowserBtn"
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
@@ -96,7 +96,7 @@
                     <EditText
                         android:id="@+id/btnTextUrl"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="50dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:hint="@string/enter_url"
@@ -185,7 +185,7 @@
 
             <ImageButton
                 android:id="@+id/moreBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/go_btn"
@@ -220,20 +220,72 @@
 
 
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="780dp"
-        android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        app:adSize="780x70"
-        app:adUnitId="ca-app-pub-3504589383575544/9715937751"
+    <LinearLayout
+        android:id="@+id/adsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="105dp"
+        android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="105dp">
 
-    </com.google.android.gms.ads.AdView>
+            <ImageView
+                android:id="@+id/adsRemove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/browser_clear"
+                android:visibility="visible"
+                app:tint="@color/white"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/adView"
+                app:layout_constraintEnd_toEndOf="parent"
+                >
 
+            </ImageView>
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="780dp"
+                android:layout_height="70dp"
+                app:adSize="780x70"
+                app:adUnitId="ca-app-pub-3504589383575544/9715937751"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </com.google.android.gms.ads.AdView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/bottomRightBrowser"
+        android:layout_width="155dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="62dp"
+        android:background="@drawable/curver_linktube_"
+        app:layout_constraintTop_toBottomOf="@+id/adsLayout">
+
+        <ImageButton
+            android:id="@+id/bottomRightBrowserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+
+            android:contentDescription="@string/refresh_btn"
+            android:src="@drawable/outline_fast_rewind_24"
+            app:tint="@color/white"
+            tools:ignore="RedundantDescriptionCheck" />
+
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/linearLayout5"
         android:layout_width="match_parent"
@@ -247,7 +299,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:orientation="horizontal">
 
             <ImageButton
@@ -312,19 +364,20 @@
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
             <ImageButton
-                android:id="@+id/bottomMoreBrowser"
+                android:id="@+id/bottomLeftBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
-                android:src="@drawable/icon_dark"
+                android:src="@drawable/outline_fast_forward_24"
                 android:visibility="visible"
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
         </LinearLayout>
 
     </LinearLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

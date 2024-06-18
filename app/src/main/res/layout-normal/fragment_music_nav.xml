@@ -100,20 +100,12 @@
                             android:layout="@layout/music_nav_empty_state_layout"
                             android:foregroundGravity="center"
                             android:visibility="gone"/>
-                        <TextView
-                            android:id="@+id/TotalMusics"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="2dp"
-                            android:layout_marginTop="5dp"
-                            android:text="@string/total_songs"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
+
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/musicRV"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
+                            android:layout_marginTop="10dp"
                             android:paddingBottom="60dp"
                             android:scrollbars="vertical"/>
                     </LinearLayout>

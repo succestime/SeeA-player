@@ -7,10 +7,6 @@
 android:id="@+id/historyActivityLayout"
     tools:context=".browserActivity.HistoryBrowser">
 
-
-
-
-
     <LinearLayout
         android:id="@+id/linearLayout7"
         android:layout_width="match_parent"
@@ -131,8 +127,9 @@ android:id="@+id/historyActivityLayout"
         android:id="@+id/recyclerFileView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:paddingBottom="300dp"
+       android:layout_marginTop="20dp"
+        android:paddingBottom="180dp"
+        android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalLine" />

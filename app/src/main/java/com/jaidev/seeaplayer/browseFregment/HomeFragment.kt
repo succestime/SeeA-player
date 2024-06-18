@@ -129,8 +129,27 @@ class HomeFragment : Fragment() {
         }
 
         linkTubeRef.binding.btnTextUrl.setOnClickListener {
-            linkTubeRef.binding.btnTextUrl.requestFocus()
+            // Check if btnTextUrl has text, if so, select all text
+            if (linkTubeRef.binding.btnTextUrl.text.isNotEmpty()) {
+                linkTubeRef.binding.btnTextUrl.selectAll()
+            }
 
+            // Show the keyboard explicitly
+            val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(linkTubeRef.binding.btnTextUrl, InputMethodManager.SHOW_IMPLICIT)
+
+            // Check if the keyboard is visible
+            val rootView = view?.rootView
+            rootView?.viewTreeObserver?.addOnGlobalLayoutListener {
+                val rect = Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val screenHeight = rootView.height
+                val keypadHeight = screenHeight - rect.bottom
+                val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+
+                // Update the visibility of RecyclerView based on keyboard visibility
+                binding.historyRecycler.visibility = if (isKeyboardVisible) View.VISIBLE else View.GONE
+            }
         }
 
         linkTubeRef.binding.searchBrowser.setOnClickListener {

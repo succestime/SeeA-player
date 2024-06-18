@@ -7,6 +7,8 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +19,18 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.jaidev.seeaplayer.LogSignIn.signin
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.databinding.FragmentMoreNavBinding
-import com.jaidev.seeaplayer.loadSmallMediumSizeNativeAds
 
 class moreNav : Fragment() {
     private lateinit var binding : FragmentMoreNavBinding
@@ -30,6 +38,12 @@ class moreNav : Fragment() {
     private var checkedItem: Int = 0
     private var selected: String = ""
     private val CHECKED_ITEM = "checked_item"
+    lateinit var mAdView: AdView
+    private var rewardedInterstitialAd : RewardedInterstitialAd? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private val rewardedAdRunnable = Runnable {
+        rewardedIAd()
+    }
     // Define your variable here
     companion object{
         lateinit var auth : FirebaseAuth
@@ -39,14 +53,24 @@ class moreNav : Fragment() {
         val view = inflater.inflate(R.layout.fragment_more_nav, container, false)
         binding = FragmentMoreNavBinding.bind(view)
         (activity as AppCompatActivity).supportActionBar?.title = "Settings"
+        MobileAds.initialize(requireContext()) {}
+        mAdView = binding.bannerAds
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+        mAdView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                binding.adsLayout.visibility = View.VISIBLE
+            }
+        }
+        // Initially set the adsLayout visibility to GONE until the ad is loaded
+        binding.adsLayout.visibility = View.GONE
+
 
         auth = FirebaseAuth.getInstance()
 
-        binding.templateView?.let {
-            loadSmallMediumSizeNativeAds(requireContext(),R.string.small_medium_native_ads,
-                it
-            )
-        }
+        handler.postDelayed(rewardedAdRunnable, 10000)
+        rewardedIAd()
+
 
         if (auth.currentUser == null) {
             startActivity(Intent(requireContext(), signin::class.java))
@@ -80,6 +104,7 @@ binding.Settingslayout.setOnClickListener {
 
         // Set the background color of SwipeRefreshLayout based on app theme
         setRelativeLayoutBackgroundColor()
+
 
 
         return view
@@ -240,15 +265,42 @@ binding.Settingslayout.setOnClickListener {
         }
         builder.show()
     }
+    fun rewardedIAd(){
+        val adRequest = AdRequest.Builder().build()
+        RewardedInterstitialAd.load(requireContext(),"ca-app-pub-3504589383575544/8279203168",
+            adRequest, object : RewardedInterstitialAdLoadCallback() {
+                override fun onAdLoaded(p0: RewardedInterstitialAd) {
 
+                    rewardedInterstitialAd=p0
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    rewardedInterstitialAd=null
+                }
+            })
+
+    }
     override fun onResume() {
         super.onResume()
-        binding.templateView?.let {
-            loadSmallMediumSizeNativeAds(requireContext(),R.string.small_medium_native_ads,
-                it
-            )
+        MobileAds.initialize(requireContext()) {}
+        mAdView = binding.bannerAds
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+        mAdView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                binding.adsLayout.visibility = View.VISIBLE
+            }
         }
+        // Initially set the adsLayout visibility to GONE until the ad is loaded
+        binding.adsLayout.visibility = View.GONE
         binding.userDetails.text = updateData()
         setActionBarGradient()
+        handler.postDelayed(rewardedAdRunnable, 10000)
+        rewardedIAd()
+    }
+    override fun onPause() {
+        super.onPause()
+        // Remove the delayed task when the fragment is paused
+        handler.removeCallbacks(rewardedAdRunnable)
     }
 }

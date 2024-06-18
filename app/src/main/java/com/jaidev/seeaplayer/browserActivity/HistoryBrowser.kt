@@ -272,7 +272,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         Toast.makeText(this, "Browsing data cleared successfully", Toast.LENGTH_SHORT).show()
     }
 
-    fun loadAppOpenAd() {
+    private fun loadAppOpenAd() {
         if (!isAdDisplayed) {
             val adRequest = AdRequest.Builder().build()
             AppOpenAd.load(

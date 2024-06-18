@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import com.jaidev.seeaplayer.databinding.ActivitySeeAoneBinding
 class SeeAOne : AppCompatActivity() {
     private lateinit var binding: ActivitySeeAoneBinding
     private var selectedBox: View? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,20 +34,14 @@ class SeeAOne : AppCompatActivity() {
         val annualBox = binding.annualBox
         val biennialBox = binding.biennialBox
 
+        // Setting touch listeners for the boxes
+        setTouchListener(squareBox, binding.monthlySelect, binding.monthlyCircle)
+        setTouchListener(quarterlyBox, binding.quarterlySelect, binding.quarterlyCircle)
+        setTouchListener(annualBox, binding.annualSelect, binding.annualCircle)
+        setTouchListener(biennialBox, binding.biennialSelect, binding.biennialCircle)
 
-        squareBox.setOnClickListener { selectBox(squareBox, binding.monthlySelect) }
-        quarterlyBox.setOnClickListener { selectBox(quarterlyBox, binding.quarterlySelect) }
-        annualBox.setOnClickListener { selectBox(annualBox, binding.annualSelect) }
-        biennialBox.setOnClickListener {
-            binding.biennialSelect.let { it1 ->
-                selectBox(biennialBox,
-                    it1
-                )
-            }
-        }
-
-        quarterlyBox.performClick()
-
+        // Select the quarterly box by default
+        selectBox(quarterlyBox, binding.quarterlySelect, binding.quarterlyCircle)
 
         binding.SeeAeduActivity.setOnClickListener {
             startActivity(Intent(this, SeeAEdu::class.java))
@@ -54,7 +50,7 @@ class SeeAOne : AppCompatActivity() {
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun selectBox(box: View, selectIndicator: ImageView) {
+    private fun selectBox(box: View, selectIndicator: ImageView, circleIndicator: View?) {
         // Reset the background of the previously selected box (if any)
         selectedBox?.background = getDrawable(R.drawable.square_box_bg_selector)
 
@@ -64,12 +60,31 @@ class SeeAOne : AppCompatActivity() {
         // Update the currently selected box
         selectedBox = box
 
-        binding.monthlySelect.visibility = ImageView.GONE
-        binding.quarterlySelect.visibility = ImageView.GONE
-        binding.annualSelect.visibility = ImageView.GONE
-        binding.biennialSelect.visibility = ImageView.GONE
+        // Show all circles for unselected boxes
+        binding.monthlyCircle?.visibility = ImageView.VISIBLE
+        binding.quarterlyCircle?.visibility = ImageView.VISIBLE
+        binding.annualCircle?.visibility = ImageView.VISIBLE
+        binding.biennialCircle?.visibility = ImageView.VISIBLE
 
-        // Show indicator of the selected box
+        // Hide all select indicators
+        binding.monthlySelect.visibility = ImageView.INVISIBLE
+        binding.quarterlySelect.visibility = ImageView.INVISIBLE
+        binding.annualSelect.visibility = ImageView.INVISIBLE
+        binding.biennialSelect.visibility = ImageView.INVISIBLE
+
+        // Show the select indicator of the selected box
         selectIndicator.visibility = ImageView.VISIBLE
+        // Hide the circle indicator of the selected box
+        circleIndicator?.visibility = ImageView.INVISIBLE
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setTouchListener(box: View, selectIndicator: ImageView, circleIndicator: View?) {
+        box.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                selectBox(box, selectIndicator, circleIndicator)
+            }
+            true
+        }
     }
 }

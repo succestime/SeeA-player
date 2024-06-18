@@ -6,7 +6,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -125,9 +124,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             // Set your custom selected background on the root view of the item
             holder.root.setBackgroundResource(R.drawable.browser_selected_background)
         } else {
-            // Reset to default background based on app theme
-            val defaultBackgroundColor = getDefaultBackgroundColor()
-            holder.root.setBackgroundColor(defaultBackgroundColor)
+            holder.root.setBackgroundResource(R.drawable.browser_selected_white_background)
         }
 
         // Hide or show the more button based on selection mode
@@ -380,17 +377,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
 
 
-    // Function to get default background color based on app theme
-    private fun getDefaultBackgroundColor(): Int {
-        val isDarkMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-        return if (isDarkMode) {
-            // Dark mode is enabled, return dark color resource
-            ContextCompat.getColor(context, R.color.gray)
-        } else {
-            // Light mode is enabled, return light color resource
-            ContextCompat.getColor(context, R.color.white)
-        }
-    }
+
     fun updateVideoTitle(position: Int, newName: String) {
         videoList[position].title = newName
         notifyItemChanged(position)

@@ -61,7 +61,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         binding.videoRVFA.setItemViewCacheSize(200)
         adapter = VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true )
         binding.videoRVFA.adapter = adapter
-        binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
+        binding.totalVideo.text = "${currentFolderVideos.size} Videos"
 
 
         adapter = VideoAdapter(this@FoldersActivity, MainActivity.videoList , isFolder = true)
@@ -103,7 +103,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
             adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true)
             binding.videoRVFA.adapter = adapter
-            binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
+            binding.totalVideo.text = "${currentFolderVideos.size} Videos"
             binding.swipeRefreshFolder.isRefreshing = false // Hide the refresh indicator
 
         }
@@ -194,7 +194,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         val position = intent.getIntExtra("position", 0)
         currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
         adapter.updateList(currentFolderVideos)
-        binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
+        binding.totalVideo.text = "${currentFolderVideos.size} Videos"
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -409,7 +409,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         if(PlayerActivity.position != -1) {binding.nowPlayingBtn.visibility = View.VISIBLE}
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged= false
-        binding.totalVideo.text = "Total Video : ${currentFolderVideos.size}"
+        binding.totalVideo.text = "${currentFolderVideos.size} Videos"
     }
 
 

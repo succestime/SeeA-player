@@ -5,8 +5,6 @@
      android:title="@string/home"
      android:icon="@drawable/home_icon"  />
 
-
-
  <item android:id="@+id/download"
   android:title="@string/download"
   android:icon="@drawable/download_icon"/>

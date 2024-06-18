@@ -29,6 +29,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -144,6 +145,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
         initializePlayer()
+        setSwipeRefreshBackgroundColor()
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         // banner ads
@@ -359,14 +361,16 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             playbackIconsAdapter.notifyDataSetChanged()
-                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.VISIBLE
-                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.fullScreenBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.repeatBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.openButton).visibility = View.VISIBLE
 
                         } else if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                             playbackIconsAdapter.notifyDataSetChanged()
-                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.GONE
-                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.fullScreenBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.repeatBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.openButton).visibility = View.GONE
                         }
                     }
                     4 -> {
@@ -672,26 +676,80 @@ binding.adsRemove.setOnClickListener {
                 playInFullscreen(enable = true)
             }
         }
-      val lockBtn =   findViewById<ImageButton>(R.id.lockButton)
+        val lockBtn = findViewById<ImageButton>(R.id.openButton)
 
         lockBtn.setOnClickListener {
             if (!isLocked) {
-                // for hiding
+                // For hiding
                 isLocked = true
-                binding.playerView.hideController()
                 binding.playerView.useController = false
-                lockBtn.setImageResource(R.drawable.round_lock)
+                binding.playerView.isDoubleTapEnabled = false
+                binding.playerView.hideController()
+                binding.lockButton.visibility = View.VISIBLE
+                lockBtn.visibility = View.GONE
+                Handler().postDelayed({
+                    binding.lockButton.visibility = View.INVISIBLE
+                }, 2000)
             } else {
-                // for showing
+                // For showing
                 isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
-
-                lockBtn.setImageResource(R.drawable.round_lock_open)
+                binding.lockButton.visibility = View.GONE
+                lockBtn.visibility = View.VISIBLE
             }
         }
-    }
 
+        binding.lockButton.setOnClickListener {
+            if (!isLocked) {
+                // For hiding
+                isLocked = true
+                binding.playerView.useController = false
+                binding.playerView.isDoubleTapEnabled = false
+                binding.playerView.hideController()
+                binding.lockButton.visibility = View.VISIBLE
+                lockBtn.visibility = View.GONE
+                Handler().postDelayed({
+                    binding.lockButton.visibility = View.INVISIBLE
+                }, 2000)
+            } else {
+                // For showing
+                isLocked = false
+                binding.playerView.useController = true
+                binding.playerView.showController()
+                binding.lockButton.visibility = View.GONE
+                lockBtn.visibility = View.VISIBLE
+            }
+        }
+        binding.playerView.setOnClickListener {
+            // Show lock button if locked when touched
+            if (isLocked) {
+                binding.lockButton.visibility = View.VISIBLE
+                // Schedule to hide lock button after 2 seconds
+                Handler().postDelayed({
+                    binding.lockButton.visibility = View.INVISIBLE
+                }, 2000)
+            }else{
+                binding.playerView.isDoubleTapEnabled = true
+            }
+
+
+        }
+
+    }
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+        if (isDarkMode) {
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.black)
+        } else {
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.black)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+        }
+    }
     @SuppressLint("NewApi")
     private fun createPlayer() {
 
@@ -730,14 +788,20 @@ binding.adsRemove.setOnClickListener {
 
         seekBarFeature()
         binding.playerView.setControllerVisibilityListener { visibility ->
-            val lockBtn = findViewById<ImageButton>(R.id.lockButton)
+            val lockBtn = findViewById<ImageButton>(R.id.openButton)
 
-            if (isLocked) {
-                lockBtn.visibility = View.VISIBLE
+            // Check if the screen orientation is portrait
+            val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+            if (isPortrait) {
+                lockBtn.visibility = View.GONE
             } else {
-                lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
+                if (isLocked) {
+                    lockBtn.visibility = View.VISIBLE
+                } else {
+                    lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
+                }
             }
-
             // Show or hide the status bar based on playerView visibility
             if (binding.playerView.isControllerVisible) {
                 showStatusBar()

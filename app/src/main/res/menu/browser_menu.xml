@@ -16,19 +16,20 @@
 
     <item
         android:id="@+id/download"
-        android:icon="@drawable/download_browser"
+        android:icon="@drawable/video_browser"
         android:title="Downloads" />
 
-    <item
-        android:id="@+id/save"
-        android:icon="@drawable/ic_save"
-        android:title="Save" />
+
 
     <item
         android:id="@+id/bookmark"
         android:icon="@drawable/ic_bookmark"
         android:title="Bookmarks" />
 
+    <item
+        android:id="@+id/save"
+        android:icon="@drawable/ic_save"
+        android:title="Save" />
     <item
         android:id="@+id/desktop"
         android:icon="@drawable/ic_laptop"

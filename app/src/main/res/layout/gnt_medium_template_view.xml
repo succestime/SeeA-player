@@ -7,7 +7,7 @@
     <com.google.android.gms.ads.nativead.NativeAdView
         android:id="@+id/native_ad_view"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="330dp"
         android:background="@drawable/gnt_outline_shape">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +24,7 @@
             <com.google.android.gms.ads.nativead.MediaView
                 android:id="@+id/media_view"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="180dp"
                 android:layout_margin="@dimen/gnt_no_size"
                 android:layout_marginTop="@dimen/gnt_no_margin"
                 app:layout_constraintBottom_toTopOf="@id/middle"
@@ -209,13 +209,13 @@
                 android:layout_height="0dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
                 android:background="@color/gnt_blue"
                 android:gravity="center"
                 android:lines="1"
                 android:textColor="@color/gnt_white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_min="35dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/body" />
 

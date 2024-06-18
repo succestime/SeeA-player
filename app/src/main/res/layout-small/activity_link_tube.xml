@@ -220,20 +220,72 @@
 
 
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="380dp"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        app:adSize="380x60"
-        app:adUnitId="ca-app-pub-3504589383575544/9715937751"
+    <LinearLayout
+        android:id="@+id/adsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="90dp"
+        android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="90dp">
 
-    </com.google.android.gms.ads.AdView>
+            <ImageView
+                android:id="@+id/adsRemove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/browser_clear"
+                android:visibility="visible"
+                android:layout_marginBottom="5dp"
+                app:tint="@color/white"
+                app:layout_constraintBottom_toTopOf="@+id/adView"
+                app:layout_constraintEnd_toEndOf="parent"
+                >
 
+            </ImageView>
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="380dp"
+                android:layout_height="60dp"
+                app:adSize="400x60"
+                app:adUnitId="ca-app-pub-3504589383575544/9715937751"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </com.google.android.gms.ads.AdView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/bottomRightBrowser"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="52dp"
+        android:background="@drawable/curver_linktube_"
+        app:layout_constraintTop_toBottomOf="@+id/adsLayout">
+
+        <ImageButton
+            android:id="@+id/bottomRightBrowserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+
+            android:contentDescription="@string/refresh_btn"
+            android:src="@drawable/outline_fast_rewind_24"
+            app:tint="@color/white"
+            tools:ignore="RedundantDescriptionCheck" />
+
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/linearLayout5"
         android:layout_width="match_parent"
@@ -312,19 +364,20 @@
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
             <ImageButton
-                android:id="@+id/bottomMoreBrowser"
+                android:id="@+id/bottomLeftBrowser"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
-                android:src="@drawable/icon_dark"
+                android:src="@drawable/outline_fast_forward_24"
                 android:visibility="visible"
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
         </LinearLayout>
 
     </LinearLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

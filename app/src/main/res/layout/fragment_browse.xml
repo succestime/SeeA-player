@@ -8,6 +8,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".browseFregment.BrowseFragment">
 
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshBrowser"
         android:layout_width="match_parent"
@@ -19,6 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
+        <!-- ProgressBar for loading indication -->
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <FrameLayout
         android:id="@+id/customView"
@@ -31,7 +34,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
+    <!-- ProgressBar for loading indication -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:indeterminateDrawable="@drawable/progress_bar_cool_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <LinearLayout
         android:id="@+id/recyclerviewLayout"
         android:layout_width="match_parent"
@@ -94,6 +108,15 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
+    <FrameLayout
+        android:id="@+id/custom_error_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
+        <!-- Include your custom error layout here -->
+        <include layout="@layout/activity_no_internet_screen"/>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

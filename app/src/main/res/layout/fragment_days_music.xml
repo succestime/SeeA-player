@@ -30,7 +30,7 @@
                     android:id="@+id/daysTotalMusics"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"
                     android:text="Total Musics"
                     android:textSize="15sp"
@@ -49,9 +49,9 @@
                     android:id="@+id/MusicRV"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="10dp"
 
-                    android:paddingBottom="69dp"
+                    android:paddingBottom="60dp"
                     android:scrollbars="vertical"
                     />
             </LinearLayout>

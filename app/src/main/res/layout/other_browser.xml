@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:backgroundTint="@android:color/transparent"
-            android:src="@drawable/internat_browser"
+            android:src="@drawable/pdf_image"
             android:visibility="visible" />
 
         <ImageButton

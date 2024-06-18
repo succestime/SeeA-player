@@ -30,8 +30,8 @@
 
             <com.github.vkay94.dtpv.youtube.YouTubeOverlay
                 android:id="@+id/ytOverlay"
-                android:layout_width="760dp"
-                android:layout_height="1239dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="#77000000"
                 android:visibility="invisible"
                 app:yt_playerView="@id/playerView">
@@ -65,20 +65,37 @@
 
     </FrameLayout>
 
+
+
     <ImageButton
         android:id="@+id/lockButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginTop="10dp"
-        android:scaleType="centerInside"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
         android:background="@drawable/ripple_circle"
-        android:contentDescription="@string/lock"
-        android:src="@drawable/round_lock_open"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:src="@drawable/round_lock"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
+
+
+    <!--    <ImageButton-->
+<!--        android:id="@+id/lockButton"-->
+<!--        android:layout_width="50dp"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:layout_marginEnd="15dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:scaleType="centerInside"-->
+<!--        android:background="@drawable/ripple_circle"-->
+<!--        android:contentDescription="@string/lock"-->
+<!--        android:src="@drawable/round_lock_open"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:tint="@color/white" />-->
     <TextView
         android:id="@+id/durationChangeTextView"
         android:layout_width="wrap_content"
@@ -203,7 +220,7 @@
             android:id="@+id/adsRemove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="@drawable/curver_ads_remove"
             android:src="@drawable/clear_ads"
             android:visibility="visible"
             android:layout_marginStart="5dp"

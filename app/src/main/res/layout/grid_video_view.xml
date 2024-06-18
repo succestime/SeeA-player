@@ -4,17 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:background="?attr/selectableItemBackground"
+    app:cardCornerRadius="10dp"
     >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-
         >
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -27,7 +23,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.455"/>
+                />
 
 
 
@@ -36,6 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:padding="8dp"
+            android:textColor="@color/black"
             android:text="Video Title"
             android:textSize="16sp"
             android:maxLines="1"
@@ -52,7 +49,8 @@
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:text="00:00"
-                android:textColor="#0759E1"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/cool_blue"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -65,14 +63,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:background="@android:color/transparent"
-                android:src="@drawable/icon_dark"
-                android:padding="3dp"
                 android:layout_marginEnd="15dp"
+                android:background="@android:color/transparent"
+                android:padding="3dp"
+                android:src="@drawable/icon_dark"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="?android:attr/textColorPrimary" />
+                app:layout_constraintVertical_bias="0.0"
+                app:tint="@color/black" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 

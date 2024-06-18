@@ -30,7 +30,7 @@
                     android:id="@+id/daysTotalMusics"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"
                     android:text="Total Musics"
                     android:textSize="15sp"
@@ -48,10 +48,8 @@
                     android:id="@+id/MusicRV"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
-
-
-                    android:paddingBottom="69dp"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="60dp"
                     android:scrollbars="vertical"
                     />
             </LinearLayout>
@@ -98,69 +96,3 @@
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    android:id="@+id/swipeRefreshMusic"-->
-<!--    tools:context=".DaysMusic">-->
-
-<!--    <FrameLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--       >-->
-<!--    <TextView-->
-<!--       android:id="@+id/daysTotalMusics"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textSize="15sp"-->
-<!--        android:layout_marginTop="5dp"-->
-<!--        android:layout_marginStart="10dp"-->
-<!--        android:textStyle="bold"-->
-<!--        android:text="@string/recant_musics" />-->
-<!--        <ViewStub-->
-<!--            android:id="@+id/emptyStateLayout"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout="@layout/recant_empty_state_layout"-->
-<!--            android:foregroundGravity="center"-->
-<!--            android:visibility="gone"/>-->
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/MusicRV"-->
-<!--        android:layout_marginTop="35dp"-->
-<!--        android:layout_marginStart="2dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"/>-->
-
-<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent">-->
-
-
-<!--       -->
-<!--       -->
-<!--    </FrameLayout>-->
-
-
-
-<!--  -->
-
-
-<!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->

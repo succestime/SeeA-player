@@ -30,6 +30,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -79,7 +80,6 @@ import kotlin.system.exitProcess
 class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener
     , GestureDetector.OnGestureListener
 {
-    private var isVideoPlaying = false
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var playPauseBtn: ImageButton
     private lateinit var fullScreenBtn: ImageButton
@@ -106,7 +106,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
     private lateinit var player: ExoPlayer
     lateinit var mAdView: AdView
-    private lateinit var gestureDetector: GestureDetector
     companion object {
         private var audioManager: AudioManager? = null
         private lateinit var player: ExoPlayer
@@ -152,7 +151,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         setTheme(R.style.coolBlueNav)
         setContentView(binding.root)
         initializePlayer()
-
+        setSwipeRefreshBackgroundColor()
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         releasePlayer()
@@ -500,15 +499,16 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             playbackIconsAdapter.notifyDataSetChanged()
-                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.VISIBLE
-                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.fullScreenBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.repeatBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.openButton).visibility = View.VISIBLE
 
                         } else if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                             playbackIconsAdapter.notifyDataSetChanged()
-
-                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.GONE
-                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.fullScreenBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.repeatBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.openButton).visibility = View.GONE
                         }
                     }
 
@@ -586,6 +586,19 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
     }
 
+    private fun setSwipeRefreshBackgroundColor() {
+        val isDarkMode = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+        if (isDarkMode) {
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.black)
+        } else {
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.black)
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+        }
+    }
     @SuppressLint("SetTextI18n")
     fun setupSleepTimer() {
         if (timer != null)
@@ -839,7 +852,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 playInFullscreen(enable = true)
             }
         }
-        val lockBtn = findViewById<ImageButton>(R.id.lockButton)
+        val lockBtn = findViewById<ImageButton>(R.id.openButton)
+
         lockBtn.setOnClickListener {
             if (!isLocked) {
                 // For hiding
@@ -847,27 +861,49 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 binding.playerView.useController = false
                 binding.playerView.isDoubleTapEnabled = false
                 binding.playerView.hideController()
-                lockBtn.setImageResource(R.drawable.round_lock)
+                binding.lockButton.visibility = View.VISIBLE
+                lockBtn.visibility = View.GONE
                 Handler().postDelayed({
-                    lockBtn.visibility = View.INVISIBLE
+                    binding.lockButton.visibility = View.INVISIBLE
                 }, 2000)
             } else {
                 // For showing
                 isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
-                lockBtn.setImageResource(R.drawable.round_lock_open)
+                binding.lockButton.visibility = View.GONE
                 lockBtn.visibility = View.VISIBLE
             }
         }
 
+        binding.lockButton.setOnClickListener {
+            if (!isLocked) {
+                // For hiding
+                isLocked = true
+                binding.playerView.useController = false
+                binding.playerView.isDoubleTapEnabled = false
+                binding.playerView.hideController()
+                binding.lockButton.visibility = View.VISIBLE
+                lockBtn.visibility = View.GONE
+                Handler().postDelayed({
+                    binding.lockButton.visibility = View.INVISIBLE
+                }, 2000)
+            } else {
+                // For showing
+                isLocked = false
+                binding.playerView.useController = true
+                binding.playerView.showController()
+                binding.lockButton.visibility = View.GONE
+                lockBtn.visibility = View.VISIBLE
+            }
+        }
         binding.playerView.setOnClickListener {
             // Show lock button if locked when touched
             if (isLocked) {
-                lockBtn.visibility = View.VISIBLE
+                binding.lockButton.visibility = View.VISIBLE
                 // Schedule to hide lock button after 2 seconds
                 Handler().postDelayed({
-                    lockBtn.visibility = View.INVISIBLE
+                    binding.lockButton.visibility = View.INVISIBLE
                 }, 2000)
             }else{
                 binding.playerView.isDoubleTapEnabled = true
@@ -876,10 +912,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
         }
 
-    }
 
-    private fun setPlaybackSpeed(speed: Float) {
-        player.playbackParameters = PlaybackParameters(speed)
     }
 
         private fun resetPlaybackSpeed() {
@@ -921,14 +954,20 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
         seekBarFeature()
         binding.playerView.setControllerVisibilityListener { visibility ->
-            val lockBtn = findViewById<ImageButton>(R.id.lockButton)
+            val lockBtn = findViewById<ImageButton>(R.id.openButton)
 
-            if (isLocked) {
-                lockBtn.visibility = View.VISIBLE
+            // Check if the screen orientation is portrait
+            val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+            if (isPortrait) {
+                lockBtn.visibility = View.GONE
             } else {
-                lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
+                if (isLocked) {
+                    lockBtn.visibility = View.VISIBLE
+                } else {
+                    lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
+                }
             }
-
             // Show or hide the status bar based on playerView visibility
             if (binding.playerView.isControllerVisible) {
                 showStatusBar()
@@ -936,13 +975,14 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 hideStatusBar()
             }
         }
-        // Adjust player view padding for status bar
         binding.playerView.setOnApplyWindowInsetsListener { view, insets ->
-            val systemWindowInsets = insets.systemWindowInsets
-            view.setPadding(0, systemWindowInsets.top, 0, systemWindowInsets.bottom)
+            val systemWindowInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(0, systemWindowInsets.top, systemWindowInsets.right, systemWindowInsets.bottom)
             insets
         }
+
     }
+
 
     private fun playVideo() {
         binding.adsLayout.visibility = View.GONE

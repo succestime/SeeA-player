@@ -37,15 +37,16 @@
         android:theme="@style/coolBlueNav"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
         <activity
             android:name=".browserActivity.OfflineMhtmlActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".TransparentActivity"
             android:exported="true"
@@ -53,21 +54,22 @@
             android:launchMode="singleInstance"
             android:taskAffinity=""
             android:theme="@style/TransparentActivityTheme">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.SEND" />-->
 
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.SEND" /> -->
 
-<!--                <data android:mimeType="text/plain" />-->
-<!--            </intent-filter>-->
+
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+
+
+            <!-- <data android:mimeType="text/plain" /> -->
+            <!-- </intent-filter> -->
         </activity>
-
         <activity
             android:name=".DownloadsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Subscription.RedeemCodeActivity"
             android:exported="false" />
@@ -175,6 +177,7 @@
         <activity
             android:name=".browserActivity.LinkTubeActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustPan"
             android:exported="true" />
         <activity
             android:name=".recantFragment.ReMusicPlayerActivity"
@@ -252,6 +255,7 @@
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
             android:exported="true"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 

@@ -50,7 +50,7 @@ class DaysDownload : Fragment() {
         binding.DownloadRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true)
         binding.DownloadRV.adapter = adapter
-        binding.daysTotalVideos.text = "Recant Videos : 0"
+        binding.daysTotalVideos.text = "0 Videos "
 
         if (!requestRuntimePermission()) {
             // Permission not granted yet
@@ -179,7 +179,7 @@ class DaysDownload : Fragment() {
         recantVideos.sortedByDescending { it.timestamp }
 
         adapter.updateRecentVideos(sortedRecentVideos)
-        binding.daysTotalVideos.text = "Total Videos : ${sortedRecentVideos.size}"
+        binding.daysTotalVideos.text = "${sortedRecentVideos.size} Videos"
 
         if (videoRecantList.isEmpty()) {
             binding.emptyStateLayout.visibility = View.VISIBLE

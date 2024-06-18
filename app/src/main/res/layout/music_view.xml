@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="75dp"
+    android:layout_height="70dp"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
@@ -13,7 +13,7 @@
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/musicViewImage"
         android:layout_width="70dp"
-        android:layout_height="65dp"
+        android:layout_height="60dp"
         android:layout_marginStart="7dp"
         android:src="@drawable/music_speaker_three"
         app:shapeAppearanceOverlay="@style/curved"/>

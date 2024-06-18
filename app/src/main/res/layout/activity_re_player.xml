@@ -69,7 +69,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
-
+    <ImageButton
+        android:id="@+id/lockButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/ripple_circle"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:src="@drawable/round_lock"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
 <!--    CardView for Volume SeekBar-->
     <LinearLayout
         android:id="@+id/volProgressContainer"
@@ -179,7 +191,7 @@
             android:id="@+id/adsRemove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="@drawable/curver_ads_remove"
             android:src="@drawable/clear_ads"
             android:visibility="visible"
             android:layout_marginStart="5dp"

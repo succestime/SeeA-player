@@ -40,7 +40,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:paddingTop="10dp"
             android:text="@string/seeA"
             android:textColor="@color/white"
             android:textSize="25sp"
@@ -48,7 +47,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.1" />
+        />
 
         <TextView
             android:id="@+id/textView11"
@@ -56,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="2dp"
-            android:paddingTop="10dp"
+
             android:text="@string/edu"
             android:textColor="#FFCF00"
             android:textSize="25sp"
@@ -65,7 +64,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/SeeAedu"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.1" />
+          />
 
         <TextView
             android:id="@+id/onehundradforthynine"
@@ -150,7 +149,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cardview_background_subs"
-android:layout_marginStart="5dp"
+                android:layout_marginStart="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView23"
                 app:layout_constraintStart_toEndOf="@+id/textView23"
                 app:layout_constraintTop_toTopOf="parent">
@@ -176,7 +175,7 @@ android:layout_marginStart="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="55dp"
             app:cardBackgroundColor="#214D97">
 
             <LinearLayout
@@ -240,7 +239,7 @@ android:layout_marginStart="5dp"
                     android:id="@+id/textView7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/monthly_n_15"
+                    android:text="@string/monthly_15"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -284,7 +283,7 @@ android:layout_marginStart="5dp"
                     android:layout_width="wrap_content"
 
                     android:layout_height="wrap_content"
-                    android:text="@string/quarterly_n_75"
+                    android:text="@string/quarterly__75"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -296,7 +295,7 @@ android:layout_marginStart="5dp"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/complete_svgrepo_com"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView12"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -326,7 +325,7 @@ android:layout_marginStart="5dp"
                     android:layout_width="wrap_content"
 
                     android:layout_height="wrap_content"
-                    android:text="@string/annual_n_149"
+                    android:text="@string/annual__149"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -370,7 +369,7 @@ android:layout_marginStart="5dp"
                     android:layout_width="wrap_content"
 
                     android:layout_height="wrap_content"
-                    android:text="@string/biennial_n_599"
+                    android:text="@string/biennial__599"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -391,38 +390,15 @@ android:layout_marginStart="5dp"
     </androidx.cardview.widget.CardView>
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView2"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/white"
-        app:cardCornerRadius="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seeA1ne">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/or"
-            android:textColor="@color/red"
-            android:textSize="20sp" />
-    </androidx.cardview.widget.CardView>
-
     <RelativeLayout
         android:id="@+id/fakeCodeNumber"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:layout_marginTop="10dp"
         android:background="@android:color/transparent"
         android:padding="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/subscribe_btn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView2">
+        app:layout_constraintStart_toStartOf="parent">
 
         <View
             android:id="@+id/view"
@@ -470,14 +446,12 @@ android:layout_marginStart="5dp"
         android:id="@+id/subscribe_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="10dp"
         android:backgroundTint="#E3B52A"
-        android:paddingBottom="10dp"
         android:text="@string/seea_subscribe_now"
-        app:layout_constraintTop_toBottomOf="@+id/fakeCodeNumber" />
+        app:layout_constraintBottom_toBottomOf="parent"
+       />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
