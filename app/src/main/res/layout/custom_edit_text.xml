@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:orientation="horizontal"
+   >
+
+    <EditText
+        android:id="@+id/editTextSearch"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/custom_music_search_browser_view"
+        android:drawableStart="@drawable/back_browser"
+        android:drawableEnd="@drawable/clear_browser"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/white"
+        android:hint="Search..."
+        android:inputType="text"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textColor="#CCCCCC"
+        android:textColorHint="#CCCCCC"
+        android:visibility="visible" />
+</LinearLayout>
