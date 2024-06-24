@@ -177,7 +177,6 @@
         <activity
             android:name=".browserActivity.LinkTubeActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
-            android:windowSoftInputMode="adjustPan"
             android:exported="true" />
         <activity
             android:name=".recantFragment.ReMusicPlayerActivity"

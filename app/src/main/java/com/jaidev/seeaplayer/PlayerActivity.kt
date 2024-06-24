@@ -136,13 +136,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Clear the FLAG_FULLSCREEN flag to show the status bar
         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        // Make the status bar transparent
         window.statusBarColor = Color.BLACK
-        // Hide the action bar if you have one
         supportActionBar?.hide()
-//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -192,6 +188,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         someIdes()
         horizontalIconList()
         directPlayVideoFromGallery()
+
     }
 
     private fun someIdes(){
@@ -1291,11 +1288,14 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         val actualDurationMinSec = getMinSecFormat(player.duration)
         val changingDurationSecMillisec = getSecMillisecFormat(durationChange)
 
+        // Determine the sign based on the swipe direction
+        val sign = if (isForward) "+" else "-"
+
         // Get the string from resources
         val formatString = getString(R.string.durationChangeTextView)
 
         // Use String.format to replace placeholders with actual values
-        val text = String.format(formatString, actualDurationMinSec, changingDurationSecMillisec)
+        val text = String.format(formatString, actualDurationMinSec, "$sign$changingDurationSecMillisec")
 
         durationChangeTextView.text = text
         durationChangeTextView.visibility = View.VISIBLE
@@ -1317,6 +1317,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             durationChangeTextView.visibility = View.GONE
         }, 1000)
     }
+
+
     private fun getMinSecFormat(duration: Long): String {
         val hours = TimeUnit.MILLISECONDS.toHours(duration)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60

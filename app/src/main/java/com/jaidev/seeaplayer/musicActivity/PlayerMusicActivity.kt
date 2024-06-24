@@ -109,6 +109,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 .load(getImgArt(musicListPA[songPosition].path))
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgPA)
+
             binding.songNamePA.text = musicListPA[songPosition].title
         }
         else initializeLayout()
@@ -347,7 +348,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         fIndex = favouriteChecker(musicListPA[songPosition].id)
 
         Glide.with(applicationContext)
-            .load(musicListPA[songPosition].artUri)
+            .load(getImgArt(musicListPA[songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgPA)
         binding.songNamePA.text = musicListPA[songPosition].title
@@ -477,7 +478,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         // Refresh now playing image & text on song completion
         NowPlaying.binding.songNameNP.isSelected = true
         Glide.with(applicationContext)
-            .load(musicListPA[songPosition].artUri)
+            .load(getImgArt(musicListPA[songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(NowPlaying.binding.songImgNP)
         NowPlaying.binding.songNameNP.text = musicListPA[songPosition].title

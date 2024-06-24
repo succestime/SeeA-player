@@ -16,8 +16,8 @@
         android:layout_width="70dp"
         android:layout_height="65dp"
         android:layout_marginStart="10dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/music_speaker_three"
+        android:background="#B8B8B8"
+        android:src="@drawable/music_note_svgrepo_com"
         app:shapeAppearanceOverlay="@style/curved"/>
 
     <LinearLayout
@@ -73,6 +73,26 @@
         tools:ignore="UseAppTint">
 
     </ImageButton>
-
-
+    <ImageButton
+        android:id="@+id/emptyCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/round_crop_square_24"
+        app:tint="?android:attr/textColorPrimary"
+        android:layout_marginVertical="15dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="3dp"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint" />
+    <ImageButton
+        android:id="@+id/fillCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/check_box_24"
+        android:background="@color/transparent"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="3dp"
+        android:visibility="gone"
+        tools:ignore="UseAppTint" />
 </LinearLayout>

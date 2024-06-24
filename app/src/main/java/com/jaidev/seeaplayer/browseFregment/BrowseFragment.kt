@@ -89,6 +89,8 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     private val loadTimeout = 5000L // 5 seconds timeout
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var loadRunnable: Runnable
+
+
     companion object {
         private const val CHANNEL_ID = "FileDownloadChannel"
     }
@@ -117,13 +119,16 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 // Inflate and set up the no internet view
 
         binding.webView.apply {
-                when {
-                    URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
-                    urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
-                    else ->{
-                            loadUrl("https://www.google.com/search?q=$urlNew")
-                    }
+            when {
+                URLUtil.isValidUrl(urlNew) -> loadUrl(urlNew)
+                urlNew.contains(".com", ignoreCase = true) -> loadUrl(urlNew)
+                urlNew.startsWith("https://", ignoreCase = true) -> loadUrl(urlNew)
+                urlNew.startsWith("http://", ignoreCase = true) -> loadUrl(urlNew)
+                urlNew.startsWith("intent://", ignoreCase = true) -> loadUrl(urlNew)
+                else ->{
+                    loadUrl("https://www.google.com/search?q=$urlNew")
                 }
+            }
 
             settings.javaScriptEnabled = true
             settings.setSupportZoom(true)
@@ -137,38 +142,41 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
             }
-            webViewClient = object : WebViewClient() {
-
-                override fun onReceivedError(
-                    view: WebView?,
-                    errorCode: Int,
-                    description: String?,
-                    failingUrl: String?
-                ) {
-                    super.onReceivedError(view, errorCode, description, failingUrl)
-                    // Hide WebView
-                    binding.webView.visibility = View.GONE // Hide the WebView
-                    // Show custom error layout
-                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
-                }
-
-
-
-                override fun onReceivedHttpError(
-                    view: WebView?,
-                    request: WebResourceRequest?,
-                    errorResponse: WebResourceResponse?
-                ) {
-                    super.onReceivedHttpError(view, request, errorResponse)
-                    binding.webView.visibility = View.GONE // Hide the WebView
-                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
-                }
-
-
-            }
+//            webViewClient = object : WebViewClient() {
+//
+//                override fun onReceivedError(
+//                    view: WebView?,
+//                    errorCode: Int,
+//                    description: String?,
+//                    failingUrl: String?
+//                ) {
+//                    super.onReceivedError(view, errorCode, description, failingUrl)
+//                    // Hide WebView
+//                    binding.webView.visibility = View.GONE // Hide the WebView
+//                    // Show custom error layout
+//                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
+//                }
+//
+//
+//
+//                override fun onReceivedHttpError(
+//                    view: WebView?,
+//                    request: WebResourceRequest?,
+//                    errorResponse: WebResourceResponse?
+//                ) {
+//                    super.onReceivedHttpError(view, request, errorResponse)
+//                    binding.webView.visibility = View.GONE // Hide the WebView
+//                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
+//                }
+//
+//
+//            }
 
 
         }
+
+
+
         val rootView = view.rootView
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener {
@@ -437,15 +445,23 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     description: String?,
                     failingUrl: String?
                 ) {
-                    super.onReceivedError(view, errorCode, description, failingUrl)
-                    // Hide WebView
-                    binding.webView.visibility = View.GONE // Hide the WebView
-                    // Show custom error layout
-                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
+//                    super.onReceivedError(view, errorCode, description, failingUrl)
+//                    // Hide WebView
+//                    binding.webView.visibility = View.GONE // Hide the WebView
+//                    // Show custom error layout
+////
+                // binding.customErrorLayout.visibility = android.view.View.VISIBLE
                 }
 
-
-
+                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                    val url = request?.url?.toString()
+                    if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                       view?.loadUrl(url)
+                    } else {
+                        Toast.makeText(requireContext(), "this aifrief", Toast.LENGTH_SHORT).show()
+                    }
+                    return true // Indicate that we've handled the URL loading
+                }
                 override fun onReceivedHttpError(
                     view: WebView?,
                     request: WebResourceRequest?,
@@ -453,9 +469,9 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                 ) {
                     super.onReceivedHttpError(view, request, errorResponse)
                     // Hide WebView
-                    binding.webView.visibility = View.GONE // Hide the WebView
+//                    binding.webView.visibility = View.GONE // Hide the WebView
                     // Show custom error layout
-                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
+//                    binding.customErrorLayout.visibility = android.view.View.VISIBLE
                 }
                 override fun doUpdateVisitedHistory(
                     view: WebView?,
@@ -490,13 +506,13 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     linkRef.binding.progressBar.progress = 0
                     linkRef.binding.progressBar.visibility = View.VISIBLE
                     linkRef.binding.btnTextUrl.text = SpannableStringBuilder(url?.let { decodeUrl(it) })
-                    if (checkForInternet(requireContext())) {
-                        binding.webView.visibility = View.VISIBLE
-                        hideNoInternetView()
-                    } else {
-                        binding.webView.visibility = View.GONE
-                        showNoInternetView()
-                    }
+//                    if (checkForInternet(requireContext())) {
+//                        binding.webView.visibility = View.VISIBLE
+//                        hideNoInternetView()
+//                    } else {
+//                        binding.webView.visibility = View.GONE
+//                        showNoInternetView()
+//                    }
                     // Start the timeout countdown
                     handler.postDelayed(loadRunnable, loadTimeout)
                     binding.progressBar.visibility = View.VISIBLE
@@ -516,13 +532,13 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
                     HistoryManager.addHistoryItem(historyItem, requireContext())
                     updateSearchHintTitleRecyclerView()
-                    if (checkForInternet(requireContext())) {
-                        binding.webView.visibility = View.VISIBLE
-                        hideNoInternetView()
-                    } else {
-                        binding.webView.visibility = View.GONE
-                        showNoInternetView()
-                    }
+//                    if (checkForInternet(requireContext())) {
+//                        binding.webView.visibility = View.VISIBLE
+//                        hideNoInternetView()
+//                    } else {
+//                        binding.webView.visibility = View.GONE
+//                        showNoInternetView()
+//                    }
                     handler.removeCallbacks(loadRunnable)
                     binding.progressBar.visibility = View.GONE
                 }
@@ -591,6 +607,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(loadRunnable)
+
     }
     private fun updateSwipeRefreshState(url: String?) {
         val keywords = listOf("/reels/", "/comments/", "/story.", "/reel/", "/shorts/", "/watch?")
@@ -649,15 +666,17 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
 
     @SuppressLint("Range")
-    private fun startDownload(url: String, fileName: String, fileExtension: String?) {
+    private fun startDownload(url: String, fileName: String?, fileExtension: String?) {
         val downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val downloadUri = Uri.parse(url)
 
+        val actualFileName = URLUtil.guessFileName(url, null, fileExtension)
+
         val request = DownloadManager.Request(downloadUri)
-            .setTitle(fileName) // Set the desired file name explicitly
+            .setTitle(actualFileName)
             .setDescription("Downloading")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, actualFileName)
 
         val downloadId = downloadManager.enqueue(request)
 
@@ -665,25 +684,52 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         val fileType = getFileType(fileExtension)
         val fileIconResId = getIconResId(fileExtension)
 
-        // Update UI to show download progress
-        (requireActivity() as? DownloadListener)?.onDownloadStarted(fileName, "", fileType, fileIconResId)
+        (requireActivity() as? DownloadListener)?.onDownloadStarted(actualFileName, "", fileType, fileIconResId)
 
-        // Create a notification to display download progress
         val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel(notificationManager)
 
+
+
         val notificationBuilder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
-            .setContentTitle(fileName) // Use the provided file name in the notification
-            .setContentText("Downloading $fileName")
+            .setContentTitle(actualFileName)
+            .setContentText("Downloading $actualFileName")
             .setSmallIcon(R.drawable.download_icon)
             .setOnlyAlertOnce(true)
             .setOngoing(true)
+            .setProgress(100, 0, false)
 
         val notification = notificationBuilder.build()
         notificationManager.notify(downloadId.toInt(), notification)
+
+        loadRunnable = object : Runnable {
+            override fun run() {
+                val query = DownloadManager.Query().setFilterById(downloadId)
+                val cursor = downloadManager.query(query)
+                if (cursor != null && cursor.moveToFirst()) {
+                    val bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                    val bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+
+                    if (bytesTotal > 0) {
+                        val progress = (bytesDownloaded * 100L / bytesTotal).toInt()
+                        notificationBuilder.setProgress(100, progress, false)
+                        notificationBuilder.setContentText("Downloading $actualFileName: $progress%")
+                        notificationManager.notify(downloadId.toInt(), notificationBuilder.build())
+
+                        binding.progressBar.progress = progress
+                    }
+
+                    if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                        handler.removeCallbacks(this)
+                        binding.progressBar.visibility = View.GONE
+                    }
+                }
+                cursor?.close()
+                handler.postDelayed(this, 1000)
+            }
+        }
+        handler.post(loadRunnable)
     }
-
-
 
 
     private fun getFileType(fileExtension: String?): FileType {
@@ -697,7 +743,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             "mp3" -> FileType.AUDIO
             "html" -> FileType.WEBSITE
             "apk" -> FileType.APK
-                        else -> FileType.UNKNOWN
+           else -> FileType.UNKNOWN
         }
     }
 
@@ -726,6 +772,9 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             notificationManager.createNotificationChannel(channel)
         }
     }
+
+
+
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun registerDownloadReceiver() {
         val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
@@ -737,16 +786,47 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     }
 
     private val downloadReceiver = object : BroadcastReceiver() {
+        @SuppressLint("Range")
         override fun onReceive(context: Context?, intent: Intent?) {
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == intent?.action) {
                 val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                // Remove the notification
-                val notificationManager =
-                    context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val notificationManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.cancel(downloadId.toInt())
+                handler.removeCallbacks(loadRunnable)
+                binding.progressBar.visibility = View.GONE // Hide the progress bar
+
+                // Query the DownloadManager for the completed download
+                val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                val query = DownloadManager.Query().setFilterById(downloadId)
+                val cursor = downloadManager.query(query)
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        val uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
+                        val fileName = uriString?.let { Uri.parse(it).lastPathSegment }
+
+                        if (fileName != null) {
+                            // Create and show a notification indicating download completion
+                            val fileExtension = fileName.substringAfterLast('.', "")
+                            val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
+                                .setSmallIcon(R.drawable.download_icon) // Use a different icon for completion
+                                .setContentTitle("$fileName")
+                                .setContentText("Download complete of $fileName")
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setAutoCancel(true)
+
+                            notificationManager.notify(downloadId.toInt(), notificationBuilder.build())
+                        }
+                    }
+                }
+                cursor?.close()
             }
         }
     }
+
+
+
     override fun onPause() {
         super.onPause()
         unregisterDownloadReceiver()
@@ -811,6 +891,9 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     // Start download if the image URL is available
                     val fileExtension = if (imgUrl.endsWith(".png")) "png" else "jpg"
                     startDownload(imgUrl, "image.$fileExtension", fileExtension)
+                }
+                else{
+                    Toast.makeText(requireContext(), "this iafndif", Toast.LENGTH_SHORT).show()
                 }
             }
             "View Image" ->{

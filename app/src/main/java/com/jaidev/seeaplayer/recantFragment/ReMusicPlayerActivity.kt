@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
@@ -24,14 +23,13 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.appopen.AppOpenAd
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.ReMoreMusicBottomSheet
 import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.SpeedMusicBottomSheet
 import com.jaidev.seeaplayer.dataClass.RecantMusic
-import com.jaidev.seeaplayer.dataClass.exitApplication
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reFormatDuration
 import com.jaidev.seeaplayer.databinding.ActivityReMusicPlayerBinding
 
@@ -194,55 +192,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_pink))
             }
         }
-//        binding.equalizerBtnPA.setOnClickListener {
-//            try {
-//                val eqIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-//                eqIntent.putExtra(
-//                    AudioEffect.EXTRA_AUDIO_SESSION,
-//                    musicService!!.mediaPlayer!!.audioSessionId
-//                )
-//                eqIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, baseContext.packageName)
-//                eqIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
-//                startActivityForResult( eqIntent, 13)
-//            } catch (e: Exception) {
-//                Toast.makeText(this, "Equalizer Feature not Supported!!", Toast.LENGTH_SHORT).show()
-//            }
-//        }
 
-//        binding.timerBtnPA.setOnClickListener {
-//            val timer = min15 || min30 || min60
-//            if (!timer) showBottomSheetDialog()
-//            else {
-//                val builder = MaterialAlertDialogBuilder(this)
-//                builder.setTitle("Stop Timer")
-//                    .setMessage("Do you want to stop timer?")
-//                    .setPositiveButton("Yes") { _, _ ->
-//                        min15 = false
-//                        min30 = false
-//                        min60 = false
-//                        binding.timerBtnPA.setColorFilter(
-//                            ContextCompat.getColor(
-//                                this,
-//                                R.color.cool_pink
-//                            )
-//                        )
-//                    }
-//                    .setNegativeButton("No") { dialog, _ ->
-//                        dialog.dismiss()
-//                    }
-//                val customDialog = builder.create()
-//                customDialog.show()
-//            }
-//        }
-
-//        binding.shareBtnPA.setOnClickListener {
-//            val shareIntent = Intent()
-//            shareIntent.action = Intent.ACTION_SEND
-//            shareIntent.type = "audio/*"
-//            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(reMusicList[songPosition].path))
-//            startActivity(Intent.createChooser(shareIntent, "Sharing Music File!!"))
-//
-//        }
     }
     private fun   setMusicLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -270,7 +220,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
     private fun setLayout(){
         Glide.with(this)
             .asBitmap()
-            .load(reMusicList[songPosition].albumArtUri)
+            .load(getImgArt(reMusicList[songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three)).centerCrop()
             .into(binding.songImgPA)
         binding.songNamePA.text = reMusicList[songPosition].title
@@ -280,9 +230,6 @@ class ReMusicPlayerActivity : AppCompatActivity()
         ))else   binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
             R.color.cool_pink))
 
-//        if(min15 || min30 || min60) binding.timerBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
-//            R.color.cool_green
-//        ))
         if (isShuffleEnabled) binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
             R.color.cool_green))else   binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
             R.color.cool_pink))
@@ -419,43 +366,6 @@ class ReMusicPlayerActivity : AppCompatActivity()
         if (requestCode == 13 || resultCode == RESULT_OK)
             return
     }
-
-    private fun showBottomSheetDialog() {
-        val dialog = BottomSheetDialog(this@ReMusicPlayerActivity)
-        dialog.setContentView(R.layout.bottom_sheet_dialog)
-        dialog.show()
-        dialog.findViewById<LinearLayout>(R.id.min_15)?.setOnClickListener {
-            Toast.makeText(baseContext, "Music will stop after 15 minutes", Toast.LENGTH_SHORT)
-                .show()
-//            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
-            min15 = true
-            Thread {
-                Thread.sleep((15 * 60000).toLong())
-                if (min15) exitApplication() }.start()
-            dialog.dismiss()
-        }
-        dialog.findViewById<LinearLayout>(R.id.min_30)?.setOnClickListener {
-            Toast.makeText(baseContext, "Music will stop after 30 minutes", Toast.LENGTH_SHORT)
-                .show()
-//            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
-            min30 = true
-            Thread {
-                Thread.sleep((30 * 60000).toLong())
-                if (min30) exitApplication() }.start()
-            dialog.dismiss()
-        }
-        dialog.findViewById<LinearLayout>(R.id.min_60)?.setOnClickListener {
-            Toast.makeText(baseContext, "Music will stop after 60 minutes", Toast.LENGTH_SHORT)
-                .show()
-//            binding.timerBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.cool_green))
-            min60 = true
-            Thread {
-                Thread.sleep((60 * 60000).toLong())
-                if (min60) exitApplication() }.start()
-            dialog.dismiss()
-        }
-    }
-
 
     fun loadAppOpenAd() {
         if (!isAdDisplayed) {

@@ -12,7 +12,7 @@
         <ImageView
             android:id="@+id/seeA_edu"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
+            android:layout_height="270dp"
             android:layout_marginHorizontal="10dp"
             android:layout_gravity="center"
             android:background="@drawable/curver"
@@ -29,8 +29,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/SeeAoneActivity"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="50sp"
+        android:layout_marginTop="8sp"
         android:background="#332B2B"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintEnd_toEndOf="parent"

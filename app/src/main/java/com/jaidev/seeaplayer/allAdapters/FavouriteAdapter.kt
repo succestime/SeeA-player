@@ -10,11 +10,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.jaidev.seeaplayer.musicActivity.FavouriteActivity.Companion.favouriteSongs
-import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.databinding.FavouriteViewBinding
+import com.jaidev.seeaplayer.musicActivity.FavouriteActivity.Companion.favouriteSongs
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 
 class FavouriteAdapter(private val context: Context, private var musicList : ArrayList<Music>): RecyclerView.Adapter<FavouriteAdapter.MyAdapter>() {
 
@@ -34,8 +34,12 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
         holder.name.text = musicList[position].title
         Glide.with(context)
             .load(musicList[position].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+            .apply(RequestOptions()
+                .placeholder(R.color.gray) // Use the newly created drawable
+                .error(R.drawable.music_note_svgrepo_com)
+                .centerCrop())
             . into(holder.image)
+
         holder.root.setOnClickListener {
             val intent = Intent(context , PlayerMusicActivity::class.java)
             intent.putExtra("index" , position)

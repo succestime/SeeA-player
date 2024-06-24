@@ -19,6 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.dataClass.exitApplication
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.MoreMusicBottomSheetBinding
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 
@@ -160,10 +161,9 @@ class MoreMusicBottomSheet : BottomSheetDialogFragment() {
 
     private fun loadThumbnailImage() {
         val currentSong = (requireActivity() as PlayerMusicActivity).getCurrentSong()
-        val imageUrl = currentSong.artUri
 
         Glide.with(this)
-            .load(imageUrl)
+            .load(getImgArt(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path))
             .placeholder(R.drawable.music_speaker_three)
             .error(R.drawable.music_speaker_three)
             .into(binding.thumbnail)

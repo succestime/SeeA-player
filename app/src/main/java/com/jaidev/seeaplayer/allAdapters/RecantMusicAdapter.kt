@@ -24,11 +24,11 @@ import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.RecantMusic
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantMusicViewBinding
 import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
@@ -54,6 +54,8 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         val album = binding.songAlbum
         val root = binding.root
         val more = binding.MoreChoose
+        val emptyCheck = binding.emptyCheck
+        val fillCheck = binding.fillCheck
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter {
@@ -70,25 +72,33 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         holder.title.text = musicReList[position].title
         holder.album.text = musicReList[position].album
         Glide.with(context)
-            .asBitmap()
-            .load(musicReList[position].albumArtUri)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
+            .load(getImgArt(musicReList[position].path))
+            .apply(RequestOptions()
+                .placeholder(R.color.gray) // Use the newly created drawable
+                .error(R.drawable.music_note_svgrepo_com) // Use the newly created drawable
+                .centerCrop())
             .into(holder.image)
 
 
-        // Determine if the item is currently selected
         if (selectedItems.contains(position)) {
-            // Set your custom selected background on the root view of the item
-            holder.root.setBackgroundResource(R.drawable.video_selected_background)
+            holder.emptyCheck.visibility = View.GONE
+            holder.fillCheck.visibility = View.VISIBLE
         } else {
-            // Reset to default background based on app theme
-            holder.root.setBackgroundResource(android.R.color.transparent)
-
+            holder.emptyCheck.visibility = View.VISIBLE
+            holder.fillCheck.visibility = View.GONE
         }
 
         // Hide or show the more button based on selection mode
-        holder.more.visibility = if (isSelectionModeEnabled) View.GONE else View.VISIBLE
+        // Adjust for selection mode
+        if (isSelectionModeEnabled) {
+            holder.more.visibility = View.GONE
+            if (!selectedItems.contains(position)) {
+                holder.emptyCheck.visibility = View.VISIBLE
+            }
+        } else {
+            holder.more.visibility = View.VISIBLE
+            holder.emptyCheck.visibility = View.GONE
+        }
 
         holder.root.setOnLongClickListener {
             toggleSelection(position)

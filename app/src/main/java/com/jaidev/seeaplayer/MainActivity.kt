@@ -29,6 +29,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -41,6 +42,8 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -58,10 +61,6 @@ import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.databinding.ActivityMainBinding
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -79,6 +78,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var mInterstitialAd: InterstitialAd? = null
     private var doubleBackToExitPressedOnce = false
+    private var rewardedInterstitialAd : RewardedInterstitialAd? = null
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val rewardedAdRunnable = Runnable {
+        rewardedIAd()
+    }
     companion object {
 
         private const val PREFS_NAME = "speed_preferences"
@@ -112,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("SuspiciousIndentation", "RestrictedApi", "CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,8 +141,6 @@ class MainActivity : AppCompatActivity() {
         setActionBarGradient()
         // Check internet connectivity and show/hide the "Subscribe" TextView
         checkInternetConnection()
-        // Load music fragment in the background
-        loadMusicFragment()
 
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
@@ -199,6 +203,8 @@ class MainActivity : AppCompatActivity() {
                     R.id.more -> {
                         val intent = Intent(this@MainActivity, More::class.java)
                         startActivity(intent)
+                        handler.postDelayed(rewardedAdRunnable, 10000)
+                        rewardedIAd()
                     }
 
                 }
@@ -208,14 +214,13 @@ class MainActivity : AppCompatActivity() {
             return@setOnItemSelectedListener true
         }
     }
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun funRequestRuntimePermission(){
         if (requestRuntimePermission()) {
             folderList = ArrayList()
             videoList = getAllVideos()
-            MusicListMA = getAllAudios()
+            MusicListMA = getAllAudio()
             setFragment(homeNav())
-
-//            FavoritesManager.loadFavorites(this@MainActivity)
 
             runnable = Runnable {
                 if(dataChanged){
@@ -228,7 +233,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             folderList = ArrayList()
             videoList = ArrayList()
-            MusicListMA = getAllAudios()
+            MusicListMA = getAllAudio()
             setFragment(homeNav())
         }
     }
@@ -395,6 +400,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -406,7 +412,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
                 folderList = ArrayList()
                 videoList = getAllVideos()
-                MusicListMA = getAllAudios()
+                MusicListMA = getAllAudio()
                 setFragment(homeNav())
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -427,7 +433,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
                 folderList = ArrayList()
                 videoList = getAllVideos()
-                MusicListMA = getAllAudios()
+                MusicListMA = getAllAudio()
                 setFragment(homeNav())
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -507,10 +513,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Function to refresh folder list
+    @RequiresApi(Build.VERSION_CODES.R)
     fun refreshFolderList() {
         folderList.clear()
         videoList = getAllVideos() // Repopulate the videoList which also populates folderList
-        MusicListMA = getAllAudios() // Repopulate the music list if needed
+        MusicListMA = getAllAudio()// Repopulate the music list if needed
     }
 
 
@@ -590,24 +597,14 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    @SuppressLint("Range", "SuspiciousIndentation")
-    fun getAllAudios(): ArrayList<Music> {
-        val sortMusicEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
-        sortValue = sortMusicEditor.getInt("sortValue", 0)
-
+    @SuppressLint("Recycle", "Range")
+    @RequiresApi(Build.VERSION_CODES.R)
+   fun getAllAudio(): ArrayList<Music>{
         val tempList = ArrayList<Music>()
-        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
-        val projection = arrayOf(
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.SIZE,
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DATE_ADDED,
-            MediaStore.Audio.Media.DATA,
-        )
+        val selection = MediaStore.Audio.Media.IS_MUSIC +  " != 0"
+        val projection = arrayOf(MediaStore.Audio.Media._ID,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media.DURATION,MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.ALBUM_ID ,     MediaStore.Audio.Media.SIZE,)
         val cursor = this.contentResolver.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null,
             sortMusicList[sortValue]
@@ -616,63 +613,35 @@ class MainActivity : AppCompatActivity() {
         if (cursor != null) {
             if (cursor.moveToNext()) {
                 do {
-                    val titleMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-                    val idMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
-                    val pathMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                    val artistMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-                    val durationMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
-                            .toLong()
-                    val sizeMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE))
-                    val albumMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-                    val albumIdMC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
-                            .toString()
-
-                    try {
-                        val file = File(pathMC)
-                        val albumArtUri =
-                            Uri.parse("content://media/external/audio/albumart/$albumIdMC")
-                        val music = Music(
-                            title = titleMC,
-                            id = idMC,
-                            duration = durationMC,
-                            path = pathMC,
-                            artUri = albumArtUri,
-                            artist = artistMC,
-                            album = albumMC,
-                            albumId = albumIdMC,
-                            size = sizeMC
-                        )
-
-
-                        if (file.exists()) {
-                            tempList.add(music)
-                        }
-
-                    } catch (_: Exception) {
-                        Toast.makeText(this, "Songs did not load", Toast.LENGTH_SHORT).show()
-                    }
-                } while (cursor.moveToNext())
-                cursor.close()
+                    val titleC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))?:"Unknown"
+                    val idC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))?:"Unknown"
+                    val albumC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))?:"Unknown"
+                    val artistC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))?:"Unknown"
+                    val pathC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
+                    val durationC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
+                    val albumIdC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)).toString()
+                    val uri =  Uri.parse("content://media/external/audio/albumart")
+                    val artUriC = Uri.withAppendedPath(uri, albumIdC).toString()
+                    val sizeC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE))
+                    val music = Music(id = idC, title = titleC, album = albumC, artist = artistC, path = pathC, duration = durationC,
+                        artUri = artUriC , size = sizeC)
+                    val file = File(music.path)
+                    if(file.exists())
+                        tempList.add(music)
+                }while (cursor.moveToNext())
             }
+            cursor.close()
         }
-
         return tempList
     }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
         if (!PlayerMusicActivity.isPlaying && PlayerMusicActivity.musicService != null) {
             exitApplication()
         }
-
     }
     private fun setActionBarGradient() {
         // Check the current night mode
@@ -731,15 +700,37 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    fun rewardedIAd(){
+        val adRequest = AdRequest.Builder().build()
+        RewardedInterstitialAd.load(this@MainActivity,"ca-app-pub-3504589383575544/8279203168",
+            adRequest, object : RewardedInterstitialAdLoadCallback() {
+                override fun onAdLoaded(p0: RewardedInterstitialAd) {
+                    handler.postDelayed(rewardedAdRunnable, 10000)
+                    rewardedInterstitialAd=p0
+                }
 
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    rewardedInterstitialAd=null
+                    handler.removeCallbacks(rewardedAdRunnable)
+
+                }
+            })
+
+    }
 
 
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
     override fun onResume() {
         super.onResume()
         setActionBarGradient()
+        handler.postDelayed(rewardedAdRunnable, 10000)
+        rewardedIAd()
     }
-
+    override fun onPause() {
+        super.onPause()
+        // Remove the delayed task when the fragment is paused
+        handler.removeCallbacks(rewardedAdRunnable)
+    }
     fun loadAd() {
         val adRequest = AdRequest.Builder().build()
 
@@ -770,18 +761,6 @@ class MainActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
     }
 
-    private fun loadMusicFragment() {
-        // Use a coroutine to load music data in the background
-        CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO) {
-                // Load music data here (e.g., getAllAudios())
-                // For example:
-                MusicListMA = getAllAudios()
-                // Other relevant initialization
-            }
-            // After loading, set the music fragment loaded flag to true
-            musicLoaded = true
-        }
-    }
+
 }
 

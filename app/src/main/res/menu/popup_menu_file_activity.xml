@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/settingsInternet"
+        android:title="@string/sort_order"
+        app:tint="?android:attr/textColorPrimary"
+        android:icon="@drawable/settings_internet"
+        app:showAsAction="ifRoom"
+        />
+
+    <item android:id="@+id/searchBrowserView"
+        android:title="@string/search"
+        android:icon="@drawable/search_icon"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+
+        />
+</menu>

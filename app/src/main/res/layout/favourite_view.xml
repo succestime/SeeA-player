@@ -13,7 +13,8 @@
         android:layout_height="100dp"
         app:shapeAppearanceOverlay="@style/curved"
         android:contentDescription="@string/song_name"
-        android:src="@drawable/speaker"
+        android:background="#B8B8B8"
+        android:src="@drawable/music_note_svgrepo_com"
        />
 
     <TextView

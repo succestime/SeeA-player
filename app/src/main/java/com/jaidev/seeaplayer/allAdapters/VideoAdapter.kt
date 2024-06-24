@@ -33,7 +33,6 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.FoldersActivity
@@ -113,11 +112,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
         holder.duration.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
         Glide.with(context)
-            .asBitmap()
             .load(videoList[position].artUri)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
             .into(holder.image)
+
         setIconTint(holder.more)
         // Determine if the item is currently selected
         if (selectedItems.contains(position)) {

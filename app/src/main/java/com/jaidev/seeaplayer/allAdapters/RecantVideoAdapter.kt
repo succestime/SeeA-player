@@ -51,7 +51,8 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
         val image = binding.videoImage
         val more = binding.MoreChoose
         val root = binding.root
-
+        val emptyCheck = binding.emptyCheck
+        val fillCheck = binding.fillCheck
     }
 
 
@@ -75,18 +76,24 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
             .into(holder.image)
 
-        // Determine if the item is currently selected
         if (selectedItems.contains(position)) {
-            // Set your custom selected background on the root view of the item
-            holder.root.setBackgroundResource(R.drawable.video_selected_background)
+            holder.emptyCheck.visibility = View.GONE
+            holder.fillCheck.visibility = View.VISIBLE
         } else {
-            // Reset to default background based on app theme
-            holder.root.setBackgroundResource(android.R.color.transparent)
+            holder.emptyCheck.visibility = View.VISIBLE
+            holder.fillCheck.visibility = View.GONE
         }
-        // Hide or show the more button based on selection mode
-        holder.more.visibility = if (isSelectionModeEnabled) View.GONE else View.VISIBLE
 
-
+        // Adjust for selection mode
+        if (isSelectionModeEnabled) {
+            holder.more.visibility = View.GONE
+            if (!selectedItems.contains(position)) {
+                holder.emptyCheck.visibility = View.VISIBLE
+            }
+        } else {
+            holder.more.visibility = View.VISIBLE
+            holder.emptyCheck.visibility = View.GONE
+        }
 
         holder.root.setOnLongClickListener {
             toggleSelection(position)

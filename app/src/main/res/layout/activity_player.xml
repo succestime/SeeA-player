@@ -35,18 +35,6 @@
                 android:visibility="invisible"
                 app:yt_playerView="@id/playerView">
 
-                <TextView
-                    android:id="@+id/durationChangeTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/durationChangeTextView"
-                    android:textColor="#4A4A4A"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:visibility="gone"
-                    tools:layout_editor_absoluteX="153dp"
-                    tools:layout_editor_absoluteY="331dp" />
 
             </com.github.vkay94.dtpv.youtube.YouTubeOverlay>
         </com.github.vkay94.dtpv.DoubleTapPlayerView>
@@ -70,6 +58,21 @@
     </FrameLayout>
 
 
+    <TextView
+        android:id="@+id/durationChangeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/durationChangeTextView"
+        android:textColor="#ECE8E8"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     CardView for Volume SeekBar

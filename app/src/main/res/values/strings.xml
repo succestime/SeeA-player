@@ -98,7 +98,7 @@
     <string name="refresh_btn">Refresh</string>
     <string name="one">1</string>
     <string name="one_browse">1</string>
-    <string name="durationChangeTextView">   %1$s\n[ %2$s ]</string>
+    <string name="durationChangeTextView">%1$s\n[ %2$s ]</string>
     <string name="vol_icon">vol_icon</string>
     <string name="volume">Volume:</string>
     <string name="text">13</string>

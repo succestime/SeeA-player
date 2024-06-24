@@ -127,5 +127,25 @@
         android:background="@android:color/transparent"
         tools:ignore="UseAppTint" />
 
-
+    <ImageButton
+        android:id="@+id/emptyCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/round_crop_square_24"
+        android:layout_marginVertical="15dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="3dp"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint" />
+    <ImageButton
+        android:id="@+id/fillCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/check_box_24"
+        android:background="@color/transparent"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="3dp"
+        android:visibility="gone"
+        tools:ignore="UseAppTint" />
 </LinearLayout>

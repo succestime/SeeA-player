@@ -38,6 +38,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Music
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
@@ -97,6 +98,8 @@ class MusicAdapter(
         val root = binding.root
         val more = binding.MoreChoose
         val playlstM = binding.playlistChoose2
+        val emptyCheck = binding.emptyCheck
+        val fillCheck = binding.fillCheck
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter {
@@ -104,28 +107,42 @@ class MusicAdapter(
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    @SuppressLint("NotifyDataSetChanged", "MissingInflatedId")
+    @SuppressLint("NotifyDataSetChanged", "MissingInflatedId", "ResourceType")
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
 
         holder.title.text = musicList[position].title
         holder.album.text = musicList[position].album
 
         Glide.with(context)
-            .load(musicList[position].artUri)
+            .load(getImgArt(musicList[position].path))
             .apply(RequestOptions()
-                .placeholder(R.color.place_holder_video)  // Placeholder image while loading
-                .error(R.color.place_holder_video)  // Error image if loading fails
-                .centerCrop()  // Scale image to fill the view
-            )
+                .placeholder(R.color.gray) // Use the newly created drawable
+                .error(R.drawable.music_note_svgrepo_com) // Use the newly created drawable
+                .centerCrop())
             .into(holder.image)
 
+        // Handle selection visibility first
         if (selectedItems.contains(position)) {
-            // Set your custom selected background on the root view of the item
-            holder.root.setBackgroundResource(R.drawable.video_selected_background)
+            holder.emptyCheck.visibility = View.GONE
+            holder.fillCheck.visibility = View.VISIBLE
         } else {
-            holder.root.setBackgroundResource(android.R.color.transparent)
+            holder.emptyCheck.visibility = View.VISIBLE
+            holder.fillCheck.visibility = View.GONE
         }
-        // Handle item selection based on selectionActivity flag
+
+        // Adjust for selection mode
+        if (isSelectionModeEnabled) {
+            holder.more.visibility = View.GONE
+            if (!selectedItems.contains(position)) {
+                holder.emptyCheck.visibility = View.VISIBLE
+            }
+        } else {
+            holder.more.visibility = View.VISIBLE
+            holder.emptyCheck.visibility = View.GONE
+        }
+
+
+
         if (selectionActivity) {
             holder.more.visibility = View.GONE // Hide the more view in selection activity
             holder.playlstM.visibility = View.GONE // Hide the more view in selection activity
@@ -133,22 +150,22 @@ class MusicAdapter(
             holder.root.setOnClickListener {
                 toggleSelection(position)
             }
-        } else {
-            // Hide or show the more button based on selection mode
-            holder.more.visibility = if (isSelectionModeEnabled) View.GONE else View.VISIBLE
+        }
+        else {
+
             holder.playlstM.visibility = View.GONE // Show the more view when not in selection activity
-            holder.root.setOnLongClickListener {
-                // Start selection mode on long click
-                toggleSelection(position)
-                startActionMode()
-                true
-            }
         }
 
+        holder.root.setOnLongClickListener {
+            toggleSelection(position)
+            startActionMode()
+            true
+        }
         holder.root.setOnClickListener {
             if (actionMode != null) {
-                // If action mode is active, toggle selection as usual
                 toggleSelection(position)
+                holder.emptyCheck.visibility = View.GONE
+
             } else {
                 if (PlayerMusicActivity.isShuffleEnabled) {
                     PlayerMusicActivity.isShuffleEnabled = false
@@ -187,14 +204,25 @@ class MusicAdapter(
                         sendIntent(ref = "PlaylistDetailsAdapter", pos = position)
                     }
                 }
+
                 holder.root.setOnLongClickListener {
-                    // Start selection mode on long click
                     toggleSelection(position)
                     startActionMode()
                     true
                 }
-                holder.playlstM.visibility = View.VISIBLE // Show the more view when not in selection activity
-                holder.more.visibility = View.GONE // Show the more view when not in selection activity
+
+                // Adjust for selection mode
+                if (isSelectionModeEnabled) {
+                    holder.playlstM.visibility = View.GONE
+                    if (!selectedItems.contains(position)) {
+                        holder.emptyCheck.visibility = View.VISIBLE
+                    }
+                } else {
+                    holder.playlstM.visibility = View.VISIBLE
+                    holder.emptyCheck.visibility = View.GONE
+                }
+
+                holder.more.visibility = View.GONE
 
                 holder.playlstM.setOnClickListener { view ->
                     val popupMenu = PopupMenu(context, view)
@@ -214,12 +242,16 @@ class MusicAdapter(
             }
 
             selectionActivity ->{
+         holder.emptyCheck.visibility = View.VISIBLE
                 holder.root.setOnClickListener {
-                    if(addSong(musicList[position]))
-                        holder.root.setBackgroundResource(R.drawable.video_selected_background)
-                    else
-                        holder.root.setBackgroundResource(android.R.color.transparent)
-
+                    if(addSong(musicList[position])) {
+                        holder.emptyCheck.visibility = View.GONE
+                        holder.fillCheck.visibility = View.VISIBLE
+                    }
+                    else{
+                    holder.emptyCheck.visibility = View.VISIBLE
+                    holder.fillCheck.visibility = View.GONE
+                }
                 }
             }
         }
@@ -361,7 +393,10 @@ class MusicAdapter(
 
 
         }
+
+
     }
+
 
     override fun getItemCount(): Int {
         return musicList.size
@@ -627,14 +662,12 @@ class MusicAdapter(
 
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateMusicList(searchList : ArrayList<Music>){
+    fun updateMusicList(searchList: ArrayList<Music>) {
         musicList = ArrayList()
         musicList.addAll(searchList)
+        this.musicList = searchList
         notifyDataSetChanged()
     }
-
-
-
 
     @SuppressLint("NotifyDataSetChanged")
     fun refreshPlaylist() {

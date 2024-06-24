@@ -228,6 +228,8 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/adsLayout"
+
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:orientation="horizontal"
@@ -293,7 +295,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
       android:layout_marginTop="20dp"
-        android:paddingBottom="250dp"
+        android:paddingBottom="230dp"
         android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -303,10 +305,10 @@
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="380dp"
-        android:layout_height="100dp"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        app:adSize="380x100"
+        app:adSize="380x60"
         app:adUnitId="ca-app-pub-3504589383575544/7420946904"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

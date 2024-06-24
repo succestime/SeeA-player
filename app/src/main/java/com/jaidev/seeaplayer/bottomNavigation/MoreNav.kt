@@ -7,8 +7,6 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,10 +20,7 @@ import androidx.navigation.findNavController
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.jaidev.seeaplayer.LogSignIn.signin
@@ -39,11 +34,7 @@ class moreNav : Fragment() {
     private var selected: String = ""
     private val CHECKED_ITEM = "checked_item"
     lateinit var mAdView: AdView
-    private var rewardedInterstitialAd : RewardedInterstitialAd? = null
-    private val handler = Handler(Looper.getMainLooper())
-    private val rewardedAdRunnable = Runnable {
-        rewardedIAd()
-    }
+
     // Define your variable here
     companion object{
         lateinit var auth : FirebaseAuth
@@ -68,8 +59,7 @@ class moreNav : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
-        handler.postDelayed(rewardedAdRunnable, 10000)
-        rewardedIAd()
+
 
 
         if (auth.currentUser == null) {
@@ -265,21 +255,7 @@ binding.Settingslayout.setOnClickListener {
         }
         builder.show()
     }
-    fun rewardedIAd(){
-        val adRequest = AdRequest.Builder().build()
-        RewardedInterstitialAd.load(requireContext(),"ca-app-pub-3504589383575544/8279203168",
-            adRequest, object : RewardedInterstitialAdLoadCallback() {
-                override fun onAdLoaded(p0: RewardedInterstitialAd) {
 
-                    rewardedInterstitialAd=p0
-                }
-
-                override fun onAdFailedToLoad(p0: LoadAdError) {
-                    rewardedInterstitialAd=null
-                }
-            })
-
-    }
     override fun onResume() {
         super.onResume()
         MobileAds.initialize(requireContext()) {}
@@ -295,12 +271,7 @@ binding.Settingslayout.setOnClickListener {
         binding.adsLayout.visibility = View.GONE
         binding.userDetails.text = updateData()
         setActionBarGradient()
-        handler.postDelayed(rewardedAdRunnable, 10000)
-        rewardedIAd()
+
     }
-    override fun onPause() {
-        super.onPause()
-        // Remove the delayed task when the fragment is paused
-        handler.removeCallbacks(rewardedAdRunnable)
-    }
+
 }

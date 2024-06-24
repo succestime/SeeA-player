@@ -33,7 +33,9 @@
     </style>
 
     <style name="AppTheme.LightActionMode" parent="Widget.AppCompat.ActionMode">
-        <item name="background">@color/light_statusBar</item>
+        <item name="background">@drawable/background_actionbar_light</item>
+
+
     </style>
 
     <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">

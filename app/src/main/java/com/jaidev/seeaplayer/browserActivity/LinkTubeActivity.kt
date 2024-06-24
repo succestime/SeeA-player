@@ -110,7 +110,7 @@ class LinkTubeActivity : AppCompatActivity() {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES }
 
-        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+       window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         window.statusBarColor = Color.parseColor("#373636")
 
@@ -151,6 +151,7 @@ class LinkTubeActivity : AppCompatActivity() {
             view.setPadding(systemBarsInsets.left, systemBarsInsets.top, systemBarsInsets.right, 0)
             insets
         }
+
         binding.bottomRightBrowser.setOnTouchListener { view, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {

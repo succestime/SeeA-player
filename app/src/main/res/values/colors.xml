@@ -14,7 +14,7 @@
     <color name="textColor">#fff</color>
     <color name="titleColor">#fff</color>
     <color name="transparent">#00000000</color>
-    <color name="place_holder_video">#252424</color>
+    <color name="place_holder_video">#333333</color>
     <color name="primaryIconColor">#FF000000</color> <!-- Example color -->
     <color name="colorPrimary">#1b272c</color>
     <color name="dialog_custom_color">#3C3A3A</color>

@@ -66,8 +66,6 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         setActionBarGradient()
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
-
-
         // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
@@ -634,6 +632,12 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         setActionBarGradient()
 
         sortFilesByTimestamp()
+
+        MobileAds.initialize(this){}
+        mAdView = findViewById(R.id.adView)
+        // banner ads
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
     }
 
 }

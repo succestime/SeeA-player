@@ -15,6 +15,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reSetSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentReNowPlayingBinding
 
@@ -50,7 +51,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener   {
 
             Glide.with(this)
                 .asBitmap()
-                .load(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].albumArtUri)
+                .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
@@ -77,7 +78,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener   {
             binding.songNameNP.isSelected = true
             Glide.with(requireContext())
                 .asBitmap()
-                .load(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].albumArtUri)
+                .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
@@ -121,7 +122,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener   {
         ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
         Glide.with(requireContext())
             .asBitmap()
-            .load(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].albumArtUri)
+            .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgNP)
     }

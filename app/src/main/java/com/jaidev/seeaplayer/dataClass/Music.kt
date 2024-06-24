@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.media.MediaMetadataRetriever
-import android.net.Uri
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.color.MaterialColors
 import com.jaidev.seeaplayer.R
@@ -16,12 +15,12 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 
-data class Music(val id : String, var title : String, val album : String,val artist : String, val duration : Long = 0 , var path : String,val size : String
-                 , var artUri : Uri, val albumId : String
-) {
-
-
-}
+data class Music(
+    val id: String, var title: String, val album: String,
+    val artist: String, val duration: Long = 0, var path: String,
+    val size: String,
+    var artUri: String
+)
 
 
 class Playlist{

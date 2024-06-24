@@ -15,6 +15,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentNowPlayingBinding
 
@@ -41,7 +42,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             PlayerMusicActivity.musicService!!.createMediaPlayer()
             Glide.with(this)
                 .asBitmap()
-                .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
+                .load(getImgArt(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path))
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
@@ -73,7 +74,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             binding.songNameNP.isSelected = true
             Glide.with(requireContext())
                 .asBitmap()
-                .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
+                .load(getImgArt(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path))
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
@@ -114,7 +115,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
         binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
         Glide.with(requireContext())
             .asBitmap()
-            .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
+            .load(getImgArt(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgNP)
     }

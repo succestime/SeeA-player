@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,6 +20,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.FileProvider
+import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -59,6 +61,7 @@ class FileAdapter(
         private val fileMoreTextView: ImageButton = itemView.findViewById(R.id.iconMoreView)
         private val fileTextView: ImageButton = itemView.findViewById(R.id.iconPdfView)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+        private val window: Window? = (context as? AppCompatActivity)?.window
 
         init {
             fileMoreTextView.setOnClickListener {
@@ -119,9 +122,17 @@ class FileAdapter(
 
 // Update item view background based on selection
             if (selectedItems.contains(adapterPosition)) {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
+
                 fileSelectedTextView.visibility = View.VISIBLE
                 fileTextView.visibility = View.GONE
+
             } else {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
                 fileSelectedTextView.visibility = View.GONE
                 fileTextView.visibility = View.VISIBLE
             }
@@ -150,6 +161,7 @@ class FileAdapter(
     inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageView: ImageView = itemView.findViewById(R.id.musicBrowserImage)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+        private val window: Window? = (context as? AppCompatActivity)?.window
 
 
         fun bind(fileItem: FileItem) {
@@ -161,9 +173,15 @@ class FileAdapter(
                 .into(imageView)
 
             if (selectedItems.contains(adapterPosition)) {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
                 fileSelectedTextView.visibility = View.VISIBLE
 
             } else {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
                 fileSelectedTextView.visibility = View.GONE
             }
 
@@ -192,6 +210,7 @@ class FileAdapter(
         private val durationTextView: TextView = itemView.findViewById(R.id.durationBrowser)
         private val videoMoreTextView: ImageButton = itemView.findViewById(R.id.MoreVideoChoose)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+        private val window: Window? = (context as? AppCompatActivity)?.window
 
         init {
             videoMoreTextView.setOnClickListener {
@@ -249,9 +268,15 @@ class FileAdapter(
             videoNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
                 fileSelectedTextView.visibility = View.VISIBLE
 
             } else {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
                 fileSelectedTextView.visibility = View.GONE
             }
             itemView.setOnLongClickListener {
@@ -280,6 +305,7 @@ class FileAdapter(
         private val audioMoreTextView: ImageButton = itemView.findViewById(R.id.iconAudioView)
         private val fileTextView: ImageButton = itemView.findViewById(R.id.iconImageView)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+        private val window: Window? = (context as? AppCompatActivity)?.window
 
         init {
             audioMoreTextView.setOnClickListener {
@@ -335,9 +361,15 @@ class FileAdapter(
             audioNameTextView.text = fileItemPrefs.getOriginalFileName(fileItem)
 
             if (selectedItems.contains(adapterPosition)) {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
                 fileSelectedTextView.visibility = View.VISIBLE
                 fileTextView.visibility = View.GONE
             } else {
+                window?.let {
+                    WindowCompat.setDecorFitsSystemWindows(it, true)
+                }
                 fileSelectedTextView.visibility = View.GONE
                 fileTextView.visibility = View.VISIBLE
             }
@@ -366,6 +398,7 @@ class FileAdapter(
         private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
         private val fileTextView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+        private val window: Window? = (context as? AppCompatActivity)?.window
 
         init {
             websiteMoreTextView.setOnClickListener {
@@ -450,6 +483,7 @@ class FileAdapter(
         private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
         private val fileTextView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+        private val window: Window? = (context as? AppCompatActivity)?.window
 
         init {
             websiteMoreTextView.setOnClickListener {
@@ -538,6 +572,7 @@ class FileAdapter(
         private val websiteMoreTextView: ImageButton = itemView.findViewById(R.id.iconApkView)
         private val fileTextView: ImageButton = itemView.findViewById(R.id.iconWebsiteView)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
+        private val window: Window? = (context as? AppCompatActivity)?.window
 
         init {
             websiteMoreTextView.setOnClickListener {

@@ -29,9 +29,11 @@
         <item name="android:statusBarColor" >@color/dark_cool_blue</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
-    
+
     <style name="AppTheme.DarkActionMode" parent="Widget.AppCompat.ActionMode">
-        <item name="background">@color/black_statusBar</item>
+        <item name="background">@drawable/background_actionbar</item>
+
+
     </style>
     <!-- res/values/styles.xml -->
 

@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="270dp"
         android:orientation="vertical"
         >
 
@@ -26,17 +26,18 @@
                 />
 
 
-
         <TextView
             android:id="@+id/videoName"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:padding="8dp"
-            android:textColor="@color/black"
-            android:text="Video Title"
-            android:textSize="16sp"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:ellipsize="end" />
+            android:padding="8dp"
+            android:text="Video Title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

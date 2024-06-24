@@ -1124,11 +1124,14 @@ binding.adsRemove.setOnClickListener {
         val actualDurationMinSec = getMinSecFormat(player.duration)
         val changingDurationSecMillisec = getSecMillisecFormat(durationChange)
 
+        // Determine the sign based on the swipe direction
+        val sign = if (isForward) "+" else "-"
+
         // Get the string from resources
         val formatString = getString(R.string.durationChangeTextView)
 
         // Use String.format to replace placeholders with actual values
-        val text = String.format(formatString, actualDurationMinSec, changingDurationSecMillisec)
+        val text = String.format(formatString, actualDurationMinSec, "$sign$changingDurationSecMillisec")
 
         durationChangeTextView.text = text
         durationChangeTextView.visibility = View.VISIBLE
