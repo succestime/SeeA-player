@@ -118,7 +118,6 @@
         android:clickable="true"
         android:focusable="true"
         app:cardCornerRadius="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout13"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/songNamePA">
 
@@ -183,7 +182,8 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="@string/start_tv"
-                    android:textSize="15sp"
+                    android:textSize="18sp"
+                    android:paddingStart="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -194,7 +194,8 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="@string/end_tv"
-                    android:textSize="15sp"
+                    android:textSize="18sp"
+                    android:paddingEnd="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -266,7 +267,7 @@
                 android:id="@+id/playPauseBtnPA"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="30dp"
+                android:layout_marginHorizontal="50dp"
                 android:backgroundTint="@android:color/holo_red_light"
                 android:stateListAnimator="@null"
                 android:scaleX="1.1"

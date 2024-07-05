@@ -41,7 +41,7 @@ import java.io.File
 import java.util.Locale
 import kotlin.concurrent.thread
 
-class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
+class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  FileAdapter.OnFileCountChangeListener , FileAdapter.OnFileDeleteListener {
     private lateinit var fileListAdapter: FileAdapter
     private val fileItems: MutableList<FileItem> = mutableListOf()
     private lateinit var binding: ActivityFileBinding
@@ -49,13 +49,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     private var isEditTextVisible = false
     private var sortByNewestFirst = true // Default to sort by newest first
     lateinit var mAdView: AdView
-    private var isFileItemClicked = false
     private lateinit var swipeRefreshLayout: ConstraintLayout
-    companion object {
-
-        private val DOWNLOADS_DIRECTORY = Environment.DIRECTORY_DOWNLOADS
-
-    }
 
     @SuppressLint("NotifyDataSetChanged", "ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,13 +65,14 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         mAdView.loadAd(adRequest)
 
         // Set click listeners for each box
-        binding.monthlyBox.setOnClickListener { toggleSelection(binding.monthlyBox) }
-        binding.quarterlyBox.setOnClickListener { toggleSelection(binding.quarterlyBox) }
-        binding.annualBox.setOnClickListener { toggleSelection(binding.annualBox) }
-        binding.biennialBox.setOnClickListener { toggleSelection(binding.biennialBox) }
+        binding.monthlyBox.setOnClickListener { handleBoxClick(binding.monthlyBox) }
+        binding.quarterlyBox.setOnClickListener { handleBoxClick(binding.quarterlyBox) }
+        binding.annualBox.setOnClickListener { handleBoxClick(binding.annualBox) }
+        binding.biennialBox.setOnClickListener { handleBoxClick(binding.biennialBox) }
+        binding.pageBox.setOnClickListener { handleBoxClick(binding.pageBox) }
 
         // Set up RecyclerView and adapter
-        fileListAdapter = FileAdapter(this, fileItems, this)
+        fileListAdapter = FileAdapter(this, fileItems,  this, this, this)
 
         binding.recyclerFileView.apply {
             setHasFixedSize(true)
@@ -94,11 +89,11 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
         // Additional setup and initialization...
         binding.totalFile.text = "Total Downloaded files : ${fileList.size}"
-
         selectBox(binding.monthlyBox)
 
         swipeRefreshLayout = binding.fileActivityLayout
         setSwipeRefreshBackgroundColor()
+        updateEmptyStateVisibility()
     }
 
     private fun setSwipeRefreshBackgroundColor() {
@@ -120,12 +115,18 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
         }
     }
+    private fun handleBoxClick(box: View) {
+        // Clear the selection in the adapter
+        fileListAdapter.clearSelection()
 
+        // Perform box selection logic
+        toggleSelection(box)
+    }
 
 
     private fun thread(){
         thread {
-            val websiteUrl = "https://www.google.com" // Replace with the target website URL
+            val websiteUrl = "https://www.google.com"
 
             val fileDetailsWithWebsiteName = fetchFileDetailsFromWebsite(websiteUrl)
 
@@ -201,45 +202,59 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
 
 
     private fun showSettingDialog() {
+        // Inflate the dialog view from the XML layout
         val dialogView = LayoutInflater.from(this).inflate(R.layout.activity_setting_downloads, null)
         val dialogBinding = ActivitySettingDownloadsBinding.bind(dialogView)
 
-        // Initialize switches based on stored settings
+        // Access shared preferences to retrieve stored settings
         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        // Read the stored value for sortByNewestFirst (defaulting to true if not found)
+        // Read the stored value for sortByNewestFirst, defaulting to true if not found
         sortByNewestFirst = sharedPreferences.getBoolean("sortByNewestFirst", true)
+
+        // Set the switch states based on the current sorting order
         dialogBinding.switchNewFiles.isChecked = sortByNewestFirst
         dialogBinding.switchOldFiles.isChecked = !sortByNewestFirst
 
+        // Define the switch listener to handle changes in switch states
         val switchListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
             when (buttonView.id) {
                 R.id.switchNewFiles -> {
-                    // Update the sorting order and switch states
-                    sortByNewestFirst = !isChecked
-                    dialogBinding.switchOldFiles.isChecked = sortByNewestFirst
+                    if (isChecked) {
+                        dialogBinding.switchOldFiles.isChecked = false
+                        sortByNewestFirst = true
+                    } else {
+                        dialogBinding.switchOldFiles.isChecked = true
+                        sortByNewestFirst = false
+                    }
                 }
                 R.id.switchOldFiles -> {
-                    // Update the sorting order and switch states
-                    sortByNewestFirst = isChecked
-                    dialogBinding.switchNewFiles.isChecked = !isChecked
+                    if (isChecked) {
+                        dialogBinding.switchNewFiles.isChecked = false
+                        sortByNewestFirst = false
+                    } else {
+                        dialogBinding.switchNewFiles.isChecked = true
+                        sortByNewestFirst = true
+                    }
                 }
             }
         }
 
+        // Attach the switch listener to both switches
         dialogBinding.switchNewFiles.setOnCheckedChangeListener(switchListener)
         dialogBinding.switchOldFiles.setOnCheckedChangeListener(switchListener)
 
-
+        // Build and display the dialog
         val dialogBuilder = AlertDialog.Builder(this)
             .setView(dialogView)
-            .setTitle("Order of Downloaded files")
+            .setTitle("Order of Downloaded Files")
             .setPositiveButton("Apply") { dialog, _ ->
-                sortByNewestFirst = dialogBinding.switchOldFiles.isChecked
-                sortFilesByTimestamp()
+                // Save the selected sorting order when the user clicks "Apply"
+                sharedPreferences.edit().putBoolean("sortByNewestFirst", sortByNewestFirst).apply()
+                sortFilesByTimestamp() // Apply the sorting and update the RecyclerView
                 dialog.dismiss()
             }
             .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
+                dialog.dismiss() // Dismiss the dialog without saving
             }
             .create()
 
@@ -348,11 +363,48 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             FileType.UNKNOWN -> {
                 openFile(fileItem)
             }
+            FileType.BIN -> {  // Add this case for .bin files
+                openBinFile(fileItem)
+            }
             else -> {
                 openFile(fileItem)
             }
         }
     }
+
+    private fun openBinFile(fileItem: FileItem) {
+        try {
+            val file = File(fileItem.filePath)
+            val fileUri = FileProvider.getUriForFile(
+                this,
+                "${packageName}.provider",
+                file
+            )
+            val intent = Intent().apply {
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                action = Intent.ACTION_VIEW
+                setDataAndType(fileUri, getMimeType(fileItem.filePath))
+            }
+
+            // Check if there's any app that can handle this intent
+            val activities = packageManager.queryIntentActivities(intent, 0)
+            val isIntentSafe = activities.isNotEmpty()
+
+            if (isIntentSafe) {
+                startActivity(intent)
+            } else {
+                // Handle case where no app can handle the file type
+                // You can implement your custom handling here, such as showing a toast message
+                Toast.makeText(this, "No app found to open .bin file", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            // Log the error
+            Log.e("FileOpening", "Error opening .bin file: ${e.message}")
+            // Show a toast or handle the error as appropriate
+            Toast.makeText(this, "Error opening .bin file", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun openMhtmlFile(fileItem: FileItem) {
         try {
             val intent = Intent(this, OfflineMhtmlActivity::class.java).apply {
@@ -431,6 +483,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             "apk", "zip" -> "application/vnd.android.package-archive"
             "html", "htm" -> "text/html"
             "mhtml", "mht" -> "multipart/related"  // MIME type for .mhtml files
+            "bin" -> "application/octet-stream"  // Add this line for .bin files
             else -> null
         }
     }
@@ -450,19 +503,29 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
                     // Filter and show only video files
                     val videoFiles = fileItems.filter { it.fileType == FileType.VIDEO || it.fileType == FileType.AUDIO  }
                     fileListAdapter.filterList(videoFiles)
+
                 }
                 binding.annualBox -> {
                     // Filter and show only image files
                     val imageFiles = fileItems.filter { it.fileType == FileType.IMAGE }
                     fileListAdapter.filterList(imageFiles)
+
                 }
                 binding.biennialBox -> {
                     // Filter and show only APK files
-                    val apkFiles = fileItems.filter { it.fileType == FileType.APK || it.fileType == FileType.WEBSITE || it.fileType == FileType.PDF || it.fileType == FileType.MHTML || it.fileType == FileType.UNKNOWN}
+                    val apkFiles = fileItems.filter { it.fileType == FileType.APK || it.fileType == FileType.WEBSITE || it.fileType == FileType.PDF  || it.fileType == FileType.UNKNOWN}
                     fileListAdapter.filterList(apkFiles)
+
+                }
+                binding.pageBox -> {
+                    // Filter and show only APK files
+                    val pageFiles = fileItems.filter { it.fileType == FileType.MHTML}
+                    fileListAdapter.filterList(pageFiles)
+
                 }
                 binding.monthlyBox -> {
                     fileListAdapter.filterList(fileItems)
+
                 }
                 else -> {
                     // Show all files when no specific box is selected (monthlyBox)
@@ -471,6 +534,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             }
         }
         }
+
         // If the clicked box is already selected, do nothing (maintain selection)
 
 
@@ -524,7 +588,48 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         }
 // Sort files based on the default sorting order
         sortFilesByTimestamp()
+// Filter image files and check if the list is empty
+        val imageFiles = downloadedFiles.filter { it.fileType == FileType.IMAGE }
+        if (imageFiles.isEmpty()) {
+            binding.fileEmptyStateLayout.visibility = View.VISIBLE
+            binding.annualBox.visibility = View.GONE
+        } else {
+            binding.fileEmptyStateLayout.visibility = View.GONE
+            binding.annualBox.visibility = View.VISIBLE
+        }
 
+        // Filter image files and check if the list is empty
+        val webViewFiles = downloadedFiles.filter { it.fileType == FileType.MHTML }
+        if (webViewFiles.isEmpty()) {
+            binding.fileEmptyStateLayout.visibility = View.VISIBLE
+
+            binding.pageBox.visibility = View.GONE
+        } else {
+            binding.fileEmptyStateLayout.visibility = View.GONE
+            binding.pageBox.visibility = View.VISIBLE
+        }
+
+        // Filter image files and check if the list is empty
+        val otherFiles = downloadedFiles.filter { it.fileType == FileType.APK || it.fileType == FileType.WEBSITE || it.fileType == FileType.PDF  || it.fileType == FileType.UNKNOWN }
+        if (otherFiles.isEmpty()) {
+            binding.fileEmptyStateLayout.visibility = View.VISIBLE
+
+            binding.biennialBox.visibility = View.GONE
+        } else {
+            binding.fileEmptyStateLayout.visibility = View.GONE
+            binding.biennialBox.visibility = View.VISIBLE
+        }
+
+        // Filter image files and check if the list is empty
+        val videoFiles = downloadedFiles.filter { it.fileType == FileType.AUDIO || it.fileType == FileType.VIDEO }
+        if (videoFiles.isEmpty()) {
+            binding.fileEmptyStateLayout.visibility = View.VISIBLE
+
+            binding.quarterlyBox.visibility = View.GONE
+        } else {
+            binding.fileEmptyStateLayout.visibility = View.GONE
+            binding.quarterlyBox.visibility = View.VISIBLE
+        }
         return downloadedFiles
     }
 
@@ -545,6 +650,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
             "apk", "zip" -> FileType.APK
             "html", "htm" -> FileType.WEBSITE
             "mhtml", "mht" -> FileType.MHTML  // Add this line
+            "bin" -> FileType.BIN
             else -> FileType.UNKNOWN
         }
     }
@@ -630,7 +736,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
     override fun onResume() {
         super.onResume()
         setActionBarGradient()
-
+        updateEmptyStateVisibility()
         sortFilesByTimestamp()
 
         MobileAds.initialize(this){}
@@ -639,6 +745,36 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener  {
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
     }
+
+    @SuppressLint("SetTextI18n")
+    override fun onFileCountChanged(newCount: Int) {
+
+            binding.totalFile.text = "Total Downloaded files: $newCount"
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
+    override fun onFileDeleted(fileItem: FileItem) {
+        fileItems.remove(fileItem) // Remove the file from the main list
+
+        // Notify the adapter that the data set has changed
+        fileListAdapter.notifyDataSetChanged()
+
+        // Update the total file count text
+        binding.totalFile.text = "Total Downloaded files: ${fileItems.size}"
+
+
+    }
+    private fun updateEmptyStateVisibility() {
+        if (fileItems.isEmpty()) {
+            binding.fileEmptyStateLayout.visibility = View.VISIBLE
+            binding.recyclerFileView.visibility = View.GONE
+        } else {
+            binding.fileEmptyStateLayout.visibility = View.GONE
+            binding.recyclerFileView.visibility = View.VISIBLE
+        }
+    }
+
 
 }
 

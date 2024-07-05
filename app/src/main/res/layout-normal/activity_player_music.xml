@@ -71,16 +71,16 @@
         app:layout_constraintTop_toBottomOf="@id/topRow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.6" />
+        app:layout_constraintHeight_percent="0.55" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
-        android:layout_width="330dp"
-        android:layout_height="400dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:layout_marginVertical="10dp"
         android:scaleType="centerCrop"
         android:src="@drawable/music_g"
-        app:adSize="330x400"
+        app:adSize="300x300"
         app:adUnitId="ca-app-pub-3504589383575544/2057825034"
         app:layout_constraintBottom_toBottomOf="@+id/songImgPA"
         app:layout_constraintEnd_toEndOf="@+id/songImgPA"
@@ -112,14 +112,12 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+   android:layout_marginVertical="20dp"
         android:background="?attr/selectableItemBackground"
         android:backgroundTint="@color/gray"
         android:clickable="true"
         android:focusable="true"
         app:cardCornerRadius="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout13"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/songNamePA">
 
@@ -131,6 +129,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="5dp"
+
             android:src="@drawable/icon_dark">
 
         </ImageView>
@@ -185,6 +184,7 @@
                     android:gravity="center"
                     android:text="@string/start_tv"
                     android:textSize="15sp"
+                    android:paddingStart="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -196,6 +196,7 @@
                     android:gravity="center"
                     android:text="@string/end_tv"
                     android:textSize="15sp"
+                    android:paddingEnd="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -214,7 +215,7 @@
         android:id="@+id/bottomRow"
         android:layout_width="0dp"
         android:layout_height="70dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="15dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -236,8 +237,8 @@
 
         <ImageButton
             android:id="@+id/shuffleBtnPA"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="4dp"
             android:background="?attr/selectableItemBackground"
@@ -255,7 +256,7 @@
                 android:id="@+id/previousBtnPA"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:scaleY="0.9"
                 android:scaleX="0.9"
                 android:stateListAnimator="@null"
@@ -267,7 +268,7 @@
                 android:id="@+id/playPauseBtnPA"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="30dp"
+                android:layout_marginHorizontal="25dp"
                 android:backgroundTint="@android:color/holo_red_light"
                 android:stateListAnimator="@null"
                 android:scaleX="1.1"
@@ -286,7 +287,7 @@
                 android:id="@+id/nextBtnPA"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:scaleY="0.9"
                 android:scaleX="0.9"
                 android:stateListAnimator="@null"
@@ -296,8 +297,8 @@
         <!-- Timer Button -->
         <ImageButton
             android:id="@+id/repeatBtnPA"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="4dp"
             android:background="?attr/selectableItemBackground"

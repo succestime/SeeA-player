@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="16sp"
-
     tools:context=".MoreMusicBottomSheet"
     >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ImageView
         android:id="@+id/downIcon"
         android:layout_width="match_parent"
@@ -103,7 +105,8 @@
             app:layout_constraintEnd_toEndOf="@+id/share"
             app:layout_constraintStart_toStartOf="@+id/share"
             app:layout_constraintTop_toBottomOf="@+id/share"
-            tools:ignore="RtlSymmetry" />
+            tools:ignore="RtlSymmetry"
+           />
     </LinearLayout>
 
     <LinearLayout
@@ -251,7 +254,7 @@
             app:drawableStartCompat="@drawable/round_sleep_timer" />
     </LinearLayout>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
 

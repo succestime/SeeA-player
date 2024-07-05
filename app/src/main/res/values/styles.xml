@@ -11,5 +11,10 @@
             <item name="cornerSize">16dp</item> <!-- Adjust corner size as needed -->
         </style>
 
+    <style name="BottomNavTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+
 
 </resources>

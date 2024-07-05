@@ -11,7 +11,7 @@
     <LinearLayout
         android:id="@+id/linearLayout7"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
@@ -30,38 +30,44 @@
 
             />
 
-        <TextView
-            android:id="@+id/totalFile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="Total Downloaded files : 0"
-            android:textSize="15dp"
 
-            />
 
 
 
     </LinearLayout>
 
 
+    <TextView
+        android:id="@+id/totalFile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="Total Downloaded files : 0"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="@+id/linearLayout7"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout7" />
     <View
         android:id="@+id/horizontalLine"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_margin="10dp"
         android:background="#024E02"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout7"
+        app:layout_constraintTop_toBottomOf="@id/totalFile"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- HorizontalScrollView added here -->
+    <HorizontalScrollView
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:scrollbars="none"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/horizontalLine">
+        app:layout_constraintTop_toBottomOf="@+id/horizontalLine"
+        android:layout_margin="10dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/monthlyBox"
@@ -182,6 +188,47 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/white" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/page_Box"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/square_box_bg_browser"
+            android:clickable="true"
+            android:focusable="true"
+
+            android:orientation="horizontal"
+            android:paddingStart="5dp"
+            android:paddingEnd="10dp"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+
+            app:layout_constraintStart_toEndOf="@+id/annual_Box"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlSymmetry">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pages"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/page_select"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/internat_browser"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/biennial_Box"
@@ -198,7 +245,7 @@
 
             app:layout_constraintBottom_toBottomOf="parent"
 
-            app:layout_constraintStart_toEndOf="@+id/annual_Box"
+            app:layout_constraintStart_toEndOf="@+id/page_Box"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="RtlSymmetry">
 
@@ -224,10 +271,8 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/white" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </HorizontalScrollView>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -292,15 +337,25 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerFileView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
         android:scrollbars="vertical"
-        android:paddingBottom="225dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
-
+    <ViewStub
+        android:id="@+id/fileEmptyStateLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="center"
+        android:layout="@layout/browser_file_empty_state_layout"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="380dp"

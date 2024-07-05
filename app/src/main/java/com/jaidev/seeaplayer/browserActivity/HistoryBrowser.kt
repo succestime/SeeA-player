@@ -151,6 +151,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
                 // Hide editTextSearch
                 hideEditText()
                 fileListAdapter.filter("") // Passing empty string to show all files
+                updateEmptyStateVisibility()
 
 
 
@@ -169,6 +170,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             // Clear the text in the EditText
             binding.editTextSearch.text?.clear()
             fileListAdapter.filter("") // Passing empty string to show all files
+            updateEmptyStateVisibility()
 
 
         }
@@ -297,4 +299,14 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadAppOpenAd()
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        loadAppOpenAd()
+    }
 }

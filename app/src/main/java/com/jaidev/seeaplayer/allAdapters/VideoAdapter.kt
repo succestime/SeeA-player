@@ -45,23 +45,26 @@ import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import java.io.File
 
-class VideoAdapter(private val context: Context, private var videoList: ArrayList<VideoData>,private val isFolder: Boolean = false,private val isDownloadVideo: Boolean = false)
+class VideoAdapter(private val context: Context,
+                   private var videoList: ArrayList<VideoData>,
+                   private val isFolder: Boolean = false,
+                   private val fileCountChangeListener: OnFileCountChangeListener
+)
     : RecyclerView.Adapter<VideoAdapter.MyHolder>() {
+    interface OnFileCountChangeListener {
+        fun onFileCountChanged(newCount: Int)
+    }
 
     private var newPosition = 0
     private lateinit var dialogRF: AlertDialog
-    private lateinit var sharedPreferences: SharedPreferences
-    // Tracks selected items
-    private val selectedItems = HashSet<Int>()
-    private var actionMode: ActionMode? = null
-    private var isGridMode = false // Track if grid mode is enabled
-    private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
+    private var sharedPreferences: SharedPreferences
+    val selectedItems = HashSet<Int>()
+    var actionMode: ActionMode? = null
+    private var isGridMode = false
+    private var isSelectionModeEnabled = false
 
     companion object {
         private const val PREF_NAME = "video_titles"
-        private const val VIEW_TYPE_GRID_VIDEO = 1
-        private var videoRenameListener: VideoRenameListener? = null
-
     }
     init {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -72,28 +75,20 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
     interface VideoDeleteListener {
         fun onVideoDeleted()
-
-
-    }
-    interface VideoRenameListener {
-        fun onVideoRenamed(position: Int, newName: String)
     }
 
     private var videoDeleteListener: VideoDeleteListener? = null
 
-    fun setVideoDeleteListener(listener: VideoDeleteListener) {
-        videoDeleteListener = listener
-    }
-    // Function to update layout mode dynamically
     @SuppressLint("NotifyDataSetChanged")
     fun enableGridMode(enable: Boolean) {
         isGridMode = enable
         notifyDataSetChanged()
     }
-//    interface VideoViewHolderBinder {
-//        fun bind(videoData: VideoData)
-//    }
 
+    fun isSelectionModeEnabled(): Boolean {
+
+        return isSelectionModeEnabled
+    }
     class MyHolder(binding: GridVideoViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.videoName
         val duration = binding.duration
@@ -291,7 +286,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                 notifyDataSetChanged()
                                 videoDeleteListener?.onVideoDeleted()
                             }
+
                         }
+                        // Notify listener of the file count change
+                        fileCountChangeListener.onFileCountChanged(videoList.size)
                     } else {
                         Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
                     }
@@ -390,8 +388,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
         if (selectedItems.isEmpty()) {
             actionMode?.finish()
+
         } else {
             startActionMode()
+
         }
 
         notifyItemChanged(position) // Update selected state for the item
@@ -410,6 +410,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             notifyDataSetChanged() // Update all item views to hide the "more" button
         }
         actionMode?.title = "${selectedItems.size} selected"
+
     }
 
     // Action mode callback
@@ -417,6 +418,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             // Inflate action mode menu
             mode?.menuInflater?.inflate(R.menu.multiple_player_select_menu, menu)
+            isSelectionModeEnabled = true // Enable selection mode
+
             return true
         }
 
@@ -477,6 +480,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                 notifyDataSetChanged()
                                 // Dismiss action mode
                                 actionMode?.finish()
+                                // Notify listener of the file count change
+                                fileCountChangeListener.onFileCountChanged(videoList.size)
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
                                 // User clicked Cancel, dismiss dialog
@@ -506,55 +511,43 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
     private fun shareSelectedFiles() {
         val uris = mutableListOf<Uri>()
-
-        // Iterate through selectedItems to get selected file items
         for (position in selectedItems) {
-            val video = videoList[position]
-            try {
-                val fileUri = FileProvider.getUriForFile(
-                    context,
-                    "${context.applicationContext.packageName}.provider",
-                    File(video.path)
+            val music = videoList[position]
+            val file = File(music.path)
+            val fileUri = FileProvider.getUriForFile(
+                context,
+                context.applicationContext.packageName + ".provider",
+                file
+            )
+            uris.add(fileUri)
+        }
+
+        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+        shareIntent.type = "video/*"
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        val packageManager = context.packageManager
+        val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
+        val excludedComponents = mutableListOf<ComponentName>()
+
+        for (resolvedActivity in resolvedActivityList) {
+            if (resolvedActivity.activityInfo.packageName == context.packageName) {
+                excludedComponents.add(
+                    ComponentName(
+                        resolvedActivity.activityInfo.packageName,
+                        resolvedActivity.activityInfo.name
+                    )
                 )
-                uris.add(fileUri)
-            } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
-                Toast.makeText(context, "Failed to get URI for file: ${video.path}", Toast.LENGTH_SHORT).show()
             }
         }
 
-        if (uris.isNotEmpty()) {
-            // Create an ACTION_SEND intent to share multiple files
-            val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
-            shareIntent.type = "video/*"
-            shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+        chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(chooserIntent)
 
-            // Get the list of apps that can handle the intent
-            val packageManager = context.packageManager
-            val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
-            val excludedComponents = mutableListOf<ComponentName>()
-
-            // Iterate through the list and exclude your app
-            for (resolvedActivity in resolvedActivityList) {
-                if (resolvedActivity.activityInfo.packageName == context.packageName) {
-                    excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
-                }
-            }
-
-            // Create a chooser intent
-            val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
-
-            // Exclude your app from the chooser intent
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-            }
-
-            chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(chooserIntent)
-        } else {
-            Toast.makeText(context, "No valid files to share", Toast.LENGTH_SHORT).show()
-        }
+        actionMode?.finish()
     }
 
 
@@ -599,5 +592,6 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         // Set the modified drawable to your ImageView or wherever you're using it
         imageView.setImageDrawable(drawable)
     }
+
 }
 

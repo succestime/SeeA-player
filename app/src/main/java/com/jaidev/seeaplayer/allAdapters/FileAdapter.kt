@@ -35,6 +35,9 @@ class FileAdapter(
     private val context: Context,
     private var fileList: MutableList<FileItem>,
     private val itemClickListener: OnItemClickListener,
+    private val fileCountChangeListener: OnFileCountChangeListener ,
+    private val fileDeleteListener: OnFileDeleteListener // Add this listener
+
 
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var isSelectionModeEnabled: Boolean = false // Variable to track selection mode
@@ -42,7 +45,9 @@ class FileAdapter(
     interface OnItemClickListener {
         fun onItemClick(fileItem: FileItem)
     }
-
+    interface OnFileDeleteListener {
+        fun onFileDeleted(fileItem: FileItem)
+    }
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
     private val fileItemPrefs = FileItemPreferences(context)
@@ -52,7 +57,17 @@ class FileAdapter(
         fileList.addAll(filteredList)
         notifyDataSetChanged()
     }
-
+    @SuppressLint("NotifyDataSetChanged")
+    fun clearSelection() {
+        selectedItems.clear()
+        actionMode?.finish()
+        actionMode = null
+        isSelectionModeEnabled = false
+        notifyDataSetChanged()
+    }
+    interface OnFileCountChangeListener {
+        fun onFileCountChanged(newCount: Int)
+    }
 
     // ViewHolder for PDF type
     inner class PdfViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -154,6 +169,7 @@ class FileAdapter(
 
             }
         }
+
     }
 
 
@@ -648,7 +664,7 @@ class FileAdapter(
                     toggleMultpleSelection(position)
 
                 } else {
-                    itemView.setOnClickListener { itemClickListener.onItemClick(fileItem) }
+                   itemClickListener.onItemClick(fileItem)
                 }
 
             }
@@ -846,6 +862,9 @@ class FileAdapter(
                 if (!deleted) {
                     // Handle deletion failure if necessary
                     Log.e("FileAdapter", "Failed to delete file: ${fileItem.fileName}")
+                } else {
+                    // Notify listener for each deleted file
+                    fileDeleteListener.onFileDeleted(fileItem)
                 }
             } else {
                 // File doesn't exist, handle this scenario if needed
@@ -864,6 +883,7 @@ class FileAdapter(
 
         // Dismiss action mode
         actionMode?.finish()
+
     }
 
     private fun formatFileSize(fileSize: Long): String {
@@ -954,13 +974,19 @@ class FileAdapter(
             val fileItem = fileList[position]
             val file = File(fileItem.filePath)
 
+// Create a list to store items to be deleted
+            val itemsToRemove = ArrayList<FileItem>()
             if (file.exists()) {
                 try {
                     if (file.delete()) {
-                        // File deleted successfully
+                        itemsToRemove.add(fileItem)
                         fileList.removeAt(position)
                         notifyItemRemoved(position)
                         notifyItemRangeChanged(position, fileList.size)
+                        // Notify listeners for each deleted file
+                        itemsToRemove.forEach { fileItem ->
+                            fileDeleteListener.onFileDeleted(fileItem)
+                        }
                     } else {
                         // Failed to delete file for some reason
                         Log.e("FileAdapter", "Failed to delete file: ${fileItem.fileName}")

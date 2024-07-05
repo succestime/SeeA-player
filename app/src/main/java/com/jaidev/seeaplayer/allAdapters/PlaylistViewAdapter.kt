@@ -10,8 +10,10 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Playlist
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.PlaylistMusicViewBinding
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 
 class PlaylistViewAdapter(private val context: Context,
                           private var playlistList : ArrayList<Playlist> ,
@@ -58,9 +60,11 @@ class PlaylistViewAdapter(private val context: Context,
         }
         if (PlaylistActivity.musicPlaylist.ref[position].playlist.size > 0){
             Glide.with(context)
-                .asBitmap()
-                .load(PlaylistActivity.musicPlaylist.ref[position].playlist[0].artUri)
-                .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
+                .load(getImgArt(PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist[0].path))
+                .apply(RequestOptions()
+                    .placeholder(R.color.place_holder_video)
+                    .error(R.drawable.music_speaker_three) // Use the newly created drawable
+                    .centerCrop())
                 .into(holder.image)
         }
 

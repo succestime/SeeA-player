@@ -55,6 +55,7 @@ class HistoryAdapter(
             val topicName = extractTopicName(historyItem.url)
             titleTextView.text = topicName
             urlTextView.text = historyItem.title
+
             if (historyItem.imageBitmap != null) {
                 websiteImageView.setImageBitmap(historyItem.imageBitmap)
             } else {

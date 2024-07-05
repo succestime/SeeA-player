@@ -16,6 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.dataClass.checkPlaylist
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.ActivityPlatylistDetailsBinding
 
 class PlaylistDetails : AppCompatActivity() {
@@ -175,8 +176,11 @@ class PlaylistDetails : AppCompatActivity() {
 
         if (adapter.itemCount > 0) {
             Glide.with(this)
-                .load(PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist[0].artUri)
-                .apply(RequestOptions().placeholder(R.drawable.speaker).centerCrop())
+
+                .load(getImgArt(PlaylistActivity.musicPlaylist.ref[currentPlaylistPos].playlist[0].path))
+                .apply(RequestOptions()
+                    .error(R.drawable.music_speaker_three) // Use the newly created drawable
+                    .centerCrop())
                 .into(binding.playlistImgPD)
             binding.shuffleBtnPD.visibility = View.VISIBLE
         }

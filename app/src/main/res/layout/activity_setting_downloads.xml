@@ -6,11 +6,10 @@
     android:layout_height="wrap_content"
     android:padding="20dp"
     android:layout_margin="20dp"
-
-    tools:context=".SettingDownloads">
+   >
 
     <LinearLayout
-        android:id="@+id/linearLayout6"
+        android:id="@+id/linearLayout7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -27,7 +26,7 @@
 
         <!-- Add a Switch widget -->
         <Switch
-            android:id="@+id/switchNewFiles"
+            android:id="@+id/switchOldFiles"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -47,14 +46,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout7" />
 
+
+
     <LinearLayout
-        android:id="@+id/linearLayout7"
+        android:id="@+id/linearLayout6"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+    >
 
         <TextView
             android:layout_width="0dp"
@@ -66,7 +68,7 @@
 
         <!-- Add a Switch widget -->
         <Switch
-            android:id="@+id/switchOldFiles"
+            android:id="@+id/switchNewFiles"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -74,6 +76,4 @@
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

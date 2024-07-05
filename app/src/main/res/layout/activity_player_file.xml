@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:background="@color/black"
             android:keepScreenOn="true"
-            app:controller_layout_id="@layout/custom_control_view"
+            app:controller_layout_id="@layout/custom_control_view_file"
             app:dtpv_controller="@id/ytOverlay"
             app:show_buffering="always" >
 
@@ -55,27 +55,30 @@
             tools:ignore="ObsoleteLayoutParam" />
 
     </FrameLayout>
-
-
     <ImageButton
         android:id="@+id/lockButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:backgroundTint="@android:color/transparent"
-        android:contentDescription="@string/lock"
-        android:src="@drawable/round_lock_open"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/ripple_circle"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:src="@drawable/round_lock"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
-
     <TextView
         android:id="@+id/durationChangeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textColor="#DCD7D7"
+        android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:visibility="gone"
+        android:gravity="center"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
         android:textStyle="bold"
         android:text="@string/durationChangeTextView"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -192,7 +195,7 @@
             android:id="@+id/adsRemove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="@drawable/curver_ads_remove"
             android:src="@drawable/clear_ads"
             android:visibility="visible"
             android:layout_marginStart="5dp"

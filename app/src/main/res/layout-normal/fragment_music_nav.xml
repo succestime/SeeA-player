@@ -11,7 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:ignore="ExtraText">
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
@@ -52,7 +63,8 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
                     android:contentDescription="@string/playlist_btn"
-                    android:drawableLeft="@drawable/playlist_icon"
+                    app:drawableTint="@color/cool_blue"
+                    app:drawableStartCompat="@drawable/round_playlist_music"
                     android:text="@string/playlist_btn"
                     android:textAllCaps="false"
                     android:padding="10dp"
@@ -81,10 +93,7 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+
 
 
 
@@ -109,11 +118,11 @@
                             android:paddingBottom="60dp"
                             android:scrollbars="vertical"/>
                     </LinearLayout>
-
+                    </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nowPlaying"

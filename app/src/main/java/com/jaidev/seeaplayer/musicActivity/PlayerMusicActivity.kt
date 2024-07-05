@@ -537,6 +537,13 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        mAdView = findViewById(R.id.adView)
+        // banner ads
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+    }
 
 }
 

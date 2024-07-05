@@ -11,19 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-<!--        <com.google.android.gms.ads.AdView-->
-<!--            android:id="@+id/adView"-->
-<!--            android:layout_width="250dp"-->
-<!--            android:layout_height="250dp"-->
-
-<!--            app:adSize="250x250"-->
-<!--            app:adUnitId="ca-app-pub-3940256099942544/6300978111"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            tools:ignore="MissingConstraints">-->
-
-<!--        </com.google.android.gms.ads.AdView>-->
 
 
         <LinearLayout
@@ -41,18 +28,7 @@
             app:layout_constraintVertical_bias="0.0">
 
 
-<!--            <ImageView-->
-<!--                android:id="@+id/searchBackBtn"-->
-<!--                android:layout_width="25dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:contentDescription="@string/searchbackbtn"-->
-<!--                app:tint="?android:attr/textColorPrimary"-->
-<!--                android:src="@drawable/search_back_btn"-->
-<!--                app:layout_constraintEnd_toEndOf="@+id/recycler_view"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                android:visibility="visible"-->
-<!--                tools:ignore="UseAppTint" />-->
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/searchRecyclerView"

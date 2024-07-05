@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,108 +11,120 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:ignore="ExtraText">
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            tools:ignore="MissingConstraints">
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/playandshuffleBtn"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/curver_music"
-                    android:contentDescription="@string/shuffle_btn"
-                    android:drawableLeft="@drawable/play_icon"
-                    android:drawableTint="@color/cool_pink"                    android:textColor="?android:textColor"
-                    android:text="@string/shuffle_btn"
-                    android:textAllCaps="false"
-                    android:padding="10dp"
-                    />
-
-                <TextView
-                    android:id="@+id/playlistBtn"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/curver_music"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:contentDescription="@string/playlist_btn"
-                    android:drawableLeft="@drawable/playlist_icon"
-                    android:text="@string/playlist_btn"
-                    android:textAllCaps="false"
-                    android:padding="10dp"
-                    android:textColor="?android:textColor"
-                    />
-
-                <TextView
-                    android:id="@+id/favouriteBtn"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/curver_music"
-                    android:padding="10dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:contentDescription="@string/favourites_btn"
-                    android:drawableTint="@color/cool_pink"
-                    android:drawableLeft="@drawable/round_favorite_music"                    android:text="@string/favourites_btn"
-                    android:textAllCaps="false"
-                    android:textColor="?android:textColor"
-
-
-                    />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:orientation="vertical">
-
-
-
-
-                <ViewStub
-                    android:id="@+id/musicemptyStateLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout="@layout/music_nav_empty_state_layout"
-                    android:foregroundGravity="center"
-                    android:visibility="gone"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/musicRV"
+                <LinearLayout
+                    android:id="@+id/linearLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="15dp"
-                    android:paddingBottom="69dp"
-                    android:scrollbars="vertical"
-                    />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    tools:ignore="MissingConstraints">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/playandshuffleBtn"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:background="@drawable/curver_music"
+                            android:contentDescription="@string/shuffle_btn"
+                            android:textColor="?android:textColor"
+                            android:text="@string/shuffle_btn"
+                            android:textAllCaps="false"
+                            android:padding="10dp"
+                            app:drawableTint="@color/cool_pink"
+                            app:drawableStartCompat="@drawable/play_icon" />
+
+                        <TextView
+                            android:id="@+id/playlistBtn"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/curver_music"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:contentDescription="@string/playlist_btn"
+                            app:drawableTint="@color/cool_blue"
+                            app:drawableStartCompat="@drawable/round_playlist_music"                            android:text="@string/playlist_btn"
+                            android:textAllCaps="false"
+                            android:padding="10dp"
+                            android:textColor="?android:textColor"
+                            />
+
+                        <TextView
+                            android:id="@+id/favouriteBtn"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/curver_music"
+                            android:padding="10dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:contentDescription="@string/favourites_btn"
+                            android:text="@string/favourites_btn"
+                            android:textAllCaps="false"
+                            android:textColor="?android:textColor"
+                            app:drawableTint="@color/cool_pink"
+                            app:drawableStartCompat="@drawable/round_favorite_music" />
+
+
+                    </LinearLayout>
+
+
+
+
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <ViewStub
+                            android:id="@+id/musicemptyStateLayout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout="@layout/music_nav_empty_state_layout"
+                            android:foregroundGravity="center"
+                            android:visibility="gone"/>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/musicRV"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:paddingBottom="60dp"
+                            android:scrollbars="vertical"/>
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nowPlaying"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

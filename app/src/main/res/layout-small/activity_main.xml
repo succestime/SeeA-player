@@ -20,6 +20,40 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/mainActivityProgressbar"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                app:cardCornerRadius="5dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:background="#434343"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Please waite"
+                        android:padding="10dp"
+                        android:textColor="@color/white"
+                        android:gravity="center_vertical"
+                        android:layout_marginHorizontal="15dp"
+                        android:textSize="18sp">
+
+                    </TextView>
+                    <ProgressBar
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginEnd="15dp">
+
+                    </ProgressBar>
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
 
         </FrameLayout>
 
@@ -28,7 +62,8 @@
             android:id="@+id/bottomNav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:itemTextColor="@color/light_gray"
+            app:itemTextColor="@color/bottom_nav_item_text_color"
+            app:itemIconTint="@color/bottom_nav_item_icon_tint"
             app:menu="@menu/bottom_items"
             android:background="#012437"
             app:labelVisibilityMode="labeled"/>

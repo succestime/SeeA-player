@@ -27,12 +27,10 @@ import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -40,7 +38,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.ads.AdListener
@@ -62,7 +59,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.allAdapters.TabAdapter
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
 import com.jaidev.seeaplayer.browseFregment.HomeFragment
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
@@ -72,7 +68,6 @@ import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.dataClass.Tab
 import com.jaidev.seeaplayer.databinding.ActivityLinkTubeBinding
 import com.jaidev.seeaplayer.databinding.BookmarkDialogBinding
-import com.jaidev.seeaplayer.databinding.TabViewBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URL
@@ -83,6 +78,7 @@ import java.util.Locale
 
 
 class LinkTubeActivity : AppCompatActivity() {
+
 
     private var printJob : PrintJob? = null
     lateinit var mAdView: AdView
@@ -101,26 +97,30 @@ class LinkTubeActivity : AppCompatActivity() {
         const val REQUEST_CODE_SPEECH_INPUT = 2000
         const val MAX_HISTORY_SIZE = 150
 
+
     }
 
-    @SuppressLint("ObsoleteSdkInt", "ClickableViewAccessibility")
+    @SuppressLint("ObsoleteSdkInt", "ClickableViewAccessibility", "InternalInsetResource",
+        "DiscouragedApi"
+    )
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES }
-
        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-
         window.statusBarColor = Color.parseColor("#373636")
-
         window.navigationBarColor = Color.parseColor("#373636")
 
         binding = ActivityLinkTubeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         supportActionBar?.hide()
-        rewardedIAd()
+        // Send broadcast to notify MainActivity that this activity is opened
+        val intent = Intent("com.yourapp.LINK_TUBE_OPENED")
+        sendBroadcast(intent)
+
         initializeView()
         initializeBinding()
         getAllBookmarks()
@@ -139,7 +139,7 @@ class LinkTubeActivity : AppCompatActivity() {
         // Initially set the adsLayout visibility to GONE until the ad is loaded
         binding.adsLayout.visibility = View.GONE
 
-        tabsList.add(Tab("Home", HomeFragment(), LinkTubeActivity()))
+        tabsList.add(Tab("Home", HomeFragment(), LinkTubeActivity(), null, null))
         binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
         binding.myPager.isUserInputEnabled = false
         myPager = binding.myPager
@@ -158,7 +158,6 @@ class LinkTubeActivity : AppCompatActivity() {
                     view.tag = Pair(view.x - event.rawX, view.y - event.rawY)
                     true
                 }
-
                 MotionEvent.ACTION_MOVE -> {
                     val tag = view.tag as Pair<Float, Float>
                     val newX = event.rawX + tag.first
@@ -169,7 +168,23 @@ class LinkTubeActivity : AppCompatActivity() {
                     val screenWidth = displayMetrics.widthPixels
                     val screenHeight = displayMetrics.heightPixels
 
-                    // Ensure the view does not go outside the screen boundaries
+                    // Get the status bar height
+                    val statusBarHeightResId = resources.getIdentifier("status_bar_height", "dimen", "android")
+                    val statusBarHeight = if (statusBarHeightResId > 0) {
+                        resources.getDimensionPixelSize(statusBarHeightResId)
+                    } else {
+                        0
+                    }
+
+                    // Get the navigation bar height
+                    val navigationBarHeightResId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+                    val navigationBarHeight = if (navigationBarHeightResId > 0) {
+                        resources.getDimensionPixelSize(navigationBarHeightResId)
+                    } else {
+                        0
+                    }
+
+                    // Ensure the view does not go outside the screen boundaries, considering the status bar and navigation bar
                     val viewWidth = view.width
                     val viewHeight = view.height
 
@@ -180,8 +195,8 @@ class LinkTubeActivity : AppCompatActivity() {
                     }
 
                     val boundedY = when {
-                        newY < 0 -> 0f
-                        newY + viewHeight > screenHeight -> (screenHeight - viewHeight).toFloat()
+                        newY < statusBarHeight -> statusBarHeight.toFloat()
+                        newY + viewHeight > (screenHeight - navigationBarHeight) -> (screenHeight - navigationBarHeight - viewHeight).toFloat()
                         else -> newY
                     }
 
@@ -192,13 +207,20 @@ class LinkTubeActivity : AppCompatActivity() {
                         .start()
                     true
                 }
-
                 else -> false
             }
         }
+        } catch (e: Exception) {
+            showToast(this@LinkTubeActivity, "Something went wrong, try to refresh")
+            e.printStackTrace()
+        }
+
 
     }
 
+    fun showToast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
 
         fun initializeBinding(){
         binding.googleMicBtn.setOnClickListener {
@@ -547,7 +569,7 @@ class LinkTubeActivity : AppCompatActivity() {
     private fun share() {
         var frag: BrowseFragment? = null
         try {
-            frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
+            frag = tabsList[myPager.currentItem].fragment as BrowseFragment
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -641,19 +663,24 @@ class LinkTubeActivity : AppCompatActivity() {
 
     }
 
-    fun rewardedIAd(){
+    fun rewardedIAd(callback: (Boolean) -> Unit) {
         val adRequest = AdRequest.Builder().build()
-        RewardedInterstitialAd.load(this,"ca-app-pub-3504589383575544/3262210040",
-            adRequest, object : RewardedInterstitialAdLoadCallback() {
-                override fun onAdLoaded(p0: RewardedInterstitialAd) {
-                    rewardedInterstitialAd=p0
-                }
+        RewardedInterstitialAd.load(this, "ca-app-pub-3504589383575544/3262210040", adRequest, object : RewardedInterstitialAdLoadCallback() {
+            override fun onAdLoaded(p0: RewardedInterstitialAd) {
+                rewardedInterstitialAd = p0
+                callback(true)
+            }
 
-                override fun onAdFailedToLoad(p0: LoadAdError) {
-                    rewardedInterstitialAd=null
-                }
-            })
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                rewardedInterstitialAd = null
+                callback(false)
+            }
+        })
+    }
 
+    fun navigateToMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -735,7 +762,7 @@ class LinkTubeActivity : AppCompatActivity() {
     }
 
 
-    private fun setSwipeRefreshBackgroundColor() {
+    fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
@@ -753,123 +780,81 @@ class LinkTubeActivity : AppCompatActivity() {
 
         }
     }
-    private fun initializeView() {
+    fun initializeView() {
 
         binding.homeBrowserBtn.setOnClickListener {
-            changeTab("Home", HomeFragment())
+            changeTab("New tab", HomeFragment())
         }
         binding.downloadBrowser.setOnClickListener {
-            var frag: BrowseFragment? = null
-            try {
-                frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            // Get the current URL from the WebView
-            val currentUrl = frag?.binding?.webView?.url
-            if (currentUrl != null) {
-                downloadCurrentWebPage(currentUrl)
-            } else {
-                Toast.makeText(this@LinkTubeActivity, "No webpage to download", Toast.LENGTH_SHORT).show()
-            }// If URL is not present, notify the user
+            handleDownload()
         }
 
         binding.topDownloadBrowser.setOnClickListener {
-            var frag: BrowseFragment? = null
-            try {
-                frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            // Get the current URL from the WebView
-            val currentUrl = frag?.binding?.webView?.url
-            if (currentUrl != null) {
-                downloadCurrentWebPage(currentUrl)
-            } else {
-                Toast.makeText(this@LinkTubeActivity, "No webpage to download", Toast.LENGTH_SHORT).show()
-            }// If URL is not present, notify the user
+            handleDownload()
         }
         binding.bottomMediaBrowser.setOnClickListener {
             if (checkForInternet(this)) {
                 // Internet is available, proceed to show ad and navigate to MainActivity
-                rewardedIAd()
-                rewardedInterstitialAd?.show(this, object : OnUserEarnedRewardListener {
-                    override fun onUserEarnedReward(p0: RewardItem) {
-                    }
+                rewardedIAd { adLoaded ->
+                    if (adLoaded) {
+                        rewardedInterstitialAd?.show(this, object : OnUserEarnedRewardListener {
+                            override fun onUserEarnedReward(p0: RewardItem) {
+                            }
+                        })
 
-                })
+                    } else {
+                        // Ad not loaded, directly navigate to MainActivity
+                        navigateToMainActivity()
+                    }
+                }
             } else {
                 // No internet, directly navigate to MainActivity
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-                return@setOnClickListener
+                navigateToMainActivity()
             }
 
             // Define an ad listener to handle navigation after ad is dismissed
             rewardedInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     // Ad dismissed, proceed to navigate to MainActivity
-                    startActivity(Intent(this@LinkTubeActivity, MainActivity::class.java))
-                    finish()
+                    navigateToMainActivity()
                 }
             }
         }
 
 
         binding.tabBtn.setOnClickListener {
-            val viewTabs =
-                layoutInflater.inflate(R.layout.tab_view, binding.root, false)
-            val bindingTabs = TabViewBinding.bind(viewTabs)
-
-            val dialogTabs = MaterialAlertDialogBuilder(this , R.style.roundCornerDialog).setView(viewTabs)
-                .setTitle("Select Tab")
-                .setPositiveButton("Home"){self, _ ->
-                    changeTab("Home", HomeFragment())
-                    self.dismiss()
-                }
-                .setNeutralButton("Google"){self, _ ->
-                    changeTab("Google", BrowseFragment(urlNew = "www.google.com"))
-                    self.dismiss()
-                }
-                .create()
-
-            bindingTabs.tabsRV.setHasFixedSize(true)
-            bindingTabs.tabsRV.layoutManager = LinearLayoutManager(this)
-            bindingTabs.tabsRV.adapter = TabAdapter(this, dialogTabs)
-
-            dialogTabs.show()
-
-            val pBtn =   dialogTabs.getButton(AlertDialog.BUTTON_POSITIVE)
-            val nBtn =   dialogTabs.getButton(AlertDialog.BUTTON_NEUTRAL)
-
-            pBtn.isAllCaps = false
-            nBtn.isAllCaps = false
-
-            pBtn.setCompoundDrawablesWithIntrinsicBounds( ResourcesCompat.getDrawable(resources,
-                R.drawable.home_browse, theme)
-                , null, null, null)
-            nBtn.setCompoundDrawablesWithIntrinsicBounds( ResourcesCompat.getDrawable(resources,
-                R.drawable.plus_icon, theme)
-                , null, null, null)
+            val intent = Intent(this, TabActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_top_right, 0)
+        }
 
 
+    }
 
+    private fun handleDownload() {
+        var frag: BrowseFragment? = null
+        try {
+            frag = tabsList[myPager.currentItem].fragment as BrowseFragment
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        // Get the current URL from the WebView
+        val currentUrl = frag?.binding?.webView?.url
+        if (currentUrl != null) {
+            downloadCurrentWebPage(currentUrl)
+        } else {
+            Toast.makeText(this@LinkTubeActivity, "No webpage to download", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun downloadCurrentWebPage(url: String) {
         var frag: BrowseFragment? = null
         try {
-            frag = LinkTubeActivity.tabsList[myPager.currentItem].fragment as BrowseFragment
+            frag = tabsList[myPager.currentItem].fragment as BrowseFragment
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        // Extracting the search query from the URL
-        val query = extractSearchQuery(url)
-        val decodedQuery = URLDecoder.decode(query, "UTF-8")
-        val fileName = "${decodedQuery?.replace("+", " ")} - SeeA LinkTube.mhtml"
-
+        val fileName = generateFileName(url)
         val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File(destinationDir, fileName)
 
@@ -882,6 +867,18 @@ class LinkTubeActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to save page", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun generateFileName(url: String): String {
+        val searchQuery = extractSearchQuery(url)
+        val decodedQuery = if (searchQuery != null) {
+            URLDecoder.decode(searchQuery, "UTF-8")
+        } else {
+            val uri = Uri.parse(url)
+            uri.host ?: "webpage"
+        }
+        val fileName = "$decodedQuery - SeeA LinkTube.mhtml"
+        return fileName
     }
 
     private fun extractSearchQuery(url: String): String? {
@@ -900,41 +897,65 @@ class LinkTubeActivity : AppCompatActivity() {
     }
 
     private fun findEndIndex(url: String, startIndex: Int): Int {
-        val delimiters = listOf('&', '#', ',', '=')
-        val indices = delimiters.map { url.indexOf(it, startIndex) }.filter { it != -1 }
-        return if (indices.isNotEmpty()) indices.minOrNull()!! else -1
+        val endIndexChars = listOf("&", "#")
+        for (char in endIndexChars) {
+            val endIndex = url.indexOf(char, startIndex)
+            if (endIndex != -1) {
+                return endIndex
+            }
+        }
+        return -1
     }
-
 
 
 
     override fun onResume() {
         super.onResume()
-        MobileAds.initialize(this){}
+        try {
         mAdView = findViewById(R.id.adView)
-        window.navigationBarColor = Color.parseColor("#373636")
-        // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
-        // Check if the banner ad is loaded
         mAdView.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 binding.adsLayout.visibility = View.VISIBLE
             }
-
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                // Initially set the adsLayout visibility to GONE until the ad is loaded
+                binding.adsLayout.visibility = View.GONE
+            }
         }
-        // Initially set the adsLayout visibility to GONE until the ad is loaded
-        binding.adsLayout.visibility = View.GONE
-        setSwipeRefreshBackgroundColor()
-
         printJob?.let {
             when{
                 it.isCompleted -> Snackbar.make(binding.root, "Successful -> ${it.info.label}", 4000).show()
                 it.isFailed -> Snackbar.make(binding.root, "Failed -> ${it.info.label}", 4000).show()
             }
         }
+        } catch (e: Exception) {
+            showToast(this@LinkTubeActivity, "Something went wrong, try to refresh")
+            e.printStackTrace()
+        }
     }
 
+    override fun onPause() {
+        super.onPause()
+        try {
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+        mAdView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                binding.adsLayout.visibility = View.VISIBLE
+            }
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                // Initially set the adsLayout visibility to GONE until the ad is loaded
+                binding.adsLayout.visibility = View.GONE
+            }
+        }
+        } catch (e: Exception) {
+            showToast(this@LinkTubeActivity, "Something went wrong, try to refresh")
+            e.printStackTrace()
+        }
+    }
 
     private fun saveAsPdf(web: WebView){
         val pm = getSystemService(Context.PRINT_SERVICE) as PrintManager
@@ -966,7 +987,7 @@ class LinkTubeActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    private fun getAllBookmarks(){
+    fun getAllBookmarks(){
         //for getting bookmarks data using shared preferences from storage
         bookmarkList = ArrayList()
         val editor = getSharedPreferences("BOOKMARKS", MODE_PRIVATE)
@@ -982,7 +1003,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
 @SuppressLint("NotifyDataSetChanged")
 fun changeTab(url: String, fragment: Fragment , isBackground : Boolean = false) {
-    LinkTubeActivity.tabsList.add(Tab(name = url,fragment = fragment , activity = Activity()))
+    LinkTubeActivity.tabsList.add(Tab(name = url,fragment = fragment , activity = Activity() , null, null ))
     myPager.adapter?.notifyDataSetChanged()
     tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
     if(!isBackground) myPager.currentItem = LinkTubeActivity.tabsList.size - 1

@@ -22,14 +22,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
+import com.jaidev.seeaplayer.dataClass.Folder
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityFoldersBinding
 import java.io.File
 
-
-
-class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
-    {
+class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener ,  VideoAdapter.OnFileCountChangeListener {
     private lateinit var binding: ActivityFoldersBinding
     private lateinit var adapter: VideoAdapter
     private var isSearchViewClicked = false
@@ -39,8 +37,11 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
     private val PREF_LAYOUT_TYPE = "pref_layout_type"
     private val LAYOUT_TYPE_GRID = "grid"
     private val LAYOUT_TYPE_LIST = "list"
+    private var hasRefreshed = false // Flag to track if a swipe-to-refresh has occurred
+
     companion object {
-        lateinit var currentFolderVideos: ArrayList<VideoData>
+        var currentFolderVideos: ArrayList<VideoData> = arrayListOf()
+
     }
 
     @SuppressLint("SetTextI18n", "SuspiciousIndentation")
@@ -49,32 +50,29 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         binding = ActivityFoldersBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        MobileAds.initialize(this){}
-
-        // banner ads
+        MobileAds.initialize(this) {}
 
         val position = intent.getIntExtra("position", 0)
         currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = MainActivity.folderList[position].folderName
+        // Set the supportActionBar title
+        val folderName = MainActivity.folderList[position].folderName.capitalize()
+        supportActionBar?.title = if (folderName.isNullOrEmpty()) "Internal memory" else folderName
+
         binding.videoRVFA.setHasFixedSize(true)
-        binding.videoRVFA.setItemViewCacheSize(200)
-        adapter = VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true )
+        binding.videoRVFA.setItemViewCacheSize(15)
+        adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true , this)
         binding.videoRVFA.adapter = adapter
+
         binding.totalVideo.text = "${currentFolderVideos.size} Videos"
 
-
-        adapter = VideoAdapter(this@FoldersActivity, MainActivity.videoList , isFolder = true)
+        adapter = VideoAdapter(this@FoldersActivity, MainActivity.videoList, isFolder = true , this)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(10)
         binding.recyclerView.layoutManager = LinearLayoutManager(this@FoldersActivity)
         binding.recyclerView.visibility = View.GONE
         binding.recyclerView.adapter = adapter
 
-
-
-
-        // Restore layout type from SharedPreferences
         val savedLayoutType = getSharedPreferences("LayoutPrefs", Context.MODE_PRIVATE)
             .getString(PREF_LAYOUT_TYPE, LAYOUT_TYPE_LIST)
         if (savedLayoutType == LAYOUT_TYPE_GRID) {
@@ -83,53 +81,48 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             setListLayoutManager()
         }
 
-
         initializeBinding()
         toggleLayoutManager()
-
         setActionBarGradient()
         swipeRefreshLayout = binding.swipeRefreshFolder
-
-        // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
 
+
+
+
     }
-    @SuppressLint("SetTextI18n")
-    private fun initializeBinding(){
+
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
+    private fun initializeBinding() {
         val position = intent.getIntExtra("position", 0)
-
         binding.swipeRefreshFolder.setOnRefreshListener {
+            if (adapter.isSelectionModeEnabled()) {
+                hasRefreshed = false // Set the flag to true after a refresh
 
-            currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
-            adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true)
-            binding.videoRVFA.adapter = adapter
-            binding.totalVideo.text = "${currentFolderVideos.size} Videos"
-            binding.swipeRefreshFolder.isRefreshing = false // Hide the refresh indicator
-
+                binding.swipeRefreshFolder.isRefreshing = false
+            } else {
+                hasRefreshed = true // Set the flag to true after a refresh
+                currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
+                adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true, this)
+                binding.videoRVFA.adapter = adapter
+                binding.totalVideo.text = "${currentFolderVideos.size} Videos"
+                binding.swipeRefreshFolder.isRefreshing = false
+            }
         }
-
         binding.nowPlayingBtn.setOnClickListener {
-
-                    startPlayerActivity()
-
+            startPlayerActivity()
         }
-
-        // Delay execution of startPlayerActivity by 2 seconds
-
 
         binding.gridBtn.setOnClickListener {
-            adapter.enableGridMode(true) // Disable grid mode
-
+            adapter.enableGridMode(true)
             setGridLayoutManager()
-
+            // Clear selection and reset action mode
         }
 
         binding.listBtn.setOnClickListener {
-            adapter.enableGridMode(false) // Disable grid mode
+            adapter.enableGridMode(false)
             setListLayoutManager()
-
         }
-
     }
 
     private fun setGridLayoutManager() {
@@ -148,7 +141,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         saveLayoutType(LAYOUT_TYPE_LIST)
     }
 
-    // Call this function whenever you want to toggle between grid and list layout
     private fun toggleLayoutManager() {
         currentLayoutManager?.let {
             if (it is GridLayoutManager) {
@@ -158,15 +150,13 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             }
         }
     }
-    // Function to save layout type to SharedPreferences
+
     private fun saveLayoutType(layoutType: String) {
         getSharedPreferences("LayoutPrefs", Context.MODE_PRIVATE)
             .edit()
             .putString(PREF_LAYOUT_TYPE, layoutType)
             .apply()
     }
-// Inside your Activity (e.g., MainActivity)
-
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -175,16 +165,12 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         }
 
         if (isDarkMode) {
-            // Dark mode is enabled, set background color to #012030
             swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
-
         } else {
-            // Light mode is enabled, set background color to white
             swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-
         }
     }
 
@@ -202,11 +188,9 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
         menuInflater.inflate(R.menu.search_music_view, menu)
 
         val searchItem = menu.findItem(R.id.searchMusicView)
-
         val searchView = searchItem?.actionView as SearchView
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
-            // Handle the click event here
             when (item.itemId) {
                 R.id.sortOrder -> {
                     val menuItems = arrayOf(
@@ -225,10 +209,8 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
                             sortEditor.putInt("sortValue", value)
                             sortEditor.apply()
 
-                            //for restarting app
                             finish()
                             startActivity(intent)
-
                         }
                         .setSingleChoiceItems(menuItems, MainActivity.sortValue) { _, pos ->
                             value = pos
@@ -238,16 +220,12 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLACK)
                     true
                 }
-
-
                 else -> false
             }
         }
         searchView.setOnCloseListener {
             isSearchViewClicked = false
             binding.recyclerView.visibility = View.GONE
-//            binding.searchBackBtn.visibility = View.GONE
-
             false
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -256,32 +234,35 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             override fun onQueryTextChange(newText: String?): Boolean {
                 MainActivity.searchList = ArrayList()
                 if (newText != null) {
-
                     val queryText = newText.lowercase()
                     for (video in MainActivity.videoList) {
-                        // Filter videos based on the user's input
                         if (video.title.lowercase().contains(queryText)) {
                             MainActivity.searchList.add(video)
                         }
-
                     }
                     MainActivity.search = true
                     adapter.updateList(searchList = MainActivity.searchList)
-
                 }
-                // Check if the search view is clicked or if there is text in the search view
                 if (isSearchViewClicked || newText?.isNotEmpty() == true) {
                     binding.recyclerView.visibility = View.VISIBLE
-
                 } else {
                     binding.recyclerView.visibility = View.GONE
-
                 }
-
                 return true
             }
         })
 
+        val profileMenuItem = menu.findItem(R.id.profile)
+        profileMenuItem.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.profile -> {
+                    startActivity(Intent(this@FoldersActivity, More::class.java))
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+                    true
+                }
+                else -> false
+            }
+        }
         return true
     }
 
@@ -289,9 +270,10 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
     fun getAllVideos(folderId: String): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
         MainActivity.sortValue = sortEditor.getInt("sortValue", 0)
-
+        val selection = "${MediaStore.Video.Media.BUCKET_ID} = ?"
         val tempList = ArrayList<VideoData>()
-        val selection = MediaStore.Video.Media.BUCKET_ID + " like? "
+        val folderMap = mutableMapOf<String, String>()  // Map to hold folder ID and name association
+
         val projection = arrayOf(
             MediaStore.Video.Media.TITLE,
             MediaStore.Video.Media.SIZE,
@@ -306,21 +288,17 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection, arrayOf(folderId),
             MainActivity.sortList[MainActivity.sortValue]
         )
-        if (cursor != null)
-            if (cursor.moveToNext())
+        cursor?.use {
+            if (it.moveToFirst()) {
                 do {
-                    val titleC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE))
-                    val idC = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID))
-                    val folderC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
-                    val sizeC = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.SIZE))
-                    val pathC = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA))
-                    val durationC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
-                            .toLong()
-                    val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
-
+                    val titleC = it.getString(it.getColumnIndex(MediaStore.Video.Media.TITLE)) ?: ""
+                    val idC = it.getString(it.getColumnIndex(MediaStore.Video.Media._ID)) ?: ""
+                    val folderC = it.getString(it.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)) ?: ""
+                    val folderIdC = it.getString(it.getColumnIndex(MediaStore.Video.Media.BUCKET_ID)) ?: ""
+                    val sizeC = it.getString(it.getColumnIndex(MediaStore.Video.Media.SIZE)) ?: ""
+                    val pathC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DATA)) ?: ""
+                    val durationC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DURATION))?.toLong() ?: 0L
+                    val dateAddedMillis = it.getLong(it.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
 
                     try {
                         val file = File(pathC)
@@ -329,31 +307,42 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
                         val isNewVideo = currentTimestamp - dateAddedMillis <= DateUtils.DAY_IN_MILLIS
 
                         val video = VideoData(
-                            title = titleC, id = idC, folderName = folderC, duration = durationC,
-                            path = pathC, size = sizeC, artUri = artUriC, dateAdded = dateAddedMillis, isNew =isNewVideo
+                            title = titleC,
+                            id = idC,
+                            folderName = folderC,
+                            duration = durationC,
+                            size = sizeC,
+                            path = pathC,
+                            artUri = artUriC,
+                            dateAdded = dateAddedMillis,
+                            isNew = isNewVideo
                         )
-
 
                         if (file.exists()) tempList.add(video)
 
-                    } catch (_: Exception) {
+                        // Ensure folder is added to MainActivity.folderList
+                        if (MainActivity.folderList.none { it.id == folderIdC }) {
+                            MainActivity.folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory"
+                             }))
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                } while (cursor.moveToNext())
-        cursor?.close()
+                } while (it.moveToNext())
+            }
+        }
         return tempList
     }
-
 
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
+
     private fun setActionBarGradient() {
-        // Check the current night mode
         val nightMode = AppCompatDelegate.getDefaultNightMode()
         if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -363,7 +352,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
                 )
             }
         } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
             supportActionBar?.apply {
                 setBackgroundDrawable(
                     ContextCompat.getDrawable(
@@ -373,14 +361,11 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
                 )
             }
         } else {
-            // System Default mode is applied
             val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
                 android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
                 else -> false
             }
-            // Set the ActionBar color based on the System Default mode
             if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
                 supportActionBar?.apply {
                     setBackgroundDrawable(
                         ContextCompat.getDrawable(
@@ -390,7 +375,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
                     )
                 }
             } else {
-                // System Default mode is light
                 supportActionBar?.apply {
                     setBackgroundDrawable(
                         ContextCompat.getDrawable(
@@ -402,24 +386,30 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener
             }
         }
     }
+
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation", "SetTextI18n")
     override fun onResume() {
         super.onResume()
         setActionBarGradient()
-        if(PlayerActivity.position != -1) {binding.nowPlayingBtn.visibility = View.VISIBLE}
+        if (PlayerActivity.position != -1) binding.nowPlayingBtn.visibility = View.VISIBLE
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
-        MainActivity.adapterChanged= false
+        MainActivity.adapterChanged = false
         binding.totalVideo.text = "${currentFolderVideos.size} Videos"
+        // Enable or disable swipe-to-refresh based on selection mode and refresh flag
+        binding.swipeRefreshFolder.isEnabled = !adapter.isSelectionModeEnabled() || hasRefreshed
+    }
+
+    private fun startPlayerActivity() {
+        val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
+        intent.putExtra("class", "NowPlaying")
+        startActivity(intent)
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onFileCountChanged(newCount: Int) {
+        binding.totalVideo.text = "$newCount Videos"
+
     }
 
 
-        private fun startPlayerActivity() {
-
-                val intent = Intent(this@FoldersActivity, PlayerActivity::class.java)
-                intent.putExtra("class", "NowPlaying")
-                startActivity(intent)
-
-        }
-
-
-    }
+}

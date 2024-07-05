@@ -23,6 +23,7 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.WindowCompat
@@ -109,7 +110,8 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         private lateinit var loudnessEnhancer: LoudnessEnhancer
     }
 
-    @SuppressLint("MissingInflatedId", "ObsoleteSdkInt")
+    @RequiresApi(Build.VERSION_CODES.Q)
+    @SuppressLint("MissingInflatedId", "ObsoleteSdkInt", "NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Clear the FLAG_FULLSCREEN flag to show the status bar
@@ -135,21 +137,13 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
 
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
-//        // Hide the status bar (system UI)
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            window.insetsController?.let { controller ->
-//                controller.hide(WindowInsets.Type.statusBars())
-//                controller.systemBarsBehavior =
-//                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//            }
-//        } else {
-//            @Suppress("DEPRECATION")
-//
-//            window.decorView.systemUiVisibility =
-//                (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-//                        or View.SYSTEM_UI_FLAG_FULLSCREEN
-//                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-//        }
+        // for immersive mode
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+            controller.show(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
 
         // Get the video URI and title from the intent extras
         val videoUriString = intent.getStringExtra("videoUri")
@@ -212,30 +206,62 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
             finish()
         }
 
-        findViewById<ImageButton>(R.id.nextBtn).setOnClickListener {
-            playNextVideo()
-        }
+        val lockBtn = findViewById<ImageButton>(R.id.openButton)
 
-        findViewById<ImageButton>(R.id.prevBtn).setOnClickListener {
-            playPreviousVideo()
+        lockBtn.setOnClickListener {
+            if (!isLocked) {
+                // For hiding
+                isLocked = true
+                binding.playerView.useController = false
+                binding.playerView.isDoubleTapEnabled = false
+                binding.playerView.hideController()
+                binding.lockButton.visibility = View.VISIBLE
+                lockBtn.visibility = View.GONE
+                Handler().postDelayed({
+                    binding.lockButton.visibility = View.INVISIBLE
+                }, 2000)
+            } else {
+                // For showing
+              isLocked = false
+                binding.playerView.useController = true
+                binding.playerView.showController()
+                binding.lockButton.visibility = View.GONE
+                lockBtn.visibility = View.VISIBLE
+            }
         }
-
         binding.lockButton.setOnClickListener {
             if (!isLocked) {
-                // for hiding
-                isLocked = true
-                binding.playerView.hideController()
+                // For hiding
+               isLocked = true
                 binding.playerView.useController = false
-                binding.lockButton.setImageResource(R.drawable.round_lock)
+                binding.playerView.isDoubleTapEnabled = false
+                binding.playerView.hideController()
+                binding.lockButton.visibility = View.VISIBLE
+                lockBtn.visibility = View.GONE
+                Handler().postDelayed({
+                    binding.lockButton.visibility = View.INVISIBLE
+                }, 2000)
             } else {
-                // for showing
+                // For showing
                 isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
-                binding.lockButton.setImageResource(R.drawable.round_lock_open)
+                binding.lockButton.visibility = View.GONE
+                lockBtn.visibility = View.VISIBLE
             }
         }
-
+        binding.playerView.setOnClickListener {
+            // Show lock button if locked when touched
+            if (isLocked) {
+                binding.lockButton.visibility = View.VISIBLE
+                // Schedule to hide lock button after 2 seconds
+                Handler().postDelayed({
+                    binding.lockButton.visibility = View.INVISIBLE
+                }, 2000)
+            }else{
+                binding.playerView.isDoubleTapEnabled = true
+            }
+        }
         fullScreenBtn = findViewById(R.id.fullScreenBtn)
         fullScreenBtn.setOnClickListener {
             toggleFullscreen()
@@ -266,19 +292,46 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         loudnessEnhancer.enabled = true
         horizontalIconList()
         setupSwipeGesture()
-        binding.playerView.setControllerVisibilityListener {
-            when {
-                isLocked -> binding.lockButton.visibility = View.VISIBLE
-                binding.playerView.isControllerVisible -> binding.lockButton.visibility =
-                    View.VISIBLE
 
-                else -> binding.lockButton.visibility = View.INVISIBLE
+        binding.playerView.setControllerVisibilityListener { visibility ->
+            val lockBtn = findViewById<ImageButton>(R.id.openButton)
+
+            // Check if the screen orientation is portrait
+            val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+            if (isPortrait) {
+                lockBtn.visibility = View.GONE
+            } else {
+                if (isLocked) {
+                    lockBtn.visibility = View.VISIBLE
+                } else {
+                    lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
+                }
             }
-
-
+            // Show or hide the status bar based on playerView visibility
+            if (binding.playerView.isControllerVisible) {
+                showStatusBar()
+            } else {
+                hideStatusBar()
+            }
         }
+        binding.playerView.setOnApplyWindowInsetsListener { view, insets ->
+            val systemWindowInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(0, systemWindowInsets.top, systemWindowInsets.right, systemWindowInsets.bottom)
+            insets
+        }
+
     }
 
+    private fun showStatusBar() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        binding.playerView.showController() // Show player controller
+    }
+
+    private fun hideStatusBar() {
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        binding.playerView.hideController() // Hide player controller
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun horizontalIconList() {
@@ -406,15 +459,16 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             playbackIconsAdapter.notifyDataSetChanged()
-                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.VISIBLE
-                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.fullScreenBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.repeatBtn).visibility = View.VISIBLE
+                            findViewById<ImageButton>(R.id.openButton).visibility = View.VISIBLE
 
                         } else if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                             playbackIconsAdapter.notifyDataSetChanged()
-
-                            findViewById<ImageButton>(R.id.back10secondBtn).visibility = View.GONE
-                            findViewById<ImageButton>(R.id.forward10secondBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.fullScreenBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.repeatBtn).visibility = View.GONE
+                            findViewById<ImageButton>(R.id.openButton).visibility = View.GONE
                         }
                     }
 
@@ -545,25 +599,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
     }
 
 
-    private fun playNextVideo() {
-        if (videoUriList != null && currentIndex < videoUriList!!.size - 1) {
-            currentIndex++
-        } else if (videoUriList != null && videoUriList!!.isNotEmpty()) {
-            // If currentIndex is already at the last video, loop back to the first video
-            currentIndex = 0
-        }
-        playVideoAtCurrentIndex()
-    }
 
-    private fun playPreviousVideo() {
-        if (videoUriList != null && currentIndex > 0) {
-            currentIndex--
-        } else if (videoUriList != null && videoUriList!!.isNotEmpty()) {
-            // If currentIndex is already at the first video, loop to the last video
-            currentIndex = videoUriList!!.size - 1
-        }
-        playVideoAtCurrentIndex()
-    }
 
 
     private fun playVideoAtCurrentIndex() {
@@ -967,11 +1003,14 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         val actualDurationMinSec = getMinSecFormat(player.duration)
         val changingDurationSecMillisec = getSecMillisecFormat(durationChange)
 
+        // Determine the sign based on the swipe direction
+        val sign = if (isForward) "+" else "-"
+
         // Get the string from resources
         val formatString = getString(R.string.durationChangeTextView)
 
         // Use String.format to replace placeholders with actual values
-        val text = String.format(formatString, actualDurationMinSec, changingDurationSecMillisec)
+        val text = String.format(formatString, actualDurationMinSec, "$sign$changingDurationSecMillisec")
 
         durationChangeTextView.text = text
         durationChangeTextView.visibility = View.VISIBLE

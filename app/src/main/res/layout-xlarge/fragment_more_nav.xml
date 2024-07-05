@@ -289,7 +289,8 @@
                     android:layout_height="30dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="25dp"
-                    android:src="@drawable/theme_svgrepo_com" />
+                    android:src="@drawable/theme_icon"
+                    app:tint="@color/white" />
 
 
                 <TextView
@@ -409,7 +410,8 @@
                     android:layout_height="30dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="25dp"
-                    android:src="@drawable/rupee_currency" />
+                    android:src="@drawable/card_svgrepo_com"
+                    app:tint="@color/white" />
 
 
                 <TextView

@@ -37,7 +37,10 @@
         android:theme="@style/coolBlueNav"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".browserActivity.TabActivity"
+            android:exported="false"
+            android:theme="@style/TransparentTheme"/>
         <activity
             android:name=".browserActivity.OfflineMhtmlActivity"
             android:exported="true">
@@ -228,23 +231,35 @@
             android:supportsPictureInPicture="true"
             tools:ignore="ObsoleteSdkInt"
             tools:targetApi="n">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-            <!-- <intent-filter tools:ignore="AppLinkUrlError"> -->
-            <!-- <action android:name="android.intent.action.VIEW" /> -->
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
+                <data android:scheme="http" />
+                <data android:mimeType="video/*" />
+                <data android:scheme="https" />
+                <data android:mimeType="video/*" />
+                <data android:scheme="content" />
+                <data android:mimeType="video/*" />
+                <data android:scheme="file" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
 
-            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+                <category android:name="android.intent.category.DEFAULT" />
 
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
 
-            <!-- <action android:name="android.intent.action.SEND" /> -->
-            <!-- <action android:name="android.intent.action.SEND_MULTIPLE" /> -->
+                <category android:name="android.intent.category.DEFAULT" />
 
-
-            <!-- <category android:name="android.intent.category.BROWSABLE" /> -->
-
-
-            <!-- <data android:mimeType="video/*" /> -->
-            <!-- </intent-filter> -->
+                <data android:mimeType="video/*" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".FoldersActivity"
@@ -254,8 +269,8 @@
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
             android:exported="true"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             tools:ignore="LockedOrientationActivity" />
 
         <service android:name=".Services.MusicService" />

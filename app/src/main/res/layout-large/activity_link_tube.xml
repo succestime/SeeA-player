@@ -85,8 +85,7 @@
                             android:layout_height="match_parent"
                             android:layout_marginEnd="5dp"
                             android:layout_marginStart="@dimen/car_ui_padding_2"
-                            android:src="@drawable/search_icon"
-                            app:tint="@color/white"
+                            android:src="@drawable/search_licktube_icon"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -261,16 +260,16 @@
 
     <LinearLayout
         android:id="@+id/bottomRightBrowser"
-        android:layout_width="60dp"
-        android:layout_height="0dp"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="52dp"
         android:gravity="center"
         android:visibility="gone"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="52dp"
         android:background="@drawable/curver_linktube_"
-        app:layout_constraintTop_toBottomOf="@+id/adsLayout">
+>
 
         <ImageButton
             android:id="@+id/bottomRightBrowserButton"

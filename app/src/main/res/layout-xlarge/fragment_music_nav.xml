@@ -13,6 +13,18 @@
         android:layout_height="match_parent"
         tools:ignore="ExtraText">
 
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
@@ -29,32 +41,31 @@
                 <TextView
                     android:id="@+id/playandshuffleBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
+                    android:layout_width="150dp"
                     android:layout_height="45dp"
-                    android:layout_weight="1"
+
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
                     android:background="@drawable/curver_music"
                     android:contentDescription="@string/shuffle_btn"
-                    android:drawableLeft="@drawable/play_icon"
-                    android:drawableTint="@color/cool_pink"                    android:textColor="?android:textColor"
+                    android:textColor="?android:textColor"
                     android:text="@string/shuffle_btn"
                     android:textAllCaps="false"
                     android:padding="10dp"
-                    />
+                    app:drawableTint="@color/cool_pink"
+                    app:drawableStartCompat="@drawable/play_icon" />
 
                 <TextView
                     android:id="@+id/playlistBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
+                    android:layout_width="150dp"
                     android:layout_height="45dp"
-                    android:layout_weight="1"
                     android:background="@drawable/curver_music"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
                     android:contentDescription="@string/playlist_btn"
-                    android:drawableLeft="@drawable/playlist_icon"
-                    android:text="@string/playlist_btn"
+                    app:drawableTint="@color/cool_blue"
+                    app:drawableStartCompat="@drawable/round_playlist_music"                    android:text="@string/playlist_btn"
                     android:textAllCaps="false"
                     android:padding="10dp"
                     android:textColor="?android:textColor"
@@ -63,9 +74,8 @@
                 <TextView
                     android:id="@+id/favouriteBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
+                    android:layout_width="160dp"
                     android:layout_height="45dp"
-                    android:layout_weight="1"
                     android:background="@drawable/curver_music"
                     android:padding="10dp"
                     android:layout_marginStart="5dp"
@@ -109,7 +119,9 @@
             </LinearLayout>
 
         </LinearLayout>
+        </LinearLayout>
 
+        </androidx.core.widget.NestedScrollView>
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nowPlaying"
             android:layout_width="match_parent"

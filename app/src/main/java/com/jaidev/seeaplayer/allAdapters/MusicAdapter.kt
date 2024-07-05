@@ -548,46 +548,42 @@ class MusicAdapter(
 
     private fun shareSelectedFiles() {
         val uris = mutableListOf<Uri>()
-
-        // Iterate through selectedItems to get selected file items
         for (position in selectedItems) {
             val music = musicList[position]
+            val file = File(music.path)
             val fileUri = FileProvider.getUriForFile(
                 context,
                 context.applicationContext.packageName + ".provider",
-                File(music.path)
+                file
             )
             uris.add(fileUri)
         }
 
-        // Create an ACTION_SEND intent to share multiple files
         val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
         shareIntent.type = "audio/*"
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-        // Get the list of apps that can handle the intent
         val packageManager = context.packageManager
         val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
         val excludedComponents = mutableListOf<ComponentName>()
 
-        // Iterate through the list and exclude your app
         for (resolvedActivity in resolvedActivityList) {
             if (resolvedActivity.activityInfo.packageName == context.packageName) {
-                excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+                excludedComponents.add(
+                    ComponentName(
+                        resolvedActivity.activityInfo.packageName,
+                        resolvedActivity.activityInfo.name
+                    )
+                )
             }
         }
 
-        // Create a chooser intent
         val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
-
-        // Exclude your app from the chooser intent
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-
         chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooserIntent)
 
-        // Dismiss action mode
         actionMode?.finish()
     }
 

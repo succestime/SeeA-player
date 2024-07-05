@@ -4,7 +4,6 @@ package com.jaidev.seeaplayer
 import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.PictureInPictureParams
-import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -17,9 +16,12 @@ import android.media.audiofx.LoudnessEnhancer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -35,7 +37,6 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bullhead.equalizer.EqualizerFragment
@@ -148,7 +149,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         setContentView(binding.root)
         initializePlayer()
         setSwipeRefreshBackgroundColor()
-        MobileAds.initialize(this){}
+        MobileAds.initialize(this) {}
         mAdView = findViewById(R.id.adView)
         releasePlayer()
         // Set up your ExoPlayer instance and attach it to the CustomPlayerView
@@ -159,15 +160,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         val mediaItem = MediaItem.fromUri("your_video_url_here")
         player.setMediaItem(mediaItem)
         player.prepare()
-        // Get the received intent
-        val receivedIntent = intent
-        if (receivedIntent != null && Intent.ACTION_SEND == receivedIntent.action) {
-            val sharedUri = receivedIntent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-            sharedUri?.let {
-                // Handle the shared video URI
-                handleIntentData(it)
-            }
-        }
+
 
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
@@ -187,11 +180,158 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
         someIdes()
         horizontalIconList()
-        directPlayVideoFromGallery()
+        initializeLayout()
+        initializeBinding()
+        try {
+            //for handling video file intent (Improved Version)
+            if (intent.data?.scheme.contentEquals("content")) {
+                playerList = ArrayList()
+                position = 0
+                val cursor = contentResolver.query(
+                    intent.data!!, arrayOf(MediaStore.Video.Media.DATA), null, null,
+                    null
+                )
+                cursor?.let {
+                    if (it.moveToFirst()) {
+                        try {
+                            val path =
+                                it.getString(it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
+                            val file = File(path)
+                            val video = VideoData(
+                                id = "",
+                                title = file.name,
+                                duration = 0L,
+                                artUri = Uri.fromFile(file),
+                                path = path,
+                                size = "",
+                                folderName = "",
+                                dateAdded = file.lastModified(),
+                                isNew = true
+                            )
+                            playerList.add(video)
+                        } catch (e: Exception) {
+                            val tempPath = getPathFromURI(context = this, uri = intent.data!!)
+                            val tempFile = File(tempPath)
+                            val video = VideoData(
+                                id = "",
+                                title = tempFile.name,
+                                duration = 0L,
+                                artUri = Uri.fromFile(tempFile),
+                                path = tempPath,
+                                size = "",
+                                folderName = "",
+                                dateAdded = tempFile.lastModified(),
+                                isNew = true
+                            )
+                            playerList.add(video)
+                        } finally {
+                            cursor.close()
+                        }
+                    } else {
+                        cursor.close()
+                        throw Exception("Failed to move cursor to the first row.")
+                    }
+                }
+                if (playerList.isNotEmpty()) {
+                    createPlayer()
+                    initializeBinding()
+                } else {
+                    Toast.makeText(this, "No video file found.", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+        }
 
+        handleIncomingIntent(intent) // Handle the incoming intent here
+
+        try {
+            //for handling video file intent (Improved Version)
+            if (intent.data?.scheme.contentEquals("content")) {
+                handleIncomingIntent(intent) // Handle the intent here too
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+        }
     }
 
-    private fun someIdes(){
+
+    // Handle new intents
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIncomingIntent(intent)
+    }
+
+    private fun handleIncomingIntent(intent: Intent) {
+        if (intent.action == Intent.ACTION_SEND && intent.type?.startsWith("video/") == true) {
+            val videoUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            if (videoUri != null) {
+                playSharedVideo(videoUri)
+            }
+        }
+    }
+
+    private fun playSharedVideo(videoUri: Uri) {
+        playerList = ArrayList()
+        val video = VideoData(
+            id = "",
+            title = getFileNameFromUri(videoUri),
+            duration = 0L,
+            artUri = videoUri,
+            path = videoUri.toString(),
+            size = "",
+            folderName = "",
+            dateAdded = System.currentTimeMillis(),
+            isNew = true
+        )
+        playerList.add(video)
+        position = 0
+        createPlayer()
+    }
+
+    // Utility method to get file name from URI
+    private fun getFileNameFromUri(uri: Uri): String {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor = contentResolver.query(uri, null, null, null, null)
+            cursor.use { it ->
+                if (it != null && it.moveToFirst()) {
+                    result = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result?.lastIndexOf('/')
+            if (cut != null && cut != -1) {
+                result = result?.substring(cut + 1)
+            }
+        }
+        return result ?: "Unknown"
+    }
+
+    //used to get path of video selected by user (if column data fails to get path)
+        private fun getPathFromURI(context: Context, uri: Uri): String {
+            var filePath = ""
+            // ExternalStorageProvider
+            val docId = DocumentsContract.getDocumentId(uri)
+            val split = docId.split(':')
+            val type = split[0]
+
+            return if ("primary".equals(type, ignoreCase = true)) {
+                "${Environment.getExternalStorageDirectory()}/${split[1]}"
+            } else {
+                //getExternalMediaDirs() added in API 21
+                val external = context.externalMediaDirs
+                if (external.size > 1) {
+                    filePath = external[1].absolutePath
+                    filePath = filePath.substring(0, filePath.indexOf("Android")) + split[1]
+                }
+                filePath
+            }
+        }
+
+        private fun someIdes(){
         videoTitle = findViewById(R.id.videoTitle)
         playPauseBtn = findViewById(R.id.playPauseBtn)
         fullScreenBtn = findViewById(R.id.fullScreenBtn)
@@ -202,158 +342,10 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         recyclerViewIcons = findViewById(R.id.horizontalRecyclerview)
         eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
     }
-    private fun directPlayVideoFromGallery() {
-        try {
-            // Get the action and data from the intent
-            val intentAction = intent.action
-            val intentData = intent.data
-
-            if (intentAction != null && (intentAction == Intent.ACTION_VIEW || intentAction == Intent.ACTION_SEND)) {
-                playerList = ArrayList()
-                position = 0
-
-                when (intentAction) {
-                    Intent.ACTION_VIEW -> {
-                        // Handle ACTION_VIEW intent
-                        intentData?.let {
-                            handleIntentData(it)
-                        }
-                    }
-                    Intent.ACTION_SEND -> {
-                        // Handle ACTION_SEND intent
-                        val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-                        uri?.let {
-                            handleIntentData(it)
-                        }
-                    }
-                }
-
-                if (playerList.isNotEmpty()) {
-                    playFirstVideo()
-                    initializeBinding()
-                } else {
-                    Toast.makeText(this, "Failed to load video", Toast.LENGTH_SHORT).show()
-                    initializeLayout()
-                    initializeBinding()
-                }
-            } else {
-                // Fallback if no intent data
-                initializeLayout()
-                initializeBinding()
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun playFirstVideo() {
-        val player = SimpleExoPlayer.Builder(this).build()
-        binding.playerView.player = player
-        val firstVideo = playerList[0]
-        val mediaItem = MediaItem.fromUri(firstVideo.artUri)
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.playWhenReady = true
-    }
 
 
-    private fun handleIntentData(uri: Uri) {
-        when (uri.scheme) {
-            "content" -> {
-                // Handle content URIs (e.g., from the gallery)
-                val videoData = getVideoDataFromUri(uri)
-                videoData?.let { playerList.add(it) }
-            }
-            "file" -> {
-                // Handle file URIs (e.g., from file explorers or "Open with")
-                val path = uri.path
-                path?.let {
-                    val file = File(it)
-                    val video = VideoData(
-                        id = "",
-                        title = file.name,
-                        duration = 0L,
-                        artUri = Uri.fromFile(file),
-                        path = it,
-                        size = "",
-                        folderName = "",
-                        dateAdded = file.lastModified(),
-                        isNew = true
-                    )
-                    playerList.add(video)
-                }
-            }
-            else -> {
-                // Handle other URI schemes (e.g., custom schemes)
-                val path = getPathFromUri(uri)
-                path?.let {
-                    val file = File(it)
-                    val video = VideoData(
-                        id = "",
-                        title = file.name,
-                        duration = 0L,
-                        artUri = uri,
-                        path = it,
-                        size = "",
-                        folderName = "",
-                        dateAdded = file.lastModified(),
-                        isNew = true
-                    )
-                    playerList.add(video)
-                }
-            }
-        }
-    }
 
-    private fun getVideoDataFromUri(uri: Uri): VideoData? {
-        return try {
-            val documentFile = DocumentFile.fromSingleUri(this, uri)
-            documentFile?.let {
-                val path = getPathFromUri(uri)
-                val file = File(path ?: "")
-                val video = VideoData(
-                    id = "",
-                    title = documentFile.name ?: "Unknown",
-                    duration = 0L,
-                    artUri = uri,
-                    path = path ?: "",
-                    size = documentFile.length().toString(),
-                    folderName = file.parent ?: "",
-                    dateAdded = documentFile.lastModified(),
-                    isNew = true
-                )
-                video
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
 
-    private fun getPathFromUri(uri: Uri): String? {
-        var path: String? = null
-        val projection = arrayOf(MediaStore.Video.Media._ID, MediaStore.Video.Media.DISPLAY_NAME)
-        contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID))
-                val displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME))
-                val contentUri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
-                path = getRealPathFromUri(contentUri)
-            }
-        }
-        return path
-    }
-
-    private fun getRealPathFromUri(uri: Uri): String? {
-        var path: String? = null
-        val projection = arrayOf(MediaStore.Video.Media.DATA)
-        contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
-            }
-        }
-        return path
-    }
 
     private fun releasePlayer() {
         player.release()

@@ -37,9 +37,15 @@ import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.recantFragment.ReVideoPlayerActivity
 import java.io.File
 
-class RecentVideoAdapter(private val context: Context, private var videoReList: ArrayList<RecantVideo> ,private val isRecantVideo: Boolean = false ) :
+class RecentVideoAdapter(private val context: Context,
+                         private var videoReList: ArrayList<RecantVideo> ,
+                         private val isRecantVideo: Boolean = false,
+                         val fileCountChangeListener: OnFileCountChangeListener
+) :
     RecyclerView.Adapter<RecentVideoAdapter.MyAdapter>() {
-
+    interface OnFileCountChangeListener {
+        fun onFileCountChanged(newCount: Int)
+    }
     private  var newPosition = 0
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
@@ -133,10 +139,10 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
 
                 val selectedPosition = newPosition  // Use newPosition or another variable to identify the selected video
                 showSingleDeleteConfirmation(selectedPosition)
+                dialog.dismiss()
             }
 
             bindingMf.shareBtn.setOnClickListener {
-                dialog.dismiss()
                 val shareIntent = Intent()
                 shareIntent.action = Intent.ACTION_SEND_MULTIPLE
                 shareIntent.type = "video/*"
@@ -165,6 +171,7 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
 
                 chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 ContextCompat.startActivity(context, chooserIntent, null)
+                dialog.dismiss()
             }
 
             bindingMf.infoBtn.setOnClickListener {
@@ -191,7 +198,6 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
                     )
                     .bold { append("\n\nLocation : ") }.append(videoReList[position].path)
                 bindingIF.detailTV.text = infoText
-
 
             }
 
@@ -297,6 +303,8 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
                                 selectedItems.clear()
                                 mode?.finish()
                                 notifyDataSetChanged()
+                                // Notify listener of the file count change
+                                fileCountChangeListener.onFileCountChanged(videoReList.size)
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
                                 // User clicked Cancel, dismiss dialog
@@ -330,6 +338,7 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             .setMessage("Are you sure you want to delete '${video.title}'?")
             .setPositiveButton("Delete") { _, _ ->
                 deleteVideo(position)
+
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
@@ -337,6 +346,7 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             .show()
     }
     // Function to delete a single video
+    @SuppressLint("NotifyDataSetChanged")
     private fun deleteVideo(position: Int) {
         val video = videoReList[position]
         val file = File(video.path)
@@ -345,57 +355,55 @@ class RecentVideoAdapter(private val context: Context, private var videoReList: 
             MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
             videoReList.removeAt(position)
             notifyItemRemoved(position)
+            notifyDataSetChanged()
             Toast.makeText(context, "Video deleted successfully", Toast.LENGTH_SHORT).show()
 
             // If action mode is active, finish it after deletion
             actionMode?.finish()
+            // Notify listener of the file count change
+            fileCountChangeListener.onFileCountChanged(videoReList.size)
         } else {
             Toast.makeText(context, "Failed to delete video", Toast.LENGTH_SHORT).show()
         }
     }
     private fun shareSelectedFiles() {
         val uris = mutableListOf<Uri>()
-
-        // Iterate through selectedItems to get selected file items
         for (position in selectedItems) {
-            val videoData = videoReList[position]
+            val music = videoReList[position]
+            val file = File(music.path)
             val fileUri = FileProvider.getUriForFile(
                 context,
                 context.applicationContext.packageName + ".provider",
-                File(videoData.path)
+                file
             )
             uris.add(fileUri)
         }
 
-
-        // Create an ACTION_SEND intent to share multiple files
         val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
         shareIntent.type = "video/*"
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-        // Get the list of apps that can handle the intent
         val packageManager = context.packageManager
         val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
         val excludedComponents = mutableListOf<ComponentName>()
 
-        // Iterate through the list and exclude your app
         for (resolvedActivity in resolvedActivityList) {
             if (resolvedActivity.activityInfo.packageName == context.packageName) {
-                excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+                excludedComponents.add(
+                    ComponentName(
+                        resolvedActivity.activityInfo.packageName,
+                        resolvedActivity.activityInfo.name
+                    )
+                )
             }
         }
 
-        // Create a chooser intent
         val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
-
-        // Exclude your app from the chooser intent
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-
         chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooserIntent)
 
-        // Dismiss action mode
         actionMode?.finish()
     }
 

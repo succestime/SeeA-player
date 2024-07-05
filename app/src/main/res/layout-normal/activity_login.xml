@@ -14,7 +14,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         app:cardCornerRadius="50dp"
-        android:layout_marginTop="156dp"
+        android:layout_marginTop="120dp"
         app:cardBackgroundColor="@android:color/transparent"
 
         android:src="@mipmap/ic_logo_o"
@@ -157,7 +157,7 @@
         android:textSize="18sp"
         android:layout_marginEnd="40dp"
         android:layout_marginTop="45dp"
-        android:background="@drawable/square_box_bg_browser"
+        android:background="@drawable/google_box_bg_browser"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"

@@ -11,7 +11,9 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -20,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.MainActivity.Companion.MusicListMA
 import com.jaidev.seeaplayer.MainActivity.Companion.musicListSearch
 import com.jaidev.seeaplayer.MainActivity.Companion.search
+import com.jaidev.seeaplayer.Subscription.SeeAOne
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.databinding.FragmentMusicNavBinding
@@ -49,8 +52,9 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
 
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
+        setupActionBar()
         binding.musicRV.setHasFixedSize(true)
-        binding.musicRV.setItemViewCacheSize(50)
+//        binding.musicRV.setItemViewCacheSize(50)
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true)
         adapter.setMusicDeleteListener(this)
@@ -77,8 +81,6 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
             startActivity(Intent(requireContext(), PlaylistActivity::class.java))
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         }
-        swipeRefreshLayout = binding.swipeRefreshMusic
-        setSwipeRefreshBackgroundColor()
 
         return view
     }
@@ -137,7 +139,31 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
             }
         }
     }
+    private fun setupActionBar() {
+        val inflater = LayoutInflater.from(requireContext())
+        val customActionBarView = inflater.inflate(R.layout.custom_action_bar_layout, null)
 
+        val titleTextView = customActionBarView.findViewById<TextView>(R.id.titleTextView)
+        titleTextView.text = "Musics"
+
+        val subscribeTextView = customActionBarView.findViewById<TextView>(R.id.subscribe)
+        if (MainActivity.isInternetAvailable(requireContext())) {
+            subscribeTextView.visibility = View.VISIBLE
+            subscribeTextView.setOnClickListener {
+                startActivity(Intent(requireContext(), SeeAOne::class.java))
+                (activity as AppCompatActivity).overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+            }
+        } else {
+            subscribeTextView.visibility = View.GONE
+        }
+
+
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setDisplayShowCustomEnabled(true)
+            setDisplayShowTitleEnabled(false)
+            customView = customActionBarView
+        }
+    }
     private fun showPlayShuffleMenu(view: View) {
         val popupMenu = PopupMenu(requireContext(), view, 0, 0, R.style.CustomPopupMenu)
         popupMenu.inflate(R.menu.play_shuffle_menu)
@@ -172,17 +198,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
         popupMenu.show()
     }
 
-    private fun setSwipeRefreshBackgroundColor() {
-        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-            else -> false
-        }
-        if (isDarkMode) {
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
-        } else {
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
-        }
-    }
+
 
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("NotifyDataSetChanged")
@@ -223,9 +239,8 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation", "SetTextI18n")
     override fun onResume() {
         super.onResume()
-        setSwipeRefreshBackgroundColor()
-        if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
-        MainActivity.adapterChanged = false
         updateEmptyState()
     }
+
+
 }

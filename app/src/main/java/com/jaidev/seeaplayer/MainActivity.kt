@@ -8,11 +8,14 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -22,13 +25,13 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.format.DateUtils
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -37,18 +40,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.Services.FolderDetectionService
-import com.jaidev.seeaplayer.Subscription.SeeAOne
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.bottomNavigation.downloadNav
 import com.jaidev.seeaplayer.bottomNavigation.homeNav
@@ -71,19 +69,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: VideoAdapter
     private  var runnable : Runnable? = null
     private lateinit var drawerLayout: DrawerLayout
-
-    private var musicLoaded = false
-    private lateinit var musicFragment: Fragment // Define your music fragment
-
-    private lateinit var navController: NavController
     private var mInterstitialAd: InterstitialAd? = null
     private var doubleBackToExitPressedOnce = false
-    private var rewardedInterstitialAd : RewardedInterstitialAd? = null
+    private var adLoaded = false // Flag to track if the ad is loaded
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val rewardedAdRunnable = Runnable {
-        rewardedIAd()
-    }
+    private lateinit var linkTubeActivityResultLauncher: ActivityResultLauncher<Intent>
+
+
     companion object {
 
         private const val PREFS_NAME = "speed_preferences"
@@ -115,10 +107,18 @@ class MainActivity : AppCompatActivity() {
             MediaStore.Audio.Media.SIZE,
             MediaStore.Audio.Media.SIZE + " DESC"
         )
+        fun isInternetAvailable(context: Context): Boolean {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    @SuppressLint("SuspiciousIndentation", "RestrictedApi", "CutPasteId")
+    @SuppressLint("SuspiciousIndentation", "RestrictedApi", "CutPasteId",
+        "UnspecifiedRegisterReceiverFlag"
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sharedPreferences = this.getSharedPreferences("themes", Context.MODE_PRIVATE)
@@ -133,8 +133,19 @@ class MainActivity : AppCompatActivity() {
         }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        loadAd()
 
-        setupActionBar()
+        // Register BroadcastReceiver
+        val filter = IntentFilter("com.yourapp.LINK_TUBE_OPENED")
+        registerReceiver(linkTubeOpenedReceiver, filter)
+
+        // Register for activity result
+        linkTubeActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // Hide progress bar when returning from LinkTubeActivity
+            binding.mainActivityProgressbar.visibility = View.GONE
+            setFragment(homeNav())
+            binding.bottomNav.selectedItemId = R.id.home // Manually set the selected item
+        }
         bottomNav()
         funRequestRuntimePermission()
         setBottomLayoutBackgroundColor()
@@ -146,74 +157,58 @@ class MainActivity : AppCompatActivity() {
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
 
+//        setupActionBar()
+//        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
+//        bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
-        bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
-
-//
         drawerLayout = binding.drawerLayoutMA
-        // Set the background color of SwipeRefreshLayout based on app theme
-
 
         setDrawerLayoutBackgroundColor()
 
-
-
-
-// Check if the service needs to be started
         if (shouldStartService()) {
             startMediaScanService()
         }
 
 
+    }
 
-        binding.drawerLayoutMA.setOnClickListener {
-            loadAd()
-            mInterstitialAd?.show(this)
+    private val linkTubeOpenedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            // Hide the progress bar when LinkTubeActivity is opened
+            binding.mainActivityProgressbar.visibility = View.GONE
         }
-
-
-
     }
 
 
-
-    private fun bottomNav(){
+    private fun bottomNav() {
         binding.bottomNav.setOnItemSelectedListener {
-
             try {
                 when (it.itemId) {
                     R.id.home -> {
                         setFragment(homeNav())
                     }
-
                     R.id.music -> {
                         setFragment(musicNav())
                     }
-
                     R.id.download -> {
                         setFragment(downloadNav())
                     }
-
                     R.id.linkTube -> {
                         val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
-                        startActivity(intent)
+                        linkTubeActivityResultLauncher.launch(intent)
+                            binding.mainActivityProgressbar.visibility = View.VISIBLE
                     }
-
-                    R.id.more -> {
-                        val intent = Intent(this@MainActivity, More::class.java)
-                        startActivity(intent)
-                        handler.postDelayed(rewardedAdRunnable, 10000)
-                        rewardedIAd()
-                    }
-
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@MainActivity, "Error coming", Toast.LENGTH_SHORT).show()
             }
-            return@setOnItemSelectedListener true
+            true
         }
     }
+
+
+
+
     @RequiresApi(Build.VERSION_CODES.R)
     private fun funRequestRuntimePermission(){
         if (requestRuntimePermission()) {
@@ -237,27 +232,6 @@ class MainActivity : AppCompatActivity() {
             setFragment(homeNav())
         }
     }
-    private fun setupActionBar() {
-        supportActionBar?.setDisplayShowCustomEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-
-        val inflater = LayoutInflater.from(this)
-        val customActionBarView = inflater.inflate(R.layout.custom_action_bar_layout, null)
-
-        val titleTextView = customActionBarView.findViewById<TextView>(R.id.titleTextView)
-        titleTextView.text = "SeeA Player"
-
-        val subscribeTextView = customActionBarView.findViewById<TextView>(R.id.subscribe)
-
-        subscribeTextView.setOnClickListener {
-            startActivity(Intent(this, SeeAOne::class.java))
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-        }
-
-        supportActionBar?.customView = customActionBarView
-    }
-
-
 
 
     private fun checkInternetConnection() {
@@ -302,12 +276,10 @@ class MainActivity : AppCompatActivity() {
         if (isDarkMode) {
             // Dark mode is enabled, set background color to #012030
             binding.bottomNav.setBackgroundColor(resources.getColor(R.color.light_bottom_navBar))
-            binding.bottomNav.itemTextColor = ContextCompat.getColorStateList(this@MainActivity, R.color.white)
             window.navigationBarColor = ContextCompat.getColor(this, R.color.light_bottom_navBar)
         } else {
             // Light mode is enabled, set background color to white
             binding.bottomNav.setBackgroundColor(resources.getColor(android.R.color.white))
-            binding.bottomNav.itemTextColor = ContextCompat.getColorStateList(this@MainActivity, R.color.black)
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
@@ -333,6 +305,8 @@ class MainActivity : AppCompatActivity() {
         val serviceIntent = Intent(this, FolderDetectionService::class.java)
         startService(serviceIntent)
     }
+
+
 
 
     private fun setFragment(fragment: Fragment) {
@@ -414,7 +388,6 @@ class MainActivity : AppCompatActivity() {
                 videoList = getAllVideos()
                 MusicListMA = getAllAudio()
                 setFragment(homeNav())
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     requestPermissionR()
                 }
@@ -462,7 +435,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
-        // Find the item you want to hide
+
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
             // Handle the click event here
@@ -499,6 +472,29 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        val profileMenuItem = menu.findItem(R.id.profile)
+        profileMenuItem.setOnMenuItemClickListener { item ->
+            // Handle the click event here
+            when (item.itemId) {
+                R.id.profile -> {
+                    startActivity(Intent(this@MainActivity, More::class.java))
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+                    if (!adLoaded) { // Check if the ad has already been loaded
+                        loadAd()
+                        adLoaded = true // Set the flag to true after loading the ad
+                    }
+                    mInterstitialAd?.show(this)
+
+                    true
+
+                }
+
+                else -> false
+            }
+        }
+
+
         return true
     }
 
@@ -525,10 +521,10 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("Range")
     fun getAllVideos(): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
-        sortValue = sortEditor.getInt("sortValue", 0)
-
+    sortValue = sortEditor.getInt("sortValue", 0)
         val tempList = ArrayList<VideoData>()
-        val tempFolderList = ArrayList<String>()
+        val folderMap = mutableMapOf<String, String>()  // Map to hold folder ID and name association
+
         val projection = arrayOf(
             MediaStore.Video.Media.TITLE,
             MediaStore.Video.Media.SIZE,
@@ -543,25 +539,17 @@ class MainActivity : AppCompatActivity() {
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, null, null,
             sortList[sortValue]
         )
-        if (cursor != null)
-            if (cursor.moveToFirst())
+        cursor?.use {
+            if (it.moveToFirst()) {
                 do {
-                    val titleC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE))
-                    val idC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID))
-                    val folderC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
-                    val folderIdC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_ID))
-                    val sizeC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.SIZE))
-                    val pathC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA))
-                    val durationC =
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
-                            .toLong()
-                    val dateAddedMillis = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
+                    val titleC = it.getString(it.getColumnIndex(MediaStore.Video.Media.TITLE)) ?: ""
+                    val idC = it.getString(it.getColumnIndex(MediaStore.Video.Media._ID)) ?: ""
+                    val folderC = it.getString(it.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)) ?: ""
+                    val folderIdC = it.getString(it.getColumnIndex(MediaStore.Video.Media.BUCKET_ID)) ?: ""
+                    val sizeC = it.getString(it.getColumnIndex(MediaStore.Video.Media.SIZE)) ?: ""
+                    val pathC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DATA)) ?: ""
+                    val durationC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DURATION))?.toLong() ?: 0L
+                    val dateAddedMillis = it.getLong(it.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
 
                     try {
                         val file = File(pathC)
@@ -576,25 +564,26 @@ class MainActivity : AppCompatActivity() {
                             duration = durationC,
                             size = sizeC,
                             path = pathC,
-                            artUri = artUriC, dateAdded = dateAddedMillis, isNew =isNewVideo
+                            artUri = artUriC,
+                            dateAdded = dateAddedMillis,
+                            isNew = isNewVideo
                         )
 
                         if (file.exists()) tempList.add(video)
 
-                        // for adding folders and watching that not duplicate folder should add
-                        if (!tempFolderList.contains(folderC)) {
-                            tempFolderList.add(folderC)
-                            folderList.add(Folder(id = folderIdC, folderName = folderC))
+                        // Ensure folder is added to MainActivity.folderList
+                        if (folderList.none { it.id == folderIdC }) {
+                           folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" } ))
                         }
-                    } catch (_: Exception) {}
-                } while (cursor.moveToNext())
-        cursor?.close()
-        // Remove folders with 0 or null videos
-        folderList.removeAll { folder ->
-            tempList.none { video -> video.folderName == folder.folderName }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                } while (it.moveToNext())
+            }
         }
         return tempList
     }
+
 
 
     @SuppressLint("Recycle", "Range")
@@ -642,6 +631,8 @@ class MainActivity : AppCompatActivity() {
         if (!PlayerMusicActivity.isPlaying && PlayerMusicActivity.musicService != null) {
             exitApplication()
         }
+        unregisterReceiver(linkTubeOpenedReceiver)
+
     }
     private fun setActionBarGradient() {
         // Check the current night mode
@@ -697,44 +688,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
-
-    fun rewardedIAd(){
-        val adRequest = AdRequest.Builder().build()
-        RewardedInterstitialAd.load(this@MainActivity,"ca-app-pub-3504589383575544/8279203168",
-            adRequest, object : RewardedInterstitialAdLoadCallback() {
-                override fun onAdLoaded(p0: RewardedInterstitialAd) {
-                    handler.postDelayed(rewardedAdRunnable, 10000)
-                    rewardedInterstitialAd=p0
-                }
-
-                override fun onAdFailedToLoad(p0: LoadAdError) {
-                    rewardedInterstitialAd=null
-                    handler.removeCallbacks(rewardedAdRunnable)
-
-                }
-            })
-
-    }
-
-
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
     override fun onResume() {
         super.onResume()
         setActionBarGradient()
-        handler.postDelayed(rewardedAdRunnable, 10000)
-        rewardedIAd()
+        if (!adLoaded) { // Check if the ad has already been loaded
+            loadAd()
+            adLoaded = true // Set the flag to true after loading the ad
+        }
     }
     override fun onPause() {
         super.onPause()
-        // Remove the delayed task when the fragment is paused
-        handler.removeCallbacks(rewardedAdRunnable)
+        if (!adLoaded) { // Check if the ad has already been loaded
+            loadAd()
+            adLoaded = true // Set the flag to true after loading the ad
+        }
+
     }
     fun loadAd() {
         val adRequest = AdRequest.Builder().build()
-
-
         InterstitialAd.load(
             this,
             "ca-app-pub-3504589383575544/9248821864",

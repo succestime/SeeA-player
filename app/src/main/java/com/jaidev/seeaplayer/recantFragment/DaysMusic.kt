@@ -27,7 +27,7 @@ import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.databinding.FragmentDaysMusicBinding
 import java.util.concurrent.TimeUnit
 
-class DaysMusic : Fragment() {
+class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener {
     private lateinit var binding: FragmentDaysMusicBinding
     private lateinit var adapter: RecantMusicAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -37,11 +37,10 @@ class DaysMusic : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view =  inflater.inflate(R.layout.fragment_days_music, container, false)
         binding = FragmentDaysMusicBinding.bind(view)
-
         binding.MusicRV.setHasFixedSize(true)
         binding.MusicRV.setItemViewCacheSize(50)
         binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
-        adapter = RecantMusicAdapter(requireContext(), musicRecantList , isReMusic = true)
+        adapter = RecantMusicAdapter(requireContext(), musicRecantList , isReMusic = true ,this@DaysMusic)
         binding.MusicRV.adapter = adapter
         binding.daysTotalMusics.text = "0 Musics"
         if (!requestRuntimePermission()) {
@@ -66,7 +65,6 @@ swipeRefreshLayout.setOnRefreshListener {
     swipeRefreshLayout.isRefreshing = false
 }
         // Set the background color of SwipeRefreshLayout based on app theme
-        setSwipeRefreshBackgroundColor()
 
         shuffleEmpty()
         return view
@@ -164,20 +162,7 @@ swipeRefreshLayout.setOnRefreshListener {
 
 
 
-    private fun setSwipeRefreshBackgroundColor() {
-        val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-            else -> false
-        }
 
-        if (isDarkMode) {
-            // Dark mode is enabled, set background color to #012030
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
-        } else {
-            // Light mode is enabled, set background color to white
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
-        }
-    }
 
     @SuppressLint("SetTextI18n")
     private fun loadRecentMusics() {
@@ -255,6 +240,12 @@ swipeRefreshLayout.setOnRefreshListener {
         }
 
         return musicReList
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onFileCountChanged(newCount: Int) {
+        binding.daysTotalMusics.text = "$newCount Musics"
+
     }
 
 

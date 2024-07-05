@@ -19,22 +19,32 @@ import com.jaidev.seeaplayer.dataClass.SearchTitleStore
 
 class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<SavedTitlesAdapter.ViewHolder>() {
 
-    private val titles: MutableList<String> = SearchTitleStore.getTitles(context).map { it.title }.toMutableList()
+    private val originalTitles: MutableList<String> = SearchTitleStore.getTitles(context).map { it.title }.toMutableList()
+    private var filteredTitles: MutableList<String> = originalTitles.toMutableList()
 
     fun addItem(title: String) {
-        titles.add(0, title) // Add new item at the beginning of the list
+        originalTitles.add(0, title) // Add new item at the beginning of the list
         saveTitlesToStore()
         notifyItemInserted(0) // Notify RecyclerView that a new item has been added at position 0
     }
-
     fun removeItem(position: Int) {
-        titles.removeAt(position)
+        originalTitles.removeAt(position)
         saveTitlesToStore()
         notifyItemRemoved(position)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun filter(query: String) {
+        filteredTitles = if (query.isEmpty()) {
+            originalTitles.toMutableList()
+        } else {
+            originalTitles.filter { it.contains(query, ignoreCase = true) }.toMutableList()
+        }
+        notifyDataSetChanged()
+    }
+
     private fun saveTitlesToStore() {
-        val searchTitles = titles.map { SearchTitle(it) } // Assuming SearchTitle has a constructor that takes a title string
+        val searchTitles = originalTitles.map { SearchTitle(it) } // Assuming SearchTitle has a constructor that takes a title string
         SearchTitleStore.saveTitles(context, searchTitles)
     }
 
@@ -44,12 +54,12 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val title = titles[position]
+        val title = filteredTitles[position]
         holder.bind(title = title)
     }
 
     override fun getItemCount(): Int {
-        return titles.size
+        return filteredTitles.size
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -63,7 +73,7 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
             val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
             itemView.setOnClickListener {
-                val query = titles[adapterPosition] // Get the query from titles list based on adapter position
+                val query = filteredTitles[adapterPosition] // Get the query from titles list based on adapter position
                 navigateToBrowserFragment(query)
                 val clickedPosition = adapterPosition
                 moveItemToTop(clickedPosition)
@@ -72,7 +82,7 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
             }
 
             historyViewImageButton.setOnClickListener {
-                val clickedTitle = titles[adapterPosition]
+                val clickedTitle = filteredTitles[adapterPosition]
                 fillTitleInTextUrl(clickedTitle)
             }
             // Long press listener
@@ -119,10 +129,17 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
     @SuppressLint("NotifyDataSetChanged")
     private fun moveItemToTop(clickedPosition: Int) {
         if (clickedPosition != 0) {
-            val clickedItem = titles.removeAt(clickedPosition)
-            titles.add(0, clickedItem)
+            val clickedItem = filteredTitles.removeAt(clickedPosition)
+            filteredTitles.add(0, clickedItem)
+
+            // Update originalTitles to reflect the new order
+            val originalClickedPosition = originalTitles.indexOf(clickedItem)
+            originalTitles.removeAt(originalClickedPosition)
+            originalTitles.add(0, clickedItem)
+
             saveTitlesToStore()
             notifyDataSetChanged()
         }
     }
+
 }

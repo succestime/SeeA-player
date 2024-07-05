@@ -1,4 +1,3 @@
-
 package com.jaidev.seeaplayer.browseFregment
 
 import android.annotation.SuppressLint
@@ -42,8 +41,8 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         binding = FragmentHomeBinding.bind(view)
         saveDefaultBookmarks()
-        // Show the keyboard explicitly
         addDefaultBookmarks()
+
         // Check if the keyboard is visible
         val rootView = view?.rootView
         rootView?.viewTreeObserver?.addOnGlobalLayoutListener {
@@ -58,6 +57,7 @@ class HomeFragment : Fragment() {
         }
         return view
     }
+
     private fun saveDefaultBookmarks() {
         val bookmarkTitles = listOf("Wikipedia", "Google", "YouTube")
         val bookmarkUrls = listOf("https://en.wikipedia.org", "https://www.google.com", "https://www.youtube.com")
@@ -74,6 +74,7 @@ class HomeFragment : Fragment() {
 
         editor.apply()
     }
+
     private fun addDefaultBookmarks() {
         val sharedPreferences = requireContext().getSharedPreferences("DefaultBookmarks", Context.MODE_PRIVATE)
 
@@ -89,6 +90,7 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
     @SuppressLint("RestrictedApi")
     override fun onResume() {
         super.onResume()
@@ -97,10 +99,8 @@ class HomeFragment : Fragment() {
 
         LinkTubeActivity.tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
         LinkTubeActivity.tabsList[LinkTubeActivity.myPager.currentItem].name = "Home"
-
         linkTubeRef.binding.btnTextUrl.setText("")
-        linkTubeRef.binding.webIcon.setImageResource(R.drawable.search_icon)
-//        linkTubeRef.binding.refreshBrowserBtn.visibility = View.GONE
+        linkTubeRef.binding.webIcon.setImageResource(R.drawable.search_licktube_icon)
         linkTubeRef.binding.googleMicBtn.visibility = View.VISIBLE
         linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
         linkTubeRef.binding.crossBtn.visibility = View.GONE
@@ -119,7 +119,12 @@ class HomeFragment : Fragment() {
                     linkTubeRef.binding.bookMarkBtn.visibility = View.VISIBLE
                     linkTubeRef.binding.crossBtn.visibility = View.VISIBLE
                 }
+
+                // Filter the titles based on the entered text
+                val adapter = binding.historyRecycler.adapter as? SavedTitlesAdapter
+                adapter?.filter(s.toString())
             }
+
             override fun afterTextChanged(s: Editable?) {}
         }
         linkTubeRef.binding.btnTextUrl.addTextChangedListener(textWatcher)
@@ -179,7 +184,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-
         // Set click listener for homeTextUrl
         binding.homeTextUrl.setOnClickListener {
             // Request focus on btnTextUrl only if it's not already focused
@@ -206,15 +210,10 @@ class HomeFragment : Fragment() {
             }
         }
 
-
         binding.historyRecycler.setHasFixedSize(true)
         binding.historyRecycler.setItemViewCacheSize(5)
         binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.historyRecycler.adapter = SavedTitlesAdapter(requireContext())
-
-
-
-
 
         // Set editor action listener for btnTextUrl (IME_ACTION_DONE or IME_ACTION_GO)
         linkTubeRef.binding.btnTextUrl.setOnEditorActionListener { _, actionId, _ ->
@@ -241,26 +240,20 @@ class HomeFragment : Fragment() {
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(5)
 
-// Set layout manager to scroll horizontally
+        // Set layout manager to scroll horizontally
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
 
         binding.recyclerView.adapter = BookmarkAdapter(requireContext())
 
-        if (LinkTubeActivity.bookmarkList.size < 1)
+        if (LinkTubeActivity.bookmarkList.size < 1) {
             binding.viewAllBtn.visibility = View.GONE
+        }
 
         binding.viewAllBtn.setOnClickListener {
             startActivity(Intent(requireContext(), BookmarkActivity::class.java))
         }
-
-
     }
 
-
-
-    // Inside performSearch() method
-    // Inside performSearch() method
     @SuppressLint("NotifyDataSetChanged")
     private fun performSearch(query: String) {
         if (checkForInternet(requireContext())) {
@@ -272,8 +265,8 @@ class HomeFragment : Fragment() {
                 val searchTitle = SearchTitle(query)
                 SearchTitleStore.addTitle(requireContext(), searchTitle)
                 // Add new item to the adapter
-                val adapter = binding.historyRecycler.adapter as SavedTitlesAdapter
-                adapter.addItem(query)
+                val adapter = binding.historyRecycler.adapter as? SavedTitlesAdapter
+                adapter?.addItem(query)
             }
 
             // Change tab and perform search
@@ -282,8 +275,4 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
         }
     }
-
-
-
-
 }

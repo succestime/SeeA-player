@@ -5,8 +5,8 @@
     android:layout_width="300dp"
     android:layout_height="300dp"
    android:layout_marginStart="20dp"
-    android:layout_marginTop="15dp"
-    android:layout_marginBottom="15dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
     android:layout_weight="1"
     app:cardCornerRadius="8dp">
 
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#80CCCCCC"
-            android:padding="16dp">
+           >
 
             <!-- ImageView with transparent background -->
             <ImageView
@@ -29,7 +29,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/music_download_browser"
-                android:scaleType="centerCrop"
                 android:background="@android:color/transparent" />
             <ImageButton
                 android:id="@+id/selected_complete"

@@ -62,10 +62,7 @@ class moreNav : Fragment() {
 
 
 
-        if (auth.currentUser == null) {
-            startActivity(Intent(requireContext(), signin::class.java))
-            requireActivity().finish()
-        }
+
 
         binding.signOut.setOnClickListener {
             showSignOutDialog()
@@ -95,7 +92,14 @@ binding.Settingslayout.setOnClickListener {
         // Set the background color of SwipeRefreshLayout based on app theme
         setRelativeLayoutBackgroundColor()
 
-
+binding.userDetails.setOnClickListener {
+    if (auth.currentUser == null) {
+        startActivity(Intent(requireContext(), signin::class.java))
+        requireActivity().finish()
+    }else{
+        // Do nothing
+    }
+}
 
         return view
     }
@@ -240,21 +244,32 @@ binding.Settingslayout.setOnClickListener {
     }
 
     private fun showSignOutDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle("Want to sign out?")
-        builder.setMessage("Do you want to Sign Out from the app? . If yes, click on the Sign Out button.")
-        builder.setPositiveButton("Sign Out") { _, _ ->
-            auth.signOut()
-            binding.userDetails.text = updateData()
-            startActivity(Intent(requireContext(), signin::class.java))
-            requireActivity().finish()
-
+        // Check if the user is registered (logged in)
+        if (auth.currentUser == null) {
+            // Show dialog for not registered user
+            val notRegisteredBuilder = MaterialAlertDialogBuilder(requireContext())
+            notRegisteredBuilder.setTitle("Not registered!!")
+            notRegisteredBuilder.setMessage("You are not registered in the app. You do not need to sign out.")
+            notRegisteredBuilder.setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            notRegisteredBuilder.show()
+        } else {
+            // Show sign out confirmation dialog for registered user
+            val signOutBuilder = MaterialAlertDialogBuilder(requireContext())
+            signOutBuilder.setTitle("Want to sign out?")
+            signOutBuilder.setMessage("Do you want to Sign Out from the app? If yes, click on the Sign Out button.")
+            signOutBuilder.setPositiveButton("Sign Out") { _, _ ->
+                auth.signOut()
+                binding.userDetails.text = updateData()
+            }
+            signOutBuilder.setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            signOutBuilder.show()
         }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.show()
     }
+
 
     override fun onResume() {
         super.onResume()

@@ -78,19 +78,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textColor="#ECE8E8"
         android:textSize="24dp"
         android:visibility="gone"
         android:gravity="center"
         android:textStyle="bold"
         android:text="@string/durationChangeTextView"
         android:elevation="4dp"
+        android:textColor="@color/white"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/frameLayout" />
-
-
     <!--    CardView for Volume SeekBar-->
     <LinearLayout
         android:id="@+id/volProgressContainer"

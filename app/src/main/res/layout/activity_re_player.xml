@@ -63,6 +63,8 @@
         android:visibility="gone"
         android:textStyle="bold"
         android:gravity="center"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
         android:textColor="#ECE8E8"
         android:text="@string/durationChangeTextView"
         app:layout_constraintBottom_toBottomOf="parent"

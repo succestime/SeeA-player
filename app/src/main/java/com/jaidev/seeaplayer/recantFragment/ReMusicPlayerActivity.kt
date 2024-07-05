@@ -100,9 +100,6 @@ class ReMusicPlayerActivity : AppCompatActivity()
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
 
-
-
-
         reMusicPlayerLayout = binding.ReMusicPlayerLayout
         // Set the background color of SwipeRefreshLayout based on app theme
         setMusicLayoutBackgroundColor()
@@ -352,7 +349,13 @@ class ReMusicPlayerActivity : AppCompatActivity()
     }
 
 
-
+    override fun onResume() {
+        super.onResume()
+        mAdView = findViewById(R.id.adView)
+        // banner ads
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+    }
     override fun onCompletion(p0: MediaPlayer?) {
         setSongPosition(increment = true)
         createMediaPlayer()
@@ -413,5 +416,6 @@ class ReMusicPlayerActivity : AppCompatActivity()
 }
 
 private fun MediaPlayer.setOnCompletionListener(companion: ReMusicPlayerActivity.Companion) {
+
 
 }

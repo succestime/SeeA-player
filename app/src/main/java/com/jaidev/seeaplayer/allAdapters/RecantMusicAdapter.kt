@@ -36,14 +36,22 @@ import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity.Companion.binding
 import java.io.File
 
-class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<RecantMusic>, val isReMusic: Boolean = false,
-                         ): RecyclerView.Adapter<RecantMusicAdapter.MyAdapter>() {
+class RecantMusicAdapter (val  context : Context,
+                          var musicReList : ArrayList<RecantMusic>,
+                          val isReMusic: Boolean = false,
+                        val fileCountChangeListener: RecantMusicAdapter.OnFileCountChangeListener
+
+): RecyclerView.Adapter<RecantMusicAdapter.MyAdapter>() {
 
     private var newPosition = 0
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
     private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
 
+
+    interface OnFileCountChangeListener {
+        fun onFileCountChanged(newCount: Int)
+    }
     interface MusicDeleteListener {
         fun onMusicDeleted()
     }
@@ -144,6 +152,7 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
 
                 val selectedPosition = newPosition  // Use newPosition or another variable to identify the selected video
                 showSingleDeleteConfirmation(selectedPosition)
+                dialog.dismiss()
             }
             bindingMf.shareBtn.setOnClickListener {
 
@@ -247,17 +256,6 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         @SuppressLint("NotifyDataSetChanged", "ResourceType")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             when (item?.itemId) {
-//                R.id.renameMulti -> {
-////                    // Call the showRenameDialog method here
-////                    if (selectedItems.size == 1) {
-////                        val selectedPosition = selectedItems.first()
-////                        val defaultName = videoReList[selectedPosition].title
-//////                        showRenameDialog(selectedPosition, defaultName)
-////                    } else {
-////                        Toast.makeText(context, "Please select only one video to rename", Toast.LENGTH_SHORT).show()
-////                    }
-////                    return true
-//                }
 
                 R.id.shareMulti -> {
                     shareSelectedFiles()
@@ -289,6 +287,8 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
                                 notifyDataSetChanged()
                                 // Dismiss action mode
                                 actionMode?.finish()
+                                // Notify listener of the file count change
+                                fileCountChangeListener.onFileCountChanged(musicReList.size)
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
                                 // User clicked Cancel, dismiss dialog
@@ -312,51 +312,47 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
             notifyDataSetChanged()
         }
     }
-
     private fun shareSelectedFiles() {
         val uris = mutableListOf<Uri>()
-        // Iterate through selectedItems to get selected file items
         for (position in selectedItems) {
             val music = musicReList[position]
+            val file = File(music.path)
             val fileUri = FileProvider.getUriForFile(
                 context,
                 context.applicationContext.packageName + ".provider",
-                File(music.path)
+                file
             )
             uris.add(fileUri)
         }
 
-
-        // Create an ACTION_SEND intent to share multiple files
         val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
         shareIntent.type = "audio/*"
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-        // Get the list of apps that can handle the intent
         val packageManager = context.packageManager
         val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
         val excludedComponents = mutableListOf<ComponentName>()
 
-        // Iterate through the list and exclude your app
         for (resolvedActivity in resolvedActivityList) {
             if (resolvedActivity.activityInfo.packageName == context.packageName) {
-                excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+                excludedComponents.add(
+                    ComponentName(
+                        resolvedActivity.activityInfo.packageName,
+                        resolvedActivity.activityInfo.name
+                    )
+                )
             }
         }
 
-        // Create a chooser intent
         val chooserIntent = Intent.createChooser(shareIntent, "Share Files")
-
-        // Exclude your app from the chooser intent
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-
         chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooserIntent)
 
-        // Dismiss action mode
         actionMode?.finish()
     }
+
     private fun showSingleDeleteConfirmation(position: Int) {
         val video = musicReList[position]
 
@@ -384,6 +380,9 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
 
             // If action mode is active, finish it after deletion
             actionMode?.finish()
+            // Notify listener of the file count change
+            fileCountChangeListener.onFileCountChanged(musicReList.size)
+
         } else {
             Toast.makeText(context, "Failed to delete music", Toast.LENGTH_SHORT).show()
         }
@@ -394,11 +393,5 @@ class RecantMusicAdapter (val  context : Context,  var musicReList : ArrayList<R
         musicReList.addAll(recantMusic)
         notifyDataSetChanged()
     }
-//    private fun sendIntent(pos: Int, ref: String) {
-//        ReMusicPlayerActivity.position = pos
-//        val intent = Intent(context, ReMusicPlayerActivity::class.java)
-//        intent.putExtra("class", ref)
-//        ContextCompat.startActivity(context, intent, null)
-//
-//    }
+
 }

@@ -28,7 +28,7 @@ import com.jaidev.seeaplayer.databinding.FragmentDaysDownloadBinding
 import java.util.concurrent.TimeUnit
 // Import statements go here
 
-class DaysDownload : Fragment() {
+class DaysDownload : Fragment(),   RecentVideoAdapter.OnFileCountChangeListener {
     private lateinit var binding: FragmentDaysDownloadBinding
     lateinit var adapter: RecentVideoAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -45,10 +45,11 @@ class DaysDownload : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_days_download, container, false)
         binding = FragmentDaysDownloadBinding.bind(view)
+
         binding.DownloadRV.setHasFixedSize(true)
         binding.DownloadRV.setItemViewCacheSize(13)
         binding.DownloadRV.layoutManager = LinearLayoutManager(requireContext())
-        adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true)
+        adapter = RecentVideoAdapter(requireContext(), videoRecantList, isRecantVideo = true , this)
         binding.DownloadRV.adapter = adapter
         binding.daysTotalVideos.text = "0 Videos "
 
@@ -73,7 +74,6 @@ class DaysDownload : Fragment() {
             swipeRefreshLayout.isRefreshing = false
         }
         // Set the background color of SwipeRefreshLayout based on app theme
-        setSwipeRefreshBackgroundColor()
         return view
     }
 
@@ -153,21 +153,7 @@ class DaysDownload : Fragment() {
         }
     }
 
-    private fun setSwipeRefreshBackgroundColor() {
-        val isDarkMode =
-            when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
 
-        if (isDarkMode) {
-            // Dark mode is enabled, set background color to #012030
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
-        } else {
-            // Light mode is enabled, set background color to white
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
-        }
-    }
 
 
 
@@ -235,6 +221,11 @@ class DaysDownload : Fragment() {
         }
 
         return recantVList
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onFileCountChanged(newCount: Int) {
+        binding.daysTotalVideos.text = "$newCount Videos"
     }
 
 }

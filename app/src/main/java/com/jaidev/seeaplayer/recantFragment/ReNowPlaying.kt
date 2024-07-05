@@ -19,7 +19,7 @@ import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reSetSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentReNowPlayingBinding
 
-class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener   {
+class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , RecantMusicAdapter.OnFileCountChangeListener{
     lateinit var adapter: RecantMusicAdapter
     companion object{
        @SuppressLint("StaticFieldLeak")
@@ -30,7 +30,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener   {
         val view = inflater.inflate(R.layout.fragment_re_now_playing, container, false)
         binding = FragmentReNowPlayingBinding.bind(view)
         binding.root.visibility = View.INVISIBLE
-        adapter = RecantMusicAdapter(requireContext(), MainActivity.musicRecantList)
+        adapter = RecantMusicAdapter(requireContext(), MainActivity.musicRecantList , isReMusic = true ,this@ReNowPlaying)
 
         initializeBinding()
 
@@ -125,6 +125,9 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener   {
             .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgNP)
+    }
+
+    override fun onFileCountChanged(newCount: Int) {
     }
 
 

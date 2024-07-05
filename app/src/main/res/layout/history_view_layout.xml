@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Topic Name"
-
+android:paddingEnd="4dp"
             android:maxLines="1"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -63,9 +63,11 @@
             android:id="@+id/websiteName"
             android:layout_width="match_parent"
             android:layout_height="20dp"
+            android:paddingEnd="4dp"
             android:text="Website Name"
             app:layout_constraintTop_toBottomOf="@+id/TopicName"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="RtlSymmetry" />
     </LinearLayout>
 
     <!-- corsDelete ImageButton -->

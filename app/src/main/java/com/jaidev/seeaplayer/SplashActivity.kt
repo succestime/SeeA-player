@@ -29,7 +29,6 @@ class SplashActivity : AppCompatActivity() {
             2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
 
-
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 supportActionBar?.hide()
@@ -49,15 +48,20 @@ supportActionBar?.hide()
 
         // Set the modified SpannableString to the TextView
         binding.textView.text = spannableString
+
+
         // Delay for 2 seconds and then start the main activity
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
             finish()
+
         }, 2000)
 
 
 
     }
+
+
 
     private fun getCheckedItem(): Int {
         return this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
