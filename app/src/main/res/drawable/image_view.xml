@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Background shapes -->
+    <path
+        android:fillColor="#F1E3DD"
+        android:pathData="M30,50h120v160h-120z" />
+    <path
+        android:fillColor="#F1E3DD"
+        android:pathData="M50,30h120v160h-120z" />
+
+    <!-- Foreground rectangles -->
+    <path
+        android:fillColor="#A45143"
+        android:strokeColor="#A45143"
+        android:strokeWidth="2"
+        android:pathData="M55,35h90a5,5 0 0 1 5,5v120a5,5 0 0 1 -5,5h-90a5,5 0 0 1 -5,-5v-120a5,5 0 0 1 5,-5z" />
+    <path
+        android:fillColor="#A45143"
+        android:strokeColor="#A45143"
+        android:strokeWidth="2"
+        android:pathData="M45,45h90a5,5 0 0 1 5,5v120a5,5 0 0 1 -5,5h-90a5,5 0 0 1 -5,-5v-120a5,5 0 0 1 5,-5z" />
+
+    <!-- Close button in the top right corner -->
+    <path
+        android:fillColor="#F1E3DD"
+        android:pathData="M135,45a5,5 0 1 1 0,10a5,5 0 1 1 0,-10z" />
+    <path
+        android:strokeColor="#A45143"
+        android:strokeWidth="2"
+        android:pathData="M132,48l6,-6m0,6l-6,-6" />
+</vector>

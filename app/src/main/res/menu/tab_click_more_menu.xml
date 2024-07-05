@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/newTab"
+        android:icon="@drawable/new_tab"
+        android:title="New Tab" />
+
+    <item
+        android:id="@+id/clearAllTabs"
+        android:icon="@drawable/browser_clear"
+        android:title="Close all tabs" />
+
+    <item
+        android:id="@+id/selectTabs"
+        android:icon="@drawable/ic_edit_icon"
+        android:title="Select tabs" />
+
+</menu>
