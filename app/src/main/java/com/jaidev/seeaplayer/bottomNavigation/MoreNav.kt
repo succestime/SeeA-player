@@ -60,10 +60,6 @@ class moreNav : Fragment() {
         auth = FirebaseAuth.getInstance()
 
 
-
-
-
-
         binding.signOut.setOnClickListener {
             showSignOutDialog()
         }
@@ -92,14 +88,22 @@ binding.Settingslayout.setOnClickListener {
         // Set the background color of SwipeRefreshLayout based on app theme
         setRelativeLayoutBackgroundColor()
 
-binding.userDetails.setOnClickListener {
-    if (auth.currentUser == null) {
-        startActivity(Intent(requireContext(), signin::class.java))
-        requireActivity().finish()
-    }else{
-        // Do nothing
-    }
-}
+        binding.userDetails.setOnClickListener {
+            if (checkConnection(requireContext())) {
+                // Internet is connected
+                if (auth.currentUser == null) {
+                    // User is not authenticated, navigate to sign-in screen
+                    startActivity(Intent(requireContext(), signin::class.java))
+                } else {
+                    Toast.makeText(requireContext(), "You are already registered \uD83D\uDE0A", Toast.LENGTH_SHORT).show()
+
+                }
+            } else {
+                // Internet is not connected, show a toast message
+                Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
         return view
     }

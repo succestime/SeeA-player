@@ -54,7 +54,7 @@
     <style name="AppModelStyle" parent="Widget.Design.BottomSheet.Modal" >
         <item name="android:background">@drawable/rounded_bottom_sheet_gray</item>
     </style>
-    <style name="TransparentTheme" parent="Theme.AppCompat.Light">
+    <style name="TransparentTheme" parent="Theme.AppCompat.DayNight">
         <item name="android:statusBarColor">#0F4D6C</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>

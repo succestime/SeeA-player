@@ -29,8 +29,8 @@
                 android:contentDescription="@string/refresh_btn"
                 android:visibility="visible"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="1dp"
-                android:src="@drawable/home_browse"
+
+                android:src="@drawable/plus_icon"
                 tools:ignore="RedundantDescriptionCheck"
                 app:tint="@color/white" />
             <ImageButton
@@ -40,8 +40,6 @@
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:visibility="visible"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="1dp"
                 app:tint="@color/white"
                 android:src="@drawable/round_arrow_back"
                 tools:ignore="RedundantDescriptionCheck" />
@@ -52,8 +50,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:visibility="visible"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="1dp"
+                android:layout_marginEnd="2dp"
                 app:tint="@color/white"
                 android:src="@drawable/round_arrow_forward"
                 tools:ignore="RedundantDescriptionCheck" />
@@ -167,19 +164,22 @@
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/tabBtn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/custom_tabs_textview"
-                android:gravity="center"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
+                android:layout_gravity="center_vertical">
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tabBtn"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@drawable/custom_tabs_textview"
+                android:gravity="center"
                 android:text="@string/one_browse"
                 android:textColor="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
-
+            </LinearLayout>
             <ImageButton
                 android:id="@+id/moreBtn"
                 android:layout_width="wrap_content"

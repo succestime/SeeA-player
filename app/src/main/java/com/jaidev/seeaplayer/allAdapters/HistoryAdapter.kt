@@ -1,6 +1,7 @@
 package com.jaidev.seeaplayer.allAdapters
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,11 +9,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
+import java.util.Locale
 
 class HistoryAdapter(
-    private var historyItems: MutableList<HistoryItem>,
+    private val context: Context,
+    var historyItems: MutableList<HistoryItem>,
     private val itemClickListener: ItemClickListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -22,7 +26,7 @@ class HistoryAdapter(
 
     }
 
-    private var filteredItems: MutableList<HistoryItem> = mutableListOf()
+    var filteredItems: MutableList<HistoryItem> = mutableListOf()
     companion object {
         private const val VIEW_TYPE_NORMAL = 0
     }
@@ -35,15 +39,23 @@ class HistoryAdapter(
         if (query.isEmpty()) {
             filteredItems.addAll(historyItems)
         } else {
-            val filterPattern = query.toLowerCase().trim()
+            val filterPattern = query.toLowerCase(Locale.getDefault()).trim()
             historyItems.forEach { item ->
-                if (item.url.toLowerCase().contains(filterPattern)) {
+                val title = item.url.toLowerCase(Locale.getDefault())
+                val words = filterPattern.split("\\s+".toRegex()) // Split the query into words
+                val matchesAllWords = words.all { word -> title.contains(word) }
+                if (matchesAllWords) {
                     filteredItems.add(item)
                 }
             }
         }
         notifyDataSetChanged()
     }
+
+    fun getTopFiveRecentItems(): List<HistoryItem> {
+        return historyItems.take(5)
+    }
+
     inner class NormalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.TopicName)
         private val urlTextView: TextView = itemView.findViewById(R.id.websiteName)
@@ -51,9 +63,9 @@ class HistoryAdapter(
         private val corsDeleteButton: ImageView = itemView.findViewById(R.id.corsDelete)
 
         fun bind(historyItem: HistoryItem) {
-            // Extract the topic name from the URL
             val topicName = extractTopicName(historyItem.url)
             titleTextView.text = topicName
+
             urlTextView.text = historyItem.title
 
             if (historyItem.imageBitmap != null) {
@@ -68,6 +80,7 @@ class HistoryAdapter(
                     filteredItems.removeAt(position)
                     notifyItemRemoved(position)
                     HistoryManager.deleteHistoryItem(historyItem, itemView.context)
+                    (context as HistoryBrowser).updateEmptyStateVisibility()
                 }
             }
 

@@ -1,5 +1,7 @@
 package com.jaidev.seeaplayer.browserActivity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -159,11 +161,18 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
             showSettingDialog()
 
         }
+
+        binding.clearActivity.setOnClickListener {
+            finish()
+        }
+
         binding.imageButtonSearch.setOnClickListener {
             // Show editTextSearch
             binding.editTextSearch.visibility = View.VISIBLE
             binding.imageButtonSearch.visibility = View.GONE
             binding.settingBrowser.visibility = View.GONE
+            binding.clearActivity.visibility = View.GONE
+            binding.constraintLayout.visibility = View.GONE
             binding.editTextSearch.text?.clear()
 
             // Set focus to editTextSearch
@@ -195,6 +204,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
                 s?.let {
                     val searchText = s.toString().trim().toLowerCase(Locale.getDefault())
                     filterFileItems(searchText)
+                    updateEmptyStateVisibility()
                 }
             }
         })
@@ -301,7 +311,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
                 // Hide editTextSearch
                 hideEditText()
                 filterFileItems("") // Passing empty string to show all files
-
+                updateEmptyStateVisibility()
                 return
             }
         }
@@ -317,7 +327,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
             // Clear the text in the EditText
             binding.editTextSearch.text?.clear()
             filterFileItems("") // Passing empty string to show all files
-
+            updateEmptyStateVisibility()
         }
     }
 
@@ -326,12 +336,30 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
         binding.editTextSearch.visibility = View.GONE
         binding.imageButtonSearch.visibility = View.VISIBLE
         binding.settingBrowser.visibility = View.VISIBLE
+        binding.clearActivity.visibility = View.VISIBLE
+
+        // Set initial positions for the views outside the screen
+        binding.constraintLayout.translationY = -binding.constraintLayout.height.toFloat()
+        binding.horizontalLine.translationY = -binding.horizontalLine.height.toFloat()
+
+        // Create ObjectAnimators to slide in from the top
+        val constraintLayoutAnimator = ObjectAnimator.ofFloat(binding.constraintLayout, "translationY", 0f)
+        val horizontalLineAnimator = ObjectAnimator.ofFloat(binding.horizontalLine, "translationY", 0f)
+
+        // Create an AnimatorSet to play the animations together
+        val animatorSet = AnimatorSet()
+        animatorSet.playTogether(constraintLayoutAnimator, horizontalLineAnimator)
+        animatorSet.duration = 200 // Animation duration in milliseconds
+        animatorSet.start()
+
+        // Show the views
+        binding.constraintLayout.visibility = View.VISIBLE
+        binding.horizontalLine.visibility = View.VISIBLE
+
         // Hide keyboard
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.editTextSearch.windowToken, 0)
         isEditTextVisible = false
-
-
     }
 
 
@@ -503,33 +531,34 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
                     // Filter and show only video files
                     val videoFiles = fileItems.filter { it.fileType == FileType.VIDEO || it.fileType == FileType.AUDIO  }
                     fileListAdapter.filterList(videoFiles)
-
+                    updateEmptyStateVisibility()
                 }
                 binding.annualBox -> {
                     // Filter and show only image files
                     val imageFiles = fileItems.filter { it.fileType == FileType.IMAGE }
                     fileListAdapter.filterList(imageFiles)
-
+                    updateEmptyStateVisibility()
                 }
                 binding.biennialBox -> {
                     // Filter and show only APK files
                     val apkFiles = fileItems.filter { it.fileType == FileType.APK || it.fileType == FileType.WEBSITE || it.fileType == FileType.PDF  || it.fileType == FileType.UNKNOWN}
                     fileListAdapter.filterList(apkFiles)
-
+                    updateEmptyStateVisibility()
                 }
                 binding.pageBox -> {
                     // Filter and show only APK files
                     val pageFiles = fileItems.filter { it.fileType == FileType.MHTML}
                     fileListAdapter.filterList(pageFiles)
-
+                    updateEmptyStateVisibility()
                 }
                 binding.monthlyBox -> {
                     fileListAdapter.filterList(fileItems)
-
+                    updateEmptyStateVisibility()
                 }
                 else -> {
                     // Show all files when no specific box is selected (monthlyBox)
                     fileListAdapter.filterList(fileItems)
+                    updateEmptyStateVisibility()
                 }
             }
         }
@@ -552,6 +581,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
         box.setBackgroundResource(R.drawable.selected_background_tint_browser)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun retrieveDownloadedFiles(): List<FileItem> {
         val downloadedFiles = ArrayList<FileItem>()
         val sharedPreferences = getSharedPreferences("FileMetadata", Context.MODE_PRIVATE)
@@ -586,50 +616,59 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
                 }
             }
         }
-// Sort files based on the default sorting order
         sortFilesByTimestamp()
+
 // Filter image files and check if the list is empty
         val imageFiles = downloadedFiles.filter { it.fileType == FileType.IMAGE }
         if (imageFiles.isEmpty()) {
-            binding.fileEmptyStateLayout.visibility = View.VISIBLE
+            fileListAdapter.notifyDataSetChanged()
             binding.annualBox.visibility = View.GONE
-        } else {
-            binding.fileEmptyStateLayout.visibility = View.GONE
+        }
+        else {
+            fileListAdapter.notifyDataSetChanged()
             binding.annualBox.visibility = View.VISIBLE
         }
 
         // Filter image files and check if the list is empty
         val webViewFiles = downloadedFiles.filter { it.fileType == FileType.MHTML }
         if (webViewFiles.isEmpty()) {
-            binding.fileEmptyStateLayout.visibility = View.VISIBLE
 
+            fileListAdapter.notifyDataSetChanged()
             binding.pageBox.visibility = View.GONE
-        } else {
-            binding.fileEmptyStateLayout.visibility = View.GONE
+        }
+        else {
+
+            fileListAdapter.notifyDataSetChanged()
             binding.pageBox.visibility = View.VISIBLE
         }
 
         // Filter image files and check if the list is empty
         val otherFiles = downloadedFiles.filter { it.fileType == FileType.APK || it.fileType == FileType.WEBSITE || it.fileType == FileType.PDF  || it.fileType == FileType.UNKNOWN }
         if (otherFiles.isEmpty()) {
-            binding.fileEmptyStateLayout.visibility = View.VISIBLE
 
+            // Notify the adapter of the change
+            fileListAdapter.notifyDataSetChanged()
             binding.biennialBox.visibility = View.GONE
-        } else {
-            binding.fileEmptyStateLayout.visibility = View.GONE
+        }
+        else {
+
+            fileListAdapter.notifyDataSetChanged()
             binding.biennialBox.visibility = View.VISIBLE
         }
 
         // Filter image files and check if the list is empty
         val videoFiles = downloadedFiles.filter { it.fileType == FileType.AUDIO || it.fileType == FileType.VIDEO }
         if (videoFiles.isEmpty()) {
-            binding.fileEmptyStateLayout.visibility = View.VISIBLE
 
+            fileListAdapter.notifyDataSetChanged()
             binding.quarterlyBox.visibility = View.GONE
-        } else {
-            binding.fileEmptyStateLayout.visibility = View.GONE
+        }
+        else {
+
+            fileListAdapter.notifyDataSetChanged()
             binding.quarterlyBox.visibility = View.VISIBLE
         }
+
         return downloadedFiles
     }
 
@@ -763,15 +802,13 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
         // Update the total file count text
         binding.totalFile.text = "Total Downloaded files: ${fileItems.size}"
 
-
     }
-    private fun updateEmptyStateVisibility() {
-        if (fileItems.isEmpty()) {
+    fun updateEmptyStateVisibility() {
+        if (fileListAdapter.itemCount == 0) {
             binding.fileEmptyStateLayout.visibility = View.VISIBLE
-            binding.recyclerFileView.visibility = View.GONE
         } else {
             binding.fileEmptyStateLayout.visibility = View.GONE
-            binding.recyclerFileView.visibility = View.VISIBLE
+
         }
     }
 

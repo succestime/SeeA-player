@@ -164,32 +164,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             }
 
 
-
-            webChromeClient = object : WebChromeClient() {
-                override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                    binding.progressBar.progress = newProgress
-                    binding.progressBar.visibility = if (newProgress == 100) View.GONE else View.VISIBLE
-                }
-
-                override fun onReceivedIcon(view: WebView?, icon: Bitmap?) {
-                    super.onReceivedIcon(view, icon)
-                    val linkRef = requireActivity() as LinkTubeActivity
-                    linkRef.binding.webIcon.setImageBitmap(icon)
-                    webIcon = icon
-
-                }
-
-                override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-                    binding.webView.visibility = View.GONE
-                    binding.customView.visibility = View.VISIBLE
-                    binding.customView.addView(view)
-                }
-
-                override fun onHideCustomView() {
-                    binding.webView.visibility = View.VISIBLE
-                    binding.customView.visibility = View.GONE
-                }
-            }
         }
 
         val rootView = view.rootView
@@ -574,13 +548,13 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     linkRef.binding.progressBar.visibility = View.GONE
                     binding.webView.zoomOut()
                     updateSwipeRefreshState(url)
+                    updateSearchHintTitleRecyclerView()
                     val websiteTitle = HistoryManager.extractWebsiteTitle(url ?: "")
                     val favicon = view?.favicon
                     val timestamp = System.currentTimeMillis()
                     val historyItem = HistoryItem(url ?: "", websiteTitle, timestamp, favicon)
-
                     HistoryManager.addHistoryItem(historyItem, requireContext())
-                    updateSearchHintTitleRecyclerView()
+
 //                    if (checkForInternet(requireContext())) {
 //                        binding.webView.visibility = View.VISIBLE
 //                        hideNoInternetView()
@@ -609,12 +583,19 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                     super.onReceivedIcon(view, icon)
                     try {
                         linkRef.binding.webIcon.setImageBitmap(icon)
+
                         webIcon = icon
                         // Update the icon for the current tab
                         val currentTab = tabsList[myPager.currentItem]
                         currentTab.icon = icon
                         // Notify the TabAdapter of the change
                         (myPager.adapter as? TabAdapter)?.notifyItemChanged(myPager.currentItem)
+
+                        val websiteTitle = HistoryManager.extractWebsiteTitle(url ?: "")
+                        val favicon = view?.favicon
+                        val timestamp = System.currentTimeMillis()
+                        val historyItem = HistoryItem(url ?: "", websiteTitle, timestamp, favicon)
+                        HistoryManager.addHistoryItem(historyItem, requireContext())
 
                         LinkTubeActivity.bookmarkIndex = linkRef.isBookmarked(view?.url!!)
                         if (LinkTubeActivity.bookmarkIndex != -1) {
@@ -671,9 +652,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
+
     private fun updateSwipeRefreshState(url: String?) {
         val keywords = listOf("/reels/", "/comments/", "/story.", "/reel/", "/shorts/", "/watch?")
         binding.swipeRefreshBrowser.isEnabled = !keywords.any { url?.contains(it, ignoreCase = true) == true }

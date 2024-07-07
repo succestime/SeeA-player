@@ -12,6 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivityLoginBinding
@@ -35,25 +36,37 @@ class SignUp : AppCompatActivity() {
         }
 
         binding.loginBtn.setOnClickListener {
-            val email = binding.emailLogin.text.toString()
-            val password = binding.passwordLogin.text.toString()
+            if (MainActivity.isInternetAvailable(this)) {
+                val email = binding.emailLogin.text.toString()
+                val password = binding.passwordLogin.text.toString()
 
-            if (email.isNotEmpty() && password.isNotEmpty())
-              moreNav.auth.signInWithEmailAndPassword(email , password).addOnCompleteListener {
-                    if (it.isSuccessful){
-                        Toast.makeText(this, "SignUp Successful", Toast.LENGTH_LONG).show()
-                        finish()
+                if (email.isNotEmpty() && password.isNotEmpty())
+                    moreNav.auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            Toast.makeText(this, "SignUp Successful", Toast.LENGTH_LONG).show()
+                            finish()
 
+                        }
+                    }.addOnFailureListener {
+                        Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()
                     }
-                }.addOnFailureListener {
-                    Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()
-                }
+            }else {
+                // Show a toast message if there is no internet connection
+                Toast.makeText(this, "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+            }
         }
+
+
         setActionBarGradient()
 
         binding.googleBtn.setOnClickListener {
-            googleSignInClient.signOut()
-            startActivityForResult(googleSignInClient.signInIntent,4)
+            if (MainActivity.isInternetAvailable(this)) {
+                googleSignInClient.signOut()
+                startActivityForResult(googleSignInClient.signInIntent, 4)
+            } else {
+                // Show a toast message if there is no internet connection
+                Toast.makeText(this, "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+            }
         }
 
         swipeRefreshLayout = binding.ActivitySignUp
@@ -64,7 +77,7 @@ class SignUp : AppCompatActivity() {
         moreNav.auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "SignIn Successful", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "SignUp Successful", Toast.LENGTH_LONG).show()
                     finish()
                 }
             }.addOnFailureListener {

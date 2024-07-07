@@ -27,6 +27,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.textfield.TextInputEditText
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.Services.FileItemPreferences
+import com.jaidev.seeaplayer.browserActivity.FileActivity
 import com.jaidev.seeaplayer.dataClass.FileItem
 import com.jaidev.seeaplayer.dataClass.FileType
 import java.io.File
@@ -57,6 +58,7 @@ class FileAdapter(
         fileList.addAll(filteredList)
         notifyDataSetChanged()
     }
+
     @SuppressLint("NotifyDataSetChanged")
     fun clearSelection() {
         selectedItems.clear()
@@ -865,6 +867,7 @@ class FileAdapter(
                 } else {
                     // Notify listener for each deleted file
                     fileDeleteListener.onFileDeleted(fileItem)
+                    (context as FileActivity).updateEmptyStateVisibility()
                 }
             } else {
                 // File doesn't exist, handle this scenario if needed
@@ -883,7 +886,7 @@ class FileAdapter(
 
         // Dismiss action mode
         actionMode?.finish()
-
+        (context as FileActivity).updateEmptyStateVisibility()
     }
 
     private fun formatFileSize(fileSize: Long): String {
@@ -983,6 +986,7 @@ class FileAdapter(
                         fileList.removeAt(position)
                         notifyItemRemoved(position)
                         notifyItemRangeChanged(position, fileList.size)
+                        (context as FileActivity).updateEmptyStateVisibility()
                         // Notify listeners for each deleted file
                         itemsToRemove.forEach { fileItem ->
                             fileDeleteListener.onFileDeleted(fileItem)

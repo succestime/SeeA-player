@@ -30,7 +30,7 @@
                 android:visibility="visible"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
-                android:src="@drawable/home_browse"
+                android:src="@drawable/plus_icon"
                 tools:ignore="RedundantDescriptionCheck"
                 app:tint="@color/white" />
             <ImageButton
@@ -168,22 +168,25 @@
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/tabBtn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/custom_tabs_textview"
-                android:gravity="center"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="1dp"
-                android:text="@string/one_browse"
-                android:textColor="@color/white"
-                tools:ignore="RedundantDescriptionCheck" />
-
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="2dp"
+                android:layout_gravity="center_vertical">
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tabBtn"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/custom_tabs_textview"
+                    android:gravity="center"
+                    android:text="@string/one_browse"
+                    android:textColor="@color/white"
+                    tools:ignore="RedundantDescriptionCheck" />
+            </LinearLayout>
             <ImageButton
                 android:id="@+id/moreBtn"
-                android:layout_width="50dp"
+                android:layout_width="35dp"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/go_btn"

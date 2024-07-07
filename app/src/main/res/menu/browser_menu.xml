@@ -26,6 +26,11 @@
         android:icon="@drawable/ic_bookmark"
         android:title="Bookmarks" />
 
+
+    <item
+        android:id="@+id/recantTab"
+        android:icon="@drawable/tabs_svg_menu_com"
+        android:title="Recant tabs" />
     <item
         android:id="@+id/save"
         android:icon="@drawable/ic_save"

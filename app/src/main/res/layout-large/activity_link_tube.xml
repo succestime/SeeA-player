@@ -30,7 +30,7 @@
                 android:visibility="visible"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="1dp"
-                android:src="@drawable/home_browse"
+                android:src="@drawable/plus_icon"
                 tools:ignore="RedundantDescriptionCheck"
                 app:tint="@color/white" />
             <ImageButton

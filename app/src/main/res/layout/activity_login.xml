@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/ActivitySignUp"
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".LogSignIn.SignUp">
 
@@ -13,8 +14,9 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         app:cardCornerRadius="50dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="120dp"
         app:cardBackgroundColor="@android:color/transparent"
+
         android:src="@mipmap/ic_logo_o"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -29,13 +31,14 @@
             android:scaleType="centerCrop" />
 
     </androidx.cardview.widget.CardView>
+
     <EditText
         android:id="@+id/emailLogin"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="52dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/curver_auth"
         android:ems="10"
         android:hint="@string/enter_your_email"
@@ -53,9 +56,9 @@
         android:id="@+id/passwordLogin"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="52dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/curver_auth"
         android:ems="10"
         android:hint="@string/password"
@@ -73,14 +76,15 @@
     <Button
         android:id="@+id/loginBtn"
         android:layout_width="200dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="100dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="100dp"
         android:background="@drawable/curver"
-        android:text="@string/login"
-        android:textStyle="bold"
+        android:text="@string/activity_signin"
         android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/passwordLogin"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="@+id/passwordLogin"
@@ -134,7 +138,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:text="OR"
-         />
+            />
 
         <View
             android:layout_width="0dp"

@@ -38,9 +38,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".browserActivity.RecantTabActivity"
+            android:exported="false" />
+        <activity
             android:name=".browserActivity.TabActivity"
             android:exported="false"
-            android:theme="@style/TransparentTheme"/>
+            android:theme="@style/TransparentTheme"></activity>
         <activity
             android:name=".browserActivity.OfflineMhtmlActivity"
             android:exported="true">
@@ -143,6 +146,7 @@
 
         <activity
             android:name=".browserActivity.FileActivity"
+            android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="false" />
         <activity
             android:name=".Subscription.SeeaEduProcess"

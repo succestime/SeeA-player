@@ -13,6 +13,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.jaidev.seeaplayer.MainActivity.Companion.isInternetAvailable
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.bottomNavigation.moreNav
 import com.jaidev.seeaplayer.databinding.ActivitySigninBinding
@@ -39,12 +40,13 @@ class signin : AppCompatActivity() {
         }
 
         binding.createAccountBtn.setOnClickListener {
-            val name = binding.userName.text.toString()
-            val email = binding.emailResister.text.toString()
-            val password = binding.passwordResister.text.toString()
+            if (isInternetAvailable(this)) {
+                val name = binding.userName.text.toString()
+                val email = binding.emailResister.text.toString()
+                val password = binding.passwordResister.text.toString()
 
-            if (email.isNotEmpty() && password.isNotEmpty() && name.isNotEmpty()) {
-                moreNav.auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { createUserTask ->
+                if (email.isNotEmpty() && password.isNotEmpty() && name.isNotEmpty()) {
+                    moreNav.auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { createUserTask ->
                         if (createUserTask.isSuccessful) {
                             val user = moreNav.auth.currentUser
                             val profileUpdates = UserProfileChangeRequest.Builder()
@@ -56,7 +58,6 @@ class signin : AppCompatActivity() {
                                     if (updateProfileTask.isSuccessful) {
                                         Toast.makeText(this, "SignIn Successful", Toast.LENGTH_LONG).show()
                                         finish()
-
                                     } else {
                                         // Handle failure to update profile
                                         Toast.makeText(this, "Failed to update profile", Toast.LENGTH_LONG).show()
@@ -67,16 +68,27 @@ class signin : AppCompatActivity() {
                             Toast.makeText(this, "Failed to create user: ${createUserTask.exception?.message}", Toast.LENGTH_LONG).show()
                         }
                     }.addOnFailureListener {
-                    Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    // Handle empty fields
+                    Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show()
                 }
             } else {
-                // Handle empty fields
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show()
+                // Show a toast message if there is no internet connection
+                Toast.makeText(this, "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
             }
         }
+
+
         binding.googleBtn.setOnClickListener {
-            googleSignInClient.signOut()
-            startActivityForResult(googleSignInClient.signInIntent,4)
+            if (isInternetAvailable(this)) {
+                googleSignInClient.signOut()
+                startActivityForResult(googleSignInClient.signInIntent, 4)
+            }else {
+                // Show a toast message if there is no internet connection
+                Toast.makeText(this, "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
+            }
         }
 
         setActionBarGradient()

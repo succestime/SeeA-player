@@ -27,11 +27,7 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
         saveTitlesToStore()
         notifyItemInserted(0) // Notify RecyclerView that a new item has been added at position 0
     }
-    fun removeItem(position: Int) {
-        originalTitles.removeAt(position)
-        saveTitlesToStore()
-        notifyItemRemoved(position)
-    }
+
 
     @SuppressLint("NotifyDataSetChanged")
     fun filter(query: String) {
@@ -70,10 +66,12 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
             titleTextView.text = title
 
             // Access the InputMethodManager from the context
-            val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val inputMethodManager =
+                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
             itemView.setOnClickListener {
-                val query = filteredTitles[adapterPosition] // Get the query from titles list based on adapter position
+                val query =
+                    filteredTitles[adapterPosition] // Get the query from titles list based on adapter position
                 navigateToBrowserFragment(query)
                 val clickedPosition = adapterPosition
                 moveItemToTop(clickedPosition)
@@ -93,6 +91,7 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
 
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         private fun showRemoveSuggestionDialog(title: String) {
             val alertDialogBuilder = AlertDialog.Builder(context)
             // Set the title of the dialog to the selected item's name
@@ -101,7 +100,18 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
 
             // Set positive button (Remove)
             alertDialogBuilder.setPositiveButton("OK") { _, _ ->
-                removeItem(adapterPosition)
+                val position = filteredTitles.indexOf(title)
+                if (position != -1) {
+                    // Remove the item from the filtered list
+                    filteredTitles.removeAt(position)
+                    // Remove the item from the original list
+                    originalTitles.remove(title)
+                    // Notify the adapter about the removed item
+
+                    notifyDataSetChanged()
+                    // Persist the changes
+                    saveTitlesToStore()
+                }
             }
 
             // Set negative button (Cancel)
@@ -113,10 +123,9 @@ class SavedTitlesAdapter(private val context: Context) : RecyclerView.Adapter<Sa
             val alertDialog = alertDialogBuilder.create()
             alertDialog.show()
         }
-
     }
 
-    private fun navigateToBrowserFragment(query: String) {
+        private fun navigateToBrowserFragment(query: String) {
         val browserFragment = BrowseFragment(urlNew = query)
         changeTab("Brave", browserFragment)
     }

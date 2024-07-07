@@ -14,17 +14,19 @@
         android:layout_height="40dp"
         android:layout_marginStart="20dp"
         app:cardCornerRadius="20dp"
+        android:backgroundTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iconWebsiteView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_gravity="center"
             android:visibility="visible"
             android:src="@drawable/pdf_image"
+            android:scaleType="centerCrop"
             android:backgroundTint="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Topic Name"
-android:paddingEnd="4dp"
+android:paddingEnd="15dp"
             android:maxLines="1"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -63,7 +65,7 @@ android:paddingEnd="4dp"
             android:id="@+id/websiteName"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:paddingEnd="4dp"
+            android:paddingEnd="15dp"
             android:text="Website Name"
             app:layout_constraintTop_toBottomOf="@+id/TopicName"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -71,9 +73,9 @@ android:paddingEnd="4dp"
     </LinearLayout>
 
     <!-- corsDelete ImageButton -->
-    <ImageButton
+    <ImageView
         android:id="@+id/corsDelete"
-        android:layout_width="30dp"
+        android:layout_width="20sp"
         android:layout_height="match_parent"
         android:backgroundTint="@android:color/transparent"
         android:src="@drawable/clear_browser"

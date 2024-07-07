@@ -91,7 +91,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @SuppressLint("RestrictedApi")
+    @SuppressLint("RestrictedApi", "NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
 
@@ -214,6 +214,7 @@ class HomeFragment : Fragment() {
         binding.historyRecycler.setItemViewCacheSize(5)
         binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.historyRecycler.adapter = SavedTitlesAdapter(requireContext())
+
 
         // Set editor action listener for btnTextUrl (IME_ACTION_DONE or IME_ACTION_GO)
         linkTubeRef.binding.btnTextUrl.setOnEditorActionListener { _, actionId, _ ->

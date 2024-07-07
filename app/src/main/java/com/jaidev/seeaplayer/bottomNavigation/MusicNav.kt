@@ -54,7 +54,6 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
         binding = FragmentMusicNavBinding.bind(view)
         setupActionBar()
         binding.musicRV.setHasFixedSize(true)
-//        binding.musicRV.setItemViewCacheSize(50)
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true)
         adapter.setMusicDeleteListener(this)

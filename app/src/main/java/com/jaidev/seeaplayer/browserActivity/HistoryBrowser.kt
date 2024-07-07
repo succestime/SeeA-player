@@ -1,12 +1,14 @@
 package com.jaidev.seeaplayer.browserActivity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -30,15 +32,17 @@ import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.databinding.ActivityHistoryBrowserBinding
 
-class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
+class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
     private var isEditTextVisible = false
     private lateinit var binding: ActivityHistoryBrowserBinding
     private lateinit var fileListAdapter: HistoryAdapter
     private lateinit var emptyStateLayout: ViewStub // Add reference to emptyStateLayout
-    private var appOpenAd : AppOpenAd? = null
+    private var appOpenAd: AppOpenAd? = null
     private var isAdDisplayed = false
     private lateinit var swipeRefreshLayout: ConstraintLayout
-    companion object{
+
+
+    companion object {
         val historyItems: MutableList<HistoryItem> = mutableListOf()
     }
 
@@ -48,11 +52,11 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         binding = ActivityHistoryBrowserBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-        MobileAds.initialize(this){}
+        MobileAds.initialize(this) {}
         loadAppOpenAd()
 
         val historyList = HistoryManager.getHistoryList(this).toMutableList()
-        fileListAdapter = HistoryAdapter(historyList ,this )
+        fileListAdapter = HistoryAdapter(this, historyList, this)
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
         binding.recyclerFileView.setHasFixedSize(true)
         binding.recyclerFileView.setItemViewCacheSize(10)
@@ -64,6 +68,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         swipeRefreshLayout = binding.historyActivityLayout
         setSwipeRefreshBackgroundColor()
     }
+
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -83,13 +88,23 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
 
         }
     }
+
     @SuppressLint("ClickableViewAccessibility")
-    private fun initializeBinding(){
+    private fun initializeBinding() {
 
         binding.imageButtonSearch.setOnClickListener {
+
+            if (fileListAdapter.itemCount == 0) {
+                // Do nothing if RecyclerView is empty
+                return@setOnClickListener
+            }
             // Show editTextSearch
             binding.editTextSearch.visibility = View.VISIBLE
             binding.imageButtonSearch.visibility = View.GONE
+            binding.clearActivity.visibility = View.GONE
+            binding.totalFile.visibility = View.GONE
+            binding.ClearData.visibility = View.GONE
+            binding.horizontalLine.visibility = View.GONE
             binding.editTextSearch.text?.clear()
 
             // Set focus to editTextSearch
@@ -102,10 +117,11 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             isEditTextVisible = true
         }
 
-
-
         binding.ClearData.setOnClickListener {
             showClearDataConfirmationDialog()
+        }
+        binding.clearActivity.setOnClickListener {
+            finish()
         }
         binding.editTextSearch.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
@@ -127,12 +143,53 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
                 s?.let {
                     fileListAdapter.filter(s.toString())
                     updateEmptyStateVisibility()
+                    if (s.toString().isEmpty()) {
+                        updateEmptyStateVisibility()
+                    } else {
+                        binding.totalFile.visibility = View.GONE
+                        binding.ClearData.visibility = View.GONE
+                        binding.horizontalLine.visibility = View.GONE
+                    }
                 }
             }
         })
 
     }
 
+    private fun hideEditText() {
+        binding.editTextSearch.visibility = View.GONE
+        binding.imageButtonSearch.visibility = View.VISIBLE
+        binding.clearActivity.visibility = View.VISIBLE
+
+        // Set initial positions for the views outside the screen
+        binding.totalFile.translationY = -binding.totalFile.height.toFloat()
+        binding.ClearData.translationY = -binding.ClearData.height.toFloat()
+        binding.horizontalLine.translationY = -binding.horizontalLine.height.toFloat()
+
+        // Animate views to slide in from the top
+        val totalFileAnimator = ObjectAnimator.ofFloat(binding.totalFile, "translationY", 0f)
+        val clearDataAnimator = ObjectAnimator.ofFloat(binding.ClearData, "translationY", 0f)
+        val horizontalLineAnimator = ObjectAnimator.ofFloat(binding.horizontalLine, "translationY", 0f)
+
+        // Create an AnimatorSet to play the animations together
+        val animatorSet = AnimatorSet()
+        animatorSet.playTogether(totalFileAnimator, clearDataAnimator, horizontalLineAnimator)
+        animatorSet.duration = 500 // Animation duration in milliseconds
+        animatorSet.start()
+
+        // Show the views
+        binding.totalFile.visibility = View.VISIBLE
+        binding.ClearData.visibility = View.VISIBLE
+        binding.horizontalLine.visibility = View.VISIBLE
+
+        // Hide keyboard
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.editTextSearch.windowToken, 0)
+        isEditTextVisible = false
+
+        // Ensure the empty state is updated
+        updateEmptyStateVisibility()
+    }
 
     private fun handleEditTextTouch(v: View, event: MotionEvent) {
         val bounds: Rect = binding.editTextSearch.compoundDrawablesRelative[2].bounds
@@ -153,8 +210,6 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
                 fileListAdapter.filter("") // Passing empty string to show all files
                 updateEmptyStateVisibility()
 
-
-
                 return
             }
         }
@@ -171,45 +226,49 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             binding.editTextSearch.text?.clear()
             fileListAdapter.filter("") // Passing empty string to show all files
             updateEmptyStateVisibility()
-
-
         }
     }
 
+    fun updateEmptyStateVisibility() {
+        val typedValue = TypedValue()
+        val theme = theme
+        theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+        val color = ContextCompat.getColor(this, typedValue.resourceId)
 
-    private fun hideEditText() {
-        binding.editTextSearch.visibility = View.GONE
-        binding.imageButtonSearch.visibility = View.VISIBLE
-        // Hide keyboard
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(binding.editTextSearch.windowToken, 0)
-        isEditTextVisible = false
-
-
-    }
-    private fun updateEmptyStateVisibility() {
         if (fileListAdapter.itemCount == 0) {
             emptyStateLayout.visibility = View.VISIBLE
+            binding.imageButtonSearch.setColorFilter(ContextCompat.getColor(this, R.color.gray)) // Set to gray
+            if (!isEditTextVisible) {
+                binding.totalFile.visibility = View.GONE
+                binding.ClearData.visibility = View.GONE
+                binding.horizontalLine.visibility = View.GONE
+            }
         } else {
             emptyStateLayout.visibility = View.GONE
+            binding.imageButtonSearch.setColorFilter(color) // Set to primary text color
+            if (!isEditTextVisible) {
+                binding.totalFile.visibility = View.VISIBLE
+                binding.ClearData.visibility = View.VISIBLE
+                binding.horizontalLine.visibility = View.VISIBLE
+            }
         }
     }
+
     override fun onItemClick(historyItem: HistoryItem) {
         // Handle item click here
         val query = historyItem.url
         openUrlInBrowser(query)
-        showLoadingToast()
+       finish()
     }
+
     private fun openUrlInBrowser(query: String) {
         val browserFragment = BrowseFragment(urlNew = query)
         changeTab("Brave", browserFragment)
     }
 
-    private fun showLoadingToast() {
-        Toast.makeText(this, "Provided link is loading. You can go back.", Toast.LENGTH_LONG).show()
-    }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun showClearDataConfirmationDialog() {
         if (fileListAdapter.itemCount == 0) {
             // Show toast indicating no search history to delete
@@ -232,6 +291,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
             // Set positive button (Clear Data)
             alertDialogBuilder.setPositiveButton("Clear Data") { dialog, _ ->
                 clearBrowsingData()
+
                 dialog.dismiss()
             }
 
@@ -246,32 +306,23 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         }
     }
 
-
-
-
     @SuppressLint("NotifyDataSetChanged")
     private fun clearBrowsingData() {
         // Clear browsing history data
         HistoryManager.clearHistory(this)
 
-        // Fetch updated history list
-        val updatedHistoryList = HistoryManager.getHistoryList(this).toMutableList()
+        // Clear the adapter's data set
+        fileListAdapter.historyItems.clear()
+        fileListAdapter.filteredItems.clear()
 
-        // Log the size of the updated history list for debugging
-        Log.d("HistoryBrowser", "Updated history list size: ${updatedHistoryList.size}")
-
-        // Update historyItems with the updated list
-        historyItems.clear()
-        historyItems.addAll(updatedHistoryList)
-
-        // Log the size of historyItems after update for debugging
-        Log.d("HistoryBrowser", "Updated historyItems size: ${historyItems.size}")
-
-        // Notify the adapter that the dataset has changed
+        // Notify the adapter of the change
         fileListAdapter.notifyDataSetChanged()
 
         // Show a toast message to indicate successful data clearance
         Toast.makeText(this, "Browsing data cleared successfully", Toast.LENGTH_SHORT).show()
+
+        // Update the empty state visibility
+        updateEmptyStateVisibility()
     }
 
     private fun loadAppOpenAd() {
@@ -303,6 +354,7 @@ class HistoryBrowser : AppCompatActivity() , HistoryAdapter.ItemClickListener  {
         super.onResume()
         loadAppOpenAd()
 
+        updateEmptyStateVisibility()
     }
 
     override fun onPause() {

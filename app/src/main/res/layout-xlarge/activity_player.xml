@@ -104,6 +104,7 @@
         android:textColor="@color/white"
         android:shadowColor="#000000"
         android:shadowRadius="5"
+        android:shadowDx="5"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"

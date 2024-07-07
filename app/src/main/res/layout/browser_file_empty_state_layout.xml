@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:contentDescription="@string/app_name"
-        android:src="@drawable/file_remove_svgrepo_com" />
+        android:src="@drawable/download_file_download_svgrepo_com" />
 
     <TextView
         android:id="@+id/empty_state_title"
@@ -19,20 +19,21 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
         android:gravity="center_horizontal"
-        android:text="NO File Present!"
+        android:text="You' ll find your downloads hare"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
     />
 
 
     <TextView
         android:id="@+id/empty_state_description"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/empty_state_title"
         android:layout_centerHorizontal="true"
+        android:layout_marginHorizontal="50dp"
         android:layout_marginTop="12dp"
         android:gravity="center_horizontal"
-        android:text="There are no file here"
+        android:text="You can save images and files to view offline or share in others app"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
        />
 

@@ -106,110 +106,108 @@ class LinkTubeActivity : AppCompatActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES }
-       window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        window.statusBarColor = Color.parseColor("#373636")
-        window.navigationBarColor = Color.parseColor("#373636")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.attributes.layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES }
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            window.statusBarColor = Color.parseColor("#373636")
+            window.navigationBarColor = Color.parseColor("#373636")
 
-        binding = ActivityLinkTubeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+            binding = ActivityLinkTubeBinding.inflate(layoutInflater)
+            setContentView(binding.root)
 
-        supportActionBar?.hide()
-        // Send broadcast to notify MainActivity that this activity is opened
-        val intent = Intent("com.yourapp.LINK_TUBE_OPENED")
-        sendBroadcast(intent)
+            supportActionBar?.hide()
+            // Send broadcast to notify MainActivity that this activity is opened
+            val intent = Intent("com.yourapp.LINK_TUBE_OPENED")
+            sendBroadcast(intent)
 
-        initializeView()
-        initializeBinding()
-        getAllBookmarks()
-        setSwipeRefreshBackgroundColor()
-        changeFullscreen(enable = true)
-        checkHistorySize()
-        MobileAds.initialize(this) {}
-        mAdView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
-        mAdView.adListener = object : AdListener() {
-            override fun onAdLoaded() {
-                binding.adsLayout.visibility = View.VISIBLE
-            }
-        }
-        // Initially set the adsLayout visibility to GONE until the ad is loaded
-        binding.adsLayout.visibility = View.GONE
-
-        tabsList.add(Tab("Home", HomeFragment(), LinkTubeActivity(), null, null))
-        binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
-        binding.myPager.isUserInputEnabled = false
-        myPager = binding.myPager
-        tabsBtn = binding.tabBtn
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBarsInsets.left, systemBarsInsets.top, systemBarsInsets.right, 0)
-            insets
-        }
-
-        binding.bottomRightBrowser.setOnTouchListener { view, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    view.tag = Pair(view.x - event.rawX, view.y - event.rawY)
-                    true
+            initializeView()
+            initializeBinding()
+            getAllBookmarks()
+            setSwipeRefreshBackgroundColor()
+            changeFullscreen(enable = true)
+            checkHistorySize()
+            MobileAds.initialize(this) {}
+            mAdView = findViewById(R.id.adView)
+            val adRequest = AdRequest.Builder().build()
+            mAdView.loadAd(adRequest)
+            mAdView.adListener = object : AdListener() {
+                override fun onAdLoaded() {
+                    binding.adsLayout.visibility = View.VISIBLE
                 }
-                MotionEvent.ACTION_MOVE -> {
-                    val tag = view.tag as Pair<Float, Float>
-                    val newX = event.rawX + tag.first
-                    val newY = event.rawY + tag.second
-
-                    // Get the screen width and height
-                    val displayMetrics = resources.displayMetrics
-                    val screenWidth = displayMetrics.widthPixels
-                    val screenHeight = displayMetrics.heightPixels
-
-                    // Get the status bar height
-                    val statusBarHeightResId = resources.getIdentifier("status_bar_height", "dimen", "android")
-                    val statusBarHeight = if (statusBarHeightResId > 0) {
-                        resources.getDimensionPixelSize(statusBarHeightResId)
-                    } else {
-                        0
-                    }
-
-                    // Get the navigation bar height
-                    val navigationBarHeightResId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-                    val navigationBarHeight = if (navigationBarHeightResId > 0) {
-                        resources.getDimensionPixelSize(navigationBarHeightResId)
-                    } else {
-                        0
-                    }
-
-                    // Ensure the view does not go outside the screen boundaries, considering the status bar and navigation bar
-                    val viewWidth = view.width
-                    val viewHeight = view.height
-
-                    val boundedX = when {
-                        newX < 0 -> 0f
-                        newX + viewWidth > screenWidth -> (screenWidth - viewWidth).toFloat()
-                        else -> newX
-                    }
-
-                    val boundedY = when {
-                        newY < statusBarHeight -> statusBarHeight.toFloat()
-                        newY + viewHeight > (screenHeight - navigationBarHeight) -> (screenHeight - navigationBarHeight - viewHeight).toFloat()
-                        else -> newY
-                    }
-
-                    view.animate()
-                        .x(boundedX)
-                        .y(boundedY)
-                        .setDuration(0)
-                        .start()
-                    true
-                }
-                else -> false
             }
-        }
+            // Initially set the adsLayout visibility to GONE until the ad is loaded
+            binding.adsLayout.visibility = View.GONE
+            tabsList.add(Tab("Home", HomeFragment(), LinkTubeActivity(), null, null))
+            binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
+            binding.myPager.isUserInputEnabled = false
+            myPager = binding.myPager
+            tabsBtn = binding.tabBtn
+
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+                val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                view.setPadding(systemBarsInsets.left, systemBarsInsets.top, systemBarsInsets.right, 0)
+                insets
+            }
+
+            binding.bottomRightBrowser.setOnTouchListener { view, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        view.tag = Pair(view.x - event.rawX, view.y - event.rawY)
+                        true
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        val tag = view.tag as Pair<Float, Float>
+                        val newX = event.rawX + tag.first
+                        val newY = event.rawY + tag.second
+
+                        // Get the screen width and height
+                        val displayMetrics = resources.displayMetrics
+                        val screenWidth = displayMetrics.widthPixels
+                        val screenHeight = displayMetrics.heightPixels
+
+                        // Get the status bar height
+                        val statusBarHeightResId = resources.getIdentifier("status_bar_height", "dimen", "android")
+                        val statusBarHeight = if (statusBarHeightResId > 0) {
+                            resources.getDimensionPixelSize(statusBarHeightResId)
+                        } else {
+                            0
+                        }
+
+                        // Get the navigation bar height
+                        val navigationBarHeightResId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+                        val navigationBarHeight = if (navigationBarHeightResId > 0) {
+                            resources.getDimensionPixelSize(navigationBarHeightResId)
+                        } else {
+                            0
+                        }
+
+                        // Ensure the view does not go outside the screen boundaries, considering the status bar and navigation bar
+                        val viewWidth = view.width
+                        val viewHeight = view.height
+
+                        val boundedX = when {
+                            newX < 0 -> 0f
+                            newX + viewWidth > screenWidth -> (screenWidth - viewWidth).toFloat()
+                            else -> newX
+                        }
+
+                        val boundedY = when {
+                            newY < statusBarHeight -> statusBarHeight.toFloat()
+                            newY + viewHeight > (screenHeight - navigationBarHeight) -> (screenHeight - navigationBarHeight - viewHeight).toFloat()
+                            else -> newY
+                        }
+
+                        view.animate()
+                            .x(boundedX)
+                            .y(boundedY)
+                            .setDuration(0)
+                            .start()
+                        true
+                    }
+                    else -> false
+                }
+            }
         } catch (e: Exception) {
             showToast(this@LinkTubeActivity, "Something went wrong, try to refresh")
             e.printStackTrace()
@@ -222,7 +220,7 @@ class LinkTubeActivity : AppCompatActivity() {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
-        fun initializeBinding(){
+    fun initializeBinding(){
         binding.googleMicBtn.setOnClickListener {
             speak()
         }
@@ -246,7 +244,10 @@ class LinkTubeActivity : AppCompatActivity() {
                     R.id.newTab -> {
                         changeTab("Home", HomeFragment())
                     }
+R.id.recantTab -> {
+    startActivity(Intent(this, RecantTabActivity::class.java))
 
+}
                     R.id.history -> {
                         startActivity(Intent(this, HistoryBrowser::class.java))
                     }
@@ -316,6 +317,9 @@ class LinkTubeActivity : AppCompatActivity() {
         }
 
     }
+
+
+
     @SuppressLint("Recycle")
     private fun slideOutLinearLayout() {
         val linearLayout5 = findViewById<LinearLayout>(R.id.linearLayout5)
@@ -540,21 +544,21 @@ class LinkTubeActivity : AppCompatActivity() {
 
     private fun changeFullscreen(enable: Boolean){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        if(enable){
-            // Do not hide the status bar, only hide the navigation bar
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            WindowInsetsControllerCompat(window, binding.root).let { controller ->
-                controller.hide(WindowInsetsCompat.Type.navigationBars())
-                controller.show(WindowInsetsCompat.Type.statusBars())
-                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
+            if(enable){
+                // Do not hide the status bar, only hide the navigation bar
+                WindowCompat.setDecorFitsSystemWindows(window, false)
+                WindowInsetsControllerCompat(window, binding.root).let { controller ->
+                    controller.hide(WindowInsetsCompat.Type.navigationBars())
+                    controller.show(WindowInsetsCompat.Type.statusBars())
+                    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
 
-        }else{
-            // Show the navigation bar, status bar remains visible
-            WindowCompat.setDecorFitsSystemWindows(window, true)
-            WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.navigationBars())
-            WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.statusBars())
-        }
+            }else{
+                // Show the navigation bar, status bar remains visible
+                WindowCompat.setDecorFitsSystemWindows(window, true)
+                WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.navigationBars())
+                WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.statusBars())
+            }
         } else {
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
                 val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -754,7 +758,7 @@ class LinkTubeActivity : AppCompatActivity() {
     }
 
 
-    private inner class TabsAdapter(fa: FragmentManager, lc: Lifecycle) :
+    private  class TabsAdapter(fa: FragmentManager, lc: Lifecycle) :
         FragmentStateAdapter(fa, lc) {
         override fun getItemCount(): Int = tabsList.size
 
@@ -912,24 +916,24 @@ class LinkTubeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         try {
-        mAdView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
-        mAdView.adListener = object : AdListener() {
-            override fun onAdLoaded() {
-                binding.adsLayout.visibility = View.VISIBLE
+            mAdView = findViewById(R.id.adView)
+            val adRequest = AdRequest.Builder().build()
+            mAdView.loadAd(adRequest)
+            mAdView.adListener = object : AdListener() {
+                override fun onAdLoaded() {
+                    binding.adsLayout.visibility = View.VISIBLE
+                }
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    // Initially set the adsLayout visibility to GONE until the ad is loaded
+                    binding.adsLayout.visibility = View.GONE
+                }
             }
-            override fun onAdFailedToLoad(p0: LoadAdError) {
-                // Initially set the adsLayout visibility to GONE until the ad is loaded
-                binding.adsLayout.visibility = View.GONE
+            printJob?.let {
+                when{
+                    it.isCompleted -> Snackbar.make(binding.root, "Successful -> ${it.info.label}", 4000).show()
+                    it.isFailed -> Snackbar.make(binding.root, "Failed -> ${it.info.label}", 4000).show()
+                }
             }
-        }
-        printJob?.let {
-            when{
-                it.isCompleted -> Snackbar.make(binding.root, "Successful -> ${it.info.label}", 4000).show()
-                it.isFailed -> Snackbar.make(binding.root, "Failed -> ${it.info.label}", 4000).show()
-            }
-        }
         } catch (e: Exception) {
             showToast(this@LinkTubeActivity, "Something went wrong, try to refresh")
             e.printStackTrace()
@@ -939,18 +943,19 @@ class LinkTubeActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         try {
-        mAdView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
-        mAdView.adListener = object : AdListener() {
-            override fun onAdLoaded() {
-                binding.adsLayout.visibility = View.VISIBLE
+            mAdView = findViewById(R.id.adView)
+            val adRequest = AdRequest.Builder().build()
+            mAdView.loadAd(adRequest)
+            mAdView.adListener = object : AdListener() {
+                override fun onAdLoaded() {
+                    binding.adsLayout.visibility = View.VISIBLE
+                }
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    // Initially set the adsLayout visibility to GONE until the ad is loaded
+                    binding.adsLayout.visibility = View.GONE
+                }
             }
-            override fun onAdFailedToLoad(p0: LoadAdError) {
-                // Initially set the adsLayout visibility to GONE until the ad is loaded
-                binding.adsLayout.visibility = View.GONE
-            }
-        }
+
         } catch (e: Exception) {
             showToast(this@LinkTubeActivity, "Something went wrong, try to refresh")
             e.printStackTrace()
@@ -1036,4 +1041,3 @@ fun checkForInternet(context: Context): Boolean {
 
 
 }
-

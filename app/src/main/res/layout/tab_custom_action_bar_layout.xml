@@ -25,6 +25,7 @@
             android:layout_gravity="center"
         android:src="@drawable/plus_icon"
             />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/titleNewTab"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"

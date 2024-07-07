@@ -87,6 +87,7 @@
         android:textColor="@color/white"
         android:shadowColor="#000000"
         android:shadowRadius="5"
+        android:shadowDx="5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
