@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="horizontal">
+
+    <!-- Icon CardView -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/iconCardView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        app:cardCornerRadius="20dp"
+        android:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/tabWebsiteIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            android:src="@drawable/pdf_image"
+            android:scaleType="centerCrop"
+            android:backgroundTint="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Metadata Layout -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@+id/iconCardView"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- TopicName TextView -->
+        <TextView
+            android:id="@+id/TabTopicName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:paddingEnd="15dp"
+            android:text="Topic Name"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/websiteName"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlSymmetry" />
+
+        <!-- WebsiteName TextView -->
+        <TextView
+            android:id="@+id/tabWebsiteName"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:paddingEnd="15dp"
+            android:text="Website Name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/TopicName"
+            tools:ignore="RtlSymmetry" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
