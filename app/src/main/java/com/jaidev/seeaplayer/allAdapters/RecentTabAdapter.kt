@@ -1,11 +1,13 @@
 package com.jaidev.seeaplayer.allAdapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.HistoryItem
+import com.jaidev.seeaplayer.dataClass.UniqueHistoryItem
 import com.jaidev.seeaplayer.databinding.RecantTabViewLayoutBinding
 
 class RecentTabAdapter(
@@ -15,6 +17,11 @@ class RecentTabAdapter(
 ) : RecyclerView.Adapter<RecentTabAdapter.MyHolder>() {
 
     private var maxVisibleItems = 6
+    private var uniqueItems: MutableList<UniqueHistoryItem> = mutableListOf()
+
+    init {
+        updateUniqueItems()
+    }
 
     class MyHolder(binding: RecantTabViewLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         val tabTopicName = binding.TabTopicName
@@ -25,7 +32,6 @@ class RecentTabAdapter(
 
     interface ItemClickListener {
         fun onItemClick(historyItem: HistoryItem)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
@@ -33,11 +39,12 @@ class RecentTabAdapter(
     }
 
     override fun getItemCount(): Int {
-        return maxVisibleItems.coerceAtMost(recentItems.size)
+        return maxVisibleItems.coerceAtMost(uniqueItems.size)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
-        val item = recentItems[position]
+        val item = uniqueItems[position].historyItem
         val topicName = extractTopicName(item.url)
         holder.tabTopicName.text = topicName
 
@@ -53,20 +60,31 @@ class RecentTabAdapter(
             itemClickListener.onItemClick(item)
 
             // Remove the clicked item from the list
-            recentItems.removeAt(position)
+            recentItems.remove(item)
+
+            // Update the unique items list
+            updateUniqueItems()
 
             // Notify adapter about the removed item
             notifyItemRemoved(position)
+            notifyItemRangeChanged(position, uniqueItems.size)
+        }
+    }
 
-            // If there are more items to show, increase the max visible items and notify the adapter
-            if (recentItems.size >= 5) {
-                maxVisibleItems++
-                notifyItemInserted(maxVisibleItems - 1)
+    private fun updateUniqueItems() {
+        val uniqueMap = mutableMapOf<String, UniqueHistoryItem>()
+
+        for (item in recentItems) {
+            val topicName = extractTopicName(item.url)
+            if (uniqueMap.containsKey(topicName)) {
+                uniqueMap[topicName]?.duplicateCount = uniqueMap[topicName]?.duplicateCount?.plus(1) ?: 1
             } else {
-                notifyItemRangeChanged(position, recentItems.size)
+                uniqueMap[topicName] = UniqueHistoryItem(item, 0)
             }
         }
 
+        uniqueItems = uniqueMap.values.toMutableList()
+        notifyDataSetChanged()
     }
 
     private fun extractTopicName(url: String): String {
@@ -80,8 +98,4 @@ class RecentTabAdapter(
             decodedUrl
         }
     }
-
-
 }
-
-

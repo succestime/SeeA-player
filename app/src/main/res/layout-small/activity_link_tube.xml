@@ -29,8 +29,8 @@
                 android:contentDescription="@string/refresh_btn"
                 android:visibility="visible"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="1dp"
-                android:src="@drawable/plus_icon"
+
+                android:src="@drawable/home_browse"
                 tools:ignore="RedundantDescriptionCheck"
                 app:tint="@color/white" />
             <ImageButton
@@ -40,8 +40,6 @@
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:visibility="visible"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="1dp"
                 app:tint="@color/white"
                 android:src="@drawable/round_arrow_back"
                 tools:ignore="RedundantDescriptionCheck" />
@@ -52,8 +50,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/refresh_btn"
                 android:visibility="visible"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="1dp"
+                android:layout_marginEnd="2dp"
                 app:tint="@color/white"
                 android:src="@drawable/round_arrow_forward"
                 tools:ignore="RedundantDescriptionCheck" />
@@ -75,21 +72,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="2dp"
-                    android:background="?attr/selectableItemBackground"
                     android:elevation="2dp"
                     >
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/webIcon"
-                            android:layout_width="25dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginStart="@dimen/car_ui_padding_2"
-                            android:src="@drawable/search_licktube_icon"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                         />
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/webIcon"
+                        android:layout_width="25dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="@dimen/car_ui_padding_2"
+                        android:src="@drawable/search_licktube_icon"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        />
 
 
                     <EditText
@@ -105,7 +100,6 @@
                         android:textColor="@color/white"
                         android:textColorHint="@color/white"
                         tools:ignore="RtlSymmetry" />
-
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -151,10 +145,12 @@
 
                     </LinearLayout>
 
+
                 </LinearLayout>
 
 
             </LinearLayout>
+
 
             <ImageButton
                 android:id="@+id/topDownloadBrowser"
@@ -168,10 +164,11 @@
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="1dp"
                 android:layout_gravity="center_vertical">
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/tabBtn"
@@ -179,8 +176,6 @@
                     android:layout_height="25dp"
                     android:background="@drawable/custom_tabs_textview"
                     android:gravity="center"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="1dp"
                     android:text="@string/one_browse"
                     android:textColor="@color/white"
                     tools:ignore="RedundantDescriptionCheck" />
@@ -215,12 +210,9 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintVertical_bias="1.0" />
-
-
+        />
 
     <LinearLayout
         android:id="@+id/adsLayout"
@@ -251,7 +243,7 @@
 
             <com.google.android.gms.ads.AdView
                 android:id="@+id/adView"
-                android:layout_width="380dp"
+                android:layout_width="400dp"
                 android:layout_height="60dp"
                 app:adSize="400x60"
                 app:adUnitId="ca-app-pub-3504589383575544/9715937751"
@@ -265,8 +257,8 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/bottomRightBrowser"
-        android:layout_width="60dp"
-        android:layout_height="0dp"
+        android:layout_width="65dp"
+        android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
@@ -274,7 +266,7 @@
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="52dp"
         android:background="@drawable/curver_linktube_"
-        app:layout_constraintTop_toBottomOf="@+id/adsLayout">
+        >
 
         <ImageButton
             android:id="@+id/bottomRightBrowserButton"
@@ -286,6 +278,53 @@
             android:src="@drawable/outline_fast_rewind_24"
             app:tint="@color/white"
             tools:ignore="RedundantDescriptionCheck" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout6"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#373636"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:layout_gravity="center_vertical"
+
+        app:layout_constraintBottom_toBottomOf="@+id/myPager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/showTabActivity"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                app:tint="@color/white"
+                android:src="@drawable/round_arrow_up_24"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tabQuickButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:paddingEnd="5dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
+                />
+
+            <ImageView
+                android:id="@+id/addNewTab"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/add_circle_svgrepo_com"/>
+
+
+        </LinearLayout>
 
     </LinearLayout>
     <LinearLayout
@@ -302,6 +341,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageButton
@@ -354,17 +394,26 @@
                 app:tint="@color/white"
                 tools:ignore="RedundantDescriptionCheck" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tab2Btn"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_tabs_textview"
+                android:gravity="center"
+                android:text="@string/one_browse"
+                android:textColor="@color/white"
+                tools:ignore="RedundantDescriptionCheck" />
             <ImageButton
-                android:id="@+id/downloadBrowser"
+                android:id="@+id/browser_clear"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/refresh_btn"
-                android:src="@drawable/download_browser"
-                android:visibility="visible"
+                android:layout_weight="1"
                 app:tint="@color/white"
-                tools:ignore="RedundantDescriptionCheck" />
+                android:src="@drawable/browser_clear"
+                android:visibility="gone" />
             <ImageButton
                 android:id="@+id/bottomLeftBrowser"
                 android:layout_width="40dp"
@@ -380,6 +429,15 @@
 
     </LinearLayout>
 
-
+    <View
+        android:id="@+id/overlay_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/myPager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

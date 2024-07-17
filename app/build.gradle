@@ -52,17 +52,17 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.firebase:firebase-auth:23.0.0'
-    implementation 'androidx.privacysandbox.tools:tools-core:1.0.0-alpha08'
-    implementation 'androidx.lifecycle:lifecycle-service:2.8.1'
+    implementation 'androidx.privacysandbox.tools:tools-core:1.0.0-alpha09'
+    implementation 'androidx.lifecycle:lifecycle-service:2.8.3'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     implementation 'com.google.firebase:firebase-auth-ktx:23.0.0'
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
-    implementation 'com.google.firebase:firebase-analytics-ktx:22.0.0'
+    implementation 'com.google.android.gms:play-services-maps:19.0.0'
+    implementation 'com.google.firebase:firebase-analytics-ktx:22.0.2'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     implementation 'com.android.car.ui:car-ui-lib:2.6.0'
 
     implementation 'com.github.bumptech.glide:glide:4.15.1' // Check for the latest version on Glide's GitHub repository
@@ -102,7 +102,7 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     
     // ads
-    implementation 'com.google.android.gms:play-services-ads:23.1.0'
+    implementation 'com.google.android.gms:play-services-ads:23.2.0'
 
 //for sending mail
     implementation 'com.sun.mail:android-mail:1.6.2'
@@ -115,7 +115,7 @@ dependencies {
     implementation "org.jsoup:jsoup:1.14.3"
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.3'
 
 
 

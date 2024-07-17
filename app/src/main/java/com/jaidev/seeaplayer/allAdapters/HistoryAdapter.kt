@@ -26,6 +26,7 @@ class HistoryAdapter(
 
     }
 
+
     var filteredItems: MutableList<HistoryItem> = mutableListOf()
     companion object {
         private const val VIEW_TYPE_NORMAL = 0

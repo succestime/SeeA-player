@@ -1,26 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="40dp"
+    android:layout_marginEnd="20dp"
     android:gravity="center">
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center">
+        <androidx.cardview.widget.CardView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#C8C6C6"
+            app:cardElevation="@null"
+            app:cardCornerRadius="50sp"
 
-    <TextView
-        android:id="@+id/bookmarkIcon"
-        android:layout_width="43dp"
-        android:layout_height="40dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        android:textStyle="bold" />
-
+            >
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:backgroundTint="#C8C6C6"
+                android:layout_margin="10dp"
+                app:cardCornerRadius="50sp">
+            <TextView
+                android:id="@+id/bookmarkIcon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+               android:gravity="center"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
     <TextView
         android:id="@+id/bookmarkName"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginTop="5dp"
         android:singleLine="true"
         android:text="@string/bookmark"
         android:textColor="@color/white"

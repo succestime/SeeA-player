@@ -7,6 +7,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,12 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        // Create a ContextThemeWrapper with the desired theme
+        val contextThemeWrapper = ContextThemeWrapper(activity, R.style.TransparentTheme)
+
+        // Inflate the layout using the themed context
+        val themedInflater = inflater.cloneInContext(contextThemeWrapper)
+        val view = themedInflater.inflate(R.layout.fragment_home, container, false)
         binding = FragmentHomeBinding.bind(view)
         saveDefaultBookmarks()
         addDefaultBookmarks()
@@ -98,6 +104,7 @@ class HomeFragment : Fragment() {
         val linkTubeRef = requireActivity() as LinkTubeActivity
 
         LinkTubeActivity.tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
+        LinkTubeActivity.tabs2Btn.text = LinkTubeActivity.tabsList.size.toString()
         LinkTubeActivity.tabsList[LinkTubeActivity.myPager.currentItem].name = "Home"
         linkTubeRef.binding.btnTextUrl.setText("")
         linkTubeRef.binding.webIcon.setImageResource(R.drawable.search_licktube_icon)

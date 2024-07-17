@@ -1,10 +1,13 @@
 package com.jaidev.seeaplayer.browserActivity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
+import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -20,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.TabAdapter
+import com.jaidev.seeaplayer.allAdapters.TabQuickButtonAdapter
 import com.jaidev.seeaplayer.browseFregment.HomeFragment
 import com.jaidev.seeaplayer.databinding.ActivityTabBinding
 
@@ -27,6 +31,7 @@ class TabActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTabBinding
     private lateinit var tabLayout: ConstraintLayout
     private lateinit var adapter: TabAdapter
+    private var actionMode: ActionMode? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
@@ -35,10 +40,8 @@ class TabActivity : AppCompatActivity() {
 
             binding.tabsRV.setHasFixedSize(true)
             binding.tabsRV.layoutManager = GridLayoutManager(this, 2)
-            adapter = TabAdapter(this)
+            adapter = TabAdapter(this , null, isLinktubeActivity = false)
             binding.tabsRV.adapter = adapter
-
-
 
             setActionBarGradient()
             updateEmptyViewVisibility()
@@ -52,6 +55,7 @@ class TabActivity : AppCompatActivity() {
             showErrorToast()
         }
     }
+
 
     private fun setSwipeRefreshBackgroundColor() {
         try {
@@ -104,16 +108,15 @@ class TabActivity : AppCompatActivity() {
             val popup = PopupMenu(this, view)
             popup.menuInflater.inflate(R.menu.tab_click_more_menu, popup.menu)
 
-            // Check if the RecyclerView is empty
-            if ((binding.tabsRV.adapter as TabAdapter).itemCount == 0) {
-                // Disable and set the color of the menu items
-                val clearAllTabsItem = popup.menu.findItem(R.id.clearAllTabs)
-                val selectTabsItem = popup.menu.findItem(R.id.selectTabs)
+            val clearAllTabsItem = popup.menu.findItem(R.id.clearAllTabs)
+            val selectTabsItem = popup.menu.findItem(R.id.selectTabs)
 
+            if (binding.videoEmptyStateLayout.visibility == View.VISIBLE) {
+                // If RecyclerView is empty, disable items and set color to gray
                 clearAllTabsItem.isEnabled = false
                 selectTabsItem.isEnabled = false
 
-                val grayColor = ContextCompat.getColor(this, R.color.gray) // Replace R.color.gray with your actual gray color resource
+                val grayColor = ContextCompat.getColor(this, R.color.gray)
 
                 val clearAllTabsTitle = SpannableString(clearAllTabsItem.title)
                 clearAllTabsTitle.setSpan(ForegroundColorSpan(grayColor), 0, clearAllTabsTitle.length, 0)
@@ -123,15 +126,21 @@ class TabActivity : AppCompatActivity() {
                 selectTabsTitle.setSpan(ForegroundColorSpan(grayColor), 0, selectTabsTitle.length, 0)
                 selectTabsItem.title = selectTabsTitle
 
-                // If you have icons, you can set their color as well
-                if (clearAllTabsItem.icon != null) {
-                    clearAllTabsItem.icon!!.mutate().setColorFilter(grayColor, PorterDuff.Mode.SRC_IN)
-                }
-                if (selectTabsItem.icon != null) {
-                    selectTabsItem.icon!!.mutate().setColorFilter(grayColor, PorterDuff.Mode.SRC_IN)
-                }
-            }
+                clearAllTabsItem.icon?.mutate()?.setColorFilter(grayColor, PorterDuff.Mode.SRC_IN)
+                selectTabsItem.icon?.mutate()?.setColorFilter(grayColor, PorterDuff.Mode.SRC_IN)
+            } else {
+                // If RecyclerView is not empty, enable items and set color to default
+                clearAllTabsItem.isEnabled = true
+                selectTabsItem.isEnabled = true
 
+
+                val clearAllTabsTitle = SpannableString(clearAllTabsItem.title)
+                clearAllTabsItem.title = clearAllTabsTitle
+
+                val selectTabsTitle = SpannableString(selectTabsItem.title)
+                selectTabsItem.title = selectTabsTitle
+
+            }
             // Use reflection to show icons in the popup menu
             try {
                 val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
@@ -149,7 +158,8 @@ class TabActivity : AppCompatActivity() {
                 }
                 when (menuItem.itemId) {
                     R.id.newTab -> {
-                        changeTab("Home", HomeFragment())
+                        LinkTubeActivity.myPager.currentItem = 0
+                        TabQuickButtonAdapter.updateTabs()
                         finish()
                         true
                     }
@@ -158,7 +168,11 @@ class TabActivity : AppCompatActivity() {
                         true
                     }
                     R.id.selectTabs -> {
-                        // Handle select tabs action
+                        actionMode = startActionMode(actionModeCallback)
+                        actionMode?.let {
+                            adapter.toggleSelectionMode(it)
+                        }
+
                         true
                     }
                     else -> false
@@ -170,6 +184,171 @@ class TabActivity : AppCompatActivity() {
         }
     }
 
+    private val actionModeCallback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.action_mode_menu, menu)
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            return when (item.itemId) {
+                R.id.action_mode_menu -> {
+                    val actionModeView = findViewById<View>(R.id.action_mode_menu)
+                    showMorePopupMenu(actionModeView)
+                    true
+                }
+                else -> false
+            }
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            Log.d("TabActivity", "ActionMode destroyed")
+            actionMode?.let {
+                adapter.toggleSelectionMode(it)
+            }
+            actionMode = null
+        }
+    }
+
+    @SuppressLint("DiscouragedPrivateApi", "NotifyDataSetChanged")
+    private fun showMorePopupMenu(view: View) {
+        val popup = PopupMenu(this, view)
+        popup.menuInflater.inflate(R.menu.action_mode_more_menu, popup.menu)
+
+        // Check if all items are selected
+        val allSelected = adapter.selectedItems.size == adapter.itemCount
+
+        if (allSelected) {
+            // Hide the original "Select All" item
+            val selectAllItem = popup.menu.findItem(R.id.selectAll)
+            selectAllItem.isVisible = false
+
+            // Show the existing "Deselect All" item
+            val deselectAllItem = popup.menu.findItem(R.id.deSelect)
+            deselectAllItem.isVisible = true
+        } else {
+            // Ensure "Select All" item is visible
+            val selectAllItem = popup.menu.findItem(R.id.selectAll)
+            selectAllItem.isVisible = true
+
+            // Ensure "Deselect All" item is hidden
+            val deselectAllItem = popup.menu.findItem(R.id.deSelect)
+            deselectAllItem.isVisible = false
+        }
+
+        // Get references to close and share menu items
+        val closeTabsItem = popup.menu.findItem(R.id.closeTabs)
+        val shareTabsItem = popup.menu.findItem(R.id.shareTabs)
+
+        // Check if no tabs are selected
+        val noTabsSelected = adapter.selectedItems.isEmpty()
+
+        if (noTabsSelected) {
+            // Disable items and set color to gray
+            closeTabsItem.isEnabled = false
+            shareTabsItem.isEnabled = false
+
+            val grayColor = ContextCompat.getColor(this, R.color.gray)
+
+            val closeTabsTitle = SpannableString(closeTabsItem.title)
+            closeTabsTitle.setSpan(ForegroundColorSpan(grayColor), 0, closeTabsTitle.length, 0)
+            closeTabsItem.title = closeTabsTitle
+
+            val shareTabsTitle = SpannableString(shareTabsItem.title)
+            shareTabsTitle.setSpan(ForegroundColorSpan(grayColor), 0, shareTabsTitle.length, 0)
+            shareTabsItem.title = shareTabsTitle
+
+            closeTabsItem.icon?.mutate()?.setColorFilter(grayColor, PorterDuff.Mode.SRC_IN)
+            shareTabsItem.icon?.mutate()?.setColorFilter(grayColor, PorterDuff.Mode.SRC_IN)
+        } else {
+            // Enable items and set color to default
+            closeTabsItem.isEnabled = true
+            shareTabsItem.isEnabled = true
+
+            val closeTabsTitle = SpannableString(closeTabsItem.title)
+            closeTabsItem.title = closeTabsTitle
+
+            val shareTabsTitle = SpannableString(shareTabsItem.title)
+            shareTabsItem.title = shareTabsTitle
+        }
+        // Force icons to show
+        try {
+            val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+            fieldPopup.isAccessible = true
+            val mPopup = fieldPopup.get(popup)
+            mPopup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java).invoke(mPopup, true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        popup.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.selectAll -> {
+                    // Select all items
+                    for (i in 0 until adapter.itemCount) {
+                        adapter.selectedItems.add(i)
+                    }
+                    adapter.notifyDataSetChanged()
+                    updateActionModeTitle()
+                    // Reopen the popup menu
+                    showMorePopupMenu(view)
+
+                    true
+                }
+                R.id.deSelect -> {
+                    // Deselect all items
+                    adapter.selectedItems.clear()
+                    adapter.notifyDataSetChanged()
+                    updateActionModeTitle()
+                    // Reopen the popup menu
+                    showMorePopupMenu(view)
+
+                    true
+                }
+                R.id.closeTabs -> {
+                    adapter.removeSelectedTabs()
+                    updateActionModeTitle()
+                    true
+                }
+                R.id.shareTabs -> {
+                    shareSelectedTabs()
+
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+    private fun shareSelectedTabs() {
+        val selectedTabs = adapter.selectedItems.mapNotNull { position ->
+            LinkTubeActivity.tabsList.getOrNull(position)?.name
+        }
+
+        if (selectedTabs.isNotEmpty()) {
+            val shareText = selectedTabs.joinToString("\n")
+
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, shareText)
+                type = "text/plain"
+            }
+            startActivity(Intent.createChooser(shareIntent, "Share tabs via"))
+        } else {
+            Toast.makeText(this, "No tabs selected to share", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun updateActionModeTitle() {
+        actionMode?.title = if (adapter.selectedItems.isEmpty()) {
+            "Select tabs"
+        } else {
+            "${adapter.selectedItems.size} Selected"
+        }
+    }
     @SuppressLint("NotifyDataSetChanged")
     private fun showClearAllTabsDialog() {
         try {
@@ -186,6 +365,11 @@ class TabActivity : AppCompatActivity() {
                 (binding.tabsRV.adapter as TabAdapter).notifyDataSetChanged()
                 updateEmptyViewVisibility()
                 dialog.dismiss()
+
+                // Finish the LinkTubeActivity and add a new tab with HomeFragment
+                changeTab("Home", HomeFragment())
+                (binding.tabsRV.adapter as TabAdapter).notifyDataSetChanged()
+
             }
 
             dialog.show()
@@ -193,6 +377,7 @@ class TabActivity : AppCompatActivity() {
             showErrorToast()
         }
     }
+
 
     fun updateEmptyViewVisibility() {
         try {
@@ -280,7 +465,8 @@ class TabActivity : AppCompatActivity() {
             val connectivityCardView = customActionBarView.findViewById<LinearLayout>(R.id.connectivityCardView)
 
             connectivityCardView.setOnClickListener {
-                changeTab("Home", HomeFragment())
+                LinkTubeActivity.myPager.currentItem = 0
+                TabQuickButtonAdapter.updateTabs()
                 finish()
             }
 

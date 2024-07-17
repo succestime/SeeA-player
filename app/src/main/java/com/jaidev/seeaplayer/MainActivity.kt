@@ -53,6 +53,7 @@ import com.jaidev.seeaplayer.bottomNavigation.homeNav
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.dataClass.Folder
 import com.jaidev.seeaplayer.dataClass.Music
+import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.dataClass.VideoData
@@ -521,9 +522,9 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("Range")
     fun getAllVideos(): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
-    sortValue = sortEditor.getInt("sortValue", 0)
+        sortValue = sortEditor.getInt("sortValue", 0)
         val tempList = ArrayList<VideoData>()
-        val folderMap = mutableMapOf<String, String>()  // Map to hold folder ID and name association
+        val folderMap = mutableMapOf<String, String>()
 
         val projection = arrayOf(
             MediaStore.Video.Media.TITLE,
@@ -571,9 +572,10 @@ class MainActivity : AppCompatActivity() {
 
                         if (file.exists()) tempList.add(video)
 
-                        // Ensure folder is added to MainActivity.folderList
                         if (folderList.none { it.id == folderIdC }) {
-                           folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" } ))
+                            folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" }))
+
+
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -581,10 +583,23 @@ class MainActivity : AppCompatActivity() {
                 } while (it.moveToNext())
             }
         }
+
+        if (sortValue == 2 || sortValue == 3) {
+            tempList.sortWith(Comparator { o1, o2 ->
+                val result = NaturalOrderComparator().compare(o1.title, o2.title)
+                if (sortValue == 3) -result else result
+            })
+        }
+// Sort the folderList using NaturalOrderComparator
+        if (sortValue == 2 || sortValue == 3) { // Name(A to Z) or Name(Z to A)
+            folderList.sortWith(Comparator { o1, o2 ->
+                val result = NaturalOrderComparator().compare(o1.folderName, o2.folderName)
+                if (sortValue == 3) -result else result
+            })
+        }
+
         return tempList
     }
-
-
 
     @SuppressLint("Recycle", "Range")
     @RequiresApi(Build.VERSION_CODES.R)
@@ -621,6 +636,17 @@ class MainActivity : AppCompatActivity() {
             }
             cursor.close()
         }
+        // Sort the tempList based on the selected sorting option
+        if (sortValue == 2 || sortValue == 3) { // Name(A to Z) or Name(Z to A)
+            tempList.sortWith(Comparator { o1, o2 ->
+                NaturalOrderComparator().compare(o1.title, o2.title)
+            })
+            if (sortValue == 3) { // Name(Z to A)
+                tempList.reverse()
+            }
+        }
+
+
         return tempList
     }
 

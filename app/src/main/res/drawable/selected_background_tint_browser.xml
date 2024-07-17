@@ -4,5 +4,5 @@
     <!-- Set the background color for the selected box -->
     <solid android:color="#0B4663" />
     <!-- Optionally, you can define corner radius and other properties -->
-    <corners android:radius="4dp" />
+    <corners android:radius="8dp" />
 </shape>

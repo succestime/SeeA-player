@@ -21,8 +21,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.MainActivity.Companion.folderList
+import com.jaidev.seeaplayer.MainActivity.Companion.sortValue
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.dataClass.Folder
+import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityFoldersBinding
 import java.io.File
@@ -201,7 +204,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
                         "File Size(Smallest)",
                         "File Size(Largest)"
                     )
-                    var value = MainActivity.sortValue
+                    var value = sortValue
                     val dialog = MaterialAlertDialogBuilder(this)
                         .setTitle("Sort By")
                         .setPositiveButton("OK") { _, _ ->
@@ -212,7 +215,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
                             finish()
                             startActivity(intent)
                         }
-                        .setSingleChoiceItems(menuItems, MainActivity.sortValue) { _, pos ->
+                        .setSingleChoiceItems(menuItems, sortValue) { _, pos ->
                             value = pos
                         }
                         .create()
@@ -269,7 +272,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
     @SuppressLint("Range")
     fun getAllVideos(folderId: String): ArrayList<VideoData> {
         val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE)
-        MainActivity.sortValue = sortEditor.getInt("sortValue", 0)
+        sortValue = sortEditor.getInt("sortValue", 0)
         val selection = "${MediaStore.Video.Media.BUCKET_ID} = ?"
         val tempList = ArrayList<VideoData>()
         val folderMap = mutableMapOf<String, String>()  // Map to hold folder ID and name association
@@ -286,7 +289,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         )
         val cursor = this.contentResolver.query(
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection, arrayOf(folderId),
-            MainActivity.sortList[MainActivity.sortValue]
+            MainActivity.sortList[sortValue]
         )
         cursor?.use {
             if (it.moveToFirst()) {
@@ -321,9 +324,10 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
                         if (file.exists()) tempList.add(video)
 
                         // Ensure folder is added to MainActivity.folderList
-                        if (MainActivity.folderList.none { it.id == folderIdC }) {
-                            MainActivity.folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory"
+                        if (folderList.none { it.id == folderIdC }) {
+                            folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory"
                              }))
+
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -331,6 +335,21 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
                 } while (it.moveToNext())
             }
         }
+
+        if (sortValue == 2 || sortValue == 3) {
+            tempList.sortWith(Comparator { o1, o2 ->
+                val result = NaturalOrderComparator().compare(o1.title, o2.title)
+                if (sortValue == 3) -result else result
+            })
+        }
+        // Sort the folderList using NaturalOrderComparator
+        if (sortValue == 2 || sortValue == 3) { // Name(A to Z) or Name(Z to A)
+            folderList.sortWith(Comparator { o1, o2 ->
+                val result = NaturalOrderComparator().compare(o1.folderName, o2.folderName)
+                if (sortValue == 3) -result else result
+            })
+        }
+
         return tempList
     }
 

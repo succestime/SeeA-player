@@ -65,32 +65,34 @@ android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/totalFile" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- HorizontalScrollView added here -->
     <HorizontalScrollView
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
         android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/allInOne"
-        android:layout_marginStart="15dp"
-        android:layout_marginVertical="10dp" >
+        app:layout_constraintTop_toBottomOf="@+id/allInOne">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/monthlyBox"
-                android:layout_width="60dp"
-                android:layout_height="40dp"
+                android:layout_width="70dp"
+                android:layout_height="35dp"
 
                 android:background="@drawable/square_box_bg_browser"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="horizontal"
-                android:paddingStart="5dp"
-                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -102,7 +104,7 @@ android:textStyle="bold"
                     android:layout_height="wrap_content"
                     android:text="All"
                     android:textColor="@android:color/white"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -111,29 +113,31 @@ android:textStyle="bold"
                     android:id="@+id/monthly_select"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
-                    android:src="@drawable/complete_svgrepo_com"
+                    android:src="@drawable/baseline_check_24"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/white" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/quarterly_Box"
-                android:layout_width="75dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="10dp"
+                android:layout_width="82dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="8dp"
                 android:background="@drawable/square_box_bg_browser"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="horizontal"
-                android:paddingStart="5dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/monthlyBox"
                 app:layout_constraintTop_toTopOf="parent"
+
                 tools:ignore="RtlSymmetry">
 
                 <TextView
@@ -143,7 +147,7 @@ android:textStyle="bold"
                     android:layout_height="wrap_content"
                     android:text="Video"
                     android:textColor="@android:color/white"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
 
                     app:layout_constraintEnd_toEndOf="parent"
@@ -164,17 +168,18 @@ android:textStyle="bold"
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/annual_Box"
                 android:layout_width="85dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="10dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="8dp"
                 android:background="@drawable/square_box_bg_browser"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="horizontal"
-                android:paddingStart="5dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/quarterly_Box"
                 app:layout_constraintTop_toTopOf="parent"
+
                 tools:ignore="RtlSymmetry">
 
                 <TextView
@@ -183,7 +188,7 @@ android:textStyle="bold"
                     android:layout_height="wrap_content"
                     android:text="Images"
                     android:textColor="@android:color/white"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -199,17 +204,18 @@ android:textStyle="bold"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/white" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/page_Box"
                 android:layout_width="80dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="10dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="8dp"
                 android:background="@drawable/square_box_bg_browser"
                 android:clickable="true"
                 android:focusable="true"
 
                 android:orientation="horizontal"
-                android:paddingStart="5dp"
+                android:paddingStart="10dp"
                 android:paddingEnd="10dp"
 
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -224,7 +230,7 @@ android:textStyle="bold"
                     android:layout_height="wrap_content"
                     android:text="Pages"
                     android:textColor="@android:color/white"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -243,19 +249,16 @@ android:textStyle="bold"
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/biennial_Box"
-                android:layout_width="70dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="10dp"
+                android:layout_width="75dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="8dp"
                 android:background="@drawable/square_box_bg_browser"
                 android:clickable="true"
                 android:focusable="true"
-
                 android:orientation="horizontal"
-                android:paddingStart="5dp"
-                android:paddingEnd="7dp"
-
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-
                 app:layout_constraintStart_toEndOf="@+id/page_Box"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="RtlSymmetry">
@@ -266,7 +269,7 @@ android:textStyle="bold"
                     android:layout_height="wrap_content"
                     android:text="Other"
                     android:textColor="@android:color/white"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

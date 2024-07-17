@@ -26,14 +26,18 @@ class ImageViewerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityImageViewerBinding
     private var imagePath: String? = null
     private lateinit var swipeRefreshLayout: ConstraintLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         // Enable up button in ActionBar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        // Retrieve the image path from Intent extras
-        imagePath = intent.getStringExtra("imagePath")
+
+        // Retrieve the image path from Intent extras or data
+        imagePath = intent.getStringExtra("imagePath") ?: getImagePathFromIntent(intent)
+
         // Set the ActionBar title to the image name
         imagePath?.let {
             val fileName = File(it).name
@@ -75,6 +79,10 @@ class ImageViewerActivity : AppCompatActivity() {
         setSwipeRefreshBackgroundColor()
     }
 
+    private fun getImagePathFromIntent(intent: Intent): String? {
+        val dataUri = intent.data ?: return null
+        return dataUri.path?.let { File(it).absolutePath }
+    }
 
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -95,7 +103,6 @@ class ImageViewerActivity : AppCompatActivity() {
 
         }
     }
-
 
     private fun loadImage() {
         if (!imagePath.isNullOrBlank()) {
@@ -143,8 +150,6 @@ class ImageViewerActivity : AppCompatActivity() {
             .into(binding.photoView)
     }
 
-
-
     private fun calculateSampleSize(imageWidth: Int, imageHeight: Int, targetWidth: Int, targetHeight: Int): Int {
         var inSampleSize = 1
 
@@ -161,12 +166,11 @@ class ImageViewerActivity : AppCompatActivity() {
 
         return inSampleSize
     }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.image_menu, menu)
         return true
     }
-
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -187,6 +191,7 @@ class ImageViewerActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
     private fun showOpenWithPopupMenu() {
         // Check if imagePath is valid
         if (!imagePath.isNullOrBlank()) {
@@ -231,6 +236,7 @@ class ImageViewerActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun shareImage() {
         // Check if imagePath is valid
         if (!imagePath.isNullOrBlank()) {

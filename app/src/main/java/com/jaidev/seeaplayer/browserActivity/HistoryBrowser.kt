@@ -12,8 +12,8 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewStub
 import android.view.inputmethod.InputMethodManager
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -36,11 +36,13 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
     private var isEditTextVisible = false
     private lateinit var binding: ActivityHistoryBrowserBinding
     private lateinit var fileListAdapter: HistoryAdapter
-    private lateinit var emptyStateLayout: ViewStub // Add reference to emptyStateLayout
     private var appOpenAd: AppOpenAd? = null
     private var isAdDisplayed = false
     private lateinit var swipeRefreshLayout: ConstraintLayout
-
+    private lateinit var progressBar: ProgressBar
+    private var isLoading = false
+    private var currentPage = 0
+    private val pageSize = 100
 
     companion object {
         val historyItems: MutableList<HistoryItem> = mutableListOf()
@@ -57,16 +59,16 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
 
         val historyList = HistoryManager.getHistoryList(this).toMutableList()
         fileListAdapter = HistoryAdapter(this, historyList, this)
-        emptyStateLayout = findViewById(R.id.emptyStateLayout)
         binding.recyclerFileView.setHasFixedSize(true)
         binding.recyclerFileView.setItemViewCacheSize(10)
         binding.recyclerFileView.layoutManager = LinearLayoutManager(this)
         binding.recyclerFileView.adapter = fileListAdapter
-        // Show empty state layout based on history list size
         updateEmptyStateVisibility()
         initializeBinding()
         swipeRefreshLayout = binding.historyActivityLayout
         setSwipeRefreshBackgroundColor()
+
+
     }
 
     private fun setSwipeRefreshBackgroundColor() {
@@ -155,7 +157,15 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
         })
 
     }
-
+    override fun onBackPressed() {
+        if (isEditTextVisible) {
+            hideEditText()
+            fileListAdapter.filter("") // Passing empty string to show all files
+            updateEmptyStateVisibility()
+        } else {
+            super.onBackPressed()
+        }
+    }
     private fun hideEditText() {
         binding.editTextSearch.visibility = View.GONE
         binding.imageButtonSearch.visibility = View.VISIBLE
@@ -190,7 +200,13 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
         // Ensure the empty state is updated
         updateEmptyStateVisibility()
     }
-
+//    override fun onBackPressed() {
+//        if (isEditTextVisible) {
+//            hideEditText()
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
     private fun handleEditTextTouch(v: View, event: MotionEvent) {
         val bounds: Rect = binding.editTextSearch.compoundDrawablesRelative[2].bounds
         val drawableStart = binding.editTextSearch.compoundDrawablesRelative[0] // Index 0 for drawable start
@@ -236,7 +252,7 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
         val color = ContextCompat.getColor(this, typedValue.resourceId)
 
         if (fileListAdapter.itemCount == 0) {
-            emptyStateLayout.visibility = View.VISIBLE
+            binding.emptyStateLayout.visibility = View.VISIBLE
             binding.imageButtonSearch.setColorFilter(ContextCompat.getColor(this, R.color.gray)) // Set to gray
             if (!isEditTextVisible) {
                 binding.totalFile.visibility = View.GONE
@@ -244,7 +260,7 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
                 binding.horizontalLine.visibility = View.GONE
             }
         } else {
-            emptyStateLayout.visibility = View.GONE
+            binding.emptyStateLayout.visibility = View.GONE
             binding.imageButtonSearch.setColorFilter(color) // Set to primary text color
             if (!isEditTextVisible) {
                 binding.totalFile.visibility = View.VISIBLE

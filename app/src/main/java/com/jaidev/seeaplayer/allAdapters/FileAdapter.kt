@@ -37,11 +37,14 @@ class FileAdapter(
     private var fileList: MutableList<FileItem>,
     private val itemClickListener: OnItemClickListener,
     private val fileCountChangeListener: OnFileCountChangeListener ,
-    private val fileDeleteListener: OnFileDeleteListener // Add this listener
-
+    private val fileDeleteListener: OnFileDeleteListener ,
+    private val selectionModeChangeListener: OnSelectionModeChangeListener
 
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var isSelectionModeEnabled: Boolean = false // Variable to track selection mode
+    interface OnSelectionModeChangeListener {
+        fun onSelectionModeChanged(isSelectionModeEnabled: Boolean)
+    }
 
     interface OnItemClickListener {
         fun onItemClick(fileItem: FileItem)
@@ -67,6 +70,7 @@ class FileAdapter(
         isSelectionModeEnabled = false
         notifyDataSetChanged()
     }
+
     interface OnFileCountChangeListener {
         fun onFileCountChanged(newCount: Int)
     }
@@ -755,8 +759,12 @@ class FileAdapter(
         // Start or finish action mode based on selection
         if (selectedItems.isEmpty()) {
             actionMode?.finish()
+            selectionModeChangeListener.onSelectionModeChanged(false) // Notify listener
+
         } else {
             startActionMode()
+            selectionModeChangeListener.onSelectionModeChanged(true) // Notify listener
+
         }
 
         // Update selected items

@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
@@ -43,7 +44,11 @@ import java.io.File
 import java.util.Locale
 import kotlin.concurrent.thread
 
-class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  FileAdapter.OnFileCountChangeListener , FileAdapter.OnFileDeleteListener {
+class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
+    FileAdapter.OnFileCountChangeListener ,
+    FileAdapter.OnFileDeleteListener
+    , FileAdapter.OnSelectionModeChangeListener
+{
     private lateinit var fileListAdapter: FileAdapter
     private val fileItems: MutableList<FileItem> = mutableListOf()
     private lateinit var binding: ActivityFileBinding
@@ -74,7 +79,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
         binding.pageBox.setOnClickListener { handleBoxClick(binding.pageBox) }
 
         // Set up RecyclerView and adapter
-        fileListAdapter = FileAdapter(this, fileItems,  this, this, this)
+        fileListAdapter = FileAdapter(this, fileItems,  this, this, this,this)
 
         binding.recyclerFileView.apply {
             setHasFixedSize(true)
@@ -123,6 +128,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
 
         // Perform box selection logic
         toggleSelection(box)
+        onSelectionModeChanged(false)
     }
 
 
@@ -153,6 +159,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
         }
         startActivity(intent)
     }
+
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -360,6 +367,8 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.editTextSearch.windowToken, 0)
         isEditTextVisible = false
+        updateEmptyStateVisibility()
+
     }
 
 
@@ -457,6 +466,16 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
             // Show a toast or handle the error as appropriate
         }
     }
+    override fun onBackPressed() {
+        if (isEditTextVisible) {
+            hideEditText()
+            filterFileItems("")
+updateEmptyStateVisibility()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     private fun openFile(fileItem: FileItem) {
         try {
             when (fileItem.fileType) {
@@ -702,10 +721,9 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
             // Extract the file URL and filename from the webpage content based on file type
             val fileUrl: String
             val fileName: String
-            val websiteName: String
 
             // Fetch the website name
-            websiteName = doc.title()
+            val websiteName: String = doc.title()
 
             // Check if the webpage contains a PDF file link
             if (doc.select("a[href$=.pdf], a[href$=.pdfa], a[href$=.pdfxml], a[href$=.fdf], a[href$=.xfdf], a[href$=.pdfx], a[href$=.pdp] , a[href$=.PPT], a[href$=.pptx]").isNotEmpty()) {
@@ -803,12 +821,37 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,  Fil
         binding.totalFile.text = "Total Downloaded files: ${fileItems.size}"
 
     }
-    fun updateEmptyStateVisibility() {
+ fun updateEmptyStateVisibility() {
         if (fileListAdapter.itemCount == 0) {
             binding.fileEmptyStateLayout.visibility = View.VISIBLE
+
+            // Set button colors to gray
+            binding.imageButtonSearch.setColorFilter(Color.GRAY)
+            binding.settingBrowser.setColorFilter(Color.GRAY)
+
+            // Disable click listeners
+            binding.imageButtonSearch.isClickable = false
+            binding.settingBrowser.isClickable = false
         } else {
             binding.fileEmptyStateLayout.visibility = View.GONE
 
+            // Reset button colors
+            binding.imageButtonSearch.setColorFilter(null)
+            binding.settingBrowser.setColorFilter(null)
+
+            // Enable click listeners
+            binding.imageButtonSearch.isClickable = true
+            binding.settingBrowser.isClickable = true
+        }
+    }
+
+    override fun onSelectionModeChanged(isSelectionModeEnabled: Boolean) {
+        if (isSelectionModeEnabled) {
+            binding.linearLayout7.visibility = View.GONE
+            binding.adsLayout.visibility = View.GONE
+        } else {
+            binding.linearLayout7.visibility = View.VISIBLE
+            binding.adsLayout.visibility = View.VISIBLE
         }
     }
 

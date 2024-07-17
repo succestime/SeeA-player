@@ -69,6 +69,7 @@ import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
 import com.jaidev.seeaplayer.allAdapters.SavedTitlesAdapter
 import com.jaidev.seeaplayer.allAdapters.SearchItemAdapter
 import com.jaidev.seeaplayer.allAdapters.TabAdapter
+import com.jaidev.seeaplayer.allAdapters.TabQuickButtonAdapter
 import com.jaidev.seeaplayer.browserActivity.FileActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
@@ -100,8 +101,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     private var mInterstitialAd: InterstitialAd? = null
     private lateinit var fileListAdapter: SearchItemAdapter
     private var isLoadingPage = false // Add this variabl
-    private lateinit var noInternetView: View
-    private val loadTimeout = 5000L // 5 seconds timeout
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var loadRunnable: Runnable
 
@@ -122,7 +121,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
     }
 
 
-    @SuppressLint("SetJavaScriptEnabled", "ObsoleteSdkInt")
+    @SuppressLint("SetJavaScriptEnabled", "ObsoleteSdkInt", "NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -182,7 +181,9 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
         setupNoInternetView()
         checkAndDisableSwipeRefreshBasedOnUrl() // Check URL here
-        return view
+            TabQuickButtonAdapter.updateTabs()
+
+            return view
 
         } catch (e: Exception) {
             showToast(requireContext(), "Something went wrong, try to refresh")
@@ -260,6 +261,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         tabsList[myPager.currentItem].name =
             binding.webView.url.toString()
         LinkTubeActivity.tabsBtn.text = tabsList.size.toString()
+        LinkTubeActivity.tabs2Btn.text = tabsList.size.toString()
         binding.webView.apply {
             settings.javaScriptEnabled = true
             settings.setSupportZoom(true)
@@ -588,6 +590,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                         // Update the icon for the current tab
                         val currentTab = tabsList[myPager.currentItem]
                         currentTab.icon = icon
+                        TabQuickButtonAdapter.updateTabs()
                         // Notify the TabAdapter of the change
                         (myPager.adapter as? TabAdapter)?.notifyItemChanged(myPager.currentItem)
 
@@ -1012,7 +1015,6 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
                         frameLayout.addView(imgView)
 
                         val imgDialog = MaterialAlertDialogBuilder(requireContext())
-                            .setView(frameLayout)
                             .create()
                         imgDialog.show()
                         imgView.layoutParams.width = Resources.getSystem().displayMetrics.widthPixels
@@ -1271,6 +1273,8 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
             true // Back press handled within the fragment
         } else if (webView.canGoBack()) {
             webView.goBack()
+            TabQuickButtonAdapter.updateTabs()
+            LinkTubeActivity.tabs2Btn.text = tabsList.size.toString()
             true // Back press handled within the fragment
         } else {
             false // Back press not handled within the fragment

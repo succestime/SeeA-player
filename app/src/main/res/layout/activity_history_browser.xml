@@ -142,11 +142,11 @@ android:id="@+id/historyActivityLayout"
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerFileView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalLine" />
@@ -158,7 +158,7 @@ android:id="@+id/historyActivityLayout"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/recyclerFileView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

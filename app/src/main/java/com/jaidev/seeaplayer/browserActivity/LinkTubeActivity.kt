@@ -1,4 +1,3 @@
-
 package com.jaidev.seeaplayer.browserActivity
 
 import android.animation.Animator
@@ -16,21 +15,28 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.print.PrintAttributes
 import android.print.PrintJob
 import android.print.PrintManager
 import android.speech.RecognizerIntent
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.webkit.WebView
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -38,20 +44,18 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
@@ -59,15 +63,18 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.allAdapters.TabAdapter
+import com.jaidev.seeaplayer.allAdapters.TabQuickButtonAdapter
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
 import com.jaidev.seeaplayer.browseFregment.HomeFragment
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
+import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabs2Btn
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsBtn
 import com.jaidev.seeaplayer.dataClass.Bookmark
-import com.jaidev.seeaplayer.dataClass.HistoryManager
 import com.jaidev.seeaplayer.dataClass.Tab
 import com.jaidev.seeaplayer.databinding.ActivityLinkTubeBinding
 import com.jaidev.seeaplayer.databinding.BookmarkDialogBinding
+import com.jaidev.seeaplayer.databinding.ClearTabDialogLayoutBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URL
@@ -86,18 +93,23 @@ class LinkTubeActivity : AppCompatActivity() {
     private var rewardedInterstitialAd : RewardedInterstitialAd? = null
     @SuppressLint("StaticFieldLeak")
     lateinit var binding: ActivityLinkTubeBinding
+    val MAX_HISTORY_SIZE = 150
+
     companion object {
         var tabsList: ArrayList<Tab> = ArrayList()
         private var isFullscreen: Boolean = true
         var isDesktopSite: Boolean = false
         var bookmarkList: ArrayList<Bookmark> = ArrayList()
         var bookmarkIndex : Int = -1
+        @SuppressLint("StaticFieldLeak")
+        lateinit var adapter: TabQuickButtonAdapter
+
         lateinit var myPager : ViewPager2
         lateinit var tabsBtn : MaterialTextView
+        lateinit var tabs2Btn : MaterialTextView
         const val REQUEST_CODE_SPEECH_INPUT = 2000
-        const val MAX_HISTORY_SIZE = 150
-
-
+        // Flag to track if the Home tab has been added
+        private var isHomeTabAdded: Boolean = false
     }
 
     @SuppressLint("ObsoleteSdkInt", "ClickableViewAccessibility", "InternalInsetResource",
@@ -126,7 +138,7 @@ class LinkTubeActivity : AppCompatActivity() {
             getAllBookmarks()
             setSwipeRefreshBackgroundColor()
             changeFullscreen(enable = true)
-            checkHistorySize()
+            setupRecyclerView()
             MobileAds.initialize(this) {}
             mAdView = findViewById(R.id.adView)
             val adRequest = AdRequest.Builder().build()
@@ -136,13 +148,21 @@ class LinkTubeActivity : AppCompatActivity() {
                     binding.adsLayout.visibility = View.VISIBLE
                 }
             }
+
             // Initially set the adsLayout visibility to GONE until the ad is loaded
             binding.adsLayout.visibility = View.GONE
-            tabsList.add(Tab("Home", HomeFragment(), LinkTubeActivity(), null, null))
+
+            // Add the Home tab if it hasn't been added yet
+            if (!isHomeTabAdded) {
+                tabsList.add(Tab("Home", HomeFragment(), LinkTubeActivity(), null, null))
+                isHomeTabAdded = true
+            }
+
             binding.myPager.adapter = TabsAdapter(supportFragmentManager, lifecycle)
             binding.myPager.isUserInputEnabled = false
             myPager = binding.myPager
             tabsBtn = binding.tabBtn
+            tabs2Btn = binding.tab2Btn
 
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
                 val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -166,23 +186,24 @@ class LinkTubeActivity : AppCompatActivity() {
                         val screenWidth = displayMetrics.widthPixels
                         val screenHeight = displayMetrics.heightPixels
 
-                        // Get the status bar height
-                        val statusBarHeightResId = resources.getIdentifier("status_bar_height", "dimen", "android")
-                        val statusBarHeight = if (statusBarHeightResId > 0) {
-                            resources.getDimensionPixelSize(statusBarHeightResId)
-                        } else {
-                            0
-                        }
+                        // Get the system window insets (status bar, navigation bar, gesture insets)
+                        val insets = ViewCompat.getRootWindowInsets(view)?.getInsets(WindowInsetsCompat.Type.systemBars()) ?: Insets.NONE
 
-                        // Get the navigation bar height
-                        val navigationBarHeightResId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-                        val navigationBarHeight = if (navigationBarHeightResId > 0) {
-                            resources.getDimensionPixelSize(navigationBarHeightResId)
-                        } else {
-                            0
-                        }
+                        // Get the status bar, navigation bar, and gesture insets
+                        val statusBarHeight = insets.top
+                        val navigationBarHeight = insets.bottom
 
-                        // Ensure the view does not go outside the screen boundaries, considering the status bar and navigation bar
+                        // Get the bounds of linearLayout6 if it's visible
+                        val linearLayout6 = binding.linearLayout6
+                        val isLinearLayout6Visible = linearLayout6.visibility == View.VISIBLE
+                        val linearLayout6Location = IntArray(2)
+                        if (isLinearLayout6Visible) {
+                            linearLayout6.getLocationOnScreen(linearLayout6Location)
+                        }
+                        val linearLayout6Top = linearLayout6Location[1]
+                        val linearLayout6Bottom = linearLayout6Top + linearLayout6.height
+
+                        // Ensure the view does not go outside the screen boundaries, considering the insets and linearLayout6
                         val viewWidth = view.width
                         val viewHeight = view.height
 
@@ -195,6 +216,7 @@ class LinkTubeActivity : AppCompatActivity() {
                         val boundedY = when {
                             newY < statusBarHeight -> statusBarHeight.toFloat()
                             newY + viewHeight > (screenHeight - navigationBarHeight) -> (screenHeight - navigationBarHeight - viewHeight).toFloat()
+                            isLinearLayout6Visible && newY + viewHeight > linearLayout6Top && newY < linearLayout6Bottom -> linearLayout6Top.toFloat() - viewHeight
                             else -> newY
                         }
 
@@ -208,15 +230,154 @@ class LinkTubeActivity : AppCompatActivity() {
                     else -> false
                 }
             }
+
+
         } catch (e: Exception) {
             showToast(this@LinkTubeActivity, "Something went wrong, try to refresh")
             e.printStackTrace()
+        }
+        adapter.updateTabs()  // Notify the adapter to update the tabs
+
+
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setupRecyclerView() {
+        binding.tabQuickButton.setHasFixedSize(true)
+        binding.tabQuickButton.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        adapter = TabQuickButtonAdapter(this )
+        binding.tabQuickButton.adapter = adapter
+        adapter.notifyDataSetChanged()
+
+    }
+
+    private fun initializeView() {
+
+        binding.homeBrowserBtn.setOnClickListener {
+            animateAndSwitchToFirstTab()
+        }
+
+        binding.tab2Btn.setOnClickListener {
+            binding.linearLayout6.visibility = View.VISIBLE
+            binding.tab2Btn.visibility = View.GONE
+            binding.browserClear.visibility = View.VISIBLE
+            adapter.updateTabs()  // Notify the adapter to update the tabs
+
+        }
+
+        binding.browserClear.setOnClickListener {
+            binding.linearLayout6.visibility = View.GONE
+            binding.tab2Btn.visibility = View.VISIBLE
+            binding.browserClear.visibility = View.GONE
+            adapter.updateTabs()  // Notify the adapter to update the tabs
+
+        }
+
+        binding.showTabActivity.setOnClickListener {
+            showTabDialog()
+        }
+        binding.topDownloadBrowser.setOnClickListener {
+            handleDownload()
+        }
+        binding.bottomMediaBrowser.setOnClickListener {
+
+            navigateToMainActivity()
+        }
+        binding.addNewTab.setOnClickListener {
+            changeTab("Home", HomeFragment())
+        }
+
+        binding.tabBtn.setOnClickListener {
+            val intent = Intent(this, TabActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_top_right, 0)
         }
 
 
     }
 
-    fun showToast(context: Context, message: String) {
+    private fun animateAndSwitchToFirstTab() {
+        if (myPager.currentItem != 0) {
+            // Store initial position
+            val initialX = myPager.x
+            val initialY = myPager.y
+
+            // Set initial position to top left outside the screen
+            myPager.x = -myPager.width.toFloat()
+            myPager.y = -myPager.height.toFloat()
+
+            // Create the ObjectAnimator for x and y properties
+            val animatorX = ObjectAnimator.ofFloat(myPager, "x", initialX)
+            val animatorY = ObjectAnimator.ofFloat(myPager, "y", initialY)
+
+            // Create AnimatorSet to play animations together
+            val animatorSet = AnimatorSet()
+            animatorSet.playTogether(animatorX, animatorY)
+            animatorSet.interpolator = AccelerateDecelerateInterpolator()
+            animatorSet.duration = 500 // Animation duration in milliseconds
+
+            animatorSet.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
+                    myPager.setCurrentItem(0, false) // Set without animation
+                    // Check if the current item is set to 0
+                    if (myPager.currentItem == 0) {
+                        tabsList[myPager.currentItem].name = "Home"
+                        binding.btnTextUrl.setText("")
+                        binding.webIcon.setImageResource(R.drawable.search_licktube_icon)
+                            adapter.updateTabs()
+                    }
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    // After the animation ends, switch to the first tab
+                }
+
+                override fun onAnimationCancel(animation: Animator) {
+                    // No-op
+                }
+
+                override fun onAnimationRepeat(animation: Animator) {
+                    // No-op
+                }
+            })
+
+            // Start the animation
+            animatorSet.start()
+        } else {
+            // If already on the first tab, no need to animate, just ensure it's set to 0
+            myPager.currentItem = 0
+        }
+    }
+
+    @SuppressLint("DiscouragedApi")
+    private fun showTabDialog() {
+        val viewTabs = layoutInflater.inflate(R.layout.clear_tab_dialog_layout, binding.root, false)
+        val bindingTabs = ClearTabDialogLayoutBinding.bind(viewTabs)
+
+        val dialogClear = viewTabs.findViewById<ImageButton>(R.id.clearDialog)
+
+
+        val dialogTabs = MaterialAlertDialogBuilder(this)
+            .setView(viewTabs)
+            .create()
+
+
+        // Set up the RecyclerView
+        bindingTabs.tabsRV.setHasFixedSize(true)
+        bindingTabs.tabsRV.layoutManager = GridLayoutManager(this , 2)
+        bindingTabs.tabsRV.adapter = TabAdapter(this, dialogTabs , isLinktubeActivity = true)
+        dialogTabs.show()
+
+        dialogClear.setOnClickListener {
+            dialogTabs.dismiss()
+        }
+        val tabView = viewTabs
+        tabView.requestLayout()
+        dialogTabs.window?.setBackgroundDrawableResource(R.drawable.dialog_background)
+    }
+
+
+
+    private fun showToast(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
@@ -226,68 +387,7 @@ class LinkTubeActivity : AppCompatActivity() {
         }
 
         binding.moreBtn.setOnClickListener {
-            val popupMenu = PopupMenu(this@LinkTubeActivity, binding.moreBtn)
-            popupMenu.menuInflater.inflate(R.menu.browser_menu, popupMenu.menu)
-            try {
-                val fieldPopup = PopupMenu::class.java.getDeclaredField("mPopup")
-                fieldPopup.isAccessible = true
-                val popup = fieldPopup.get(popupMenu)
-                popup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
-                    .invoke(popup, true)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            popupMenu.setOnMenuItemClickListener { item ->
-
-                when (item.itemId) {
-                    R.id.newTab -> {
-                        changeTab("Home", HomeFragment())
-                    }
-R.id.recantTab -> {
-    startActivity(Intent(this, RecantTabActivity::class.java))
-
-}
-                    R.id.history -> {
-                        startActivity(Intent(this, HistoryBrowser::class.java))
-                    }
-
-                    R.id.download -> {
-                        startActivity(Intent(this, FileActivity::class.java))
-                    }
-
-                    R.id.save -> {
-                        save()
-                    }
-
-                    R.id.bookmark -> {
-                        bookMark()
-                    }
-
-                    R.id.desktop -> {
-                        desktopMade()
-                    }
-                    R.id.fullScreen -> {
-                        fullScreen()
-                    }
-
-                    R.id.share -> {
-                        share()
-                    }
-
-                    R.id.exit -> {
-                        exit()
-                    }
-                }
-                true
-            }
-
-            popupMenu.show()
-            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-                val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                view.setPadding(systemBarsInsets.left, systemBarsInsets.top, systemBarsInsets.right, 0)
-                insets
-            }
+            showPopupMenu(it)
         }
         binding.bottomLeftBrowser.setOnClickListener {
             slideOutLinearLayout()
@@ -318,7 +418,163 @@ R.id.recantTab -> {
 
     }
 
+    @SuppressLint("MissingInflatedId", "InflateParams")
+    private fun showPopupMenu(anchorView: View) {
+        // Inflate the popup_menu layout
+        val layoutInflater = LayoutInflater.from(this)
+        val popupView: View = layoutInflater.inflate(R.layout.linktube_pop_window, null)
 
+        // Create the PopupWindow
+        val popupWindow = PopupWindow(popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT)
+
+        // Show the PopupWindow
+        popupWindow.isFocusable = true
+        popupWindow.update()
+
+        // Calculate the offset
+        val location = IntArray(2)
+        anchorView.getLocationOnScreen(location)
+        val offsetX = location[0]
+        val offsetY = -(location[1] * 1.5).toInt()  // 1.5 times the location[1] value
+
+
+        popupWindow.showAsDropDown(anchorView, offsetX, offsetY)
+
+        // Find the menu items
+        val historyItem = popupView.findViewById<LinearLayout>(R.id.history)
+        val viewOneItem = popupView.findViewById<View>(R.id.menu1)
+        val viewTwoItem = popupView.findViewById<View>(R.id.menu2)
+        val viewThreeItem = popupView.findViewById<View>(R.id.menu3)
+        val recentItem = popupView.findViewById<LinearLayout>(R.id.recantTab)
+        val downloadItem = popupView.findViewById<LinearLayout>(R.id.download)
+        val saveItem = popupView.findViewById<LinearLayout>(R.id.save)
+        val bookmarkItem = popupView.findViewById<LinearLayout>(R.id.bookmark)
+        val desktopItem = popupView.findViewById<LinearLayout>(R.id.desktop)
+        val fullScreenItem = popupView.findViewById<LinearLayout>(R.id.fullScreen)
+        val shareItem = popupView.findViewById<LinearLayout>(R.id.share)
+        val exitItem = popupView.findViewById<LinearLayout>(R.id.exit)
+
+        // List of menu items for animation
+        val menuItems = listOf(historyItem,viewOneItem, downloadItem, bookmarkItem,recentItem ,viewTwoItem,saveItem,  desktopItem, shareItem, viewThreeItem, fullScreenItem,  exitItem)
+
+        // Initially hide all menu items
+        menuItems.forEach { it.visibility = View.INVISIBLE }
+
+        // Animate the appearance of each menu item with a delay
+        menuItems.forEachIndexed { index, item ->
+            val delay = index * 50L // Delay in milliseconds
+            Handler(Looper.getMainLooper()).postDelayed({
+                item.visibility = View.VISIBLE
+                item.alpha = 0f
+                item.animate().alpha(1f).setDuration(100).start()
+            }, delay)
+        }
+        val forwardMenu = popupView.findViewById<ImageView>(R.id.forwardMenu)
+        val downloadMenu = popupView.findViewById<ImageView>(R.id.downloadMenu)
+        val bookmarkMenu = popupView.findViewById<ImageView>(R.id.bookmarkMenu)
+        val refreshMenu = popupView.findViewById<ImageView>(R.id.clearMenu)
+
+        // Set initial translationX for animation
+        forwardMenu.translationX = 200f
+        downloadMenu.translationX = 200f
+        bookmarkMenu.translationX = 200f
+        refreshMenu.translationX = 200f
+
+        // Animate the icons
+        refreshMenu.animate().translationX(0f).setDuration(200).setStartDelay(0).start()
+        downloadMenu.animate().translationX(0f).setDuration(200).setStartDelay(10).start()
+        bookmarkMenu.animate().translationX(0f).setDuration(200).setStartDelay(20).start()
+        forwardMenu.animate().translationX(0f).setDuration(200).setStartDelay(30).start()
+
+
+        var frag: BrowseFragment? = null
+        try {
+            frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
+        } catch (_: Exception) {
+        }
+
+        if (frag?.binding?.webView?.canGoForward() == true) {
+            // Set the color of forwardMenu to default if it can go forward
+            forwardMenu.colorFilter = null
+        } else {
+            // Set the color of forwardMenu to gray if it cannot go forward
+            forwardMenu.setColorFilter(Color.parseColor("#515151"))
+
+        }
+
+        // Check if the current webpage is bookmarked
+        val currentUrl = frag?.binding?.webView?.url
+        val isBookmarked = bookmarkList.any { it.url == currentUrl }
+
+        // Update bookmark icon based on bookmark status
+        bookmarkMenu.setImageResource(
+            if (isBookmarked) R.drawable._star_bookmark_24 else R.drawable._star_bookmark_border_24
+        )
+
+        forwardMenu.setOnClickListener {
+            frag?.apply {
+                if (binding.webView.canGoForward()) {
+                    binding.webView.goForward()
+                }
+            }
+            popupWindow.dismiss()
+        }
+
+        popupView.findViewById<ImageView>(R.id.downloadMenu).setOnClickListener {
+            handleDownload()
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<ImageView>(R.id.bookmarkMenu).setOnClickListener {
+            bookMark()
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<ImageView>(R.id.clearMenu).setOnClickListener {
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.newTab).setOnClickListener {
+            changeTab("Home", HomeFragment())
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.recantTab).setOnClickListener {
+            startActivity(Intent(this, RecantTabActivity::class.java))
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.history).setOnClickListener {
+            startActivity(Intent(this, HistoryBrowser::class.java))
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.download).setOnClickListener {
+            startActivity(Intent(this, FileActivity::class.java))
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.save).setOnClickListener {
+            save()
+            popupWindow.dismiss()
+        }
+
+        popupView.findViewById<LinearLayout>(R.id.bookmark).setOnClickListener {
+            startActivity(Intent(this, BookmarkActivity::class.java))
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.desktop).setOnClickListener {
+            desktopMade()
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.fullScreen).setOnClickListener {
+            fullScreen()
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.share).setOnClickListener {
+            share()
+            popupWindow.dismiss()
+        }
+        popupView.findViewById<LinearLayout>(R.id.exit).setOnClickListener {
+            exit()
+            popupWindow.dismiss()
+        }
+    }
 
     @SuppressLint("Recycle")
     private fun slideOutLinearLayout() {
@@ -464,6 +720,9 @@ R.id.recantTab -> {
             return
         }
         frag?.let {
+            val currentUrl = it.binding.webView.url!!
+            val bookmarkIndex = bookmarkList.indexOfFirst { bookmark -> bookmark.url == currentUrl }
+
             if (bookmarkIndex == -1) {
                 val viewB = layoutInflater.inflate(
                     R.layout.bookmark_dialog,
@@ -510,11 +769,13 @@ R.id.recantTab -> {
                 dialogB.show()
                 bBinding.bookmarkTitle.setText(it.binding.webView.title)
             } else {
+
                 val dialogB = MaterialAlertDialogBuilder(this@LinkTubeActivity)
                     .setTitle("Remove Bookmark")
                     .setMessage("Url: ${it.binding.webView.url}")
                     .setPositiveButton("Remove") { dialog, _ ->
                         bookmarkList.removeAt(bookmarkIndex)
+
                         Toast.makeText(
                             this@LinkTubeActivity,
                             "Bookmark removed successfully",
@@ -579,7 +840,7 @@ R.id.recantTab -> {
         }
         val url = frag?.binding?.webView?.url
 
-        if (url != null && url.isNotEmpty()) {
+        if (!url.isNullOrEmpty()) {
             // If URL is present, share the URL
             ShareCompat.IntentBuilder(this@LinkTubeActivity)
                 .setChooserTitle("Share URL")
@@ -623,19 +884,20 @@ R.id.recantTab -> {
 
     }
 
-    private fun checkHistorySize() {
-        if (HistoryManager.getHistorySize(this) >= MAX_HISTORY_SIZE) {
-            val builder = MaterialAlertDialogBuilder(this)
-            builder.setTitle("Delete History Items")
-                .setMessage("The history has reached its maximum capacity. Delete some items?")
-                .setPositiveButton("Delete") { _, _ ->
-                    startActivity(Intent(this, HistoryBrowser::class.java))
-                    finish()
-                }
-            val customDialog = builder.create()
-            customDialog.show()
-        }
-    }
+//    private fun checkHistorySize() {
+//
+//        if (HistoryManager.getHistorySize(this) >= MAX_HISTORY_SIZE) {
+//            val builder = MaterialAlertDialogBuilder(this)
+//            builder.setTitle("Delete History Items")
+//                .setMessage("The history has reached its maximum capacity. Delete some items?")
+//                .setPositiveButton("Delete") { _, _ ->
+//                    startActivity(Intent(this, HistoryBrowser::class.java))
+//                    finish()
+//                }
+//            val customDialog = builder.create()
+//            customDialog.show()
+//        }
+//    }
 
     fun speak() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -667,25 +929,13 @@ R.id.recantTab -> {
 
     }
 
-    fun rewardedIAd(callback: (Boolean) -> Unit) {
-        val adRequest = AdRequest.Builder().build()
-        RewardedInterstitialAd.load(this, "ca-app-pub-3504589383575544/3262210040", adRequest, object : RewardedInterstitialAdLoadCallback() {
-            override fun onAdLoaded(p0: RewardedInterstitialAd) {
-                rewardedInterstitialAd = p0
-                callback(true)
-            }
 
-            override fun onAdFailedToLoad(p0: LoadAdError) {
-                rewardedInterstitialAd = null
-                callback(false)
-            }
-        })
-    }
 
-    fun navigateToMainActivity() {
+    private fun navigateToMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -749,6 +999,7 @@ R.id.recantTab -> {
                     binding.myPager.currentItem != 0 -> {
                         tabsList.removeAt(binding.myPager.currentItem)
                         binding.myPager.adapter?.notifyDataSetChanged()
+                        adapter.updateTabs()
                         binding.myPager.currentItem = tabsList.size - 1
                     }
                     else -> super.onBackPressed()
@@ -766,6 +1017,8 @@ R.id.recantTab -> {
     }
 
 
+
+    @SuppressLint("ObsoleteSdkInt")
     fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -783,57 +1036,15 @@ R.id.recantTab -> {
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
 
         }
+        val navigationBarDividerColor = ContextCompat.getColor(this, R.color.gray)
+
+        // This sets the navigation bar divider color. API 28+ required.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.navigationBarDividerColor = navigationBarDividerColor
+        }
     }
-    fun initializeView() {
-
-        binding.homeBrowserBtn.setOnClickListener {
-            changeTab("New tab", HomeFragment())
-        }
-        binding.downloadBrowser.setOnClickListener {
-            handleDownload()
-        }
-
-        binding.topDownloadBrowser.setOnClickListener {
-            handleDownload()
-        }
-        binding.bottomMediaBrowser.setOnClickListener {
-            if (checkForInternet(this)) {
-                // Internet is available, proceed to show ad and navigate to MainActivity
-                rewardedIAd { adLoaded ->
-                    if (adLoaded) {
-                        rewardedInterstitialAd?.show(this, object : OnUserEarnedRewardListener {
-                            override fun onUserEarnedReward(p0: RewardItem) {
-                            }
-                        })
-
-                    } else {
-                        // Ad not loaded, directly navigate to MainActivity
-                        navigateToMainActivity()
-                    }
-                }
-            } else {
-                // No internet, directly navigate to MainActivity
-                navigateToMainActivity()
-            }
-
-            // Define an ad listener to handle navigation after ad is dismissed
-            rewardedInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    // Ad dismissed, proceed to navigate to MainActivity
-                    navigateToMainActivity()
-                }
-            }
-        }
 
 
-        binding.tabBtn.setOnClickListener {
-            val intent = Intent(this, TabActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_top_right, 0)
-        }
-
-
-    }
 
     private fun handleDownload() {
         var frag: BrowseFragment? = null
@@ -910,6 +1121,7 @@ R.id.recantTab -> {
         }
         return -1
     }
+
 
 
 
@@ -992,7 +1204,7 @@ R.id.recantTab -> {
         editor.apply()
     }
 
-    fun getAllBookmarks(){
+    private fun getAllBookmarks(){
         //for getting bookmarks data using shared preferences from storage
         bookmarkList = ArrayList()
         val editor = getSharedPreferences("BOOKMARKS", MODE_PRIVATE)
@@ -1010,9 +1222,11 @@ R.id.recantTab -> {
 fun changeTab(url: String, fragment: Fragment , isBackground : Boolean = false) {
     LinkTubeActivity.tabsList.add(Tab(name = url,fragment = fragment , activity = Activity() , null, null ))
     myPager.adapter?.notifyDataSetChanged()
+    LinkTubeActivity.adapter.updateTabs()
+    TabQuickButtonAdapter.updateTabs()
     tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
+    tabs2Btn.text = LinkTubeActivity.tabsList.size.toString()
     if(!isBackground) myPager.currentItem = LinkTubeActivity.tabsList.size - 1
-
 
 }
 

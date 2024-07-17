@@ -6,5 +6,5 @@
         android:color="#989797"
     android:width="2dp"/>
     <solid android:color="@color/black"/> <!-- Set your desired background color -->
-    <corners android:radius="4dp"/> <!-- Adjust as needed -->
+    <corners android:radius="8dp"/> <!-- Adjust as needed -->
 </shape>

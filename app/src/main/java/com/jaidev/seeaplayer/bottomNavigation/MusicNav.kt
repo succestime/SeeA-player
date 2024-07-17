@@ -18,13 +18,16 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.MainActivity.Companion.MusicListMA
 import com.jaidev.seeaplayer.MainActivity.Companion.musicListSearch
 import com.jaidev.seeaplayer.MainActivity.Companion.search
+import com.jaidev.seeaplayer.MainActivity.Companion.sortValue
 import com.jaidev.seeaplayer.Subscription.SeeAOne
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.dataClass.Music
+import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
 import com.jaidev.seeaplayer.databinding.FragmentMusicNavBinding
 import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
@@ -54,6 +57,8 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
         binding = FragmentMusicNavBinding.bind(view)
         setupActionBar()
         binding.musicRV.setHasFixedSize(true)
+        binding.musicRV.setItemViewCacheSize(50)
+
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true)
         adapter.setMusicDeleteListener(this)
@@ -67,7 +72,13 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
         }
 
         updateEmptyState()
-
+        // Optionally, you can add a scroll listener if needed
+        binding.musicRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                // Your code here if you want to do something on scroll
+            }
+        })
         binding.playandshuffleBtn.setOnClickListener { view ->
             showPlayShuffleMenu(view)
         }
@@ -119,6 +130,15 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
                 }while (cursor.moveToNext())
             }
             cursor.close()
+        }
+        // Sort the tempList based on the selected sorting option
+        if (sortValue == 2 || sortValue == 3) { // Name(A to Z) or Name(Z to A)
+            tempList.sortWith(Comparator { o1, o2 ->
+                NaturalOrderComparator().compare(o1.title, o2.title)
+            })
+            if (sortValue == 3) { // Name(Z to A)
+                tempList.reverse()
+            }
         }
         return tempList
     }
