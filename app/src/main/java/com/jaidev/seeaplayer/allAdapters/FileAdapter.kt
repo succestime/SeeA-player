@@ -82,7 +82,6 @@ class FileAdapter(
         private val fileMoreTextView: ImageButton = itemView.findViewById(R.id.iconMoreView)
         private val fileTextView: ImageButton = itemView.findViewById(R.id.iconPdfView)
         private val fileSelectedTextView: ImageButton = itemView.findViewById(R.id.selected_complete)
-        private val window: Window? = (context as? AppCompatActivity)?.window
 
         init {
             fileMoreTextView.setOnClickListener {
@@ -143,17 +142,12 @@ class FileAdapter(
 
 // Update item view background based on selection
             if (selectedItems.contains(adapterPosition)) {
-                window?.let {
-                    WindowCompat.setDecorFitsSystemWindows(it, true)
-                }
 
                 fileSelectedTextView.visibility = View.VISIBLE
                 fileTextView.visibility = View.GONE
 
             } else {
-                window?.let {
-                    WindowCompat.setDecorFitsSystemWindows(it, true)
-                }
+
                 fileSelectedTextView.visibility = View.GONE
                 fileTextView.visibility = View.VISIBLE
             }
@@ -755,7 +749,6 @@ class FileAdapter(
             selectedItems.add(position)
 
         }
-
         // Start or finish action mode based on selection
         if (selectedItems.isEmpty()) {
             actionMode?.finish()
@@ -764,9 +757,7 @@ class FileAdapter(
         } else {
             startActionMode()
             selectionModeChangeListener.onSelectionModeChanged(true) // Notify listener
-
         }
-
         // Update selected items
         notifyDataSetChanged()
         actionMode?.invalidate()
@@ -817,6 +808,8 @@ class FileAdapter(
             selectedItems.clear()
             actionMode = null
             isSelectionModeEnabled = false
+            selectionModeChangeListener.onSelectionModeChanged(false)
+
             notifyDataSetChanged()
 
 
@@ -849,6 +842,7 @@ class FileAdapter(
 
         // Dismiss action mode
         actionMode?.finish()
+        selectionModeChangeListener.onSelectionModeChanged(false)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -875,6 +869,8 @@ class FileAdapter(
                 } else {
                     // Notify listener for each deleted file
                     fileDeleteListener.onFileDeleted(fileItem)
+                    selectionModeChangeListener.onSelectionModeChanged(false)
+
                     (context as FileActivity).updateEmptyStateVisibility()
                 }
             } else {

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
@@ -30,7 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.jaidev.seeaplayer.PlayerFileActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.FileAdapter
 import com.jaidev.seeaplayer.dataClass.FileDownloader
@@ -83,6 +83,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
 
         binding.recyclerFileView.apply {
             setHasFixedSize(true)
+            setItemViewCacheSize(10)
             layoutManager = LinearLayoutManager(this@FileActivity)
             adapter = fileListAdapter
         }
@@ -103,6 +104,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
         updateEmptyStateVisibility()
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -120,6 +122,12 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
+        }
+        val navigationBarDividerColor = ContextCompat.getColor(this, R.color.gray)
+
+        // This sets the navigation bar divider color. API 28+ required.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.navigationBarDividerColor = navigationBarDividerColor
         }
     }
     private fun handleBoxClick(box: View) {
@@ -466,13 +474,20 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
             // Show a toast or handle the error as appropriate
         }
     }
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (isEditTextVisible) {
+            handleBoxClick(binding.monthlyBox)
             hideEditText()
             filterFileItems("")
-updateEmptyStateVisibility()
+          updateEmptyStateVisibility()
         } else {
-            super.onBackPressed()
+            // Check if the currently selected box is not binding.monthlyBox
+            if (selectedBox != binding.monthlyBox) {
+                handleBoxClick(binding.monthlyBox)
+            } else {
+                super.onBackPressed()
+            }
         }
     }
 

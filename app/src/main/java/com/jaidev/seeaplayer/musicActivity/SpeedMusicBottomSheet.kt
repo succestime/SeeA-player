@@ -1,4 +1,4 @@
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.musicActivity
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.jaidev.seeaplayer.R
 
 class SpeedMusicBottomSheet : BottomSheetDialogFragment() {
 
@@ -127,7 +128,9 @@ class SpeedMusicBottomSheet : BottomSheetDialogFragment() {
         previousClickedTextView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
 
         // Set the drawableEnd and change the text color for the clicked text view
-        val drawable: Drawable? = ContextCompat.getDrawable(requireContext(), R.drawable.complete_svgrepo_com)
+        val drawable: Drawable? = ContextCompat.getDrawable(requireContext(),
+            R.drawable.complete_svgrepo_com
+        )
         clickedTextView.setCompoundDrawablesWithIntrinsicBounds(
             null, // left drawable
             null, // top drawable

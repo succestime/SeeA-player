@@ -1,4 +1,4 @@
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.musicActivity
 
 import android.Manifest
 import android.content.Intent
@@ -18,10 +18,10 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.MoreMusicBottomSheetBinding
-import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 
 class MoreMusicBottomSheet : BottomSheetDialogFragment() {
 
@@ -56,13 +56,17 @@ class MoreMusicBottomSheet : BottomSheetDialogFragment() {
         binding.repeat.setOnClickListener {
             if (!PlayerMusicActivity.repeat) {
                 PlayerMusicActivity.repeat = true
-                PlayerMusicActivity.binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(requireContext(), R.color.cool_green))
+                PlayerMusicActivity.binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(requireContext(),
+                    R.color.cool_green
+                ))
                 Toast.makeText(requireContext(), "Repeat mode is on", Toast.LENGTH_SHORT).show()
                 dismiss()
             } else {
                 PlayerMusicActivity.repeat = false
                 Toast.makeText(requireContext(), "Repeat mode is off", Toast.LENGTH_SHORT).show()
-                PlayerMusicActivity.binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(requireContext(), R.color.cool_pink))
+                PlayerMusicActivity.binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(requireContext(),
+                    R.color.cool_pink
+                ))
                 dismiss()
             }
         }
@@ -123,10 +127,14 @@ class MoreMusicBottomSheet : BottomSheetDialogFragment() {
 
         if (isDarkMode) {
             // Dark mode is enabled, set background color to dark_cool_blue
-            requireActivity().window.navigationBarColor = ContextCompat.getColor(requireContext(), R.color.dark_cool_blue)
+            requireActivity().window.navigationBarColor = ContextCompat.getColor(requireContext(),
+                R.color.dark_cool_blue
+            )
         } else {
             // Light mode is enabled, set background color to white
-            requireActivity().window.navigationBarColor = ContextCompat.getColor(requireContext(), R.color.white)
+            requireActivity().window.navigationBarColor = ContextCompat.getColor(requireContext(),
+                R.color.white
+            )
         }
     }
 

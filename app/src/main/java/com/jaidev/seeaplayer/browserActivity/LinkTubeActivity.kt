@@ -63,6 +63,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.allAdapters.BookmarkAdapter
 import com.jaidev.seeaplayer.allAdapters.TabAdapter
 import com.jaidev.seeaplayer.allAdapters.TabQuickButtonAdapter
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
@@ -71,6 +72,7 @@ import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.myPager
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabs2Btn
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.tabsBtn
 import com.jaidev.seeaplayer.dataClass.Bookmark
+import com.jaidev.seeaplayer.dataClass.SharedPreferencesBookmarkSaver
 import com.jaidev.seeaplayer.dataClass.Tab
 import com.jaidev.seeaplayer.databinding.ActivityLinkTubeBinding
 import com.jaidev.seeaplayer.databinding.BookmarkDialogBinding
@@ -84,7 +86,7 @@ import java.util.Calendar
 import java.util.Locale
 
 
-class LinkTubeActivity : AppCompatActivity() {
+class LinkTubeActivity : AppCompatActivity(), BookmarkAdapter.BookmarkSaver {
 
 
     private var printJob : PrintJob? = null
@@ -94,13 +96,17 @@ class LinkTubeActivity : AppCompatActivity() {
     @SuppressLint("StaticFieldLeak")
     lateinit var binding: ActivityLinkTubeBinding
     val MAX_HISTORY_SIZE = 150
+    private var currentPopupWindow: PopupWindow? = null
+
+    private lateinit var bookmarkSaver: SharedPreferencesBookmarkSaver
 
     companion object {
         var tabsList: ArrayList<Tab> = ArrayList()
         private var isFullscreen: Boolean = true
         var isDesktopSite: Boolean = false
-        var bookmarkList: ArrayList<Bookmark> = ArrayList()
         var bookmarkIndex : Int = -1
+        var bookmarkList: ArrayList<Bookmark> = ArrayList()
+
         @SuppressLint("StaticFieldLeak")
         lateinit var adapter: TabQuickButtonAdapter
 
@@ -132,7 +138,8 @@ class LinkTubeActivity : AppCompatActivity() {
             // Send broadcast to notify MainActivity that this activity is opened
             val intent = Intent("com.yourapp.LINK_TUBE_OPENED")
             sendBroadcast(intent)
-
+            bookmarkSaver = SharedPreferencesBookmarkSaver(this)
+            BookmarkActivity.bookmarkList = bookmarkSaver.loadBookmarks()
             initializeView()
             initializeBinding()
             getAllBookmarks()
@@ -323,7 +330,7 @@ class LinkTubeActivity : AppCompatActivity() {
                         tabsList[myPager.currentItem].name = "Home"
                         binding.btnTextUrl.setText("")
                         binding.webIcon.setImageResource(R.drawable.search_licktube_icon)
-                            adapter.updateTabs()
+                        adapter.updateTabs()
                     }
                 }
 
@@ -418,7 +425,7 @@ class LinkTubeActivity : AppCompatActivity() {
 
     }
 
-    @SuppressLint("MissingInflatedId", "InflateParams")
+    @SuppressLint("MissingInflatedId", "InflateParams", "ObsoleteSdkInt")
     private fun showPopupMenu(anchorView: View) {
         // Inflate the popup_menu layout
         val layoutInflater = LayoutInflater.from(this)
@@ -432,7 +439,10 @@ class LinkTubeActivity : AppCompatActivity() {
         // Show the PopupWindow
         popupWindow.isFocusable = true
         popupWindow.update()
-
+        // Set the elevation for the PopupWindow
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            popupWindow.elevation = 10.0F
+        }
         // Calculate the offset
         val location = IntArray(2)
         anchorView.getLocationOnScreen(location)
@@ -512,7 +522,8 @@ class LinkTubeActivity : AppCompatActivity() {
         bookmarkMenu.setImageResource(
             if (isBookmarked) R.drawable._star_bookmark_24 else R.drawable._star_bookmark_border_24
         )
-
+        // Update bookmark icon based on current status
+        updateBookmarkIcon(bookmarkMenu)
         forwardMenu.setOnClickListener {
             frag?.apply {
                 if (binding.webView.canGoForward()) {
@@ -1000,7 +1011,12 @@ class LinkTubeActivity : AppCompatActivity() {
                         tabsList.removeAt(binding.myPager.currentItem)
                         binding.myPager.adapter?.notifyDataSetChanged()
                         adapter.updateTabs()
-                        binding.myPager.currentItem = tabsList.size - 1
+                        TabAdapter.updateTabs()
+                        if (myPager.currentItem > 0 ) {
+                            myPager.currentItem = tabsList.size - 1
+                        } else if (tabsList.isNotEmpty()) {
+                            myPager.currentItem = 0
+                        }
                     }
                     else -> super.onBackPressed()
                 }
@@ -1014,6 +1030,8 @@ class LinkTubeActivity : AppCompatActivity() {
         override fun getItemCount(): Int = tabsList.size
 
         override fun createFragment(position: Int): Fragment = tabsList[position].fragment
+
+
     }
 
 
@@ -1194,16 +1212,29 @@ class LinkTubeActivity : AppCompatActivity() {
         return -1
     }
 
-    fun saveBookmarks(){
-        //for storing bookmarks data using shared preferences
-        val editor = getSharedPreferences("BOOKMARKS", MODE_PRIVATE).edit()
+    fun saveBookmarks() {
 
+        // Save bookmarks data using shared preferences
+        val editor = getSharedPreferences("BOOKMARKS", MODE_PRIVATE).edit()
         val data = GsonBuilder().create().toJson(bookmarkList)
         editor.putString("bookmarkList", data)
-
         editor.apply()
+        
     }
+    private fun updateBookmarkIcon(bookmarkMenu: ImageView) {
+        var frag: BrowseFragment? = null
+        try {
+            frag = tabsList[binding.myPager.currentItem].fragment as BrowseFragment
+        } catch (_: Exception) {
+        }
 
+        val currentUrl = frag?.binding?.webView?.url
+        val isBookmarked = bookmarkList.any { it.url == currentUrl }
+
+        bookmarkMenu.setImageResource(
+            if (isBookmarked) R.drawable._star_bookmark_24 else R.drawable._star_bookmark_border_24
+        )
+    }
     private fun getAllBookmarks(){
         //for getting bookmarks data using shared preferences from storage
         bookmarkList = ArrayList()
@@ -1216,6 +1247,13 @@ class LinkTubeActivity : AppCompatActivity() {
             bookmarkList.addAll(list)
         }
     }
+
+    override fun saveBookmarks(bookmarkList: ArrayList<Bookmark>) {
+        val editor = getSharedPreferences("BOOKMARKS", MODE_PRIVATE).edit()
+        val data = GsonBuilder().create().toJson(bookmarkList)
+        editor.putString("bookmarkList", data)
+        editor.apply()
+    }
 }
 
 @SuppressLint("NotifyDataSetChanged")
@@ -1224,6 +1262,7 @@ fun changeTab(url: String, fragment: Fragment , isBackground : Boolean = false) 
     myPager.adapter?.notifyDataSetChanged()
     LinkTubeActivity.adapter.updateTabs()
     TabQuickButtonAdapter.updateTabs()
+    TabAdapter.updateTabs()
     tabsBtn.text = LinkTubeActivity.tabsList.size.toString()
     tabs2Btn.text = LinkTubeActivity.tabsList.size.toString()
     if(!isBackground) myPager.currentItem = LinkTubeActivity.tabsList.size - 1

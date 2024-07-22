@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="black">#FF000000</color>
     <color name="F_black">#332F2F</color>
     <color name="white">#FFFFFFFF</color>
@@ -26,7 +26,8 @@
     <color name="blue">#FF0000FF</color>
     <color name="yellow">#FFFFFF00</color>
     <color name="gray">#FF808080</color>
-    <color name="gray__">#BE1818</color>
+    <color name="gray__">#BAB7B7</color>
+    <color name="gray___">#5A5959</color>
     <color name="colorStart">#002A40</color>
     <color name="colorEnd">#011B29</color>
     <color name="light_black">#FF7F7F7F</color>
@@ -41,6 +42,7 @@
     <color name="dark_white">#FF7F7F7F</color>
     <color name="dark_red">#FF7F0000</color>
     <color name="dark_green">#FF007F00</color>
+<!--    <color name="dark_gray" tools:ignore="MissingDefaultResource">#474747</color>-->
     <color name="dark_blue">#FF00007F</color>
     <color name="dark_yellow">#FF7F7F00</color>
     <color name="light_dark">#74000000</color>
@@ -66,9 +68,6 @@
 
     <integer-array name="myColors">
         <item>@color/light_yellow</item>
-        <item>@color/cool_blue</item>
-        <item>@color/purple_500</item>
-
     </integer-array>
 
     <color name="hint_text_color">#A0A0A0</color>

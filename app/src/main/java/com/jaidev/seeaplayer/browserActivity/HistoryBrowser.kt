@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -39,10 +39,8 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
     private var appOpenAd: AppOpenAd? = null
     private var isAdDisplayed = false
     private lateinit var swipeRefreshLayout: ConstraintLayout
-    private lateinit var progressBar: ProgressBar
-    private var isLoading = false
-    private var currentPage = 0
-    private val pageSize = 100
+
+
 
     companion object {
         val historyItems: MutableList<HistoryItem> = mutableListOf()
@@ -71,6 +69,7 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
 
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -88,6 +87,12 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
+        }
+        val navigationBarDividerColor = ContextCompat.getColor(this, R.color.gray)
+
+        // This sets the navigation bar divider color. API 28+ required.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.navigationBarDividerColor = navigationBarDividerColor
         }
     }
 

@@ -25,9 +25,9 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.ReMoreMusicBottomSheet
+import com.jaidev.seeaplayer.musicActivity.ReMoreMusicBottomSheet
 import com.jaidev.seeaplayer.Services.MusicService
-import com.jaidev.seeaplayer.SpeedMusicBottomSheet
+import com.jaidev.seeaplayer.musicActivity.SpeedMusicBottomSheet
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reFormatDuration

@@ -16,6 +16,8 @@
         <item name="actionModeStyle">@style/AppTheme.LightActionMode</item>
 
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+        <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+
     </style>
 
     <style name="TransparentActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">

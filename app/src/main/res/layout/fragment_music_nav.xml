@@ -31,6 +31,7 @@
                     tools:ignore="MissingConstraints">
 
                     <LinearLayout
+                        android:id="@+id/chipBar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
@@ -99,13 +100,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
-                        <ViewStub
-                            android:id="@+id/musicemptyStateLayout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout="@layout/music_nav_empty_state_layout"
-                            android:foregroundGravity="center"
-                            android:visibility="gone"/>
+
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/musicRV"
@@ -132,7 +127,18 @@
             tools:layout="@layout/fragment_now_playing"
             />
 
-
+        <ViewStub
+            android:id="@+id/musicemptyStateLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/music_nav_empty_state_layout"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
+             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

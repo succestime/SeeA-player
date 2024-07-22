@@ -3,6 +3,7 @@ package com.jaidev.seeaplayer.browserActivity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -57,6 +58,7 @@ class TabActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("ObsoleteSdkInt")
     private fun setSwipeRefreshBackgroundColor() {
         try {
             val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
@@ -71,6 +73,12 @@ class TabActivity : AppCompatActivity() {
                 tabLayout.setBackgroundColor(resources.getColor(android.R.color.white))
                 window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
                 window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            }
+            val navigationBarDividerColor = ContextCompat.getColor(this, R.color.gray)
+
+            // This sets the navigation bar divider color. API 28+ required.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.navigationBarDividerColor = navigationBarDividerColor
             }
         } catch (e: Exception) {
             showErrorToast()

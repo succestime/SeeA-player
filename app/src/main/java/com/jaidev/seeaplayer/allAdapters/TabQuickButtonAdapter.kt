@@ -55,7 +55,6 @@ class TabQuickButtonAdapter(
         // Update the UI for the current tab and other tabs
         if (LinkTubeActivity.myPager.currentItem == position) {
             holder.tabCard.setBackgroundResource(R.drawable.tab_selected_background)
-
         } else {
             holder.tabCard.setBackgroundResource(R.drawable.tab_2_background)
         }
@@ -69,7 +68,6 @@ class TabQuickButtonAdapter(
                 LinkTubeActivity.myPager.currentItem = position
 
             notifyDataSetChanged()
-
 
             }
 

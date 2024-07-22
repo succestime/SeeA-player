@@ -127,10 +127,10 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_browse, container, false)
+        binding = FragmentBrowseBinding.inflate(inflater, container, false)
+
 
         try {
-        binding = FragmentBrowseBinding.bind(view)
         registerForContextMenu(binding.webView)
 
             loadRunnable = Runnable {
@@ -165,7 +165,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
 
         }
 
-        val rootView = view.rootView
+        val rootView = binding.root.rootView
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener {
             val rect = Rect()
@@ -183,7 +183,7 @@ class BrowseFragment(private var urlNew : String) : Fragment(), DownloadListener
         checkAndDisableSwipeRefreshBasedOnUrl() // Check URL here
             TabQuickButtonAdapter.updateTabs()
 
-            return view
+            return binding.root
 
         } catch (e: Exception) {
             showToast(requireContext(), "Something went wrong, try to refresh")

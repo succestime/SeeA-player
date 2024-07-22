@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/empty_state_image"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="150dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/empty_folder" />
 
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/empty_state_image"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:text="NO Music Found!"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"

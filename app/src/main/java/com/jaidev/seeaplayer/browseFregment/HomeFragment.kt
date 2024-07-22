@@ -27,13 +27,17 @@ import com.jaidev.seeaplayer.browserActivity.checkForInternet
 import com.jaidev.seeaplayer.dataClass.Bookmark
 import com.jaidev.seeaplayer.dataClass.SearchTitle
 import com.jaidev.seeaplayer.dataClass.SearchTitleStore
+import com.jaidev.seeaplayer.dataClass.SharedPreferencesBookmarkSaver
 import com.jaidev.seeaplayer.databinding.FragmentHomeBinding
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), BookmarkAdapter.BookmarkAdapterCallback{
 
     private lateinit var binding: FragmentHomeBinding
     private var isBtnTextUrlFocused = false // Flag to track if btnTextUrl has been focused
-
+    companion object {
+        lateinit var bookmarkList: ArrayList<Bookmark>
+    }
+    private lateinit var bookmarkSaver: SharedPreferencesBookmarkSaver
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -65,8 +69,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun saveDefaultBookmarks() {
-        val bookmarkTitles = listOf("Wikipedia", "Google", "YouTube")
-        val bookmarkUrls = listOf("https://en.wikipedia.org", "https://www.google.com", "https://www.youtube.com")
+        val bookmarkTitles = listOf("Wikipedia - Default", "Google - Default", "YouTube - Default")
+        val bookmarkUrls = listOf("https://www.wikipedia.org", "https://www.google.com", "https://m.youtube.com")
 
         val sharedPreferences = requireContext().getSharedPreferences("DefaultBookmarks", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -77,14 +81,13 @@ class HomeFragment : Fragment() {
 
             editor.putString(title, url)
         }
-
         editor.apply()
     }
 
     private fun addDefaultBookmarks() {
         val sharedPreferences = requireContext().getSharedPreferences("DefaultBookmarks", Context.MODE_PRIVATE)
 
-        val defaultBookmarkTitles = listOf("Wikipedia", "Google", "YouTube")
+        val defaultBookmarkTitles = listOf("Wikipedia - Default", "Google - Default", "YouTube - Default")
 
         for (title in defaultBookmarkTitles) {
             val url = sharedPreferences.getString(title, "")
@@ -251,8 +254,9 @@ class HomeFragment : Fragment() {
         // Set layout manager to scroll horizontally
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        binding.recyclerView.adapter = BookmarkAdapter(requireContext())
-
+        binding.recyclerView.adapter = BookmarkAdapter(requireContext() , isActivity = false  ,callback = this ,requireContext() as BookmarkAdapter.BookmarkSaver)
+        bookmarkSaver = SharedPreferencesBookmarkSaver(requireContext())
+        BookmarkActivity.bookmarkList = bookmarkSaver.loadBookmarks()
         if (LinkTubeActivity.bookmarkList.size < 1) {
             binding.viewAllBtn.visibility = View.GONE
         }
@@ -283,4 +287,12 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "No Internet Connection \uD83C\uDF10", Toast.LENGTH_SHORT).show()
         }
     }
+
+    override fun onListEmpty(isEmpty: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+
+
+
 }

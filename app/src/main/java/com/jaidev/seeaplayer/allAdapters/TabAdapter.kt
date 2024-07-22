@@ -104,12 +104,13 @@ class TabAdapter(private val context: Context, private val dialog: AlertDialog?
                         toggleSelection(position)
                     } else {
                         try {
+
                             val currentFragment = LinkTubeActivity.tabsList[position].fragment
                             if (currentFragment is BrowseFragment && !currentFragment.binding.webView.url.isNullOrEmpty()) {
                                 reloadBrowserFragment(currentFragment)
                             }
                             LinkTubeActivity.myPager.currentItem = position
-
+                         notifyDataSetChanged()
                             if (context is TabActivity) {
                                 TabQuickButtonAdapter.updateTabs()
                                 context.finish()
@@ -248,6 +249,7 @@ class TabAdapter(private val context: Context, private val dialog: AlertDialog?
 
         }
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return if (isLinktubeActivity) {

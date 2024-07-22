@@ -100,7 +100,7 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".PlayerFileActivity"
+            android:name=".browserActivity.PlayerFileActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="true"
             android:launchMode="singleTask"
@@ -192,7 +192,9 @@
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".browserActivity.BookmarkActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            />
         <activity
             android:name=".browserActivity.LinkTubeActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"

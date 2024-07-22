@@ -1,4 +1,4 @@
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.browserActivity
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -49,6 +49,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.PlaybackIconsAdapter
 import com.jaidev.seeaplayer.dataClass.IconModel
 import com.jaidev.seeaplayer.databinding.ActivityPlayerFileBinding
