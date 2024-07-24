@@ -10,6 +10,8 @@ import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
@@ -20,10 +22,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -240,77 +244,163 @@ class VideoAdapter(private val context: Context,
                 showRenameDialog(position, videoList[position].title)
             }
 
+//            bindingMf.deleteBtn.setOnClickListener {
+//                dialog.dismiss()
+//
+//                val alertDialogBuilder = AlertDialog.Builder(context)
+//                val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
+//
+//                val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
+//                val deleteText = view.findViewById<TextView>(R.id.deleteText)
+//                val cancelText = view.findViewById<TextView>(R.id.cancelText)
+//                val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
+//
+//                // Set the delete text color to red
+//                deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+//
+//                // Set the cancel text color to black
+//                cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+//
+//                // Load video image into iconImageView using Glide
+//                Glide.with(context)
+//                    .asBitmap()
+//                    .load(videoList[position].artUri)
+//                    .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
+//                    .into(iconImageView)
+//
+//                videoNameDelete.text = videoList[position].title
+//
+//                alertDialogBuilder.setView(view)
+//
+//                val alertDialog = alertDialogBuilder.create()
+//
+//                deleteText.setOnClickListener {
+//                    val file = File(videoList[position].path)
+//                    if (file.exists() && file.delete()) {
+//                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+//                        when {
+//                            MainActivity.search -> {
+//                                MainActivity.dataChanged = true
+//                                videoList.removeAt(position)
+//                                notifyDataSetChanged()
+//                            }
+//                            isFolder -> {
+//                                MainActivity.dataChanged = true
+//                                FoldersActivity.currentFolderVideos.removeAt(position)
+//                                notifyDataSetChanged()
+//                                videoDeleteListener?.onVideoDeleted()
+//                            }
+//
+//                        }
+//                        // Notify listener of the file count change
+//                        fileCountChangeListener.onFileCountChanged(videoList.size)
+//                    } else {
+//                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+//                    }
+//                    alertDialog.dismiss()
+//                }
+//
+//                cancelText.setOnClickListener {
+//                    // Handle cancel action here
+//                    alertDialog.dismiss()
+//                }
+//                alertDialog.show()
+//            }
+
             bindingMf.deleteBtn.setOnClickListener {
                 dialog.dismiss()
-
-                val alertDialogBuilder = AlertDialog.Builder(context)
-                val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-
-                val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
-                val deleteText = view.findViewById<TextView>(R.id.deleteText)
-                val cancelText = view.findViewById<TextView>(R.id.cancelText)
-                val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
-
-                // Set the delete text color to red
-                deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-
-                // Set the cancel text color to black
-                cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-
-                // Load video image into iconImageView using Glide
-                Glide.with(context)
-                    .asBitmap()
-                    .load(videoList[position].artUri)
-                    .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
-                    .into(iconImageView)
-
-                videoNameDelete.text = videoList[position].title
-
-                alertDialogBuilder.setView(view)
-
-                val alertDialog = alertDialogBuilder.create()
-
-                deleteText.setOnClickListener {
-                    val file = File(videoList[position].path)
-                    if (file.exists() && file.delete()) {
-                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                        when {
-                            MainActivity.search -> {
-                                MainActivity.dataChanged = true
-                                videoList.removeAt(position)
-                                notifyDataSetChanged()
-                            }
-                            isFolder -> {
-                                MainActivity.dataChanged = true
-                                FoldersActivity.currentFolderVideos.removeAt(position)
-                                notifyDataSetChanged()
-                                videoDeleteListener?.onVideoDeleted()
-                            }
-
-                        }
-                        // Notify listener of the file count change
-                        fileCountChangeListener.onFileCountChanged(videoList.size)
-                    } else {
-                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-                    }
-                    alertDialog.dismiss()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                    showPermissionRequestDialog()
+                } else {
+                    showDeleteDialog(position)
                 }
-
-                cancelText.setOnClickListener {
-                    // Handle cancel action here
-                    alertDialog.dismiss()
-                }
-                alertDialog.show()
             }
         }
 
     }
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun showPermissionRequestDialog() {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.video_music_delete_permission_dialog, null)
+        val alertDialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
 
+        dialogView.findViewById<Button>(R.id.buttonOpenSettings).setOnClickListener {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.addCategory(Intent.CATEGORY_DEFAULT)
+            intent.data = Uri.parse("package:${context.packageName}")
+            ContextCompat.startActivity(context, intent, null)
+            alertDialog.dismiss()
+        }
 
+        dialogView.findViewById<Button>(R.id.buttonNotNow).setOnClickListener {
+            alertDialog.dismiss()
+        }
 
+        alertDialog.show()
+    }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showDeleteDialog(position: Int) {
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        val view = LayoutInflater.from(context).inflate(R.layout.delete_alertdialog, null)
 
+        val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
+        val deleteText = view.findViewById<TextView>(R.id.deleteText)
+        val cancelText = view.findViewById<TextView>(R.id.cancelText)
+        val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
 
+        // Set the delete text color to red
+        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+
+        // Set the cancel text color to black
+        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+
+        // Load video image into iconImageView using Glide
+        Glide.with(context)
+            .asBitmap()
+            .load(videoList[position].artUri)
+            .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
+            .into(iconImageView)
+
+        videoNameDelete.text = videoList[position].title
+
+        alertDialogBuilder.setView(view)
+
+        val alertDialog = alertDialogBuilder.create()
+
+        deleteText.setOnClickListener {
+            val file = File(videoList[position].path)
+            if (file.exists() && file.delete()) {
+                MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                when {
+                    MainActivity.search -> {
+                        MainActivity.dataChanged = true
+                        videoList.removeAt(position)
+                        notifyDataSetChanged()
+                    }
+                    isFolder -> {
+                        MainActivity.dataChanged = true
+                        FoldersActivity.currentFolderVideos.removeAt(position)
+                        notifyDataSetChanged()
+                        videoDeleteListener?.onVideoDeleted()
+                    }
+                }
+                // Notify listener of the file count change
+                fileCountChangeListener.onFileCountChanged(videoList.size)
+            } else {
+                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+            }
+            alertDialog.dismiss()
+        }
+
+        cancelText.setOnClickListener {
+            // Handle cancel action here
+            alertDialog.dismiss()
+        }
+        alertDialog.show()
+    }
     override fun getItemCount(): Int {
         return videoList.size
     }
@@ -340,7 +430,6 @@ class VideoAdapter(private val context: Context,
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
             }
-
         dialogRF = dialogBuilder.create()
         dialogRF.show()
 

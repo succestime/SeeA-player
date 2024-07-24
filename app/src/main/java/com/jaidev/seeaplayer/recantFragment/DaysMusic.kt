@@ -22,12 +22,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.MainActivity.Companion.musicRecantList
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.databinding.FragmentDaysMusicBinding
 import java.util.concurrent.TimeUnit
 
-class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener {
+class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener,  RecantMusicAdapter.MusicDeleteListener , MusicAdapter.MusicDeleteListener  {
     private lateinit var binding: FragmentDaysMusicBinding
     private lateinit var adapter: RecantMusicAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -35,40 +36,45 @@ class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener {
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view =  inflater.inflate(R.layout.fragment_days_music, container, false)
+        val view = inflater.inflate(R.layout.fragment_days_music, container, false)
         binding = FragmentDaysMusicBinding.bind(view)
-        binding.MusicRV.setHasFixedSize(true)
-        binding.MusicRV.setItemViewCacheSize(50)
-        binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
-        adapter = RecantMusicAdapter(requireContext(), musicRecantList , isReMusic = true ,this@DaysMusic)
-        binding.MusicRV.adapter = adapter
-        binding.daysTotalMusics.text = "0 Musics"
-        if (!requestRuntimePermission()) {
-            // Permission not granted yet
-            return view
+        try {
+            binding.MusicRV.setHasFixedSize(true)
+            binding.MusicRV.setItemViewCacheSize(50)
+            binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
+            adapter = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@DaysMusic, isMusic = false
+            )
+            binding.MusicRV.adapter = adapter
+            binding.daysTotalMusics.text = "0 Musics"
+            if (!requestRuntimePermission()) {
+                // Permission not granted yet
+                return view
+            }
+
+            // Permission already granted, load recent videos
+            loadRecentMusics()
+
+            val handler = Handler(Looper.getMainLooper())
+            handler.postDelayed({
+                binding.swipeRefreshMusic.isRefreshing = false // Hide the refresh indicator
+            }, 2000) // 2000 milliseconds (2 seconds)
+
+
+            swipeRefreshLayout = binding.swipeRefreshMusic
+            swipeRefreshLayout.setOnRefreshListener {
+                loadRecentMusics()
+                binding.shuffleBtn.visibility = View.VISIBLE
+                swipeRefreshLayout.isRefreshing = false
+            }
+            // Set the background color of SwipeRefreshLayout based on app theme
+
+            shuffleEmpty()
+        } catch (_: Exception) {
         }
-
-        // Permission already granted, load recent videos
-        loadRecentMusics()
-
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-            binding.swipeRefreshMusic.isRefreshing = false // Hide the refresh indicator
-        }, 2000) // 2000 milliseconds (2 seconds)
-
-
-
-        swipeRefreshLayout = binding.swipeRefreshMusic
-swipeRefreshLayout.setOnRefreshListener {
-    loadRecentMusics()
-    binding.shuffleBtn.visibility = View.VISIBLE
-    swipeRefreshLayout.isRefreshing = false
-}
-        // Set the background color of SwipeRefreshLayout based on app theme
-
-        shuffleEmpty()
         return view
+
     }
+
 
     private fun shuffleEmpty(){
         binding.shuffleBtn.setOnClickListener {
@@ -77,7 +83,6 @@ swipeRefreshLayout.setOnRefreshListener {
             intent.putExtra("class" , "DaysMusic")
             startActivity(intent)
         }
-
         if (musicRecantList.isNotEmpty()) {
             binding.shuffleBtn.visibility = View.VISIBLE
         } else {
@@ -248,5 +253,13 @@ swipeRefreshLayout.setOnRefreshListener {
 
     }
 
+    override fun onMusicDeleted() {
+        if (musicRecantList.isEmpty()) {
+            binding.emptyStateLayout.visibility = View.VISIBLE
+        } else {
+            binding.emptyStateLayout.visibility = View.GONE
+        }
+        loadRecentMusics()
+    }
 
 }

@@ -31,6 +31,7 @@ import com.jaidev.seeaplayer.dataClass.favouriteChecker
 import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.ActivityPlayerMusicBinding
+import java.io.File
 
 class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer.OnCompletionListener, SpeedMusicBottomSheet.SpeedSelectionListener {
 
@@ -343,6 +344,11 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     }
 
     private fun setLayout() {
+        if (!fileExists(musicListPA[songPosition].path)) {
+            Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
+            prevNextSong(true) // Skip to the next song
+            return
+        }
         fIndex = favouriteChecker(musicListPA[songPosition].id)
 
         Glide.with(applicationContext)
@@ -369,6 +375,11 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
     private fun createMediaPlayer() {
         try {
+            if (!fileExists(musicListPA[songPosition].path)) {
+                Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
+                prevNextSong(true) // Skip to the next song
+                return
+            }
             if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
             musicService!!.mediaPlayer!!.reset()
             musicService!!.mediaPlayer!!.setDataSource(musicListPA[songPosition].path)
@@ -392,6 +403,9 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
     }
 
+    private fun fileExists(path: String): Boolean {
+        return File(path).exists()
+    }
 
     private fun playMusic() {
         isPlaying = true
@@ -444,7 +458,8 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 //            musicService!!.audioManager.requestAudioFocus(musicService, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
         }
         createMediaPlayer()
-        musicService!!.seekBarSetup()
+        musicService!!.
+        seekBarSetup()
 
 
 

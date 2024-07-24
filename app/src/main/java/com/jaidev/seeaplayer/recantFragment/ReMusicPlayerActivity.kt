@@ -3,6 +3,7 @@ package com.jaidev.seeaplayer.recantFragment
 
 import android.annotation.SuppressLint
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.media.MediaPlayer
@@ -25,13 +26,15 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.musicActivity.ReMoreMusicBottomSheet
 import com.jaidev.seeaplayer.Services.MusicService
-import com.jaidev.seeaplayer.musicActivity.SpeedMusicBottomSheet
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reFormatDuration
+import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.ActivityReMusicPlayerBinding
+import com.jaidev.seeaplayer.musicActivity.ReMoreMusicBottomSheet
+import com.jaidev.seeaplayer.musicActivity.SpeedMusicBottomSheet
+import java.io.File
 
 class ReMusicPlayerActivity : AppCompatActivity()
     , ServiceConnection, MediaPlayer.OnCompletionListener , SpeedMusicBottomSheet.SpeedSelectionListener
@@ -45,6 +48,8 @@ class ReMusicPlayerActivity : AppCompatActivity()
         var songPosition: Int = 0
         var isPlaying: Boolean = false
         var musicService : MusicService? = null
+        var nowMusicPlayingId : String = ""
+
         private var isServiceBound = null
         var position: Int = -1
         var min10: Boolean = false
@@ -66,8 +71,40 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
         }
 
-        fun createMediaPlayer() {
+
+        fun setLayout(context: Context) {
+            if (!fileExists(reMusicList[songPosition].path)) {
+                Toast.makeText(context, "File does not exist", Toast.LENGTH_SHORT).show()
+                setSongPosition(increment = true)
+                setLayout(context)
+                createMediaPlayer(context)
+                return
+            }
+            Glide.with(context)
+                .load(getImgArt(reMusicList[songPosition].path))
+                .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+                .into(binding.songImgPA)
+
+            binding.songNamePA.text = reMusicList[songPosition].title
+
+            if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(context, R.color.cool_green))
+            else binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(context, R.color.cool_pink))
+
+            if (isShuffleEnabled) binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(context, R.color.cool_green))
+            else binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(context, R.color.cool_pink))
+
+            if (!isShuffleEnabled) binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
+            else binding.shuffleBtnPA.setImageResource(R.drawable.media_playlist_consecutive_svgrepo_com__1_)
+        }
+        fun createMediaPlayer(context: Context) {
             try {
+                if (!fileExists(reMusicList[songPosition].path)) {
+                    Toast.makeText(context, "File does not exist", Toast.LENGTH_SHORT).show()
+                    setSongPosition(increment = true)
+                    setLayout(context)
+                    createMediaPlayer(context)
+                    return
+                }
                 if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
                 musicService!!.mediaPlayer!!.reset()
                 musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
@@ -83,6 +120,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 musicService!!.mediaPlayer!!.setOnCompletionListener(this@Companion)
             }catch (e : Exception){return}
         }
+        private fun fileExists(path: String): Boolean {
+            val file = File(path)
+            return file.exists()
+        }
+
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -215,11 +257,18 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
 
     private fun setLayout(){
-        Glide.with(this)
-            .asBitmap()
+        if (!fileExists(reMusicList[songPosition].path)) {
+            Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
+            setSongPosition(increment = true)
+            setLayout()
+            createMediaPlayer()
+            return
+        }
+        Glide.with(applicationContext)
             .load(getImgArt(reMusicList[songPosition].path))
-            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three)).centerCrop()
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgPA)
+
         binding.songNamePA.text = reMusicList[songPosition].title
 
         if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
@@ -234,8 +283,18 @@ class ReMusicPlayerActivity : AppCompatActivity()
         else binding.shuffleBtnPA.setImageResource(R.drawable.media_playlist_consecutive_svgrepo_com__1_)
 
     }
+    private fun fileExists(path: String): Boolean {
+        return File(path).exists()
+    }
     private fun createMediaPlayer(){
         try {
+            if (!fileExists(reMusicList[songPosition].path)) {
+                Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
+                setSongPosition(increment = true)
+                setLayout()
+                createMediaPlayer()
+                return
+            }
             if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
             musicService!!.mediaPlayer!!.reset()
             musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
@@ -267,7 +326,6 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 reMusicList.addAll(MainActivity.musicRecantList)
               originalMusicListPA = ArrayList(reMusicList) // Save original list
                 setLayout()
-
             }
 
             "ReNowPlaying" -> {

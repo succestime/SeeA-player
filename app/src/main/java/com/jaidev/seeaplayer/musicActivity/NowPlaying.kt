@@ -15,11 +15,12 @@ import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
+import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentNowPlayingBinding
 
-class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
+class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdapter.MusicDeleteListener  {
     lateinit var adapter: MusicAdapter
     companion object{
        @SuppressLint("StaticFieldLeak")
@@ -66,10 +67,8 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
+        try {
         if(PlayerMusicActivity.musicService != null){
-           // requireActivity().registerReceiver(receiver, IntentFilter(ACTION_MUSIC_DELETED),
-             //   Context.RECEIVER_NOT_EXPORTED)
-
             binding.root.visibility = View.VISIBLE
             binding.songNameNP.isSelected = true
             Glide.with(requireContext())
@@ -81,6 +80,10 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
             if(PlayerMusicActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
             else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
 
+        }
+        }catch (e: Exception) {
+            binding.root.visibility = View.GONE
+            PlayerMusicActivity.musicService?.stopService() // Stop the music service
         }
     }
 
@@ -98,10 +101,11 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener  {
     }
 
     override fun onMusicDeleted() {
-        // Check if the NowPlaying fragment is currently visible
+        refreshNowPlayingUI()
         if (isVisible) {
-            // Refresh the UI with the current playing music or take any other necessary action
+            binding.root.visibility = View.GONE
             refreshNowPlayingUI()
+
         }
     }
 

@@ -38,6 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="video title"
+            android:gravity="center_vertical"
+
             android:layout_marginVertical="2dp"
             android:layout_marginStart="20dp"
             android:maxLines="2"
@@ -71,7 +73,7 @@
         android:textSize="18sp"
         android:gravity="center"
         android:padding="16dp"
-        android:background="@drawable/text_border"
+        android:background="@drawable/text_border_black"
         android:layout_margin="8dp"
         />
 

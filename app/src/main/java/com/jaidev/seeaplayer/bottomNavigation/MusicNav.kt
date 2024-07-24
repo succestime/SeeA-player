@@ -2,10 +2,8 @@ package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -18,27 +16,24 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jaidev.seeaplayer.MainActivity.Companion.MusicListMA
 import com.jaidev.seeaplayer.MainActivity.Companion.musicListSearch
+import com.jaidev.seeaplayer.MainActivity.Companion.musicRecantList
 import com.jaidev.seeaplayer.MainActivity.Companion.search
-import com.jaidev.seeaplayer.MainActivity.Companion.sortValue
 import com.jaidev.seeaplayer.Subscription.SeeAOne
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
-import com.jaidev.seeaplayer.dataClass.Music
-import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
+import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.databinding.FragmentMusicNavBinding
 import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
-import java.io.File
 
-class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
+class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdapter.MusicDeleteListener ,    RecantMusicAdapter.OnFileCountChangeListener
+ {
 
     private lateinit var binding: FragmentMusicNavBinding
     lateinit var adapter: MusicAdapter
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var adapterf: RecantMusicAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,28 +52,22 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
         binding = FragmentMusicNavBinding.bind(view)
         setupActionBar()
         binding.musicRV.setHasFixedSize(true)
-        binding.musicRV.setItemViewCacheSize(50)
-
+        binding.musicRV.setItemViewCacheSize(15)
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true)
+        adapterf = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@musicNav, isMusic = false)
         adapter.setMusicDeleteListener(this)
+        adapterf.setMusicDeleteListener(this)
         binding.musicRV.adapter = adapter
+        refreshMusicList()
 
         binding.swipeRefreshMusic.setOnRefreshListener {
-            MusicListMA = getAllAudio()
-            adapter.updateMusicList(MusicListMA)
-
+            refreshMusicList()
             binding.swipeRefreshMusic.isRefreshing = false
         }
 
         updateEmptyState()
-        // Optionally, you can add a scroll listener if needed
-        binding.musicRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                // Your code here if you want to do something on scroll
-            }
-        })
+
         binding.playandshuffleBtn.setOnClickListener { view ->
             showPlayShuffleMenu(view)
         }
@@ -94,54 +83,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
 
         return view
     }
-    @SuppressLint("Recycle", "Range")
-    @RequiresApi(Build.VERSION_CODES.R)
-    fun getAllAudio(): ArrayList<Music>{
-        val tempList = ArrayList<Music>()
-        val selection = MediaStore.Audio.Media.IS_MUSIC +  " != 0"
-        val projection = arrayOf(
-            MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.DATE_ADDED,
-            MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.ALBUM_ID ,     MediaStore.Audio.Media.SIZE,)
-        val cursor = requireContext().contentResolver.query(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null,
-            MainActivity.sortMusicList[MainActivity.sortValue]
-        )
 
-        if (cursor != null) {
-            if (cursor.moveToNext()) {
-                do {
-                    val titleC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))?:"Unknown"
-                    val idC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))?:"Unknown"
-                    val albumC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))?:"Unknown"
-                    val artistC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))?:"Unknown"
-                    val pathC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                    val durationC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
-                    val albumIdC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)).toString()
-                    val uri =
-                        Uri.parse("content://media/external/audio/albumart")
-                    val artUriC = Uri.withAppendedPath(uri, albumIdC).toString()
-                    val sizeC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE))
-                    val music = Music(id = idC, title = titleC, album = albumC, artist = artistC, path = pathC, duration = durationC,
-                        artUri = artUriC , size = sizeC)
-                    val file = File(music.path)
-                    if(file.exists())
-                        tempList.add(music)
-                }while (cursor.moveToNext())
-            }
-            cursor.close()
-        }
-        // Sort the tempList based on the selected sorting option
-        if (sortValue == 2 || sortValue == 3) { // Name(A to Z) or Name(Z to A)
-            tempList.sortWith(Comparator { o1, o2 ->
-                NaturalOrderComparator().compare(o1.title, o2.title)
-            })
-            if (sortValue == 3) { // Name(Z to A)
-                tempList.reverse()
-            }
-        }
-        return tempList
-    }
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("NotifyDataSetChanged")
     private fun refreshMusicList() {
@@ -223,6 +165,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
     @SuppressLint("NotifyDataSetChanged")
     override fun onMusicDeleted() {
         refreshMusicList()
+
     }
 
     private fun updateEmptyState() {
@@ -259,7 +202,12 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener {
     override fun onResume() {
         super.onResume()
         updateEmptyState()
+
     }
 
+     override fun onFileCountChanged(newCount: Int) {
+         TODO("Not yet implemented")
+     }
 
-}
+
+ }

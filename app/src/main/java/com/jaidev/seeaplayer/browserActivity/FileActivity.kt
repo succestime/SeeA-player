@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -18,8 +19,11 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -57,7 +61,16 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
     private var sortByNewestFirst = true // Default to sort by newest first
     lateinit var mAdView: AdView
     private lateinit var swipeRefreshLayout: ConstraintLayout
-
+    private val manageAllFilesPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) {
+                // Permission granted, load the files
+                loadDownloadedFiles()
+            }
+        }
+    companion object {
+        private const val REQUEST_MANAGE_ALL_FILES_ACCESS_PERMISSION = 1001
+    }
     @SuppressLint("NotifyDataSetChanged", "ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,8 +115,48 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
         swipeRefreshLayout = binding.fileActivityLayout
         setSwipeRefreshBackgroundColor()
         updateEmptyStateVisibility()
+        checkAndRequestFilePermission()
+    }
+    private fun checkAndRequestFilePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+            showPermissionRequestDialog()
+        } else {
+            loadDownloadedFiles()
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun showPermissionRequestDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.fileactivity_permission_dialog, null)
+        val alertDialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.buttonOpenSettings).setOnClickListener {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.addCategory(Intent.CATEGORY_DEFAULT)
+            intent.data = Uri.parse("package:${applicationContext.packageName}")
+            manageAllFilesPermissionLauncher.launch(intent)
+            alertDialog.dismiss()
+        }
+
+        dialogView.findViewById<Button>(R.id.buttonNotNow).setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
+    private fun loadDownloadedFiles() {
+        fileItems.clear()
+        val fileList = retrieveDownloadedFiles()
+        fileItems.addAll(fileList)
+        fileListAdapter.notifyDataSetChanged()
+        binding.totalFile.text = "Total Downloaded files: ${fileList.size}"
+        selectBox(binding.monthlyBox)
+    }
     @SuppressLint("ObsoleteSdkInt")
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {

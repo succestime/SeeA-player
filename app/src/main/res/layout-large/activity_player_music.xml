@@ -83,7 +83,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/music_g"
         app:adSize="400x400"
-        app:adUnitId="ca-app-pub-3504589383575544/2057825034"
+        app:adUnitId="ca-app-pub-3504589383575544/1450541097"
 
         app:layout_constraintBottom_toBottomOf="@+id/songImgPA"
         app:layout_constraintEnd_toEndOf="@+id/songImgPA"

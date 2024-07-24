@@ -19,7 +19,7 @@ import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reSetSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentReNowPlayingBinding
 
-class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , RecantMusicAdapter.OnFileCountChangeListener{
+class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , RecantMusicAdapter.OnFileCountChangeListener {
     lateinit var adapter: RecantMusicAdapter
     companion object{
        @SuppressLint("StaticFieldLeak")
@@ -30,10 +30,8 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
         val view = inflater.inflate(R.layout.fragment_re_now_playing, container, false)
         binding = FragmentReNowPlayingBinding.bind(view)
         binding.root.visibility = View.INVISIBLE
-        adapter = RecantMusicAdapter(requireContext(), MainActivity.musicRecantList , isReMusic = true ,this@ReNowPlaying)
-
+        adapter = RecantMusicAdapter(requireContext(), MainActivity.musicRecantList , isReMusic = true ,this@ReNowPlaying  , isMusic = false)
         initializeBinding()
-
         return view
     }
 
@@ -47,7 +45,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
         }
         binding.nextBtnNP.setOnClickListener {
             reSetSongPosition(increment = true)
-            ReMusicPlayerActivity.createMediaPlayer()
+            context?.let { it1 -> ReMusicPlayerActivity.createMediaPlayer(it1) }
 
             Glide.with(this)
                 .asBitmap()
@@ -57,34 +55,55 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
             binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
             playMusic()
         }
+
         binding.root.setOnClickListener {
-            val intent = Intent(requireContext(), ReMusicPlayerActivity::class.java)
-            intent.putExtra("index", ReMusicPlayerActivity.songPosition)
-            intent.putExtra("class", "ReNowPlaying")
-            ContextCompat.startActivity(requireContext(), intent, null)
+            try {
+                val intent = Intent(requireContext(), ReMusicPlayerActivity::class.java)
+                intent.putExtra("index", ReMusicPlayerActivity.songPosition)
+                intent.putExtra("class", "ReNowPlaying")
+                ContextCompat.startActivity(requireContext(), intent, null)
+            }catch (_:Exception){
+
+            }
+
         }
 
     }
-
+//private  fun nextButton(){
+//    reSetSongPosition(increment = true)
+//    ReMusicPlayerActivity.createMediaPlayer()
+//
+//    Glide.with(this)
+//        .asBitmap()
+//        .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+//        .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+//        .into(binding.songImgNP)
+//    binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+//    playMusic()
+//}
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
-        if(ReMusicPlayerActivity.musicService != null){
-           // requireActivity().registerReceiver(receiver, IntentFilter(ACTION_MUSIC_DELETED),
-             //   Context.RECEIVER_NOT_EXPORTED)
+        try {
+            if (ReMusicPlayerActivity.musicService != null) {
+                binding.root.visibility = View.VISIBLE
+                binding.songNameNP.isSelected = true
+                Glide.with(requireContext())
+                    .asBitmap()
+                    .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+                    .apply(
+                        RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop()
+                    )
+                    .into(binding.songImgNP)
+                binding.songNameNP.text =
+                    ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+                if (ReMusicPlayerActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+                else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
 
-            binding.root.visibility = View.VISIBLE
-            binding.songNameNP.isSelected = true
-            Glide.with(requireContext())
-                .asBitmap()
-                .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
-                .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
-                .into(binding.songImgNP)
-            binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
-            if(ReMusicPlayerActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
-            else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
-
+            }
+        }catch (_: Exception) {
+            binding.root.visibility = View.GONE
         }
     }
 
@@ -101,13 +120,6 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
         binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
 
 //        ReMusicPlayerActivity.musicService!!.showNotification(R.drawable.play_music_icon)
-    }
-    override fun onMusicDeleted() {
-        // Check if the NowPlaying fragment is currently visible
-        if (isVisible) {
-            // Refresh the UI with the current playing music or take any other necessary action
-            refreshNowPlayingUI()
-        }
     }
 
     private fun refreshNowPlayingUI() {
@@ -128,6 +140,11 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
     }
 
     override fun onFileCountChanged(newCount: Int) {
+    }
+
+    override fun onMusicDeleted() {
+        refreshNowPlayingUI()
+
     }
 
 

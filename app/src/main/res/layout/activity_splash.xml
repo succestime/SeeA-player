@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/dark_cool_blue"
     android:fitsSystemWindows="true"
     android:gravity="center"
     android:id="@+id/splashActivity"
     tools:context=".SplashActivity">
+
+<!--    android:background="@color/dark_cool_blue"-->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -37,7 +38,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/cardView"
         android:layout_alignParentBottom="true"
-        android:textColor="@color/white"
         android:textSize="25sp"
         android:layout_marginTop="15dp"
         app:layout_constraintEnd_toEndOf="parent"

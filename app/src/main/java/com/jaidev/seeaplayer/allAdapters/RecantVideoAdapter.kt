@@ -9,6 +9,8 @@ import android.content.Intent
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
@@ -19,6 +21,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -136,10 +141,13 @@ class RecentVideoAdapter(private val context: Context,
             window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
 
             bindingMf.deleteBtn.setOnClickListener {
-
-                val selectedPosition = newPosition  // Use newPosition or another variable to identify the selected video
-                showSingleDeleteConfirmation(selectedPosition)
                 dialog.dismiss()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                    showPermissionRequestDialog()
+                } else {
+                    showDeleteDialog(position)
+                }
+
             }
 
             bindingMf.shareBtn.setOnClickListener {
@@ -208,6 +216,8 @@ class RecentVideoAdapter(private val context: Context,
     override fun getItemCount(): Int {
         return videoReList.size
     }
+
+
     private fun toggleSelection(position: Int) {
         if (selectedItems.contains(position)) {
             selectedItems.remove(position)
@@ -263,18 +273,6 @@ class RecentVideoAdapter(private val context: Context,
         @SuppressLint("NotifyDataSetChanged", "ResourceType")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             when (item?.itemId) {
-//                R.id.renameMulti -> {
-////                    // Call the showRenameDialog method here
-////                    if (selectedItems.size == 1) {
-////                        val selectedPosition = selectedItems.first()
-////                        val defaultName = videoReList[selectedPosition].title
-//////                        showRenameDialog(selectedPosition, defaultName)
-////                    } else {
-////                        Toast.makeText(context, "Please select only one video to rename", Toast.LENGTH_SHORT).show()
-////                    }
-////                    return true
-//                }
-
                 R.id.shareMulti -> {
                     shareSelectedFiles()
 
@@ -329,23 +327,65 @@ class RecentVideoAdapter(private val context: Context,
         }
     }
 
-    // Function to show confirmation dialog for single video deletion
-    private fun showSingleDeleteConfirmation(position: Int) {
-        val video = videoReList[position]
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showDeleteDialog(position: Int) {
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        val view = LayoutInflater.from(context).inflate(R.layout.delete_alertdialog, null)
 
-        AlertDialog.Builder(context)
-            .setTitle("Confirm Delete")
-            .setMessage("Are you sure you want to delete '${video.title}'?")
-            .setPositiveButton("Delete") { _, _ ->
-                deleteVideo(position)
+        val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
+        val deleteText = view.findViewById<TextView>(R.id.deleteText)
+        val cancelText = view.findViewById<TextView>(R.id.cancelText)
+        val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
 
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
+
+        cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
+
+        Glide.with(context)
+            .asBitmap()
+            .load(videoReList[position].artUri)
+            .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
+            .into(iconImageView)
+
+        videoNameDelete.text = videoReList[position].title
+
+        alertDialogBuilder.setView(view)
+
+        val alertDialog = alertDialogBuilder.create()
+
+        deleteText.setOnClickListener {
+            deleteVideo(position)
+            alertDialog.dismiss()
+
+        }
+        cancelText.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
     }
-    // Function to delete a single video
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun showPermissionRequestDialog() {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.video_music_delete_permission_dialog, null)
+        val alertDialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.buttonOpenSettings).setOnClickListener {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.addCategory(Intent.CATEGORY_DEFAULT)
+            intent.data = Uri.parse("package:${context.packageName}")
+            ContextCompat.startActivity(context, intent, null)
+            alertDialog.dismiss()
+        }
+
+        dialogView.findViewById<Button>(R.id.buttonNotNow).setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
     @SuppressLint("NotifyDataSetChanged")
     private fun deleteVideo(position: Int) {
         val video = videoReList[position]
@@ -356,14 +396,12 @@ class RecentVideoAdapter(private val context: Context,
             videoReList.removeAt(position)
             notifyItemRemoved(position)
             notifyDataSetChanged()
-            Toast.makeText(context, "Video deleted successfully", Toast.LENGTH_SHORT).show()
-
             // If action mode is active, finish it after deletion
             actionMode?.finish()
             // Notify listener of the file count change
             fileCountChangeListener.onFileCountChanged(videoReList.size)
         } else {
-            Toast.makeText(context, "Failed to delete video", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
         }
     }
     private fun shareSelectedFiles() {

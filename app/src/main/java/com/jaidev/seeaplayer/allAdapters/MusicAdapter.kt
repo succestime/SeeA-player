@@ -10,6 +10,8 @@ import android.content.SharedPreferences
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
@@ -20,6 +22,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -37,6 +40,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.R.*
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
@@ -59,7 +63,6 @@ class MusicAdapter(
 )
     : RecyclerView.Adapter<MusicAdapter.MyAdapter>() {
     private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
-
     private var newPosition = 0
     private lateinit var dialogRF: AlertDialog
     private lateinit var sharedPreferences: SharedPreferences
@@ -69,10 +72,11 @@ class MusicAdapter(
     private var actionMode: ActionMode? = null
 
     companion object {
-        private var itemCount: Int = 0
         private const val PREF_NAME = "music_titles"
 
     }
+
+
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
     init {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -107,19 +111,26 @@ class MusicAdapter(
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    @SuppressLint("NotifyDataSetChanged", "MissingInflatedId", "ResourceType")
+    @SuppressLint("NotifyDataSetChanged", "MissingInflatedId", "ResourceType",
+        "SuspiciousIndentation"
+    )
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
 
         holder.title.text = musicList[position].title
         holder.album.text = musicList[position].album
 
-        Glide.with(context)
-            .load(getImgArt(musicList[position].path))
-            .apply(RequestOptions()
-                .placeholder(R.color.gray) // Use the newly created drawable
-                .error(R.drawable.music_note_svgrepo_com) // Use the newly created drawable
-                .centerCrop())
-            .into(holder.image)
+
+            Glide.with(context)
+                .load(getImgArt(musicList[position].path))
+                .apply(
+                    RequestOptions()
+                        .placeholder(color.gray) // Use the newly created drawable
+                        .error(drawable.music_note_svgrepo_com) // Use the newly created drawable
+                        .centerCrop()
+                )
+                .into(holder.image)
+
+
 
         // Handle selection visibility first
         if (selectedItems.contains(position)) {
@@ -130,7 +141,6 @@ class MusicAdapter(
             holder.fillCheck.visibility = View.GONE
         }
 
-        // Adjust for selection mode
         if (isSelectionModeEnabled) {
             holder.more.visibility = View.GONE
             if (!selectedItems.contains(position)) {
@@ -169,7 +179,7 @@ class MusicAdapter(
             } else {
                 if (PlayerMusicActivity.isShuffleEnabled) {
                     PlayerMusicActivity.isShuffleEnabled = false
-                    binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
+                    binding.shuffleBtnPA.setImageResource(drawable.shuffle_icon)
                     // If you need to perform any other actions when shuffle mode is disabled, add them here
                 }
                 when {
@@ -226,10 +236,10 @@ class MusicAdapter(
 
                 holder.playlstM.setOnClickListener { view ->
                     val popupMenu = PopupMenu(context, view)
-                    popupMenu.inflate(R.menu.playlist_remove)
+                    popupMenu.inflate(menu.playlist_remove)
                     popupMenu.setOnMenuItemClickListener { item ->
                         when (item.itemId) {
-                            R.id.remove_item -> {
+                            id.remove_item -> {
                                 // Handle the removal of the item from the playlist
                                 removeItemFromPlaylist(position)
                                 true
@@ -261,14 +271,12 @@ class MusicAdapter(
         holder.more.setOnClickListener {
             newPosition = position
             // Inflate the custom dialog layout
-            val customDialog = LayoutInflater.from(context).inflate(R.layout.video_more_features, holder.root, false)
+            val customDialog = LayoutInflater.from(context).inflate(layout.video_more_features, holder.root, false)
             val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
             // Create the dialog
             val dialogBuilder = MaterialAlertDialogBuilder(context)
                 .setView(customDialog)
             val dialog = dialogBuilder.create()
-
-            // Show the dialog
             dialog.show()
 
             // Get the window attributes of the dialog
@@ -294,7 +302,7 @@ class MusicAdapter(
             bindingMf.infoBtn.setOnClickListener {
                 dialog.dismiss()
                 val customDialogIf = LayoutInflater.from(context)
-                    .inflate(R.layout.details_view, holder.root, false)
+                    .inflate(layout.details_view, holder.root, false)
                 val bindingIf = DetailsViewBinding.bind(customDialogIf)
                 val dialogIf = MaterialAlertDialogBuilder(context).setView(customDialogIf)
                     .setCancelable(false)
@@ -329,78 +337,114 @@ class MusicAdapter(
 
             bindingMf.deleteBtn.setOnClickListener {
                 dialog.dismiss()
-                val alertDialogBuilder = AlertDialog.Builder(context)
-                val layoutInflater = LayoutInflater.from(context)
-                val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-
-
-                val musicNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
-                val deleteText = view.findViewById<TextView>(R.id.deleteText)
-                val cancelText = view.findViewById<TextView>(R.id.cancelText)
-                val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
-                // Set the delete text color to red
-                deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-
-                // Set the cancel text color to black
-                cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-
-                // Load video image into iconImageView using Glide
-                Glide.with(context)
-                    .asBitmap()
-                    .load(musicList[position].artUri)
-                    .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
-                    .into(iconImageView)
-
-                musicNameDelete.text = musicList[position].title
-
-                alertDialogBuilder.setView(view)
-
-                val alertDialog = alertDialogBuilder.create()
-                deleteText.setOnClickListener {
-                    val file = File(musicList[position].path)
-                    if (file.exists() && file.delete()) {
-                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                        when {
-                            MainActivity.search -> {
-                                MainActivity.dataChanged = true
-                                musicList.removeAt(position)
-                                notifyDataSetChanged()
-                                musicDeleteListener?.onMusicDeleted()
-                            }
-
-                            isMusic -> {
-                                MainActivity.dataChanged = true
-                                MainActivity.MusicListMA.removeAt(position)
-                                notifyDataSetChanged()
-                                musicDeleteListener?.onMusicDeleted()
-                            }
-
-
-                        }
-
-                    } else {
-                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-                    }
-                    alertDialog.dismiss()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                    showPermissionRequestDialog()
+                } else {
+                    showDeleteDialog(position)
                 }
 
-                cancelText.setOnClickListener {
-                    // Handle cancel action here
-                    alertDialog.dismiss()
-                }
-                alertDialog.show()
             }
-
-
         }
 
 
     }
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun showPermissionRequestDialog() {
+
+            val dialogView = LayoutInflater.from(context).inflate(layout.video_music_delete_permission_dialog, null)
+            val alertDialog = AlertDialog.Builder(context)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+
+            dialogView.findViewById<Button>(id.buttonOpenSettings).setOnClickListener {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory(Intent.CATEGORY_DEFAULT)
+                intent.data = Uri.parse("package:${context.packageName}")
+                ContextCompat.startActivity(context, intent, null)
+                alertDialog.dismiss()
+            }
+
+            dialogView.findViewById<Button>(id.buttonNotNow).setOnClickListener {
+                alertDialog.dismiss()
+            }
+
+            alertDialog.show()
+        }
 
 
     override fun getItemCount(): Int {
         return musicList.size
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showDeleteDialog(position: Int) {
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        val layoutInflater = LayoutInflater.from(context)
+        val view = layoutInflater.inflate(layout.delete_alertdialog_music, null)
+
+
+        val musicNameDelete = view.findViewById<TextView>(id.videmusicNameDelete)
+        val deleteText = view.findViewById<TextView>(id.deleteText)
+        val cancelText = view.findViewById<TextView>(id.cancelText)
+        val iconImageView = view.findViewById<ImageView>(id.videoImage)
+        // Set the delete text color to red
+        deleteText.setTextColor(ContextCompat.getColor(context, color.red))
+
+        // Set the cancel text color to black
+        cancelText.setTextColor(ContextCompat.getColor(context, color.black))
+
+        // Load video image into iconImageView using Glide
+        Glide.with(context)
+            .asBitmap()
+            .load(getImgArt(musicList[position].path))
+            .apply(RequestOptions().placeholder(mipmap.ic_logo_o).centerCrop())
+            .into(iconImageView)
+
+        musicNameDelete.text = musicList[position].title
+
+        alertDialogBuilder.setView(view)
+
+        val alertDialog = alertDialogBuilder.create()
+        deleteText.setOnClickListener {
+            val file = File(musicList[position].path)
+            if (file.exists() && file.delete()) {
+                MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+
+                if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
+                    // Notify the service to play the next song
+                    PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                }
+                when {
+                    MainActivity.search -> {
+                        MainActivity.dataChanged = true
+                        musicList.removeAt(position)
+                        notifyDataSetChanged()
+                        musicDeleteListener?.onMusicDeleted()
+                    }
+
+                    isMusic -> {
+                        MainActivity.dataChanged = true
+                        MainActivity.MusicListMA.removeAt(position)
+                        notifyDataSetChanged()
+                        musicDeleteListener?.onMusicDeleted()
+                    }
+
+
+                }
+
+            } else {
+                Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
+            }
+            alertDialog.dismiss()
+        }
+
+        cancelText.setOnClickListener {
+            // Handle cancel action here
+            alertDialog.dismiss()
+        }
+        alertDialog.show()
+}
 
     private fun removeItemFromPlaylist(position: Int) {
         PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(position)
@@ -461,7 +505,7 @@ class MusicAdapter(
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             // Hide the menu_rename item if more than one item is selected
-            val renameItem = menu?.findItem(R.id.renameMulti)
+            val renameItem = menu?.findItem(id.renameMulti)
             renameItem?.isVisible = selectedItems.size == 1
 
             return true
@@ -472,7 +516,7 @@ class MusicAdapter(
             // Handle action mode menu items
             val actionMode = mode
             when (item?.itemId) {
-                R.id.renameMulti -> {
+                id.renameMulti -> {
                     // Call the showRenameDialog method here
                     if (selectedItems.size == 1) {
                         val selectedPosition = selectedItems.first()
@@ -488,10 +532,10 @@ class MusicAdapter(
                     return true
                 }
 
-                R.id.shareMulti -> {
+                id.shareMulti -> {
                     shareSelectedFiles()
                 }
-                R.id.deleteMulti -> {
+                id.deleteMulti -> {
                     if (selectedItems.isNotEmpty()) {
                         // Build confirmation dialog
                         val message = if (playlistDetails) {
@@ -499,6 +543,8 @@ class MusicAdapter(
                         } else {
                             "Are you sure you want to delete these ${selectedItems.size} selected musics?"
                         }
+
+
 
                         AlertDialog.Builder(context)
                             .setTitle("Confirm Delete")
@@ -514,6 +560,9 @@ class MusicAdapter(
 
                                     if (file.exists() && file.delete()) {
                                         MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                                        if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
+                                            PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                                        }
                                         musicList.removeAt(position)
                                     }
                                 }
@@ -603,8 +652,8 @@ class MusicAdapter(
         val dialogBuilder = AlertDialog.Builder(context)
 
         // Set up the layout for the dialog
-        val view = LayoutInflater.from(context).inflate(R.layout.rename_field, null)
-        val editText = view.findViewById<EditText>(R.id.renameField)
+        val view = LayoutInflater.from(context).inflate(layout.rename_field, null)
+        val editText = view.findViewById<EditText>(id.renameField)
         editText.setText(defaultTitle) // Set default text as current music title
 
         dialogBuilder.setView(view)

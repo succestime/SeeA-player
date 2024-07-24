@@ -10,6 +10,7 @@ import com.google.android.material.color.MaterialColors
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
+import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
@@ -20,7 +21,8 @@ data class Music(
     val artist: String, val duration: Long = 0, var path: String,
     val size: String,
     var artUri: String
-)
+) {
+}
 
 
 class Playlist{
@@ -58,6 +60,21 @@ fun setSongPosition(increment: Boolean) {
             if (0 == PlayerMusicActivity.songPosition)
                 PlayerMusicActivity.songPosition = PlayerMusicActivity.musicListPA.size - 1
             else --PlayerMusicActivity.songPosition
+        }
+
+    }
+}
+fun setReSongPosition(increment: Boolean) {
+
+    if(!ReMusicPlayerActivity.repeat){
+        if (increment) {
+            if (ReMusicPlayerActivity.reMusicList.size - 1 == ReMusicPlayerActivity.songPosition)
+                ReMusicPlayerActivity.songPosition = 0
+            else ++ReMusicPlayerActivity.songPosition
+        } else {
+            if (0 == ReMusicPlayerActivity.songPosition)
+                ReMusicPlayerActivity.songPosition = ReMusicPlayerActivity.reMusicList.size - 1
+            else --ReMusicPlayerActivity.songPosition
         }
 
     }
