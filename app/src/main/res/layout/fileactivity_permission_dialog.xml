@@ -1,0 +1,56 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/file_unloack_permission_svgrepo_com"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="To show the downloads files , we need access to all files on your device."
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textAlignment="center"
+        android:maxLines="2"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/buttonOpenSettings"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:text="OPEN SETTINGS"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/buttonNotNow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="NOT NOW"
+        android:layout_marginBottom="20sp"
+        android:textColor="@color/cool_blue"
+        android:background="@color/transparent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonOpenSettings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
