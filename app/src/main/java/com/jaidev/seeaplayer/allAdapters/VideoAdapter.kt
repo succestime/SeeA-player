@@ -59,6 +59,9 @@ class VideoAdapter(private val context: Context,
         fun onFileCountChanged(newCount: Int)
     }
 
+    fun getSelectedItemCount(): Int {
+        return selectedItems.size
+    }
     private var newPosition = 0
     private lateinit var dialogRF: AlertDialog
     private var sharedPreferences: SharedPreferences
@@ -244,68 +247,6 @@ class VideoAdapter(private val context: Context,
                 showRenameDialog(position, videoList[position].title)
             }
 
-//            bindingMf.deleteBtn.setOnClickListener {
-//                dialog.dismiss()
-//
-//                val alertDialogBuilder = AlertDialog.Builder(context)
-//                val view = layoutInflater.inflate(R.layout.delete_alertdialog, null)
-//
-//                val videoNameDelete = view.findViewById<TextView>(R.id.videmusicNameDelete)
-//                val deleteText = view.findViewById<TextView>(R.id.deleteText)
-//                val cancelText = view.findViewById<TextView>(R.id.cancelText)
-//                val iconImageView = view.findViewById<ImageView>(R.id.videoImage)
-//
-//                // Set the delete text color to red
-//                deleteText.setTextColor(ContextCompat.getColor(context, R.color.red))
-//
-//                // Set the cancel text color to black
-//                cancelText.setTextColor(ContextCompat.getColor(context, R.color.black))
-//
-//                // Load video image into iconImageView using Glide
-//                Glide.with(context)
-//                    .asBitmap()
-//                    .load(videoList[position].artUri)
-//                    .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
-//                    .into(iconImageView)
-//
-//                videoNameDelete.text = videoList[position].title
-//
-//                alertDialogBuilder.setView(view)
-//
-//                val alertDialog = alertDialogBuilder.create()
-//
-//                deleteText.setOnClickListener {
-//                    val file = File(videoList[position].path)
-//                    if (file.exists() && file.delete()) {
-//                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-//                        when {
-//                            MainActivity.search -> {
-//                                MainActivity.dataChanged = true
-//                                videoList.removeAt(position)
-//                                notifyDataSetChanged()
-//                            }
-//                            isFolder -> {
-//                                MainActivity.dataChanged = true
-//                                FoldersActivity.currentFolderVideos.removeAt(position)
-//                                notifyDataSetChanged()
-//                                videoDeleteListener?.onVideoDeleted()
-//                            }
-//
-//                        }
-//                        // Notify listener of the file count change
-//                        fileCountChangeListener.onFileCountChanged(videoList.size)
-//                    } else {
-//                        Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
-//                    }
-//                    alertDialog.dismiss()
-//                }
-//
-//                cancelText.setOnClickListener {
-//                    // Handle cancel action here
-//                    alertDialog.dismiss()
-//                }
-//                alertDialog.show()
-//            }
 
             bindingMf.deleteBtn.setOnClickListener {
                 dialog.dismiss()
@@ -658,7 +599,6 @@ class VideoAdapter(private val context: Context,
         videoList.addAll(searchList)
         notifyDataSetChanged()
     }
-
 
 
     private fun setIconTint(imageView: ImageView) {

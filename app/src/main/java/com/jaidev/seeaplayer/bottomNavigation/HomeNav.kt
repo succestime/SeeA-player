@@ -88,7 +88,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun refreshFolderList() {
         // Call the refresh function in MainActivity
-      (activity as MainActivity).refreshFolderList()
+        (activity as MainActivity).refreshFolderList()
         // Update the adapter with the new data
         foldersAdapter.notifyDataSetChanged()
         adapter.notifyDataSetChanged()
@@ -181,7 +181,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
 
                 // Check if the search view is clicked or if there is text in the search view
                 if (isSearchViewClicked || newText?.isNotEmpty() == true) {
-                  binding.searchRecyclerView.visibility = View.VISIBLE
+                    binding.searchRecyclerView.visibility = View.VISIBLE
                 } else {
                     binding.searchRecyclerView.visibility = View.GONE
                 }

@@ -29,10 +29,23 @@ import com.jaidev.seeaplayer.databinding.FragmentDaysMusicBinding
 import java.util.concurrent.TimeUnit
 
 class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener,  RecantMusicAdapter.MusicDeleteListener , MusicAdapter.MusicDeleteListener  {
-    private lateinit var binding: FragmentDaysMusicBinding
     private lateinit var adapter: RecantMusicAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+companion object{
+    @SuppressLint("StaticFieldLeak")
+    private lateinit var binding: FragmentDaysMusicBinding
 
+    fun updateEmptyViewVisibility() {
+        if (musicRecantList.isEmpty()) {
+            binding.emptyStateLayout.visibility = View.VISIBLE
+            binding.shuffleBtn.visibility = View.GONE
+        } else {
+            binding.emptyStateLayout.visibility = View.GONE
+            binding.shuffleBtn.visibility = View.VISIBLE
+
+        }
+    }
+}
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -83,12 +96,7 @@ class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener,  
             intent.putExtra("class" , "DaysMusic")
             startActivity(intent)
         }
-        if (musicRecantList.isNotEmpty()) {
-            binding.shuffleBtn.visibility = View.VISIBLE
-        } else {
-            binding.shuffleBtn.visibility = View.GONE
-
-        }
+        updateEmptyViewVisibility()
 
     }
     private fun requestRuntimePermission(): Boolean {
@@ -180,13 +188,10 @@ class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener,  
         // Update the total music count text
         binding.daysTotalMusics.text = "${reMusics.size} Musics"
 
-        if (musicRecantList.isEmpty()) {
-            binding.emptyStateLayout.visibility = View.VISIBLE
-        } else {
-            binding.emptyStateLayout.visibility = View.GONE
-        }
+        updateEmptyViewVisibility()
 
     }
+
 
     private fun getAllRecantMusics(context: Context): ArrayList<RecantMusic> {
         val musicReList = ArrayList<RecantMusic>()
@@ -254,11 +259,7 @@ class DaysMusic : Fragment() ,   RecantMusicAdapter.OnFileCountChangeListener,  
     }
 
     override fun onMusicDeleted() {
-        if (musicRecantList.isEmpty()) {
-            binding.emptyStateLayout.visibility = View.VISIBLE
-        } else {
-            binding.emptyStateLayout.visibility = View.GONE
-        }
+        updateEmptyViewVisibility()
         loadRecentMusics()
     }
 

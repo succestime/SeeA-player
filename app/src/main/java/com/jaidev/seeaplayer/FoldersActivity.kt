@@ -40,7 +40,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
     private val PREF_LAYOUT_TYPE = "pref_layout_type"
     private val LAYOUT_TYPE_GRID = "grid"
     private val LAYOUT_TYPE_LIST = "list"
-    private var hasRefreshed = false // Flag to track if a swipe-to-refresh has occurred
 
     companion object {
         var currentFolderVideos: ArrayList<VideoData> = arrayListOf()
@@ -91,26 +90,23 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         setSwipeRefreshBackgroundColor()
 
 
-
-
     }
 
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun initializeBinding() {
         val position = intent.getIntExtra("position", 0)
         binding.swipeRefreshFolder.setOnRefreshListener {
-            if (adapter.isSelectionModeEnabled()) {
-                hasRefreshed = false // Set the flag to true after a refresh
-
+            if (adapter.getSelectedItemCount() > 0) {
                 binding.swipeRefreshFolder.isRefreshing = false
             } else {
-                hasRefreshed = true // Set the flag to true after a refresh
                 currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
                 adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true, this)
                 binding.videoRVFA.adapter = adapter
                 binding.totalVideo.text = "${currentFolderVideos.size} Videos"
                 binding.swipeRefreshFolder.isRefreshing = false
             }
+            adapter.notifyDataSetChanged()
+
         }
         binding.nowPlayingBtn.setOnClickListener {
             startPlayerActivity()
@@ -414,8 +410,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged = false
         binding.totalVideo.text = "${currentFolderVideos.size} Videos"
-        // Enable or disable swipe-to-refresh based on selection mode and refresh flag
-        binding.swipeRefreshFolder.isEnabled = !adapter.isSelectionModeEnabled() || hasRefreshed
     }
 
     private fun startPlayerActivity() {

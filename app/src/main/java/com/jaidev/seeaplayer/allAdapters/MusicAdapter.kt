@@ -46,6 +46,7 @@ import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
+import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.binding
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
@@ -410,11 +411,17 @@ class MusicAdapter(
             val file = File(musicList[position].path)
             if (file.exists() && file.delete()) {
                 MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-
+                MainActivity.MusicListMA.removeAt(position)
                 if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
-                    // Notify the service to play the next song
-                    PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                    if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
+                        PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                    } else {
+                        PlayerMusicActivity.musicService?.stopService() // Stop the music service
+                        PlayerMusicActivity.musicService?.mediaPlayer?.stop()
+                        NowPlaying.binding.root.visibility = View.GONE
+                    }
                 }
+
                 when {
                     MainActivity.search -> {
                         MainActivity.dataChanged = true
@@ -560,8 +567,17 @@ class MusicAdapter(
 
                                     if (file.exists() && file.delete()) {
                                         MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                                        notifyItemChanged(position)
+
                                         if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
-                                            PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                                            if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
+                                                // Notify the service to play the next song
+                                                PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                                            } else {
+                                                PlayerMusicActivity.musicService?.stopService() // Stop the music service
+                                                PlayerMusicActivity.musicService?.mediaPlayer?.stop()
+                                                NowPlaying.binding.root.visibility = View.GONE
+                                            }
                                         }
                                         musicList.removeAt(position)
                                     }

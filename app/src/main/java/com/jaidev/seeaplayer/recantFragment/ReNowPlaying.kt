@@ -22,7 +22,7 @@ import com.jaidev.seeaplayer.databinding.FragmentReNowPlayingBinding
 class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , RecantMusicAdapter.OnFileCountChangeListener {
     lateinit var adapter: RecantMusicAdapter
     companion object{
-       @SuppressLint("StaticFieldLeak")
+        @SuppressLint("StaticFieldLeak")
         lateinit var binding: FragmentReNowPlayingBinding
     }
 
@@ -38,7 +38,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
     private fun initializeBinding(){
         binding.playPauseBtnNP.setOnClickListener {
             if(ReMusicPlayerActivity.isPlaying){ pauseMusic()
-               }
+            }
             else {
                 playMusic()
             }
@@ -69,7 +69,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
         }
 
     }
-//private  fun nextButton(){
+    //private  fun nextButton(){
 //    reSetSongPosition(increment = true)
 //    ReMusicPlayerActivity.createMediaPlayer()
 //
@@ -126,10 +126,10 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
 
         if (ReMusicPlayerActivity.isPlaying) {
 
-          binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+            binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
 
         } else {
-        binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+            binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
         }
         ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
         Glide.with(requireContext())

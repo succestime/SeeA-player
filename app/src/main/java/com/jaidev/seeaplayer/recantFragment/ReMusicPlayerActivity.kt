@@ -30,7 +30,7 @@ import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reFormatDuration
-import com.jaidev.seeaplayer.dataClass.setSongPosition
+import com.jaidev.seeaplayer.dataClass.reSetSongPosition
 import com.jaidev.seeaplayer.databinding.ActivityReMusicPlayerBinding
 import com.jaidev.seeaplayer.musicActivity.ReMoreMusicBottomSheet
 import com.jaidev.seeaplayer.musicActivity.SpeedMusicBottomSheet
@@ -44,7 +44,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
     private var appOpenAd : AppOpenAd? = null
     companion object {
         // of PlayerActivity of this reMusicActivity
-        lateinit var reMusicList: ArrayList<RecantMusic>
+        var reMusicList: ArrayList<RecantMusic> = ArrayList()
         var songPosition: Int = 0
         var isPlaying: Boolean = false
         var musicService : MusicService? = null
@@ -74,10 +74,16 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
         fun setLayout(context: Context) {
             if (!fileExists(reMusicList[songPosition].path)) {
-                Toast.makeText(context, "File does not exist", Toast.LENGTH_SHORT).show()
-                setSongPosition(increment = true)
-                setLayout(context)
-                createMediaPlayer(context)
+                // Check if there are other songs to play
+                if (reMusicList.size > 1) {
+                    reSetSongPosition(increment = true)
+                    setLayout(context)
+                    createMediaPlayer(context)
+                }else{
+                    ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                    ReNowPlaying.binding.root.visibility = View.GONE
+
+                }
                 return
             }
             Glide.with(context)
@@ -99,10 +105,16 @@ class ReMusicPlayerActivity : AppCompatActivity()
         fun createMediaPlayer(context: Context) {
             try {
                 if (!fileExists(reMusicList[songPosition].path)) {
-                    Toast.makeText(context, "File does not exist", Toast.LENGTH_SHORT).show()
-                    setSongPosition(increment = true)
-                    setLayout(context)
-                    createMediaPlayer(context)
+                    // Check if there are other songs to play
+                    if (reMusicList.size > 1) {
+                        reSetSongPosition(increment = true)
+                        setLayout(context)
+                        createMediaPlayer(context)
+                    }else{
+                        ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                        ReNowPlaying.binding.root.visibility = View.GONE
+
+                    }
                     return
                 }
                 if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
@@ -135,7 +147,6 @@ class ReMusicPlayerActivity : AppCompatActivity()
         initializeLayout()
         initializeBinding()
 
-
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         // banner ads
@@ -154,7 +165,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
             if (isPlaying) pauseMusic()
             else playMusic()
         }
-      binding.musicMoreFun.setOnClickListener {
+        binding.musicMoreFun.setOnClickListener {
             // Create an instance of the BottomSheetFragment
             val moreMusicBottomSheetFragment = ReMoreMusicBottomSheet()
             // Show the BottomSheetFragment
@@ -172,7 +183,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
                     R.color.cool_green))
                 // Shuffle the music list
-               originalMusicListPA = ArrayList(reMusicList) // Save original list
+                originalMusicListPA = ArrayList(reMusicList) // Save original list
                 reMusicList.shuffle()
 
                 // Reset song position to start from the beginning
@@ -189,7 +200,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 // Find the current song in the original list and update the song position
                 val currentSong = reMusicList[songPosition]
                 reMusicList = ArrayList(originalMusicListPA)
-               songPosition = reMusicList.indexOf(currentSong)
+                songPosition = reMusicList.indexOf(currentSong)
 
                 // Create and start playing music from the current position in the original list order
                 setLayout()
@@ -200,7 +211,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
             startService(intent)
         }
 
-    binding.songNamePA.isSelected = true
+        binding.songNamePA.isSelected = true
 
 
 
@@ -257,13 +268,19 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
 
     private fun setLayout(){
-        if (!fileExists(reMusicList[songPosition].path)) {
-            Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
-            setSongPosition(increment = true)
-            setLayout()
-            createMediaPlayer()
-            return
-        }
+                if (!fileExists(reMusicList[songPosition].path)) {
+                    // Check if there are other songs to play
+                    if (reMusicList.size > 1) {
+                        reSetSongPosition(increment = true)
+                        setLayout()
+                        createMediaPlayer()
+                    }else{
+                        ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                        ReNowPlaying.binding.root.visibility = View.GONE
+
+                    }
+                    return
+                }
         Glide.with(applicationContext)
             .load(getImgArt(reMusicList[songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
@@ -288,13 +305,19 @@ class ReMusicPlayerActivity : AppCompatActivity()
     }
     private fun createMediaPlayer(){
         try {
-            if (!fileExists(reMusicList[songPosition].path)) {
-                Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
-                setSongPosition(increment = true)
-                setLayout()
-                createMediaPlayer()
-                return
-            }
+                if (!fileExists(reMusicList[songPosition].path)) {
+                    // Check if there are other songs to play
+                    if (reMusicList.size > 1) {
+                        reSetSongPosition(increment = true)
+                        setLayout()
+                        createMediaPlayer()
+                    }else{
+                        ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                        ReNowPlaying.binding.root.visibility = View.GONE
+
+                    }
+                    return
+                }
             if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
             musicService!!.mediaPlayer!!.reset()
             musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
@@ -324,7 +347,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 startService(intent)
                 reMusicList = ArrayList()
                 reMusicList.addAll(MainActivity.musicRecantList)
-              originalMusicListPA = ArrayList(reMusicList) // Save original list
+                originalMusicListPA = ArrayList(reMusicList) // Save original list
                 setLayout()
             }
 
@@ -398,7 +421,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
             ReMusicPlayerActivity.musicService = binder.currentService()
 //            isServiceBound = true
         }
-      createMediaPlayer()
+        createMediaPlayer()
         musicService!!.reSeekSetup()
     }
 
@@ -445,7 +468,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
         override fun onAdLoaded(ad: AppOpenAd) {
             appOpenAd = ad
             appOpenAd!!.show(this@ReMusicPlayerActivity)
-        isAdDisplayed = true // Mark ad as displayed
+            isAdDisplayed = true // Mark ad as displayed
         }
 
         override fun onAdFailedToLoad(p0: LoadAdError) {

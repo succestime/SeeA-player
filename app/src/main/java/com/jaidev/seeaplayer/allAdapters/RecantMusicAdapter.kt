@@ -33,7 +33,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
@@ -42,6 +41,7 @@ import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantMusicViewBinding
 import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
+import com.jaidev.seeaplayer.recantFragment.DaysMusic
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity.Companion.binding
 import com.jaidev.seeaplayer.recantFragment.ReNowPlaying
@@ -279,10 +279,8 @@ class RecantMusicAdapter (val  context : Context,
         @SuppressLint("NotifyDataSetChanged", "ResourceType")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             when (item?.itemId) {
-
                 R.id.shareMulti -> {
                     shareSelectedFiles()
-
                 }
                 R.id.deleteMulti -> {
                     if (selectedItems.isNotEmpty()) {
@@ -295,14 +293,84 @@ class RecantMusicAdapter (val  context : Context,
                                 val positionsToDelete = ArrayList(selectedItems)
                                 positionsToDelete.sortDescending()
 
+                                var shouldBreak = false
+
                                 for (position in positionsToDelete) {
+                                    if (shouldBreak) break
+
                                     val video = musicReList[position]
                                     val file = File(video.path)
 
                                     if (file.exists() && file.delete()) {
                                         MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                                        PlayerMusicActivity.musicService?.stopService() // Stop the music service
+                                        PlayerMusicActivity.musicService?.stopService()
 
+                                        val currentlyPlayingMusic = ReMusicPlayerActivity.reMusicList.getOrNull(ReMusicPlayerActivity.songPosition)
+                                        val isCurrentlyPlaying = currentlyPlayingMusic?.path == video.path
+
+                                        // Check if there is only one last music in the list and it is not currently playing
+                                        if (musicReList.size == 1 && !isCurrentlyPlaying) {
+                                            // Remove the last music item from the list
+                                            musicReList.removeAt(position)
+                                            notifyItemRemoved(position)
+                                            DaysMusic.updateEmptyViewVisibility()
+                                            notifyDataSetChanged()
+                                            actionMode?.finish()
+                                            fileCountChangeListener.onFileCountChanged(musicReList.size)
+                                            musicDeleteListener?.onMusicDeleted()
+                                            shouldBreak = true
+                                            break
+                                        }
+
+                                        // Check if there are only a few songs left and the user is deleting the currently playing song
+                                        if (musicReList.size <= 3 && isCurrentlyPlaying && musicReList.size - 1 == position) {
+                                            // No more songs to play, stop the music service
+                                            ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                                            ReNowPlaying.binding.root.visibility = View.GONE
+                                            DaysMusic.updateEmptyViewVisibility()
+                                            musicReList.removeAt(position)
+                                            notifyItemRemoved(position)
+                                            notifyDataSetChanged()
+                                            actionMode?.finish()
+                                            fileCountChangeListener.onFileCountChanged(musicReList.size)
+                                            musicDeleteListener?.onMusicDeleted()
+                                            shouldBreak = true
+                                            break
+                                        }
+
+                                        if (isCurrentlyPlaying) {
+                                            // Stop the music service
+                                            PlayerMusicActivity.musicService?.stopService()
+
+                                            // Remove the deleted song from the list
+                                            ReMusicPlayerActivity.reMusicList.removeAt(ReMusicPlayerActivity.songPosition)
+
+                                            // Check if there are other songs to play
+                                            if (ReMusicPlayerActivity.reMusicList.isNotEmpty()) {
+                                                // Adjust the song position if necessary
+                                                if (ReMusicPlayerActivity.songPosition >= ReMusicPlayerActivity.reMusicList.size) {
+                                                    ReMusicPlayerActivity.songPosition = 0
+                                                }
+
+                                                // Move to the next song and update the player
+                                                reSetSongPosition(increment = true)
+                                                ReMusicPlayerActivity.createMediaPlayer(context)
+                                                ReMusicPlayerActivity.setLayout(context)
+                                                DaysMusic.updateEmptyViewVisibility()
+                                                Glide.with(context)
+                                                    .asBitmap()
+                                                    .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+                                                    .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+                                                    .into(ReNowPlaying.binding.songImgNP)
+                                                ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+                                            } else {
+                                                DaysMusic.updateEmptyViewVisibility()
+                                                ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                                                ReNowPlaying.binding.root.visibility = View.GONE
+                                            }
+                                            DaysMusic.updateEmptyViewVisibility()
+                                        }
+                                        // Always remove the music item from the list, regardless of whether it was playing
                                         musicReList.removeAt(position)
                                     }
                                 }
@@ -313,7 +381,7 @@ class RecantMusicAdapter (val  context : Context,
                                 notifyDataSetChanged()
                                 // Dismiss action mode
                                 actionMode?.finish()
-                                // Notify listener of the file count change
+                                DaysMusic.updateEmptyViewVisibility()
                                 fileCountChangeListener.onFileCountChanged(musicReList.size)
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
@@ -324,11 +392,10 @@ class RecantMusicAdapter (val  context : Context,
                     }
                     return true
                 }
-
             }
-
             return false
         }
+
         @SuppressLint("NotifyDataSetChanged")
         override fun onDestroyActionMode(mode: ActionMode?) {
             // Clear selection and action mode
@@ -454,40 +521,88 @@ class RecantMusicAdapter (val  context : Context,
         if (file.exists() && file.delete()) {
             MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
             PlayerMusicActivity.musicService?.stopService() // Stop the music service
-            // Check if the deleted music is the currently playing one
-            if (ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path == music.path) {
-                // Move to the next song
-                reSetSongPosition(increment = true)
-                ReMusicPlayerActivity.createMediaPlayer(context)
-                ReMusicPlayerActivity.setLayout(context)
 
-                Glide.with(context)
-                    .asBitmap()
-                    .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
-                    .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
-                    .into(ReNowPlaying.binding.songImgNP)
-                ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+            val currentlyPlayingMusic = ReMusicPlayerActivity.reMusicList.getOrNull(ReMusicPlayerActivity.songPosition)
+            val isCurrentlyPlaying = currentlyPlayingMusic?.path == music.path
+
+            // Check if there is only one last music in the list and it is not currently playing
+            if (musicReList.size == 1 && !isCurrentlyPlaying) {
+                musicReList.removeAt(position)
+                notifyItemRemoved(position)
+                notifyDataSetChanged()
+                actionMode?.finish()
+                DaysMusic.updateEmptyViewVisibility()
+
+                fileCountChangeListener.onFileCountChanged(musicReList.size)
+                musicDeleteListener?.onMusicDeleted()
+                return
             }
 
-            when {
-                isMusic -> {
-                    MainActivity.dataChanged = true
-                    MainActivity.MusicListMA.removeAt(position)
-                    notifyDataSetChanged()
-                    musicDeleteListener?.onMusicDeleted()
+            // Check if there are only a few songs left and the user is deleting the currently playing song
+            if (musicReList.size <= 3 && isCurrentlyPlaying && musicReList.size - 1 == position) {
+                // No more songs to play, stop the music service
+                ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                ReNowPlaying.binding.root.visibility = View.GONE
+                musicReList.removeAt(position)
+                notifyItemRemoved(position)
+                notifyDataSetChanged()
+                actionMode?.finish()
+                DaysMusic.updateEmptyViewVisibility()
+
+                fileCountChangeListener.onFileCountChanged(musicReList.size)
+                musicDeleteListener?.onMusicDeleted()
+
+                return
+            }
+
+            if (isCurrentlyPlaying) {
+                // Stop the music service
+                PlayerMusicActivity.musicService?.stopService()
+
+
+
+                // Check if there are other songs to play
+                if (ReMusicPlayerActivity.reMusicList.isNotEmpty()) {
+                    // Adjust the song position if necessary
+                    if (ReMusicPlayerActivity.songPosition >= ReMusicPlayerActivity.reMusicList.size) {
+                        ReMusicPlayerActivity.songPosition = 0
+                    }
+
+                    // Move to the next song and update the player
+                    reSetSongPosition(increment = true)
+                    ReMusicPlayerActivity.createMediaPlayer(context)
+                    ReMusicPlayerActivity.setLayout(context)
+                    DaysMusic.updateEmptyViewVisibility()
+
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+                        .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+                        .into(ReNowPlaying.binding.songImgNP)
+                    ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+                } else {
+                    DaysMusic.updateEmptyViewVisibility()
+                    ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                    ReNowPlaying.binding.root.visibility = View.GONE
                 }
+                DaysMusic.updateEmptyViewVisibility()
+
             }
 
+            // Always remove the music item from the list, regardless of whether it was playing
             musicReList.removeAt(position)
             notifyItemRemoved(position)
             notifyDataSetChanged()
             actionMode?.finish()
             fileCountChangeListener.onFileCountChanged(musicReList.size)
             musicDeleteListener?.onMusicDeleted()
+            DaysMusic.updateEmptyViewVisibility()
         } else {
             Toast.makeText(context, "Failed to delete music", Toast.LENGTH_SHORT).show()
         }
     }
+
+
     @SuppressLint("NotifyDataSetChanged")
     fun updateRecentMusics(recantMusic: List<RecantMusic>) {
         musicReList.clear()

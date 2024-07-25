@@ -27,33 +27,9 @@
             tools:ignore="MissingConstraints">
 
         </FrameLayout>
-        <LinearLayout
-            android:id="@+id/linearLayoutFa"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="45dp"
-                android:background="@color/light_black"
-                android:clickable="true"
-                android:scrollbars="vertical"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.023" />
-        </LinearLayout>
+
+
 
         <TextView
             android:id="@+id/totalVideo"
@@ -129,17 +105,26 @@
             android:id="@+id/videoRVFA"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="2dp"
             android:layout_marginTop="30dp"
-            android:paddingBottom="30dp"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/linearLayoutFa"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.009"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/totalVideo"
             app:layout_constraintVertical_bias="0.027" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:background="@color/light_black"
+            android:clickable="true"
+            android:scrollbars="vertical"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.023" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/nowPlayingBtn"
