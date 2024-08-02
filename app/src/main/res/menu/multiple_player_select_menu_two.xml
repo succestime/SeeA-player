@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/playMulti"
+        android:title="Play Selected items"
+        android:icon="@drawable/round_play"
+        android:contentDescription="Play Selected items"
+        app:showAsAction="ifRoom"
+        tools:ignore="MissingClass" />
+
+
+    <item android:id="@+id/infoMulti"
+        android:title="Properties"
+        android:icon="@drawable/round_info"
+        android:contentDescription="Properties"
+        app:showAsAction="ifRoom"
+        tools:ignore="MissingClass"
+        />
+
+
+
+</menu>

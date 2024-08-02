@@ -1,0 +1,337 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:fillViewport="true"
+    tools:context=".ThemeActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Adaptive Theme Card -->
+        <View
+            android:id="@+id/adaptiveTheme"
+            android:layout_width="0dp"
+            android:layout_height="70sp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/curver"
+            android:backgroundTint="#8CCFFF"
+            app:layout_constraintEnd_toStartOf="@+id/lightTheme"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Light Theme Card -->
+        <View
+            android:id="@+id/lightTheme"
+            android:layout_width="0dp"
+            android:layout_height="70sp"
+            android:background="@drawable/curver"
+            android:backgroundTint="#FFEC8B"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/darkTheme"
+            app:layout_constraintStart_toEndOf="@+id/adaptiveTheme"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Dark Theme Card -->
+        <View
+            android:id="@+id/darkTheme"
+            android:layout_width="0dp"
+            android:layout_height="70sp"
+            android:background="@drawable/curver"
+            android:backgroundTint="#37474F"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lightTheme"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Classic Themes Label -->
+        <TextView
+            android:id="@+id/classicThemesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Classic Themes"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/adaptiveTheme" />
+
+        <!-- Classic Themes Grid -->
+        <GridLayout
+            android:id="@+id/classicThemesGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="700sp"
+            android:columnCount="3"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/classicThemesLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Row 1 -->
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#FF5A5A"
+                android:background="@drawable/curver" />
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#FFA64C"
+                android:background="@drawable/curver"
+                />
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#FFD54F"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#8B4513"
+                android:background="@drawable/curver"/>
+
+            <!-- Row 4 -->
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#CDDC39"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#8BC34A"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#00E676"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#4CAF50"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#4FC3F7"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#2979FF"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#651FFF"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#E040FB"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#9C27B0"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#E91E63"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#F50057"
+                android:background="@drawable/curver"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#BDBDBD"
+                android:background="@drawable/curver"/>
+
+            <!-- Double Views with split colors -->
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+
+                android:background="@drawable/split_color"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+
+                android:background="@drawable/split_color_two"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_three"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_four"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_five"/>
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_six"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_seven"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_eight"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_nine"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_ten"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_eleven"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_twelve"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_13"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_14"/>
+ <View
+                android:layout_width="30dp"
+                android:layout_height="100dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_margin="4dp"
+                android:background="@drawable/split_color_15"/>
+
+
+        </GridLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

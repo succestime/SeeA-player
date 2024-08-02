@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/rotating_shape.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="ring"
+    android:thicknessRatio="15"
+    android:useLevel="false">
+    <size
+        android:width="64dp"
+        android:height="64dp" />
+    <gradient
+        android:type="sweep"
+        android:useLevel="false"
+        android:endColor="@color/cool_blue"
+        android:angle="0"/>
+</shape>

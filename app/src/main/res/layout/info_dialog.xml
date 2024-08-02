@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Properties"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textColor="@android:color/black"
+        android:layout_gravity="start" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:rowCount="3"
+        android:columnCount="2"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/containsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contains :"
+            android:textSize="15sp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="#8A8A8A"
+            android:gravity="start"/>
+
+        <TextView
+            android:id="@+id/containsDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2 videos"
+            android:textSize="15sp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@android:color/black"
+            android:layout_columnWeight="1"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/durationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duration :"
+            android:textSize="15sp"
+            android:layout_marginTop="20dp"
+
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="#8A8A8A"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/durationDetail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="23 MB (22,897,860 bytes)"
+            android:textSize="15sp"
+            android:layout_marginTop="20dp"
+
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@android:color/black"
+            android:layout_columnWeight="1"
+            android:gravity="start" />
+        <TextView
+            android:id="@+id/totalSizeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total size :   "
+            android:textSize="15sp"
+            android:layout_marginTop="20dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="#8A8A8A"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/totalSizeDetail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="23 MB (22,897,860 bytes)"
+            android:textSize="15sp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@android:color/black"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="20dp"
+
+            android:gravity="start" />
+
+
+    </GridLayout>
+
+    <Button
+        android:id="@+id/positiveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="24dp"
+        android:text="Okay"
+        android:textSize="15sp"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textColor="@color/cool_blue"
+        android:background="?attr/selectableItemBackground" />
+</LinearLayout>

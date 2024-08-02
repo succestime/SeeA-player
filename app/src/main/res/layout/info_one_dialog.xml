@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Properties"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_gravity="start" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:columnCount="2"
+        android:rowCount="4">
+
+        <TextView
+            android:id="@+id/NameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="File :"
+            android:textSize="15dp"
+            android:textColor="#8A8A8A"
+            android:layout_column="0"
+            android:layout_row="0"/>
+
+        <TextView
+            android:id="@+id/fileName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="video_20221024_194232.mp4"
+            android:textSize="15dp"
+            android:maxLines="10"
+            android:textColor="@android:color/black"
+            android:layout_column="1"
+            android:layout_row="0"/>
+
+        <TextView
+            android:id="@+id/DurationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duration :"
+            android:textSize="15dp"
+            android:layout_marginTop="20dp"
+            android:textColor="#8A8A8A"
+            android:layout_column="0"
+            android:layout_row="1"/>
+
+        <TextView
+            android:id="@+id/DurationDetail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="3 minutes"
+            android:textSize="15dp"
+            android:layout_marginTop="20dp"
+            android:maxLines="10"
+            android:textColor="@android:color/black"
+            android:layout_column="1"
+            android:layout_row="1"/>
+
+        <TextView
+            android:id="@+id/sizeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Size :"
+            android:textSize="15dp"
+            android:layout_marginTop="20dp"
+            android:textColor="#8A8A8A"
+            android:layout_column="0"
+            android:layout_row="2"/>
+
+        <TextView
+            android:id="@+id/sizeDetail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="8.3 MB (8,275,110 bytes)"
+            android:textSize="15dp"
+            android:layout_marginTop="20dp"
+            android:maxLines="10"
+            android:textColor="@android:color/black"
+            android:layout_column="1"
+            android:layout_row="2"/>
+
+        <TextView
+            android:id="@+id/locationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location :   "
+            android:textSize="15dp"
+            android:layout_marginTop="20dp"
+            android:textColor="#8A8A8A"
+            android:layout_column="0"
+            android:layout_row="3"/>
+
+        <TextView
+            android:id="@+id/locationDetail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="December 14, 2022, 22:46"
+            android:textSize="15dp"
+            android:layout_marginTop="20dp"
+            android:maxLines="10"
+            android:textColor="@android:color/black"
+            android:layout_column="1"
+            android:layout_row="3"/>
+
+    </GridLayout>
+
+    <Button
+        android:id="@+id/positiveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="24dp"
+        android:text="Okay"
+        android:textSize="15dp"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textColor="@color/cool_blue"
+        android:background="?attr/selectableItemBackground" />
+
+</LinearLayout>
