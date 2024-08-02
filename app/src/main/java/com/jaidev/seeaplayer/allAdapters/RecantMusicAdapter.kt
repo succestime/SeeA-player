@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
-import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
@@ -28,7 +27,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -37,7 +35,6 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reSetSongPosition
-import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantMusicViewBinding
 import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
@@ -61,6 +58,7 @@ class RecantMusicAdapter (val  context : Context,
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
     private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
+    private var isAllSelected = false // Add this flag
 
 
     private var musicDeleteListener: MusicDeleteListener? = null
@@ -78,6 +76,7 @@ class RecantMusicAdapter (val  context : Context,
     }
 
 
+
     class MyAdapter(binding: RecantMusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
         var title = binding.songName
         val image = binding.musicViewImage
@@ -86,6 +85,8 @@ class RecantMusicAdapter (val  context : Context,
         val more = binding.MoreChoose
         val emptyCheck = binding.emptyCheck
         val fillCheck = binding.fillCheck
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter {
@@ -99,6 +100,8 @@ class RecantMusicAdapter (val  context : Context,
     }
 
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
+        val video = musicReList[position]
+
         holder.title.text = musicReList[position].title
         holder.album.text = musicReList[position].album
         Glide.with(context)
@@ -108,6 +111,7 @@ class RecantMusicAdapter (val  context : Context,
                 .error(R.drawable.music_note_svgrepo_com) // Use the newly created drawable
                 .centerCrop())
             .into(holder.image)
+
 
 
         if (selectedItems.contains(position)) {
@@ -137,13 +141,11 @@ class RecantMusicAdapter (val  context : Context,
         }
         holder.root.setOnClickListener {
             if (actionMode != null) {
-                // If action mode is active, toggle selection as usual
                 toggleSelection(position)
             } else {
                 if (ReMusicPlayerActivity.isShuffleEnabled) {
                     ReMusicPlayerActivity.isShuffleEnabled = false
                     binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
-                    // If you need to perform any other actions when shuffle mode is disabled, add them here
                 }
                 when {
                     isReMusic -> {
@@ -151,6 +153,7 @@ class RecantMusicAdapter (val  context : Context,
                         intent.putExtra("index", position)
                         intent.putExtra("class", "RecantMusicAdapter")
                         ContextCompat.startActivity(context, intent, null)
+
                     }
                 }
             }
@@ -195,30 +198,27 @@ class RecantMusicAdapter (val  context : Context,
             }
             bindingMf.infoBtn.setOnClickListener {
                 dialog.dismiss()
-                val customDialogIf = LayoutInflater.from(context)
-                    .inflate(R.layout.details_view, holder.root, false)
-                val bindingIf = DetailsViewBinding.bind(customDialogIf)
-                val dialogIf = MaterialAlertDialogBuilder(context).setView(customDialogIf)
+                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+                // Populate dialog views with data
+                fileNameTextView.text = musicReList[position].title
+                durationTextView.text = DateUtils.formatElapsedTime(musicReList[position].duration / 1000)
+                sizeTextView.text = Formatter.formatShortFileSize(context, musicReList[position].size.toLong())
+                locationTextView.text = musicReList[position].path
+
+                val dialogIF = MaterialAlertDialogBuilder(context)
+                    .setView(customDialogIF)
                     .setCancelable(false)
-                    .setPositiveButton("OK") { self, _ ->
-
-
-                        self.dismiss()
-                    }
                     .create()
-                dialogIf.show()
-                val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
-                    .append(musicReList[position].title)
-                    .bold { append("\n\nDuration : ") }
-                    .append(DateUtils.formatElapsedTime(musicReList[position].duration / 1000))
-                    .bold { append("\n\nFile Size : ") }.append(
-                        Formatter.formatShortFileSize(
-                            context,
-                            musicReList[position].size.toLong()
-                        )
-                    )
-                    .bold { append("\n\nLocation : ") }.append(musicReList[position].path)
-                bindingIf.detailTV.text = infoText
+                positiveButton.setOnClickListener {
+                    dialogIF.dismiss()
+                }
+                dialogIF.show()
             }
 
 
@@ -243,7 +243,7 @@ class RecantMusicAdapter (val  context : Context,
         }
 
         notifyItemChanged(position) // Update selected state for the item
-        actionMode?.title = "${selectedItems.size} selected" // Update action mode title
+        updateActionModeTitle()
         actionMode?.invalidate()
 
     }
@@ -256,9 +256,12 @@ class RecantMusicAdapter (val  context : Context,
             isSelectionModeEnabled = true // Enable selection mode
             notifyDataSetChanged() // Update all item views to hide the "more" button
         }
-        actionMode?.title = "${selectedItems.size} selected"
+        updateActionModeTitle()
     }
 
+    private fun updateActionModeTitle() {
+        actionMode?.title = "${selectedItems.size} / ${musicReList.size} Selected"
+    }
     // Action mode callback
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -377,10 +380,8 @@ class RecantMusicAdapter (val  context : Context,
                                 musicDeleteListener?.onMusicDeleted()
 
                                 selectedItems.clear()
-                                mode?.finish()
                                 notifyDataSetChanged()
-                                // Dismiss action mode
-                                actionMode?.finish()
+                                updateActionModeTitle()
                                 DaysMusic.updateEmptyViewVisibility()
                                 fileCountChangeListener.onFileCountChanged(musicReList.size)
                             }
@@ -389,8 +390,14 @@ class RecantMusicAdapter (val  context : Context,
                                 dialog.dismiss()
                             }
                             .show()
+                        updateActionModeTitle()
                     }
                     return true
+                }
+
+                R.id.checkMulti -> {
+                    toggleSelectAllItems(item)
+
                 }
             }
             return false
@@ -402,6 +409,26 @@ class RecantMusicAdapter (val  context : Context,
             selectedItems.clear()
             actionMode = null
             isSelectionModeEnabled = false // Disable selection mode
+            notifyDataSetChanged()
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        private fun toggleSelectAllItems(item: MenuItem) {
+
+            isAllSelected = if (isAllSelected) {
+                // Unselect all items
+                selectedItems.clear()
+                item.setIcon(R.drawable.round_crop_square_24)
+                false
+            } else {
+                // Select all items
+                for (i in 0 until musicReList.size) {
+                    selectedItems.add(i)
+                }
+                item.setIcon(R.drawable.check_box_24)
+                true
+            }
+            updateActionModeTitle()
             notifyDataSetChanged()
         }
     }
@@ -443,7 +470,6 @@ class RecantMusicAdapter (val  context : Context,
         chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooserIntent)
 
-        actionMode?.finish()
     }
 
 

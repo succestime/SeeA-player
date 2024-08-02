@@ -1,7 +1,10 @@
 package com.jaidev.seeaplayer.browserActivity
 
 import android.annotation.SuppressLint
+import android.app.AppOpsManager
+import android.app.PictureInPictureParams
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.content.res.Resources
@@ -14,6 +17,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -23,6 +27,8 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
@@ -33,7 +39,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bullhead.equalizer.EqualizerFragment
 import com.bullhead.equalizer.Settings
-import com.developer.filepicker.model.DialogConfigs
 import com.developer.filepicker.model.DialogProperties
 import com.developer.filepicker.view.FilePickerDialog
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay
@@ -76,11 +81,11 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
     var dark: Boolean = false
     var mute: Boolean = false
     private var speed: Float = 1.0f
+    private var initialSpeed: Float = 1.0f
+
     private var timer: Timer? = null
-    private lateinit var runnable: Runnable
     lateinit var dialogProperties: DialogProperties
     lateinit var filePickerDialog: FilePickerDialog
-    lateinit var uriSubtitle: Uri
     private lateinit var eqContainer: FrameLayout
     private lateinit var fullScreenBtn: ImageButton
     private var videoTitle: String? = null
@@ -102,15 +107,24 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
     private lateinit var durationChangeTextView: TextView
     private var currentProgress: Int = 0
     lateinit var mAdView: AdView
-    companion object{
+    private lateinit var startLinkTubeActivityLauncher: ActivityResultLauncher<Intent>
+    private var isSleepTimerRunning = false
+    private var isBoosterRunning = false
+    private var isSpeedRunning = false
+    private var sleepTimerPosition = -1
+    private var boosterPosition = -1
+    private var speedPosition = -1
+    companion object {
         private var brightness: Int = 0
         private var volume: Int = 0
-        private const val MAX_DURATION_CHANGE = 180 * 1000L // Maximum duration change in milliseconds
+        var pipStatus: Int = 0
+        private const val MAX_DURATION_CHANGE =
+            180 * 1000L // Maximum duration change in milliseconds
         private const val SWIPE_THRESHOLD = 50 // Swipe threshold in pixels
         private const val MAX_PROGRESS = 100
         private lateinit var loudnessEnhancer: LoudnessEnhancer
     }
-
+    private val videoHistory = mutableListOf<Pair<Uri, String>>()
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("MissingInflatedId", "ObsoleteSdkInt", "NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,11 +144,8 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
 
         supportActionBar?.hide()
 
-        MobileAds.initialize(this){}
+        MobileAds.initialize(this) {}
         mAdView = findViewById(R.id.adView)
-
-        videoUriList = intent.getParcelableArrayListExtra("videoUriList")
-        videoTitleList = intent.getStringArrayListExtra("videoTitleList")
 
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
@@ -146,27 +157,128 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        // Get the video URI and title from the intent extras
-        val videoUriString = intent.getStringExtra("videoUri")
-        val videoUri = Uri.parse(videoUriString)
-        videoTitle = intent.getStringExtra("videoTitle")
+        when (intent.action) {
+            Intent.ACTION_VIEW -> {
+                // Check if the intent action is ACTION_VIEW for shared video
+                intent.data?.let { videoUri ->
+                    videoTitle = getVideoTitle(videoUri) ?: "Open with Video"
+                    initializePlayer(videoUri, videoTitle)
+                }
+            }
+            Intent.ACTION_SEND -> {
+                // Check if the intent action is ACTION_SEND for shared video
+                (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { videoUri ->
+                    videoTitle = getVideoTitle(videoUri) ?: "Shared Video"
+                    initializePlayer(videoUri, videoTitle)
+                }
+            }
+            Intent.ACTION_SEND_MULTIPLE -> {
+                // Handle multiple URIs
+                val videoUris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                videoUriList = videoUris?.filterNotNull() as ArrayList<Uri>?
+                videoTitleList = videoUriList?.map { getVideoTitle(it) ?: "Shared Video" } as ArrayList<String>?
+                currentIndex = -1
+                if (videoUriList.isNullOrEmpty().not()) {
+                    playNextVideo()
+                } else {
+                    Toast.makeText(this, "No Videos to Play", Toast.LENGTH_SHORT).show()
+                }
+            }
+            else -> {
+                // Get the video URI and title from the intent extras
+                val videoUriString = intent.getStringExtra("videoUri")
+                val videoUri = Uri.parse(videoUriString)
+                videoTitle = intent.getStringExtra("videoTitle")
+                initializePlayer(videoUri, videoTitle)
+            }
+        }
 
+
+        binding.playerView.setOnApplyWindowInsetsListener { view, insets ->
+            val systemWindowInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                0,
+                systemWindowInsets.top,
+                systemWindowInsets.right,
+                systemWindowInsets.bottom
+            )
+            insets
+        }
+        startLinkTubeActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // This block will be called when the launched activity is finished
+            binding.progress.visibility = View.GONE
+        }
+    }
+
+    private fun playNextVideo() {
+        if (videoUriList != null && videoUriList!!.isNotEmpty() && currentIndex < videoUriList!!.size - 1) {
+            currentIndex++
+            val nextUri = videoUriList!![currentIndex]
+            val nextTitle = videoTitleList!![currentIndex]
+            initializePlayer(nextUri, nextTitle)
+        } else {
+            Toast.makeText(this, "No Next Video", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun playPreviousVideo() {
+        if (currentIndex > 0) {
+            currentIndex--
+            val previousUri = videoUriList!![currentIndex]
+            val previousTitle = videoTitleList!![currentIndex]
+            initializePlayer(previousUri, previousTitle)
+        } else {
+            Toast.makeText(this, "No Previous Video", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
+    private fun getVideoTitle(uri: Uri): String? {
+        var title: String? = null
+        if (uri.scheme == "content") {
+            val projection = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val titleIndex = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                    title = it.getString(titleIndex)
+                }
+            }
+        } else if (uri.scheme == "file") {
+            title = File(uri.path!!).name
+        }
+        return title
+    }
+    private fun initializePlayer(videoUri: Uri, videoTitle: String?) {
         // Initialize PlayerView
         playerView = findViewById(R.id.playerView)
 
-        // Initialize ExoPlayer
-        player = SimpleExoPlayer.Builder(this).build()
-        playerView.player = player
+        // Check if the player is already initialized
+        if (!::player.isInitialized) {
+            // Initialize ExoPlayer
+            player = SimpleExoPlayer.Builder(this).build()
+            playerView.player = player
 
-        // Set up MediaItem
+            // Initialize play/pause button and other UI elements here
+            setupPlayerControls()
+        }
+
+        // Set the media item
         val mediaItem = MediaItem.fromUri(videoUri)
         player.setMediaItem(mediaItem)
         player.prepare()
         player.play()
-        // Display video title
+
+        // Update video title
         videoTitleTextView = findViewById(R.id.videoTitle)
         videoTitleTextView.text = videoTitle
 
+        // Update the currentIndex based on the URI
+        currentIndex = videoUriList?.indexOf(videoUri) ?: 0
+    }
+
+    private fun setupPlayerControls() {
         // Initialize play/pause button
         playPauseBtn = findViewById(R.id.playPauseBtn)
         playPauseBtn.setImageResource(R.drawable.round_pause_24) // Set initial icon to pause
@@ -206,7 +318,33 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         findViewById<ImageButton>(R.id.backBtn).setOnClickListener {
             finish()
         }
+        // Initialize next button
+        findViewById<ImageButton>(R.id.nextBtn).setOnClickListener {
+            if (repeat) {
+                Toast.makeText(this, "Repeat mode is on", Toast.LENGTH_SHORT).show()
+                // If repeat mode is enabled, do nothing and call the functionality
+                // This will not play the previous video
+                // You can add a message or just leave it empty
+            } else {
+                playNextVideo()
+                findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
 
+            }
+        }
+
+        // Initialize previous button
+        findViewById<ImageButton>(R.id.prevBtn).setOnClickListener {
+            if (repeat) {
+                Toast.makeText(this, "Repeat mode is on", Toast.LENGTH_SHORT).show()
+                // If repeat mode is enabled, do nothing and call the functionality
+                // This will not play the previous video
+                // You can add a message or just leave it empty
+            } else {
+                playPreviousVideo()
+                findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
+            }
+
+        }
         val lockBtn = findViewById<ImageButton>(R.id.openButton)
 
         lockBtn.setOnClickListener {
@@ -223,7 +361,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 }, 2000)
             } else {
                 // For showing
-              isLocked = false
+                isLocked = false
                 binding.playerView.useController = true
                 binding.playerView.showController()
                 binding.lockButton.visibility = View.GONE
@@ -233,7 +371,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         binding.lockButton.setOnClickListener {
             if (!isLocked) {
                 // For hiding
-               isLocked = true
+                isLocked = true
                 binding.playerView.useController = false
                 binding.playerView.isDoubleTapEnabled = false
                 binding.playerView.hideController()
@@ -259,7 +397,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 Handler().postDelayed({
                     binding.lockButton.visibility = View.INVISIBLE
                 }, 2000)
-            }else{
+            } else {
                 binding.playerView.isDoubleTapEnabled = true
             }
         }
@@ -298,7 +436,8 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
             val lockBtn = findViewById<ImageButton>(R.id.openButton)
 
             // Check if the screen orientation is portrait
-            val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            val isPortrait =
+                resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
             if (isPortrait) {
                 lockBtn.visibility = View.GONE
@@ -306,7 +445,8 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 if (isLocked) {
                     lockBtn.visibility = View.VISIBLE
                 } else {
-                    lockBtn.visibility = if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
+                    lockBtn.visibility =
+                        if (binding.playerView.isControllerVisible) View.VISIBLE else View.INVISIBLE
                 }
             }
             // Show or hide the status bar based on playerView visibility
@@ -316,11 +456,18 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 hideStatusBar()
             }
         }
-        binding.playerView.setOnApplyWindowInsetsListener { view, insets ->
-            val systemWindowInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(0, systemWindowInsets.top, systemWindowInsets.right, systemWindowInsets.bottom)
-            insets
-        }
+        // Add listener to handle playback state changes
+        player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_ENDED) {
+                    if (videoUriList.isNullOrEmpty()) {
+                        finish() // Finish the activity if no more videos are left
+                    } else {
+                        playNextVideo() // Play the next video if available
+                    }
+                }
+            }
+        })
 
     }
 
@@ -346,7 +493,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
 
 
-        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this)
+        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this , dark)
         val layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, true)
         recyclerViewIcons.layoutManager = layoutManager
         recyclerViewIcons.adapter = playbackIconsAdapter
@@ -402,6 +549,13 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                             if (iconModelArrayList.size == 5) {
                                 iconModelArrayList.add(
                                     IconModel(
+                                        R.drawable.search_link_tube,
+                                        "Link Tube",
+                                        android.R.color.white
+                                    )
+                                )
+                                iconModelArrayList.add(
+                                    IconModel(
                                         R.drawable.round_speaker,
                                         "Booster",
                                         android.R.color.white
@@ -414,14 +568,15 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                                         android.R.color.white
                                     )
                                 )
-
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.round_subtitles,
-                                        "Subtitle",
+                                        R.drawable.round_picture_in_picture_alt,
+                                        "PIP Mode",
                                         android.R.color.white
                                     )
                                 )
+
+
                                 iconModelArrayList.add(
                                     IconModel(
                                         R.drawable.round_graphic_eq,
@@ -441,12 +596,12 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                     1 -> {
                         if (dark) {
                             nightMode?.visibility = View.GONE
-                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Night")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Night Mode" ,    iconBackground = R.drawable.ripple_circle)
                             playbackIconsAdapter.notifyDataSetChanged()
                             dark = false
                         } else {
                             nightMode?.visibility = View.VISIBLE
-                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Day")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Day Mode",    iconBackground = R.drawable.ripple_circle_cool_blue)
                             playbackIconsAdapter.notifyDataSetChanged()
                             dark = true
                         }
@@ -454,6 +609,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                     }
 
                     2 -> {
+                        speedPosition = position
                         setupSpeedDialog()
                     }
                     3 -> {
@@ -476,43 +632,43 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                     4 ->{
                         if (mute) {
                             player.setVolume(100F)
-                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute" ,    iconBackground = R.drawable.ripple_circle)
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = false
                         } else {
                             player.setVolume(0F)
                             iconModelArrayList[position] =
-                                IconModel(R.drawable.round_volume_up, "Unmute")
+                                IconModel(R.drawable.round_volume_up, "Mute" ,    iconBackground = R.drawable.ripple_circle_cool_blue)
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = true
                         }
                     }
 
                     5 -> {
+                        binding.progress.visibility = View.VISIBLE // Show progress
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // Launch LinkTubeActivity
+                            val intent = Intent(this@PlayerFileActivity, LinkTubeActivity::class.java)
+                            startLinkTubeActivityLauncher.launch(intent)
+                        }, 100) // Delay of 500 milliseconds
+                                      }
+                    6 -> {
+                        boosterPosition = position
+
                         setupBoosterDialog()
                     }
-                    6 -> {
+                    7 -> {
+                        sleepTimerPosition = position
                         setupSleepTimer()
                     }
 
-                    7 -> {
-                        dialogProperties.selection_mode = DialogConfigs.SINGLE_MODE
-                        dialogProperties.extensions = arrayOf(".srt")
-                        dialogProperties.root = File("/storage/emulated/0")
+                    8 -> {
 
-                        filePickerDialog.setDialogSelectionListener { files ->
-                            for (path in files) {
-                                val file = File(path)
-                                uriSubtitle = Uri.parse(file.absolutePath)
-                                // Further actions after selecting a subtitle file
-                            }
-                        }
-
-                        filePickerDialog.properties = dialogProperties
-                        filePickerDialog.show()
+                        setupPIPMode()
                     }
 
-                    8 -> {
+
+                    9 -> {
                         if (eqContainer.visibility == View.GONE) {
                             eqContainer.visibility = View.VISIBLE
                         } else {
@@ -553,12 +709,34 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         val customDialogB =
             LayoutInflater.from(this).inflate(R.layout.booster, binding.root, false)
         val bindingB = BoosterBinding.bind(customDialogB)
+        val initialProgress = loudnessEnhancer.targetGain.toInt() / 100
         val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
             .setOnCancelListener { playVideo() }
             .setPositiveButton("Done") { _, _ ->
-                loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress * 100)
+                val newProgress = bindingB.verticalBar.progress
+                if (newProgress != initialProgress || newProgress == 0) {
+                    if (newProgress == 0) {
+                        isBoosterRunning = false
+                        iconModelArrayList[boosterPosition] = IconModel(
+                            R.drawable.round_speaker,
+                            "Booster",
+                            iconBackground = R.drawable.ripple_circle
+                        )
+                    } else {
+                        loudnessEnhancer.setTargetGain(newProgress * 100)
+                        isBoosterRunning = true
+                        iconModelArrayList[boosterPosition] = IconModel(
+                            R.drawable.round_speaker,
+                            "Booster",
+                            iconBackground = R.drawable.ripple_circle_cool_blue
+                        )
+                    }
+                    playbackIconsAdapter.notifyItemChanged(boosterPosition)
+                }
                 playVideo()
-                // dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { self, _ ->
+                self.dismiss()
             }
             .setBackground(getSemiTransparentGrayDrawable())
             .create()
@@ -601,34 +779,75 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
 
 
 
-
-
-    private fun playVideoAtCurrentIndex() {
-        if (videoUriList != null && currentIndex in videoUriList!!.indices) {
-            val videoUri = videoUriList!![currentIndex]
-            val videoTitle = videoTitleList!![currentIndex]
-
-            // Check if the player is already playing the same video
-            val currentMediaItem = player.currentMediaItem
-            if (currentMediaItem != null && currentMediaItem.mediaId == videoUri.toString()) {
-                // If the player is already playing the same video, seek to the beginning and play
-                player.seekTo(0)
-            } else {
-                // Update player with new media item
-                val mediaItem = MediaItem.fromUri(videoUri)
-                player.setMediaItem(mediaItem)
-                player.prepare()
-                // Set the video title
-                videoTitleTextView.text = videoTitle
-            }
-            // Always play from the beginning
-            player.play()
-
+    @SuppressLint("ObsoleteSdkInt")
+    fun setupPIPMode() {
+        val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val status = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            appOps.checkOpNoThrow(
+                AppOpsManager.OPSTR_PICTURE_IN_PICTURE,
+                android.os.Process.myUid(),
+                packageName
+            ) == AppOpsManager.MODE_ALLOWED
         } else {
-            Toast.makeText(this, "There are no videos to play", Toast.LENGTH_SHORT).show()
+            false
+        }
 
-            // Handle the case where either videoUriList is null or currentIndex is out of bounds
-            // For example, you might display a toast message or perform some other action
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (status) {
+                this.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
+                // dialog.dismiss()
+                binding.playerView.showContextMenu()
+                playVideo()
+             pipStatus = 0
+            } else {
+                val intent = Intent(
+                    "android.settings.PICTURE_IN_PICTURE_SETTINGS",
+                    Uri.parse("package:$packageName")
+                )
+                startActivity(intent)
+            }
+        } else {
+            Toast.makeText(this, "Feature Not Supported!!", Toast.LENGTH_SHORT).show()
+            // dialog.dismiss()
+            playVideo()
+        }
+    }
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+
+        // Handle the case when PIP mode is entered or exited
+        if (isInPictureInPictureMode) {
+            // Handle the case when entering PIP mode
+            playVideo()
+            playPauseBtn.setImageResource(R.drawable.round_pause_24)
+        } else {
+            pauseVideo()
+            playPauseBtn.setImageResource(R.drawable.round_pause_24)
+        }
+
+        if (pipStatus != 0) {
+            recreate()
+            playInFullscreen(true)
+            val intent = Intent(this, PlayerFileActivity::class.java)
+            when (pipStatus) {
+                1 -> {
+                    intent.putParcelableArrayListExtra("videoUriList", videoUriList)
+                    intent.putStringArrayListExtra("videoTitleList", videoTitleList)
+                    intent.putExtra("currentIndex", currentIndex)
+                }
+                2 -> {
+                    intent.putParcelableArrayListExtra("videoUriList", videoUriList)
+                    intent.putStringArrayListExtra("videoTitleList", videoTitleList)
+                    intent.putExtra("currentIndex", currentIndex)
+                }
+            }
+            startActivity(intent)
+        }
+    }
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (isInPictureInPictureMode) {
+            finish()
         }
     }
     @Deprecated("Deprecated in Java")
@@ -690,8 +909,30 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         val bindingS = SpeedDialogBinding.bind(customDialogS)
         val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
             .setOnCancelListener { playVideo() }
-            .setPositiveButton("Done") { _, _ ->
-//                dialog.dismiss()
+            .setPositiveButton("Done") { self, _ ->
+                if (speed != initialSpeed) {
+                    if (speed == 1.0f) {
+                        isSpeedRunning = false
+                        iconModelArrayList[speedPosition] = IconModel(
+                            R.drawable.round_speed,
+                            "Speed",
+                            iconBackground = R.drawable.ripple_circle
+                        )
+                    } else {
+                        isSpeedRunning = true
+                        iconModelArrayList[speedPosition] = IconModel(
+                            R.drawable.round_speed,
+                            "Speed",
+                            iconBackground = R.drawable.ripple_circle_cool_blue
+                        )
+                    }
+                    playbackIconsAdapter.notifyItemChanged(speedPosition)
+                }
+                self.dismiss()
+            }
+            .setNegativeButton("Cancel") { self, _ ->
+                self.dismiss()
+
             }
             .setBackground(getSemiTransparentGrayDrawable())
             .create()
@@ -700,21 +941,59 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         bindingS.minusBtn.setOnClickListener {
             changeSpeed(isIncrement = false)
             bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+            updateSpeedIcon()
+
         }
         bindingS.plusBtn.setOnClickListener {
             changeSpeed(isIncrement = true)
             bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+            updateSpeedIcon()
+
         }
     }
-
+    private fun updateSpeedIcon() {
+        if (speed == 1.0f) {
+            isSpeedRunning = false
+            iconModelArrayList[speedPosition] = IconModel(
+                R.drawable.round_speed,
+                "Speed",
+                iconBackground = R.drawable.ripple_circle
+            )
+        } else {
+            isSpeedRunning = true
+            iconModelArrayList[speedPosition] = IconModel(
+                R.drawable.round_speed,
+                "Speed",
+                iconBackground = R.drawable.ripple_circle_cool_blue
+            )
+        }
+        playbackIconsAdapter.notifyItemChanged(speedPosition)
+    }
     @SuppressLint("SetTextI18n")
     fun setupSleepTimer() {
         if (timer != null)
-            Toast.makeText(
-                this@PlayerFileActivity,
-                "Timer Already Running !\nClose App to Reset Timer ..",
-                Toast.LENGTH_SHORT
-            ).show()
+        // Show an alert dialog to ask the user if they want to stop the timer
+            MaterialAlertDialogBuilder(this@PlayerFileActivity)
+                .setTitle("Do you want to stop the timer?")
+                .setMessage("If you want to stop the sleep timer, click on Stop")
+                .setPositiveButton("Stop") { dialog, _ ->
+                    // Cancel the ongoing timer
+               timer?.cancel()
+                timer = null
+                    isSleepTimerRunning = false
+                    // Update the icon and background
+                    iconModelArrayList[sleepTimerPosition] = IconModel(
+                        R.drawable.round_sleep_timer,
+                        "Sleep Timer",
+                        iconBackground = R.drawable.ripple_circle
+                    )
+                    playbackIconsAdapter.notifyItemChanged(sleepTimerPosition)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         else {
             var sleepTime = 15
             val customDialogS = LayoutInflater.from(this@PlayerFileActivity)
@@ -733,8 +1012,21 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                     }
 
                     timer!!.schedule(task, sleepTime * 60 * 1000.toLong())
+                    isSleepTimerRunning = true
+                    // Update the icon and background
+                    iconModelArrayList[sleepTimerPosition] = IconModel(
+                        R.drawable.round_sleep_timer,
+                        "Sleep Timer",
+                        iconBackground = R.drawable.ripple_circle_cool_blue
+                    )
+                    playbackIconsAdapter.notifyItemChanged(sleepTimerPosition)
+
                     self.dismiss()
                     playVideo()
+                }
+                .setNegativeButton("Cancel") { self, _ ->
+                    self.dismiss()
+
                 }
                 .setBackground(getSemiTransparentGrayDrawable())
                 .create()

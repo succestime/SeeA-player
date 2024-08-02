@@ -101,6 +101,9 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
             if (!isShuffleEnabled) binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
             else binding.shuffleBtnPA.setImageResource(R.drawable.media_playlist_consecutive_svgrepo_com__1_)
+
+
+
         }
         fun createMediaPlayer(context: Context) {
             try {
@@ -132,6 +135,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 musicService!!.mediaPlayer!!.setOnCompletionListener(this@Companion)
             }catch (e : Exception){return}
         }
+
+
+
+
+
         private fun fileExists(path: String): Boolean {
             val file = File(path)
             return file.exists()
@@ -154,8 +162,8 @@ class ReMusicPlayerActivity : AppCompatActivity()
         mAdView.loadAd(adRequest)
 
         reMusicPlayerLayout = binding.ReMusicPlayerLayout
-        // Set the background color of SwipeRefreshLayout based on app theme
         setMusicLayoutBackgroundColor()
+
     }
 
     private fun initializeBinding(){
@@ -324,6 +332,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
             musicService!!.mediaPlayer!!.prepare()
             musicService!!.mediaPlayer!!.start()
             isPlaying = true
+
             binding.tvSeekBarStart.text = reFormatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
             binding.tvSeekBarEnd.text = reFormatDuration(musicService!!.mediaPlayer!!.duration.toLong())
             binding.seekBarPA.progress = 0
@@ -333,6 +342,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
         }catch (e : Exception){return}
     }
+
     fun getCurrentSong(): RecantMusic {
         // Assuming you have a list of songs and a variable to store the current song position
         val currentSongPosition = songPosition

@@ -122,12 +122,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:gravity="center">
 
-
+            <ImageButton
+                android:id="@+id/prevBtn"
+                android:layout_width="65dp"
+                android:layout_height="55dp"
+                android:background="?android:selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/next_btn"
+                android:focusable="true"
+                android:src="@drawable/round_previous"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/nextBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
 
 
             <ImageButton
                 android:id="@+id/back10secondBtn"
-                android:layout_width="85dp"
+                android:layout_width="65dp"
                 android:layout_height="55dp"
                 android:background="?android:selectableItemBackground"
                 android:clickable="true"
@@ -136,7 +148,8 @@
                 android:focusable="true"
                 android:src="@drawable/round_replay_10"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/nextBtn"
+                app:layout_constraintStart_toEndOf="@id/prevBtn"
+                app:layout_constraintEnd_toStartOf="@id/playPauseBtn"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/white" />
             <ImageButton
@@ -156,7 +169,7 @@
 
             <ImageButton
                 android:id="@+id/forward10secondBtn"
-                android:layout_width="85dp"
+                android:layout_width="65dp"
                 android:layout_height="55dp"
                 android:background="?android:selectableItemBackground"
                 android:clickable="true"
@@ -165,11 +178,29 @@
                 android:focusable="true"
                 android:src="@drawable/round_forward_10"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/playPauseBtn"
+                app:layout_constraintEnd_toStartOf="@id/nextBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/nextBtn"
+                android:layout_width="65dp"
+                android:layout_height="55dp"
+                android:background="?android:selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/prev_btn"
+                android:focusable="true"
+                android:src="@drawable/round_next"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/fullScreenBtn"
                 app:layout_constraintStart_toEndOf="@+id/prevBtn"
 
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/white"  />
+                app:tint="@color/white" />
+
+
+
 
         </LinearLayout>
 

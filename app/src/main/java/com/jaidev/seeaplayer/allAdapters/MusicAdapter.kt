@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.PorterDuff
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -33,7 +34,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
-import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -43,7 +43,6 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.R.*
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.getImgArt
-import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
@@ -51,7 +50,9 @@ import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.binding
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
 import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
+import com.jaidev.seeaplayer.musicNav
 import java.io.File
+import java.text.NumberFormat
 
 
 class MusicAdapter(
@@ -67,10 +68,11 @@ class MusicAdapter(
     private var newPosition = 0
     private lateinit var dialogRF: AlertDialog
     private lateinit var sharedPreferences: SharedPreferences
-
+    private lateinit var bottomActionModeBar: View
     // Tracks selected item
     val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
+    private var isAllSelected = false // Add this flag
 
     companion object {
         private const val PREF_NAME = "music_titles"
@@ -302,30 +304,27 @@ class MusicAdapter(
             }
             bindingMf.infoBtn.setOnClickListener {
                 dialog.dismiss()
-                val customDialogIf = LayoutInflater.from(context)
-                    .inflate(layout.details_view, holder.root, false)
-                val bindingIf = DetailsViewBinding.bind(customDialogIf)
-                val dialogIf = MaterialAlertDialogBuilder(context).setView(customDialogIf)
+                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+                // Populate dialog views with data
+                fileNameTextView.text = musicList[position].title
+                durationTextView.text = DateUtils.formatElapsedTime(musicList[position].duration / 1000)
+                sizeTextView.text = Formatter.formatShortFileSize(context, musicList[position].size.toLong())
+                locationTextView.text = musicList[position].path
+
+                val dialogIF = MaterialAlertDialogBuilder(context)
+                    .setView(customDialogIF)
                     .setCancelable(false)
-                    .setPositiveButton("OK") { self, _ ->
-
-
-                        self.dismiss()
-                    }
                     .create()
-                dialogIf.show()
-                val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
-                    .append(musicList[position].title)
-                    .bold { append("\n\nDuration : ") }
-                    .append(DateUtils.formatElapsedTime(musicList[position].duration / 1000))
-                    .bold { append("\n\nFile Size : ") }.append(
-                        Formatter.formatShortFileSize(
-                            context,
-                            musicList[position].size.toLong()
-                        )
-                    )
-                    .bold { append("\n\nLocation : ") }.append(musicList[position].path)
-                bindingIf.detailTV.text = infoText
+                positiveButton.setOnClickListener {
+                    dialogIF.dismiss()
+                }
+                dialogIF.show()
             }
 
             bindingMf.renameBtn.setOnClickListener {
@@ -415,10 +414,14 @@ class MusicAdapter(
                 if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
                     if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
                         PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                        musicNav.updateEmptyState()
+
                     } else {
                         PlayerMusicActivity.musicService?.stopService() // Stop the music service
                         PlayerMusicActivity.musicService?.mediaPlayer?.stop()
                         NowPlaying.binding.root.visibility = View.GONE
+                        musicNav.updateEmptyState()
+
                     }
                 }
 
@@ -427,6 +430,8 @@ class MusicAdapter(
                         MainActivity.dataChanged = true
                         musicList.removeAt(position)
                         notifyDataSetChanged()
+                        musicNav.updateEmptyState()
+
                         musicDeleteListener?.onMusicDeleted()
                     }
 
@@ -434,6 +439,8 @@ class MusicAdapter(
                         MainActivity.dataChanged = true
                         MainActivity.MusicListMA.removeAt(position)
                         notifyDataSetChanged()
+                        musicNav.updateEmptyState()
+
                         musicDeleteListener?.onMusicDeleted()
                     }
 
@@ -486,7 +493,9 @@ class MusicAdapter(
         }
 
         notifyItemChanged(position) // Update selected state for the item
-        actionMode?.title = "${selectedItems.size} selected" // Update action mode title
+        updateActionModeTitle()
+        updateRenameButtonState()
+
         actionMode?.invalidate()
     }
 
@@ -498,104 +507,280 @@ class MusicAdapter(
             actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
             isSelectionModeEnabled = true // Enable selection mode
             notifyDataSetChanged() // Update all item views to hide the "more" button
+            showBottomActionModeBar() // Show the custom bottom action mode bar
+
         }
-        actionMode?.title = "${selectedItems.size} selected"
+        updateActionModeTitle()
+    }
+    private fun updateActionModeTitle() {
+        actionMode?.title = "${selectedItems.size} / ${musicList.size} Selected"
     }
 
+    private fun showBottomActionModeBar() {
+        // Cast context to AppCompatActivity to access layout
+        val activity = context as? AppCompatActivity
+
+        if (activity != null) {
+            // Find the included layout container
+            val bottomActionModeContainer = activity.findViewById<View>(R.id.bottom_action_mode_container)
+
+            // Ensure the container is not null and set it to visible
+            if (bottomActionModeContainer != null) {
+                bottomActionModeContainer.visibility = View.VISIBLE
+
+                // Set up click listeners
+                setupBottomActionModeBarListeners()
+            } else {
+                Toast.makeText(context, "Bottom action mode container not found", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(context, "Context is not an instance of AppCompatActivity", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun hideBottomActionModeBar() {
+        val activity = context as? AppCompatActivity
+
+        if (activity != null) {
+            // Find the included layout container
+            val bottomActionModeContainer = activity.findViewById<View>(R.id.bottom_action_mode_container)
+
+            // Ensure the container is not null and set it to gone
+            if (bottomActionModeContainer != null) {
+                bottomActionModeContainer.visibility = View.GONE
+            } else {
+                Toast.makeText(context, "Bottom action mode container not found", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(context, "Context is not an instance of AppCompatActivity", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
+    private fun setupBottomActionModeBarListeners() {
+        // Find buttons and set up listeners
+        val activity = context as? AppCompatActivity
+        val bottomActionModeContainer = activity?.findViewById<View>(R.id.bottom_action_mode_container)
+
+        bottomActionModeContainer?.let {
+            val checkBtn = it.findViewById<ImageView>(R.id.checkBtn)
+            val shareBtn = it.findViewById<ImageView>(R.id.shareBtn)
+            val infoBtn = it.findViewById<ImageView>(R.id.infoBtn)
+            val renameBtn = it.findViewById<ImageView>(R.id.renameBtn)
+            val deleteBtn = it.findViewById<ImageView>(R.id.deleteBtn)
+
+            checkBtn.setOnClickListener {
+                toggleSelectAllItems()
+            }
+
+            shareBtn.setOnClickListener {
+                shareSelectedFiles()
+            }
+
+            infoBtn.setOnClickListener {
+                if (selectedItems.size > 1) {
+                    // More than one item is selected
+                    val totalSize = selectedItems.sumOf { musicList[it].size.toLong() }
+                    val totalSizeFormatted = Formatter.formatShortFileSize(context, totalSize)
+                    val totalSizeBytesFormatted = NumberFormat.getInstance().format(totalSize)
+
+                    // Calculate the total duration
+                    val totalDuration = selectedItems.sumOf { musicList[it].duration }
+                    val totalDurationFormatted = formatDurationWithApproximation(totalDuration)
+
+                    val customDialogView = LayoutInflater.from(context).inflate(R.layout.info_dialog, null, false)
+                    val containsDetailView = customDialogView.findViewById<TextView>(R.id.containsDetail)
+                    val durationDetailView = customDialogView.findViewById<TextView>(R.id.durationDetail)
+                    val totalSizeDetailView = customDialogView.findViewById<TextView>(R.id.totalSizeDetail)
+                    val positiveButton = customDialogView.findViewById<Button>(R.id.positiveButton)
+
+                    containsDetailView.text = "${selectedItems.size} videos"
+                    durationDetailView.text = totalDurationFormatted
+                    totalSizeDetailView.text = "$totalSizeFormatted ($totalSizeBytesFormatted bytes)"
+
+                    val dialog = MaterialAlertDialogBuilder(context)
+                        .setView(customDialogView)
+                        .create()
+
+                    positiveButton.setOnClickListener {
+                        dialog.dismiss()
+                    }
+
+                    dialog.show()
+                }
+                else if (selectedItems.size == 1) {
+                    // Only one item is selected
+                    val selectedInfo = SpannableStringBuilder()
+                    val selectedPosition = selectedItems.first()
+                    val video = musicList[selectedPosition]
+
+                    val customDialogView = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null, false)
+                    val titleView = customDialogView.findViewById<TextView>(R.id.titleText)
+                    val fileNameView = customDialogView.findViewById<TextView>(R.id.fileName)
+                    val durationDetailView = customDialogView.findViewById<TextView>(R.id.DurationDetail)
+                    val sizeDetailView = customDialogView.findViewById<TextView>(R.id.sizeDetail)
+                    val locationDetailView = customDialogView.findViewById<TextView>(R.id.locationDetail)
+                    val positiveButton = customDialogView.findViewById<Button>(R.id.positiveButton)
+
+                    titleView.text = "Properties"
+                    fileNameView.text = video.title
+                    durationDetailView.text = DateUtils.formatElapsedTime(video.duration / 1000)
+                    sizeDetailView.text = Formatter.formatShortFileSize(context, video.size.toLong())
+                    locationDetailView.text = video.path
+
+
+                    val dialog = MaterialAlertDialogBuilder(context)
+                        .setView(customDialogView)
+                        .setCancelable(false)
+                        .create()
+
+                    positiveButton.setOnClickListener{
+                        dialog.dismiss()
+                    }
+
+                    dialog.show()
+                }
+            }
+
+            renameBtn.setOnClickListener {
+                // Call the showRenameDialog method here
+                if (selectedItems.size == 1) {
+                    val selectedPosition = selectedItems.first()
+                    val defaultName = musicList[selectedPosition].title
+                    showRenameDialog(selectedPosition, defaultName)
+                } else {
+                    updateRenameButtonState()
+                }
+            }
+
+            deleteBtn.setOnClickListener {
+                if (selectedItems.isNotEmpty()) {
+                    // Build confirmation dialog
+                    val message = if (playlistDetails) {
+                        "Are you sure you want to delete these ${selectedItems.size} selected musics? This will permanently delete them."
+                    } else {
+                        "Are you sure you want to delete these ${selectedItems.size} selected musics?"
+                    }
+
+                    AlertDialog.Builder(context)
+                        .setTitle("Confirm Delete")
+                        .setMessage(message)
+                        .setPositiveButton("Delete") { _, _ ->
+                            // User clicked Delete, proceed with deletion
+                            val positionsToDelete = ArrayList(selectedItems)
+                            positionsToDelete.sortDescending()
+
+                            for (position in positionsToDelete) {
+                                val music = musicList[position]
+                                val file = File(music.path)
+
+                                if (file.exists() && file.delete()) {
+                                    MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                                    notifyItemChanged(position)
+
+                                    if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
+                                        if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
+                                            musicNav.updateEmptyState()
+                                            PlayerMusicActivity.musicService?.prevNextSong(true, context)
+                                        } else {
+                                            PlayerMusicActivity.musicService?.stopService() // Stop the music service
+                                            PlayerMusicActivity.musicService?.mediaPlayer?.stop()
+                                            NowPlaying.binding.root.visibility = View.GONE
+                                            musicNav.updateEmptyState()
+
+                                        }
+                                    }
+                                    musicList.removeAt(position)
+                                    musicNav.updateEmptyState()
+
+                                }
+                            }
+                            musicNav.updateEmptyState()
+                            selectedItems.clear()
+                            notifyDataSetChanged()
+                            musicDeleteListener?.onMusicDeleted()
+                            updateActionModeTitle()
+                        }
+                        .setNegativeButton("Cancel") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
+
+            }
+
+        }
+
+    }
+    private fun updateRenameButtonState() {
+        val activity = context as? AppCompatActivity
+        val bottomActionModeContainer = activity?.findViewById<View>(R.id.bottom_action_mode_container)
+        bottomActionModeContainer?.let {
+            val renameBtn = it.findViewById<ImageView>(R.id.renameBtn)
+            if (selectedItems.size != 1) {
+                renameBtn.isEnabled = false
+                renameBtn.setColorFilter(ContextCompat.getColor(context, R.color.gray), PorterDuff.Mode.SRC_IN)
+            } else {
+                renameBtn.isEnabled = true
+                renameBtn.clearColorFilter()
+            }
+        }
+    }
+    private fun formatDurationWithApproximation(duration: Long): String {
+        val seconds = duration / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+
+        return when {
+            hours > 0 -> String.format("%02d:%02d:%02d (%d hours approx)", hours, minutes % 60, seconds % 60, hours)
+            minutes > 0 -> String.format("%02d:%02d (%d minutes approx)", minutes, seconds % 60, minutes)
+            else -> String.format("%02d (%d seconds)", seconds, seconds)
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun toggleSelectAllItems() {
+        isAllSelected = if (isAllSelected) {
+            // Unselect all items
+            selectedItems.clear()
+            false
+        } else {
+            // Select all items
+            for (i in 0 until musicList.size) {
+                selectedItems.add(i)
+            }
+            true
+        }
+        notifyDataSetChanged()
+        updateActionModeTitle()
+
+
+    }
     // Action mode callback
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            // Inflate action mode menu
-            mode?.menuInflater?.inflate(R.menu.multiple_player_select_menu, menu)
             return true
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            // Hide the menu_rename item if more than one item is selected
-            val renameItem = menu?.findItem(id.renameMulti)
-            renameItem?.isVisible = selectedItems.size == 1
+
 
             return true
         }
 
         @SuppressLint("NotifyDataSetChanged")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            // Handle action mode menu items
-            val actionMode = mode
+
             when (item?.itemId) {
-                id.renameMulti -> {
-                    // Call the showRenameDialog method here
-                    if (selectedItems.size == 1) {
-                        val selectedPosition = selectedItems.first()
-                        val defaultName = musicList[selectedPosition].title
-                        showRenameDialog(selectedPosition, defaultName)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Please select only one music to rename",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    return true
+                id.playMulti -> {
+
+
                 }
 
-                id.shareMulti -> {
-                    shareSelectedFiles()
+                id.infoMulti -> {
+
                 }
-                id.deleteMulti -> {
-                    if (selectedItems.isNotEmpty()) {
-                        // Build confirmation dialog
-                        val message = if (playlistDetails) {
-                            "Are you sure you want to delete these ${selectedItems.size} selected musics? This will permanently delete them."
-                        } else {
-                            "Are you sure you want to delete these ${selectedItems.size} selected musics?"
-                        }
 
-
-
-                        AlertDialog.Builder(context)
-                            .setTitle("Confirm Delete")
-                            .setMessage(message)
-                            .setPositiveButton("Delete") { _, _ ->
-                                // User clicked Delete, proceed with deletion
-                                val positionsToDelete = ArrayList(selectedItems)
-                                positionsToDelete.sortDescending()
-
-                                for (position in positionsToDelete) {
-                                    val music = musicList[position]
-                                    val file = File(music.path)
-
-                                    if (file.exists() && file.delete()) {
-                                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                                        notifyItemChanged(position)
-
-                                        if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
-                                            if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
-                                                // Notify the service to play the next song
-                                                PlayerMusicActivity.musicService?.prevNextSong(true, context)
-                                            } else {
-                                                PlayerMusicActivity.musicService?.stopService() // Stop the music service
-                                                PlayerMusicActivity.musicService?.mediaPlayer?.stop()
-                                                NowPlaying.binding.root.visibility = View.GONE
-                                            }
-                                        }
-                                        musicList.removeAt(position)
-                                    }
-                                }
-
-                                selectedItems.clear()
-                                mode?.finish()
-                                notifyDataSetChanged()
-                                musicDeleteListener?.onMusicDeleted()
-                            }
-                            .setNegativeButton("Cancel") { dialog, _ ->
-                                dialog.dismiss()
-                            }
-                            .show()
-                    }
-                    return true
-                }
-                // Add more action mode items as needed
             }
             return false
         }
@@ -606,6 +791,8 @@ class MusicAdapter(
             selectedItems.clear()
             actionMode = null
             isSelectionModeEnabled = false // Enable selection mode
+            hideBottomActionModeBar() // Hide the custom bottom action mode bar
+
             notifyDataSetChanged()
         }
     }
@@ -649,7 +836,6 @@ class MusicAdapter(
         chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooserIntent)
 
-        actionMode?.finish()
     }
 
     private fun renameMusic(position: Int, newName: String) {
@@ -691,8 +877,6 @@ class MusicAdapter(
             }
         dialogRF = dialogBuilder.create()
         dialogRF.show()
-        // Dismiss action mode
-        actionMode?.finish()
     }
 
 

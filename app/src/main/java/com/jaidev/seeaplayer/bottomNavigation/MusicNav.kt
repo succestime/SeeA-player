@@ -31,10 +31,22 @@ import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
 class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdapter.MusicDeleteListener ,    RecantMusicAdapter.OnFileCountChangeListener
  {
 
-    private lateinit var binding: FragmentMusicNavBinding
     lateinit var adapter: MusicAdapter
     private lateinit var adapterf: RecantMusicAdapter
 
+
+    companion object{
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var binding: FragmentMusicNavBinding
+
+        fun updateEmptyState() {
+            if (MusicListMA.isEmpty()) {
+                binding.musicemptyStateLayout.visibility = View.VISIBLE
+            } else {
+                binding.musicemptyStateLayout.visibility = View.GONE
+            }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -51,6 +63,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
         setupActionBar()
+
         binding.musicRV.setHasFixedSize(true)
         binding.musicRV.setItemViewCacheSize(15)
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())
@@ -93,11 +106,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
             MusicListMA.addAll(updatedMusicList)
             adapter.updateMusicList(MusicListMA)
              adapter.notifyDataSetChanged()
-            if (MusicListMA.isEmpty()) {
-                binding.musicemptyStateLayout.visibility = View.VISIBLE
-            } else {
-                binding.musicemptyStateLayout.visibility = View.GONE
-            }
+            updateEmptyState()
         }
     }
     private fun setupActionBar() {
@@ -147,10 +156,8 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
                     true
                 }
                 R.id.action_shuffle -> {
-                    val intent = Intent(requireContext(), PlayerMusicActivity::class.java)
-                    intent.putExtra("index", 0)
-                    intent.putExtra("class", "MusicNav")
-                    startActivity(intent)
+
+
                     true
                 }
                 else -> false
@@ -165,16 +172,9 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
     @SuppressLint("NotifyDataSetChanged")
     override fun onMusicDeleted() {
         refreshMusicList()
-
     }
 
-    private fun updateEmptyState() {
-        if (MusicListMA.isEmpty()) {
-            binding.musicemptyStateLayout.visibility = View.VISIBLE
-        } else {
-            binding.musicemptyStateLayout.visibility = View.GONE
-        }
-    }
+
 
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -29,7 +29,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_re_now_playing, container, false)
         binding = FragmentReNowPlayingBinding.bind(view)
-        binding.root.visibility = View.INVISIBLE
+        binding.root.visibility = View.GONE
         adapter = RecantMusicAdapter(requireContext(), MainActivity.musicRecantList , isReMusic = true ,this@ReNowPlaying  , isMusic = false)
         initializeBinding()
         return view

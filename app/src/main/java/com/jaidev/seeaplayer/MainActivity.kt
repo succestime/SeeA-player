@@ -45,7 +45,6 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.jaidev.seeaplayer.Services.FolderDetectionService
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.bottomNavigation.downloadNav
@@ -75,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     private var adLoaded = false // Flag to track if the ad is loaded
 
     private lateinit var linkTubeActivityResultLauncher: ActivityResultLauncher<Intent>
+    private var retryRequestedPermissions = false
 
 
     companion object {
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         lateinit var musicListSearch: ArrayList<Music>
         var search: Boolean = false
         lateinit var searchList: ArrayList<VideoData>
-        lateinit var folderList: ArrayList<Folder>
+        var folderList: ArrayList<Folder> = ArrayList()
         var dataChanged: Boolean = false
         var adapterChanged: Boolean = false
         var sortValue: Int = 0
@@ -113,6 +113,113 @@ class MainActivity : AppCompatActivity() {
             val network = connectivityManager.activeNetwork ?: return false
             val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
             return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        }
+        fun getAllRecantVideos(context: Context): ArrayList<RecantVideo> {
+            val recantVList = ArrayList<RecantVideo>()
+            val projection = arrayOf(
+                MediaStore.Video.Media.TITLE,
+                MediaStore.Video.Media._ID,
+                MediaStore.Video.Media.DURATION,
+                MediaStore.Video.Media.DATE_ADDED,
+                MediaStore.Video.Media.DATA,
+                MediaStore.Video.Media.SIZE
+            )
+
+            val sortOrder = MediaStore.Video.Media.TITLE
+
+            val cursor = context.contentResolver.query(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                sortOrder
+            )
+
+            cursor?.use {
+                val titleC = it.getColumnIndexOrThrow(MediaStore.Video.Media.TITLE)
+                val idC = it.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
+                val durationC = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+                val timestampC = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
+                val pathC = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
+                val sizeC = it.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
+
+                while (it.moveToNext()) {
+                    val title = it.getString(titleC)
+                    val id = it.getString(idC)
+                    val size = it.getString(sizeC)
+                    val duration = it.getLong(durationC)
+                    val timestamp = it.getLong(timestampC) * 1000
+                    val path = it.getString(pathC)
+                    val artUri = Uri.parse("content://media/external/video/media/$id")
+
+                    // Check if duration is greater than 0 milliseconds
+                    if (duration > 0) {
+                        val video = RecantVideo(title, timestamp, id, duration, path, artUri, size)
+                        recantVList.add(video)
+                    }
+                }
+            }
+
+            return recantVList
+        }
+
+        fun getAllRecantMusics(context: Context): ArrayList<RecantMusic> {
+            val musicReList = ArrayList<RecantMusic>()
+            val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
+            val projection = arrayOf(
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.ALBUM_ID ,
+                MediaStore.Audio.Media.SIZE
+            )
+
+            val sortOrder = MediaStore.Audio.Media.TITLE
+
+            val cursor = context.contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                sortOrder
+            )
+
+            cursor?.use {
+                val titleC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+                val sizeC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+                val artistC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+                val albumC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+                val albumIdC =
+                    it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID) // Add ALBUM_ID index
+                val idC = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                val durationC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val timestampC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+                val pathC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+
+                while (it.moveToNext()) {
+                    val title = it.getString(titleC)
+                    val artist = it.getString(artistC)
+                    val album = it.getString(albumC)
+                    val size = it.getString(sizeC)
+                    val albumId = it.getLong(albumIdC) // Get ALBUM_ID
+                    val id = it.getString(idC)
+                    val duration = it.getLong(durationC)
+                    val timestamp = it.getLong(timestampC) * 1000 // Convert to milliseconds
+                    val path = it.getString(pathC)
+                    val albumArtUri = Uri.parse("content://media/external/audio/albumart/$albumId")
+
+                    if (duration > 0) {
+                        val music = RecantMusic(title, artist, album, timestamp, id, duration, path, albumArtUri, size)
+                        musicReList.add(music)
+                    }
+                }
+            }
+
+            return musicReList
         }
     }
 
@@ -169,7 +276,7 @@ class MainActivity : AppCompatActivity() {
         if (shouldStartService()) {
             startMediaScanService()
         }
-
+        requestRuntimePermission()
 
     }
 
@@ -197,7 +304,7 @@ class MainActivity : AppCompatActivity() {
                     R.id.linkTube -> {
                         val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
                         linkTubeActivityResultLauncher.launch(intent)
-                            binding.mainActivityProgressbar.visibility = View.VISIBLE
+                        binding.mainActivityProgressbar.visibility = View.VISIBLE
                     }
                 }
             } catch (e: Exception) {
@@ -213,9 +320,12 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun funRequestRuntimePermission(){
         if (requestRuntimePermission()) {
+
             folderList = ArrayList()
             videoList = getAllVideos()
             MusicListMA = getAllAudio()
+            videoRecantList = getAllRecantVideos(this)
+            musicRecantList = getAllRecantMusics(this)
             setFragment(homeNav())
 
             runnable = Runnable {
@@ -230,6 +340,8 @@ class MainActivity : AppCompatActivity() {
             folderList = ArrayList()
             videoList = ArrayList()
             MusicListMA = getAllAudio()
+            videoRecantList = getAllRecantVideos(this)
+            musicRecantList = getAllRecantMusics(this)
             setFragment(homeNav())
         }
     }
@@ -320,53 +432,35 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun requestRuntimePermission(): Boolean {
-        //android 13 permission request
-        //android 13 permission request
+        // android 13 permission request
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_MEDIA_VIDEO
-                )
-                != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_MEDIA_AUDIO
-                )
-                != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(
-                        Manifest.permission.READ_MEDIA_VIDEO,
-                        Manifest.permission.READ_MEDIA_AUDIO ,
-                        READ_EXTERNAL_STORAGE,
-                        Manifest.permission.POST_NOTIFICATIONS ,
-                    ),
+                    arrayOf(Manifest.permission.READ_MEDIA_VIDEO),
                     13
+                )
+                return false
+            }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_MEDIA_AUDIO),
+                    14
                 )
                 return false
             }
             return true
         }
-
-        //requesting storage permission for only devices less than api 28
+        // android 9 or below
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE ,  READ_EXTERNAL_STORAGE,), 13)
+            if (ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE), 13)
                 return false
             }
             return true
         } else {
-            //read external storage permission for devices higher than android 10 i.e. api 29
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (ActivityCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE), 14)
                 return false
             }
@@ -382,47 +476,48 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 13) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
-                folderList = ArrayList()
-                videoList = getAllVideos()
-                MusicListMA = getAllAudio()
-                setFragment(homeNav())
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    requestPermissionR()
-                }
-            } else Snackbar.make(binding.root, "Storage Permission Needed!!", 5000)
-                .setAction("OK") {
-                    ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 13)
 
-                }
-                .show()
-//                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE),13)
-        }
+        if (requestCode == 13 || requestCode == 14) {
+            val deniedPermissions = permissions.filterIndexed { index, _ ->
+                grantResults[index] != PackageManager.PERMISSION_GRANTED
+            }
+            val grantedPermissions = permissions.filterIndexed { index, _ ->
+                grantResults[index] == PackageManager.PERMISSION_GRANTED
+            }
 
-        //for read external storage permission
-        if (requestCode == 14) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
-                folderList = ArrayList()
-                videoList = getAllVideos()
-                MusicListMA = getAllAudio()
-                setFragment(homeNav())
+            if (grantedPermissions.isNotEmpty()) {
+                if (requestCode == 13 && grantedPermissions.contains(Manifest.permission.READ_MEDIA_VIDEO)) {
+                    // Request next set of permissions
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            ActivityCompat.requestPermissions(
+                                this,
+                                arrayOf(Manifest.permission.READ_MEDIA_AUDIO),
+                                14
+                            )
+                        }
+                    }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    requestPermissionR()
+                } else {
+                    folderList = ArrayList()
+                    videoList = getAllVideos()
+                    MusicListMA = getAllAudio()
+                    videoRecantList = getAllRecantVideos(this)
+                    musicRecantList = getAllRecantMusics(this)
+                    setFragment(homeNav())
+                    // Check if either READ_MEDIA_AUDIO or WRITE_EXTERNAL_STORAGE is granted
+                    if (grantedPermissions.contains(Manifest.permission.READ_MEDIA_AUDIO) ||
+                        grantedPermissions.contains(WRITE_EXTERNAL_STORAGE)
+                    ) {
+                        Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+                        requestPermissionR()
+                    }
                 }
-            } else Snackbar.make(binding.root, "Storage Permission Needed!!", 5000)
-                .setAction("OK") {
-                    ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE), 14)
-
-                }
-                .show()
+            }
         }
     }
 
-    //for requesting android 11 or higher storage permission
+    // for requesting android 11 or higher storage permission
     private fun requestPermissionR() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -550,27 +645,30 @@ class MainActivity : AppCompatActivity() {
                     val sizeC = it.getString(it.getColumnIndex(MediaStore.Video.Media.SIZE)) ?: ""
                     val pathC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DATA)) ?: ""
                     val durationC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DURATION))?.toLong() ?: 0L
-                    val dateAddedMillis = it.getLong(it.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
+                    val dateAddedMillis = it.getLong(it.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)) * 1000 // Convert to milliseconds
 
                     try {
                         val file = File(pathC)
                         val artUriC = Uri.fromFile(file)
                         val currentTimestamp = System.currentTimeMillis()
-                        val isNewVideo = currentTimestamp - dateAddedMillis <= DateUtils.DAY_IN_MILLIS
+                        val isNewVideo = currentTimestamp - dateAddedMillis <= 30 * DateUtils.DAY_IN_MILLIS
+                        if (durationC > 0) {
+                            val video = VideoData(
+                                title = titleC,
+                                id = idC,
+                                folderName = folderC,
+                                duration = durationC,
+                                size = sizeC,
+                                path = pathC,
+                                artUri = artUriC,
+                                dateAdded = dateAddedMillis,
+                                isNew = isNewVideo,
 
-                        val video = VideoData(
-                            title = titleC,
-                            id = idC,
-                            folderName = folderC,
-                            duration = durationC,
-                            size = sizeC,
-                            path = pathC,
-                            artUri = artUriC,
-                            dateAdded = dateAddedMillis,
-                            isNew = isNewVideo
-                        )
 
-                        if (file.exists()) tempList.add(video)
+                            )
+
+                            if (file.exists()) tempList.add(video)
+                        }
 
                         if (folderList.none { it.id == folderIdC }) {
                             folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" }))
@@ -603,7 +701,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("Recycle", "Range")
     @RequiresApi(Build.VERSION_CODES.R)
-   fun getAllAudio(): ArrayList<Music>{
+    fun getAllAudio(): ArrayList<Music>{
         val tempList = ArrayList<Music>()
         val selection = MediaStore.Audio.Media.IS_MUSIC +  " != 0"
         val projection = arrayOf(MediaStore.Audio.Media._ID,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,
@@ -617,6 +715,7 @@ class MainActivity : AppCompatActivity() {
         if (cursor != null) {
             if (cursor.moveToNext()) {
                 do {
+
                     val titleC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))?:"Unknown"
                     val idC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))?:"Unknown"
                     val albumC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))?:"Unknown"
@@ -627,11 +726,23 @@ class MainActivity : AppCompatActivity() {
                     val uri =  Uri.parse("content://media/external/audio/albumart")
                     val artUriC = Uri.withAppendedPath(uri, albumIdC).toString()
                     val sizeC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE))
-                    val music = Music(id = idC, title = titleC, album = albumC, artist = artistC, path = pathC, duration = durationC,
-                        artUri = artUriC , size = sizeC)
-                    val file = File(music.path)
-                    if(file.exists())
-                        tempList.add(music)
+
+                    if (durationC > 0) {
+
+                        val music = Music(
+                            id = idC,
+                            title = titleC,
+                            album = albumC,
+                            artist = artistC,
+                            path = pathC,
+                            duration = durationC,
+                            artUri = artUriC,
+                            size = sizeC
+                        )
+                        val file = File(music.path)
+                        if (file.exists()) tempList.add(music)
+                    }
+
                 }while (cursor.moveToNext())
             }
             cursor.close()
@@ -761,4 +872,3 @@ class MainActivity : AppCompatActivity() {
 
 
 }
-

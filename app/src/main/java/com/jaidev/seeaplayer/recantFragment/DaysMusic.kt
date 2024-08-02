@@ -1,30 +1,22 @@
 
 package com.jaidev.seeaplayer.recantFragment
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.snackbar.Snackbar
+import com.jaidev.seeaplayer.MainActivity.Companion.getAllRecantMusics
 import com.jaidev.seeaplayer.MainActivity.Companion.musicRecantList
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
-import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.databinding.FragmentDaysMusicBinding
 import java.util.concurrent.TimeUnit
 
@@ -55,16 +47,10 @@ companion object{
             binding.MusicRV.setHasFixedSize(true)
             binding.MusicRV.setItemViewCacheSize(50)
             binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
-            adapter = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@DaysMusic, isMusic = false
-            )
+            adapter = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@DaysMusic, isMusic = false)
             binding.MusicRV.adapter = adapter
             binding.daysTotalMusics.text = "0 Musics"
-            if (!requestRuntimePermission()) {
-                // Permission not granted yet
-                return view
-            }
 
-            // Permission already granted, load recent videos
             loadRecentMusics()
 
             val handler = Handler(Looper.getMainLooper())
@@ -79,8 +65,6 @@ companion object{
                 binding.shuffleBtn.visibility = View.VISIBLE
                 swipeRefreshLayout.isRefreshing = false
             }
-            // Set the background color of SwipeRefreshLayout based on app theme
-
             shuffleEmpty()
         } catch (_: Exception) {
         }
@@ -99,83 +83,6 @@ companion object{
         updateEmptyViewVisibility()
 
     }
-    private fun requestRuntimePermission(): Boolean {
-        // Check for permission based on Android version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.READ_MEDIA_VIDEO
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.READ_MEDIA_VIDEO),
-                    13
-                )
-                return false
-            }
-        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    13
-                )
-                return false
-            }
-        } else {
-            // For Android versions >= Q (API 29)
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    14
-                )
-                return false
-            }
-        }
-        return true
-    }
-
-    // Handle permission request results
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 13) {
-            // Handle WRITE_EXTERNAL_STORAGE or READ_MEDIA_VIDEO permission request result
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, load recent videos
-                loadRecentMusics()
-            } else {
-                // Permission denied, show a message or retry request
-                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
-            }
-        } else if (requestCode == 14) {
-            // Handle READ_EXTERNAL_STORAGE permission request result
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, load recent videos
-                loadRecentMusics()
-            } else {
-                // Permission denied, show a message or retry request
-                Snackbar.make(binding.root, "Storage Permission Needed!!", Snackbar.LENGTH_LONG).show()
-            }
-        }
-    }
-
-
-
-
 
     @SuppressLint("SetTextI18n")
     private fun loadRecentMusics() {
@@ -193,64 +100,6 @@ companion object{
     }
 
 
-    private fun getAllRecantMusics(context: Context): ArrayList<RecantMusic> {
-        val musicReList = ArrayList<RecantMusic>()
-        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
-        val projection = arrayOf(
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DATE_ADDED,
-            MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.ALBUM_ID ,
-            MediaStore.Audio.Media.SIZE
-        )
-
-        val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
-
-        val cursor = context.contentResolver.query(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            projection,
-            selection,
-            null,
-            sortOrder
-        )
-
-        cursor?.use {
-            val titleC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-            val sizeC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
-            val artistC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-            val albumC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-            val albumIdC =
-                it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID) // Add ALBUM_ID index
-            val idC = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-            val durationC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-            val timestampC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
-            val pathC = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-
-            while (it.moveToNext()) {
-                val title = it.getString(titleC)
-                val artist = it.getString(artistC)
-                val album = it.getString(albumC)
-                val size = it.getString(sizeC)
-                val albumId = it.getLong(albumIdC) // Get ALBUM_ID
-                val id = it.getString(idC)
-                val duration = it.getLong(durationC)
-                val timestamp = it.getLong(timestampC) * 1000 // Convert to milliseconds
-                val path = it.getString(pathC)
-
-                // Construct album art URI
-                val albumArtUri = Uri.parse("content://media/external/audio/albumart/$albumId")
-
-                val music = RecantMusic(title, artist, album, timestamp, id, duration, path, albumArtUri , size)
-                musicReList.add(music)
-            }
-        }
-
-        return musicReList
-    }
 
     @SuppressLint("SetTextI18n")
     override fun onFileCountChanged(newCount: Int) {

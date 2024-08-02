@@ -11,14 +11,21 @@
     android:background="?attr/selectableItemBackground">
 
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/musicViewImage"
+    <FrameLayout
         android:layout_width="70dp"
         android:layout_height="60dp"
-      android:layout_marginStart="7dp"
-        android:background="#B8B8B8"
-        android:src="@drawable/music_note_svgrepo_com"
-        app:shapeAppearanceOverlay="@style/curved"/>
+        android:layout_marginStart="7dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/musicViewImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#B8B8B8"
+            android:src="@drawable/music_note_svgrepo_com"
+            app:shapeAppearanceOverlay="@style/curved"/>
+
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"

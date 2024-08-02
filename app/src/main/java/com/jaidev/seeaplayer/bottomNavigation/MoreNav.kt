@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.jaidev.seeaplayer.LogSignIn.signin
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.ThemeActivity
 import com.jaidev.seeaplayer.databinding.FragmentMoreNavBinding
 
 class moreNav : Fragment() {
@@ -79,8 +80,8 @@ binding.Settingslayout.setOnClickListener {
         }
 
         binding.appThemelayout.setOnClickListener {
-            showDialog()
-
+            startActivity(Intent(requireContext(), ThemeActivity::class.java))
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         }
         setActionBarGradient()
         relativeLayout = binding.relativeLayoutMore

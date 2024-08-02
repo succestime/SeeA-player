@@ -16,12 +16,8 @@ import android.media.audiofx.LoudnessEnhancer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.provider.OpenableColumns
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -31,6 +27,8 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
@@ -41,7 +39,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bullhead.equalizer.EqualizerFragment
 import com.bullhead.equalizer.Settings
-import com.developer.filepicker.model.DialogConfigs
 import com.developer.filepicker.model.DialogProperties
 import com.developer.filepicker.view.FilePickerDialog
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay
@@ -61,13 +58,13 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.allAdapters.PlaybackIconsAdapter
+import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.dataClass.IconModel
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityPlayerBinding
 import com.jaidev.seeaplayer.databinding.BoosterBinding
 import com.jaidev.seeaplayer.databinding.SpeedDialogBinding
-import java.io.File
 import java.text.DecimalFormat
 import java.util.Timer
 import java.util.TimerTask
@@ -79,7 +76,7 @@ import kotlin.system.exitProcess
 
 
 class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener
-    , GestureDetector.OnGestureListener
+    , GestureDetector.OnGestureListener ,   VideoAdapter.OnFileCountChangeListener
 {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var playPauseBtn: ImageButton
@@ -100,13 +97,21 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     var nightMode: View? = null
     var dark: Boolean = false
     var mute: Boolean = false
+
     lateinit var dialogProperties: DialogProperties
     lateinit var filePickerDialog: FilePickerDialog
-    lateinit var uriSubtitle: Uri
     private lateinit var eqContainer: FrameLayout
     private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
     private lateinit var player: ExoPlayer
     lateinit var mAdView: AdView
+    private lateinit var startLinkTubeActivityLauncher: ActivityResultLauncher<Intent>
+    private var isSleepTimerRunning = false
+    private var isBoosterRunning = false
+    private var isSpeedRunning = false
+    private var sleepTimerPosition = -1
+    private var boosterPosition = -1
+   private var speedPosition = -1
+
     companion object {
         private var audioManager: AudioManager? = null
         private lateinit var player: ExoPlayer
@@ -119,6 +124,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         private lateinit var trackSelector: DefaultTrackSelector
         private lateinit var loudnessEnhancer: LoudnessEnhancer
         private var speed: Float = 1.0f
+        private var initialSpeed: Float = 1.0f
+        private lateinit var adapter: VideoAdapter
+
         private var timer: Timer? = null
         var nowPlayingId: String = ""
         var pipStatus: Int = 0
@@ -152,15 +160,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         MobileAds.initialize(this) {}
         mAdView = findViewById(R.id.adView)
         releasePlayer()
-        // Set up your ExoPlayer instance and attach it to the CustomPlayerView
-        val player = SimpleExoPlayer.Builder(this).build()
-        binding.playerView.player = player
-
-        // Set media item and prepare the player
-        val mediaItem = MediaItem.fromUri("your_video_url_here")
-        player.setMediaItem(mediaItem)
-        player.prepare()
-
 
         gestureDetectorCompat = GestureDetectorCompat(this, this)
 
@@ -171,7 +170,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-
         dialogProperties = DialogProperties()
         filePickerDialog = FilePickerDialog(this@PlayerActivity)
         filePickerDialog.setTitle("Select a Subtitle File")
@@ -182,156 +180,31 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         horizontalIconList()
         initializeLayout()
         initializeBinding()
-        try {
-            //for handling video file intent (Improved Version)
-            if (intent.data?.scheme.contentEquals("content")) {
-                playerList = ArrayList()
-                position = 0
-                val cursor = contentResolver.query(
-                    intent.data!!, arrayOf(MediaStore.Video.Media.DATA), null, null,
-                    null
-                )
-                cursor?.let {
-                    if (it.moveToFirst()) {
-                        try {
-                            val path =
-                                it.getString(it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
-                            val file = File(path)
-                            val video = VideoData(
-                                id = "",
-                                title = file.name,
-                                duration = 0L,
-                                artUri = Uri.fromFile(file),
-                                path = path,
-                                size = "",
-                                folderName = "",
-                                dateAdded = file.lastModified(),
-                                isNew = true
-                            )
-                            playerList.add(video)
-                        } catch (e: Exception) {
-                            val tempPath = getPathFromURI(context = this, uri = intent.data!!)
-                            val tempFile = File(tempPath)
-                            val video = VideoData(
-                                id = "",
-                                title = tempFile.name,
-                                duration = 0L,
-                                artUri = Uri.fromFile(tempFile),
-                                path = tempPath,
-                                size = "",
-                                folderName = "",
-                                dateAdded = tempFile.lastModified(),
-                                isNew = true
-                            )
-                            playerList.add(video)
-                        } finally {
-                            cursor.close()
-                        }
-                    } else {
-                        cursor.close()
-                        throw Exception("Failed to move cursor to the first row.")
-                    }
-                }
-                if (playerList.isNotEmpty()) {
-                    createPlayer()
-                    initializeBinding()
-                } else {
-                    Toast.makeText(this, "No video file found.", Toast.LENGTH_LONG).show()
-                }
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+        startLinkTubeActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // This block will be called when the launched activity is finished
+            binding.progress.visibility = View.GONE
         }
 
-        handleIncomingIntent(intent) // Handle the incoming intent here
+        markCurrentVideoAsPlayed()
 
-        try {
-            //for handling video file intent (Improved Version)
-            if (intent.data?.scheme.contentEquals("content")) {
-                handleIncomingIntent(intent) // Handle the intent here too
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
-        }
     }
 
 
-    // Handle new intents
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        handleIncomingIntent(intent)
-    }
+    private fun markCurrentVideoAsPlayed() {
+        if (position >= 0 && position < playerList.size) {
+            val videoId = playerList[position].id
+            markVideoAsPlayed(videoId)
+            VideoAdapter.updateNewIndicator(videoId)
+            val sharedPreferences = getSharedPreferences("played_videos", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putBoolean(videoId, true)
+                apply()
 
-    private fun handleIncomingIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_SEND && intent.type?.startsWith("video/") == true) {
-            val videoUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-            if (videoUri != null) {
-                playSharedVideo(videoUri)
             }
+
         }
     }
-
-    private fun playSharedVideo(videoUri: Uri) {
-        playerList = ArrayList()
-        val video = VideoData(
-            id = "",
-            title = getFileNameFromUri(videoUri),
-            duration = 0L,
-            artUri = videoUri,
-            path = videoUri.toString(),
-            size = "",
-            folderName = "",
-            dateAdded = System.currentTimeMillis(),
-            isNew = true
-        )
-        playerList.add(video)
-        position = 0
-        createPlayer()
-    }
-
-    // Utility method to get file name from URI
-    private fun getFileNameFromUri(uri: Uri): String {
-        var result: String? = null
-        if (uri.scheme == "content") {
-            val cursor = contentResolver.query(uri, null, null, null, null)
-            cursor.use { it ->
-                if (it != null && it.moveToFirst()) {
-                    result = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
-                }
-            }
-        }
-        if (result == null) {
-            result = uri.path
-            val cut = result?.lastIndexOf('/')
-            if (cut != null && cut != -1) {
-                result = result?.substring(cut + 1)
-            }
-        }
-        return result ?: "Unknown"
-    }
-
-    //used to get path of video selected by user (if column data fails to get path)
-        private fun getPathFromURI(context: Context, uri: Uri): String {
-            var filePath = ""
-            // ExternalStorageProvider
-            val docId = DocumentsContract.getDocumentId(uri)
-            val split = docId.split(':')
-            val type = split[0]
-
-            return if ("primary".equals(type, ignoreCase = true)) {
-                "${Environment.getExternalStorageDirectory()}/${split[1]}"
-            } else {
-                //getExternalMediaDirs() added in API 21
-                val external = context.externalMediaDirs
-                if (external.size > 1) {
-                    filePath = external[1].absolutePath
-                    filePath = filePath.substring(0, filePath.indexOf("Android")) + split[1]
-                }
-                filePath
-            }
-        }
-
-        private fun someIdes(){
+    private fun someIdes(){
         videoTitle = findViewById(R.id.videoTitle)
         playPauseBtn = findViewById(R.id.playPauseBtn)
         fullScreenBtn = findViewById(R.id.fullScreenBtn)
@@ -343,9 +216,39 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         eqContainer = findViewById<FrameLayout>(R.id.eqFrame)
     }
 
+    private fun initializeLayout() {
+        when (intent.getStringExtra("class")) {
+            "FoldersActivity" -> {
+                playerList = ArrayList()
+                playerList.addAll(FoldersActivity.currentFolderVideos)
+                createPlayer()
+            }
+
+            "NowPlaying" -> {
+                speed = 1.0f
+                videoTitle.text = playerList[position].title
+                videoTitle.isSelected = true
+                binding.playerView.player = player
+                doubleTapEnable()
+                playInFullscreen(enable = isFullscreen)
+                seekBarFeature()
+                createPlayer()
+            }
+
+        }
+    }
+
+    private fun initializePlayer() {
+        player = SimpleExoPlayer.Builder(this).build()
+        binding.playerView.player = player
+
+        val mediaItem = MediaItem.fromUri("YOUR_VIDEO_URI_HERE")
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
 
 
-
+    }
 
     private fun releasePlayer() {
         player.release()
@@ -360,11 +263,13 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         iconModelArrayList.add(IconModel(R.drawable.search_link_tube,"Link Tube", android.R.color.white))
 
 
-        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this)
+
+        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this , dark)
         val layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, true)
         recyclerViewIcons.layoutManager = layoutManager
         recyclerViewIcons.adapter = playbackIconsAdapter
         playbackIconsAdapter.notifyDataSetChanged()
+
 
         playbackIconsAdapter.setOnItemClickListener(object : PlaybackIconsAdapter.OnItemClickListener {
             @SuppressLint("Range", "SourceLockedOrientationActivity")
@@ -443,13 +348,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                                     )
                                 )
 
-                                iconModelArrayList.add(
-                                    IconModel(
-                                        R.drawable.round_subtitles,
-                                        "Subtitle",
-                                        android.R.color.white
-                                    )
-                                )
+
                                 iconModelArrayList.add(
                                     IconModel(
                                         R.drawable.round_graphic_eq,
@@ -469,19 +368,21 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     1 -> {
                         if (dark) {
                             nightMode?.visibility = View.GONE
-                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Night")
-                            playbackIconsAdapter.notifyDataSetChanged()
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Night Mode" ,    iconBackground = R.drawable.ripple_circle)
                             dark = false
+
                         } else {
                             nightMode?.visibility = View.VISIBLE
-                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Day")
-                            playbackIconsAdapter.notifyDataSetChanged()
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Day Mode",    iconBackground = R.drawable.ripple_circle_cool_blue)
                             dark = true
+
                         }
+                        playbackIconsAdapter.notifyDataSetChanged()
 
                     }
 
                     2 -> {
+                        speedPosition = position
                         setupSpeedDialog()
                     }
                     3 -> {
@@ -502,27 +403,39 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     }
 
                     4 -> {
-                        startActivity(Intent(this@PlayerActivity, LinkTubeActivity::class.java))
+                        binding.progress.visibility = View.VISIBLE // Show progress
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // Launch LinkTubeActivity
+                            val intent = Intent(this@PlayerActivity, LinkTubeActivity::class.java)
+                            startLinkTubeActivityLauncher.launch(intent)
+                        }, 100) // Delay of 500 milliseconds
 
                     }
-                    5 ->{     setupSleepTimer()   }
+                    5 ->{
+
+                        sleepTimerPosition = position
+                        setupSleepTimer()
+
+                    }
 
                     6 -> {
                         if (mute) {
                             player.setVolume(100F)
-                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute" ,    iconBackground = R.drawable.ripple_circle)
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = false
                         } else {
                             player.setVolume(0F)
                             iconModelArrayList[position] =
-                                IconModel(R.drawable.round_volume_up, "Unmute")
+                                IconModel(R.drawable.round_volume_up, "Mute" ,    iconBackground = R.drawable.ripple_circle_cool_blue)
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = true
                         }
                     }
 
                     7 -> {
+                        boosterPosition = position
+
                         setupBoosterDialog()
                     }
 
@@ -531,23 +444,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     }
 
                     9 -> {
-                        dialogProperties.selection_mode = DialogConfigs.SINGLE_MODE
-                        dialogProperties.extensions = arrayOf(".srt")
-                        dialogProperties.root = File("/storage/emulated/0")
-
-                        filePickerDialog.setDialogSelectionListener { files ->
-                            for (path in files) {
-                                val file = File(path)
-                                uriSubtitle = Uri.parse(file.absolutePath)
-                                // Further actions after selecting a subtitle file
-                            }
-                        }
-
-                        filePickerDialog.properties = dialogProperties
-                        filePickerDialog.show()
-                    }
-
-                    10 -> {
                         if (eqContainer.visibility == View.GONE) {
                             eqContainer.visibility = View.VISIBLE
                         }
@@ -575,6 +471,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
     }
 
+
+
     private fun setSwipeRefreshBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
             Configuration.UI_MODE_NIGHT_YES -> true
@@ -588,15 +486,33 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
         }
     }
+
     @SuppressLint("SetTextI18n")
     fun setupSleepTimer() {
-        if (timer != null)
-            Toast.makeText(
-                this@PlayerActivity,
-                "Timer Already Running !\nClose App to Reset Timer ..",
-                Toast.LENGTH_SHORT
-            ).show()
-        else {
+        if (timer != null) {
+            // Show an alert dialog to ask the user if they want to stop the timer
+            MaterialAlertDialogBuilder(this@PlayerActivity)
+                .setTitle("Do you want to stop the timer?")
+                .setMessage("If you want to stop the sleep timer, click on Stop")
+                .setPositiveButton("Stop") { dialog, _ ->
+                    // Cancel the ongoing timer
+                    timer?.cancel()
+                    timer = null
+                    isSleepTimerRunning = false
+                    // Update the icon and background
+                    iconModelArrayList[sleepTimerPosition] = IconModel(
+                        R.drawable.round_sleep_timer,
+                        "Sleep Timer",
+                        iconBackground = R.drawable.ripple_circle
+                    )
+                    playbackIconsAdapter.notifyItemChanged(sleepTimerPosition)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        } else {
             var sleepTime = 15
             val customDialogS = LayoutInflater.from(this@PlayerActivity)
                 .inflate(R.layout.speed_dialog, binding.root, false)
@@ -614,8 +530,21 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                     }
 
                     timer!!.schedule(task, sleepTime * 60 * 1000.toLong())
+                    isSleepTimerRunning = true
+                    // Update the icon and background
+                    iconModelArrayList[sleepTimerPosition] = IconModel(
+                        R.drawable.round_sleep_timer,
+                        "Sleep Timer",
+                        iconBackground = R.drawable.ripple_circle_cool_blue
+                    )
+                    playbackIconsAdapter.notifyItemChanged(sleepTimerPosition)
+
                     self.dismiss()
                     playVideo()
+                }
+                .setNegativeButton("Cancel") { self, _ ->
+                    self.dismiss()
+
                 }
                 .setBackground(getSemiTransparentGrayDrawable())
                 .create()
@@ -640,8 +569,30 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         val bindingS = SpeedDialogBinding.bind(customDialogS)
         val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
             .setOnCancelListener { playVideo() }
-            .setPositiveButton("Done") { _, _ ->
-//                dialog.dismiss()
+            .setPositiveButton("Done") { self, _ ->
+                if (speed != initialSpeed) {
+                    if (speed == 1.0f) {
+                        isSpeedRunning = false
+                        iconModelArrayList[speedPosition] = IconModel(
+                            R.drawable.round_speed,
+                            "Speed",
+                            iconBackground = R.drawable.ripple_circle
+                        )
+                    } else {
+                        isSpeedRunning = true
+                        iconModelArrayList[speedPosition] = IconModel(
+                            R.drawable.round_speed,
+                            "Speed",
+                            iconBackground = R.drawable.ripple_circle_cool_blue
+                        )
+                    }
+                    playbackIconsAdapter.notifyItemChanged(speedPosition)
+                }
+                self.dismiss()
+            }
+            .setNegativeButton("Cancel") { self, _ ->
+                self.dismiss()
+
             }
             .setBackground(getSemiTransparentGrayDrawable())
             .create()
@@ -650,36 +601,77 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         bindingS.minusBtn.setOnClickListener {
             changeSpeed(isIncrement = false)
             bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+            updateSpeedIcon()
         }
         bindingS.plusBtn.setOnClickListener {
             changeSpeed(isIncrement = true)
             bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+            updateSpeedIcon()
         }
     }
-
+    private fun updateSpeedIcon() {
+        if (speed == 1.0f) {
+            isSpeedRunning = false
+            iconModelArrayList[speedPosition] = IconModel(
+                R.drawable.round_speed,
+                "Speed",
+                iconBackground = R.drawable.ripple_circle
+            )
+        } else {
+            isSpeedRunning = true
+            iconModelArrayList[speedPosition] = IconModel(
+                R.drawable.round_speed,
+                "Speed",
+                iconBackground = R.drawable.ripple_circle_cool_blue
+            )
+        }
+        playbackIconsAdapter.notifyItemChanged(speedPosition)
+    }
     @SuppressLint("SetTextI18n")
     fun setupBoosterDialog() {
         // dialog.dismiss()
-        val customDialogB =
-            LayoutInflater.from(this).inflate(R.layout.booster, binding.root, false)
+        val customDialogB = LayoutInflater.from(this).inflate(R.layout.booster, binding.root, false)
         val bindingB = BoosterBinding.bind(customDialogB)
+        val initialProgress = loudnessEnhancer.targetGain.toInt() / 100
         val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
             .setOnCancelListener { playVideo() }
             .setPositiveButton("Done") { _, _ ->
-                loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress * 100)
+                val newProgress = bindingB.verticalBar.progress
+                if (newProgress != initialProgress || newProgress == 0) {
+                    if (newProgress == 0) {
+                        isBoosterRunning = false
+                        iconModelArrayList[boosterPosition] = IconModel(
+                            R.drawable.round_speaker,
+                            "Booster",
+                            iconBackground = R.drawable.ripple_circle
+                        )
+                    } else {
+                        loudnessEnhancer.setTargetGain(newProgress * 100)
+                        isBoosterRunning = true
+                        iconModelArrayList[boosterPosition] = IconModel(
+                            R.drawable.round_speaker,
+                            "Booster",
+                            iconBackground = R.drawable.ripple_circle_cool_blue
+                        )
+                    }
+                    playbackIconsAdapter.notifyItemChanged(boosterPosition)
+                }
                 playVideo()
-                // dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { self, _ ->
+                self.dismiss()
             }
             .setBackground(getSemiTransparentGrayDrawable())
             .create()
         dialogB.show()
-        bindingB.verticalBar.progress = loudnessEnhancer.targetGain.toInt() / 100
-        bindingB.progressText.text =
-            "Audio Booster\n\n${loudnessEnhancer.targetGain.toInt() / 10}"
+        bindingB.verticalBar.progress = initialProgress
+        bindingB.progressText.text = "Audio Booster\n\n${initialProgress * 10}"
         bindingB.verticalBar.setOnProgressChangeListener {
             bindingB.progressText.text = "Audio Booster\n\n${it * 10}"
         }
     }
+
+
     private fun getSemiTransparentGrayDrawable(): ColorDrawable {
         val color = Color.parseColor("#011B29")
         return ColorDrawable(color)
@@ -721,46 +713,8 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
 
 
-    private fun initializeLayout() {
-        when (intent.getStringExtra("class")) {
-            "FoldersActivity" -> {
-                playerList = ArrayList()
-                playerList.addAll(FoldersActivity.currentFolderVideos)
-                createPlayer()
-            }
-            "SearchVideos" -> {
-                playerList = ArrayList()
-                playerList.addAll(MainActivity.searchList)
-                createPlayer()
-            }
-            "NowPlaying" -> {
-                speed = 1.0f
-                videoTitle.text = playerList[position].title
-                videoTitle.isSelected = true
-                binding.playerView.player = player
-                doubleTapEnable()
-                playInFullscreen(enable = isFullscreen)
-                seekBarFeature()
-                createPlayer()
-            }
-//            "shareActivity" -> {
-//                playerList = ArrayList()
-//                playerList.addAll(FoldersActivity.currentFolderVideos)
-//                createPlayer()
-//            }
 
-        }
-    }
 
-    private fun initializePlayer() {
-        player = SimpleExoPlayer.Builder(this).build()
-        binding.playerView.player = player
-
-        val mediaItem = MediaItem.fromUri("YOUR_VIDEO_URI_HERE")
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.play()
-    }
     override fun onPause() {
         super.onPause()
         resetPlaybackSpeed()
@@ -916,7 +870,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         }
         speed = 1.0f
         trackSelector = DefaultTrackSelector(this)
-        videoTitle.isSelected = true
+     videoTitle.isSelected = true
         videoTitle.text = playerList[position].title
         player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         doubleTapEnable()
@@ -940,6 +894,10 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         loudnessEnhancer.enabled = true
 
         nowPlayingId = playerList[position].id
+
+        val nextVideoId = playerList[position].id
+        markVideoAsPlayed(nextVideoId)
+        VideoAdapter.updateNewIndicator(nextVideoId)
 
         seekBarFeature()
         binding.playerView.setControllerVisibilityListener { visibility ->
@@ -989,9 +947,18 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     private fun nextPrevVideo(isNext: Boolean = true) {
         if (isNext) setPosition()
         else setPosition(isIncrement = false)
+        val nextVideoId = playerList[position].id
+        markVideoAsPlayed(nextVideoId)
+        VideoAdapter.updateNewIndicator(nextVideoId )
         createPlayer()
     }
-
+    private fun markVideoAsPlayed(videoId: String) {
+        val sharedPreferences = getSharedPreferences("played_videos", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putBoolean(videoId, true)
+            apply()
+        }
+    }
     private fun setPosition(isIncrement: Boolean = true) {
         if (!repeat) {
             if (isIncrement) {
@@ -1036,6 +1003,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         if (isIncrement) {
             if (speed < 2.9f) {
                 speed += 0.10f  // speed = speed + 0.10f
+
             }
         } else {
             if (speed > 0.20f) {
@@ -1045,20 +1013,20 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         player.setPlaybackSpeed(speed)
     }
 
-    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration)
+    {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-        if(pipStatus != 0){
+        if (pipStatus != 0) {
             recreate()
             playInFullscreen(true)
             val intent = Intent(this, PlayerActivity::class.java)
-            when(pipStatus){
-                1 -> intent.putExtra("class","FolderActivity")
-
-                2 -> intent.putExtra("class","SearchedVideos")
+            when (pipStatus) {
+                1 -> intent.putExtra("class", "FolderActivity")
             }
             startActivity(intent)
         }
-        if(isInPictureInPictureMode){ playVideo()
+        if(isInPictureInPictureMode){
+            playVideo()
             playPauseBtn.setImageResource(R.drawable.round_pause_24)
 
         } else {
@@ -1067,6 +1035,14 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
         }
     }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (isInPictureInPictureMode) {
+            finish()
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -1408,6 +1384,9 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         this.window.attributes = lp
     }
 
+    override fun onFileCountChanged(newCount: Int) {
+        TODO("Not yet implemented")
+    }
 
 
 }

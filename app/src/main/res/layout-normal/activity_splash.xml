@@ -5,6 +5,8 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/splashActivity"
+    android:background="@color/dark_cool_blue"
+
     android:fitsSystemWindows="true"
     android:gravity="center"
     tools:context=".SplashActivity">
@@ -38,6 +40,7 @@
         android:layout_alignParentBottom="true"
         android:textSize="25sp"
         android:layout_marginTop="15dp"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView">

@@ -3,7 +3,6 @@ package com.jaidev.seeaplayer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -48,21 +47,16 @@ supportActionBar?.hide()
         // Set the modified SpannableString to the TextView
         binding.textView.text = spannableString
 
-        // Set background color and navigation bar color based on theme
-        val isNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-        val backgroundColor = if (isNightMode) {
-            getColor(R.color.dark_cool_blue)
-        }else getColor(R.color.white)
-        binding.splashActivity.setBackgroundColor(backgroundColor)
 
-        window.navigationBarColor = ContextCompat.getColor(this, if (isNightMode) R.color.dark_cool_blue else R.color.white)
+
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue )
 
         // Delay for 2 seconds and then start the main activity
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
             finish()
 
-        }, 2000)
+        }, 200)
 
 
 

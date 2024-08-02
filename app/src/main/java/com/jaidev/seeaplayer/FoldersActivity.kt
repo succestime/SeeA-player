@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.format.DateUtils
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -24,15 +25,17 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity.Companion.folderList
 import com.jaidev.seeaplayer.MainActivity.Companion.sortValue
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
+import com.jaidev.seeaplayer.allAdapters.VideoSearchAdapter
+import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
 import com.jaidev.seeaplayer.dataClass.Folder
 import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityFoldersBinding
 import java.io.File
 
-class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener ,  VideoAdapter.OnFileCountChangeListener {
-    private lateinit var binding: ActivityFoldersBinding
+class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener ,  VideoAdapter.OnFileCountChangeListener, VideoSearchAdapter.OnItemClickListener{
     private lateinit var adapter: VideoAdapter
+    private lateinit var searchAdapter: VideoSearchAdapter
     private var isSearchViewClicked = false
     private lateinit var searchView: SearchView
     private var currentLayoutManager: RecyclerView.LayoutManager? = null
@@ -40,9 +43,12 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
     private val PREF_LAYOUT_TYPE = "pref_layout_type"
     private val LAYOUT_TYPE_GRID = "grid"
     private val LAYOUT_TYPE_LIST = "list"
+    private lateinit var searchItem: MenuItem
 
     companion object {
-        var currentFolderVideos: ArrayList<VideoData> = arrayListOf()
+        var currentFolderVideos: ArrayList<VideoData> = ArrayList()
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var binding: ActivityFoldersBinding
 
     }
 
@@ -55,10 +61,9 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         MobileAds.initialize(this) {}
 
         val position = intent.getIntExtra("position", 0)
-        currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
+        currentFolderVideos = getAllVideos(folderList[position].id)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        // Set the supportActionBar title
-        val folderName = MainActivity.folderList[position].folderName.capitalize()
+        val folderName = folderList[position].folderName.capitalize()
         supportActionBar?.title = if (folderName.isNullOrEmpty()) "Internal memory" else folderName
 
         binding.videoRVFA.setHasFixedSize(true)
@@ -68,12 +73,13 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
 
         binding.totalVideo.text = "${currentFolderVideos.size} Videos"
 
-        adapter = VideoAdapter(this@FoldersActivity, MainActivity.videoList, isFolder = true , this)
+        searchAdapter = VideoSearchAdapter(this@FoldersActivity, MainActivity.videoList, isSearchActivity = false , isFolder = true,
+            isShort = true , this)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(10)
         binding.recyclerView.layoutManager = LinearLayoutManager(this@FoldersActivity)
         binding.recyclerView.visibility = View.GONE
-        binding.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = searchAdapter
 
         val savedLayoutType = getSharedPreferences("LayoutPrefs", Context.MODE_PRIVATE)
             .getString(PREF_LAYOUT_TYPE, LAYOUT_TYPE_LIST)
@@ -99,8 +105,8 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
             if (adapter.getSelectedItemCount() > 0) {
                 binding.swipeRefreshFolder.isRefreshing = false
             } else {
-                currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
-                adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true, this)
+                currentFolderVideos = getAllVideos(folderList[position].id)
+                adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true, this )
                 binding.videoRVFA.adapter = adapter
                 binding.totalVideo.text = "${currentFolderVideos.size} Videos"
                 binding.swipeRefreshFolder.isRefreshing = false
@@ -175,19 +181,22 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
 
     @SuppressLint("SetTextI18n")
     override fun onVideoDeleted() {
-        MainActivity.videoList.clear()
         val position = intent.getIntExtra("position", 0)
-        currentFolderVideos = getAllVideos(MainActivity.folderList[position].id)
-        adapter.updateList(currentFolderVideos)
+        MainActivity.videoList.clear()
+        currentFolderVideos = getAllVideos(folderList[position].id)
+        adapter = VideoAdapter(this@FoldersActivity, currentFolderVideos, isFolder = true, this )
+        binding.videoRVFA.adapter = adapter
         binding.totalVideo.text = "${currentFolderVideos.size} Videos"
+        binding.swipeRefreshFolder.isRefreshing = false
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_view, menu)
-        menuInflater.inflate(R.menu.search_music_view, menu)
+        menuInflater.inflate(R.menu.search_view_menu, menu)
+        searchItem = menu.findItem(R.id.searchView)
 
-        val searchItem = menu.findItem(R.id.searchMusicView)
-        val searchView = searchItem?.actionView as SearchView
+        searchView = searchItem.actionView as SearchView
         val sortOrderMenuItem = menu.findItem(R.id.sortOrder)
         sortOrderMenuItem.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -240,7 +249,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
                         }
                     }
                     MainActivity.search = true
-                    adapter.updateList(searchList = MainActivity.searchList)
+                    searchAdapter.updateList(searchList = MainActivity.searchList)
                 }
                 if (isSearchViewClicked || newText?.isNotEmpty() == true) {
                     binding.recyclerView.visibility = View.VISIBLE
@@ -423,6 +432,19 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         binding.totalVideo.text = "$newCount Videos"
 
     }
+
+    override fun onItemClick(fileItem: VideoData) {
+        PlayerFileActivity.pipStatus = 1
+        val intent = Intent(this, SearchActivity::class.java)
+        intent.putExtra("videoData", fileItem)
+        startActivity(intent)
+        isSearchViewClicked = false
+        binding.recyclerView.visibility = View.GONE
+        // Collapse the SearchView
+        searchItem.collapseActionView()
+    }
+
+
 
 
 }

@@ -28,6 +28,8 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
@@ -38,7 +40,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bullhead.equalizer.EqualizerFragment
 import com.bullhead.equalizer.Settings
-import com.developer.filepicker.model.DialogConfigs
 import com.developer.filepicker.model.DialogProperties
 import com.developer.filepicker.view.FilePickerDialog
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay
@@ -55,7 +56,6 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
@@ -82,7 +82,6 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     private lateinit var fullScreenBtn: ImageButton
     private lateinit var videoTitle: TextView
     private lateinit var gestureDetectorCompat: GestureDetectorCompat
-    private lateinit var adapter: RecentVideoAdapter
     private var isSwipingForward = false
     private var currentSwipeX = 0f
     private var currentSwipeY = 0f
@@ -99,12 +98,18 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     var mute: Boolean = false
     lateinit var dialogProperties: DialogProperties
     lateinit var filePickerDialog: FilePickerDialog
-    lateinit var uriSubtitle: Uri
     private lateinit var eqContainer: FrameLayout
     private var isPlayingBeforePause = false // Flag to track if video was playing before going into background
     private lateinit var player: ExoPlayer
     lateinit var mAdView: AdView
-    private var rewardedInterstitialAd : RewardedInterstitialAd? = null
+    private lateinit var startLinkTubeActivityLauncher: ActivityResultLauncher<Intent>
+    private var isSleepTimerRunning = false
+    private var isBoosterRunning = false
+    private var isSpeedRunning = false
+    private var sleepTimerPosition = -1
+    private var boosterPosition = -1
+    private var speedPosition = -1
+    private var videoPosition: Int = -1
 
     // horizontal recyclerView variables
     companion object {
@@ -119,6 +124,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         private lateinit var trackSelector: DefaultTrackSelector
         private lateinit var loudnessEnhancer: LoudnessEnhancer
         private var speed: Float = 1.0f
+        private var initialSpeed: Float = 1.0f
+
         private var timer: Timer? = null
         var nowPlayingId: String = ""
         var pipStatus: Int = 0
@@ -222,8 +229,24 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         } catch (e: Exception) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
+        startLinkTubeActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // This block will be called when the launched activity is finished
+            binding.progress.visibility = View.GONE
+        }
+        videoPosition = intent.getIntExtra("video_position", -1)
 
+        markCurrentVideoAsPlayed()
+    }
 
+    private fun markCurrentVideoAsPlayed() {
+        if (position >= 0 && position < recantPlayerList.size) {
+            val videoId = recantPlayerList[position].id
+            val sharedPreferences = getSharedPreferences("played_videos", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putBoolean(videoId, true)
+                apply()
+            }
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -235,7 +258,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         iconModelArrayList.add(IconModel(R.drawable.search_link_tube,"Link Tube", android.R.color.white))
 
 
-        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this)
+        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList, this , dark)
         val layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, true)
         recyclerViewIcons.layoutManager = layoutManager
         recyclerViewIcons.adapter = playbackIconsAdapter
@@ -318,13 +341,6 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
 
                                 iconModelArrayList.add(
                                     IconModel(
-                                        R.drawable.round_subtitles,
-                                        "Subtitle",
-                                        android.R.color.white
-                                    )
-                                )
-                                iconModelArrayList.add(
-                                    IconModel(
                                         R.drawable.round_graphic_eq,
                                         "Equalizer",
                                         android.R.color.white
@@ -342,12 +358,12 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     1 -> {
                         if (dark) {
                             nightMode?.visibility = View.GONE
-                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Night")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Night Mode" ,    iconBackground = R.drawable.ripple_circle)
                             playbackIconsAdapter.notifyDataSetChanged()
                             dark = false
                         } else {
                             nightMode?.visibility = View.VISIBLE
-                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Day")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_nights_stay, "Day Mode",    iconBackground = R.drawable.ripple_circle_cool_blue)
                             playbackIconsAdapter.notifyDataSetChanged()
                             dark = true
                         }
@@ -355,6 +371,7 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     }
 
                     2 -> {
+                        speedPosition = position
                         setupSpeedDialog()
                     }
                     3 -> {
@@ -374,23 +391,30 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                         }
                     }
                     4 -> {
-                        startActivity(Intent(this@ReVideoPlayerActivity, LinkTubeActivity::class.java))
+                        binding.progress.visibility = View.VISIBLE // Show progress
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // Launch LinkTubeActivity
+                            val intent = Intent(this@ReVideoPlayerActivity, LinkTubeActivity::class.java)
+                            startLinkTubeActivityLauncher.launch(intent)
+                        }, 100) // Delay of 500 milliseconds
 
                     }
                     5-> {
+                        sleepTimerPosition = position
                         setupSleepTimer()
+
                     }
 
                     6 -> {
                         if (mute) {
                             player.setVolume(100F)
-                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute")
+                            iconModelArrayList[position] = IconModel(R.drawable.round_volume_off, "Mute" ,    iconBackground = R.drawable.ripple_circle)
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = false
                         } else {
                             player.setVolume(0F)
                             iconModelArrayList[position] =
-                                IconModel(R.drawable.round_volume_up, "Unmute")
+                                IconModel(R.drawable.round_volume_up, "Mute" ,    iconBackground = R.drawable.ripple_circle_cool_blue)
                             playbackIconsAdapter.notifyDataSetChanged()
                             mute = true
                         }
@@ -398,6 +422,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     }
 
                     7 -> {
+                        boosterPosition = position
+
                         setupBoosterDialog()
                     }
 
@@ -405,24 +431,8 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                         setupPIPMode()
                     }
 
-                    9-> {
-                        dialogProperties.selection_mode = DialogConfigs.SINGLE_MODE
-                        dialogProperties.extensions = arrayOf(".srt")
-                        dialogProperties.root = File("/storage/emulated/0")
 
-                        filePickerDialog.setDialogSelectionListener { files ->
-                            for (path in files) {
-                                val file = File(path)
-                                uriSubtitle = Uri.parse(file.absolutePath)
-                                // Further actions after selecting a subtitle file
-                            }
-                        }
-
-                        filePickerDialog.properties = dialogProperties
-                        filePickerDialog.show()
-                    }
-
-                    10 -> {
+                    9 -> {
                         if (eqContainer.visibility == View.GONE) {
                             eqContainer.visibility = View.VISIBLE
                         }
@@ -457,11 +467,28 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
     @SuppressLint("SetTextI18n")
     fun setupSleepTimer() {
         if (timer != null)
-            Toast.makeText(
-                this@ReVideoPlayerActivity,
-                "Timer Already Running !\nClose App to Reset Timer ..",
-                Toast.LENGTH_SHORT
-            ).show()
+        // Show an alert dialog to ask the user if they want to stop the timer
+            MaterialAlertDialogBuilder(this@ReVideoPlayerActivity)
+                .setTitle("Do you want to stop the timer?")
+                .setMessage("If you want to stop the sleep timer, click on Stop")
+                .setPositiveButton("Stop") { dialog, _ ->
+                    // Cancel the ongoing timer
+                 timer?.cancel()
+                    timer = null
+                    isSleepTimerRunning = false
+                    // Update the icon and background
+                    iconModelArrayList[sleepTimerPosition] = IconModel(
+                        R.drawable.round_sleep_timer,
+                        "Sleep Timer",
+                        iconBackground = R.drawable.ripple_circle
+                    )
+                    playbackIconsAdapter.notifyItemChanged(sleepTimerPosition)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         else {
             var sleepTime = 15
             val customDialogS = LayoutInflater.from(this@ReVideoPlayerActivity)
@@ -480,8 +507,21 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                     }
 
                     timer!!.schedule(task, sleepTime * 60 * 1000.toLong())
+                    isSleepTimerRunning = true
+                    // Update the icon and background
+                    iconModelArrayList[sleepTimerPosition] = IconModel(
+                        R.drawable.round_sleep_timer,
+                        "Sleep Timer",
+                        iconBackground = R.drawable.ripple_circle_cool_blue
+                    )
+                    playbackIconsAdapter.notifyItemChanged(sleepTimerPosition)
+
                     self.dismiss()
                     playVideo()
+                }
+                .setNegativeButton("Cancel") { self, _ ->
+                    self.dismiss()
+
                 }
                 .setBackground(getSemiTransparentGrayDrawable())
                 .create()
@@ -506,8 +546,30 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         val bindingS = SpeedDialogBinding.bind(customDialogS)
         val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
             .setOnCancelListener { playVideo() }
-            .setPositiveButton("Done") { _, _ ->
-//                dialog.dismiss()
+            .setPositiveButton("Done") { self, _ ->
+                if (speed != initialSpeed) {
+                    if (speed == 1.0f) {
+                        isSpeedRunning = false
+                        iconModelArrayList[speedPosition] = IconModel(
+                            R.drawable.round_speed,
+                            "Speed",
+                            iconBackground = R.drawable.ripple_circle
+                        )
+                    } else {
+                        isSpeedRunning = true
+                        iconModelArrayList[speedPosition] = IconModel(
+                            R.drawable.round_speed,
+                            "Speed",
+                            iconBackground = R.drawable.ripple_circle_cool_blue
+                        )
+                    }
+                    playbackIconsAdapter.notifyItemChanged(speedPosition)
+                }
+                self.dismiss()
+            }
+            .setNegativeButton("Cancel") { self, _ ->
+                self.dismiss()
+
             }
             .setBackground(getSemiTransparentGrayDrawable())
             .create()
@@ -516,25 +578,66 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
         bindingS.minusBtn.setOnClickListener {
             changeSpeed(isIncrement = false)
             bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+            updateSpeedIcon()
         }
         bindingS.plusBtn.setOnClickListener {
             changeSpeed(isIncrement = true)
             bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+            updateSpeedIcon()
         }
     }
-
+    private fun updateSpeedIcon() {
+        if (speed == 1.0f) {
+            isSpeedRunning = false
+            iconModelArrayList[speedPosition] = IconModel(
+                R.drawable.round_speed,
+                "Speed",
+                iconBackground = R.drawable.ripple_circle
+            )
+        } else {
+            isSpeedRunning = true
+            iconModelArrayList[speedPosition] = IconModel(
+                R.drawable.round_speed,
+                "Speed",
+                iconBackground = R.drawable.ripple_circle_cool_blue
+            )
+        }
+        playbackIconsAdapter.notifyItemChanged(speedPosition)
+    }
     @SuppressLint("SetTextI18n")
     fun setupBoosterDialog() {
         // dialog.dismiss()
         val customDialogB =
             LayoutInflater.from(this).inflate(R.layout.booster, binding.root, false)
         val bindingB = BoosterBinding.bind(customDialogB)
+        val initialProgress = loudnessEnhancer.targetGain.toInt() / 100
         val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
             .setOnCancelListener { playVideo() }
             .setPositiveButton("Done") { _, _ ->
-                loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress * 100)
+                val newProgress = bindingB.verticalBar.progress
+                if (newProgress != initialProgress || newProgress == 0) {
+                    if (newProgress == 0) {
+                        isBoosterRunning = false
+                        iconModelArrayList[boosterPosition] = IconModel(
+                            R.drawable.round_speaker,
+                            "Booster",
+                            iconBackground = R.drawable.ripple_circle
+                        )
+                    } else {
+                        loudnessEnhancer.setTargetGain(newProgress * 100)
+                        isBoosterRunning = true
+                        iconModelArrayList[boosterPosition] = IconModel(
+                            R.drawable.round_speaker,
+                            "Booster",
+                            iconBackground = R.drawable.ripple_circle_cool_blue
+                        )
+                    }
+                    playbackIconsAdapter.notifyItemChanged(boosterPosition)
+                }
                 playVideo()
-                // dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { self, _ ->
+                self.dismiss()
             }
             .setBackground(getSemiTransparentGrayDrawable())
             .create()
@@ -786,6 +889,10 @@ binding.adsRemove.setOnClickListener {
 
         nowPlayingId = recantPlayerList[position].id
 
+        val nextVideoId = recantPlayerList[position].id
+        markVideoAsPlayed(nextVideoId)
+        RecentVideoAdapter.updateNewIndicator(nextVideoId)
+
         seekBarFeature()
         binding.playerView.setControllerVisibilityListener { visibility ->
             val lockBtn = findViewById<ImageButton>(R.id.openButton)
@@ -836,7 +943,17 @@ binding.adsRemove.setOnClickListener {
     private fun nextPrevVideo(isNext: Boolean = true) {
         if (isNext) setPosition()
         else setPosition(isIncrement = false)
+        val nextVideoId = recantPlayerList[position].id
+        markVideoAsPlayed(nextVideoId)
+        RecentVideoAdapter.updateNewIndicator(nextVideoId)
         createPlayer()
+    }
+    private fun markVideoAsPlayed(videoId: String) {
+        val sharedPreferences = getSharedPreferences("played_videos", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putBoolean(videoId, true)
+            apply()
+        }
     }
 
     private fun setPosition(isIncrement: Boolean = true) {
@@ -890,7 +1007,8 @@ binding.adsRemove.setOnClickListener {
             }
             startActivity(intent)
         }
-        if(isInPictureInPictureMode){ playVideo()
+        if(isInPictureInPictureMode){
+            playVideo()
             playPauseBtn.setImageResource(R.drawable.round_pause_24)
         } else {
             pauseVideo()
@@ -898,6 +1016,13 @@ binding.adsRemove.setOnClickListener {
 
         }
     }
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (isInPictureInPictureMode) {
+            finish()
+        }
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val fragment = supportFragmentManager.findFragmentById(R.id.eqFrame)

@@ -13,7 +13,10 @@ data class RecantMusic(val title: String,
                        val duration: Long = 0,
                        val path: String,
                        val albumArtUri: Uri ,
-                       val size: String) {
+
+                       val size: String,
+                       ) {
+
 
 }
 fun reFormatDuration(duration: Long):String{

@@ -11,20 +11,35 @@
         android:layout_width="match_parent"
         android:layout_height="270dp"
         android:orientation="vertical"
+
         >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/videoImage"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="match_parent"
                 android:background="#252424"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                android:scaleType="centerCrop" />
 
+            <TextView
+                android:id="@+id/newIndicator"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="NEW"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:gravity="center_horizontal"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="4dp"
+                android:paddingHorizontal="2dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/videoName"
@@ -51,7 +66,7 @@
                 android:padding="5dp"
                 android:text="00:00"
                 android:layout_marginStart="5dp"
-                android:textColor="@color/cool_blue"
+                android:textColor="#2B5FB5"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"

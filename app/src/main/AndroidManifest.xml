@@ -38,14 +38,21 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ThemeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchActivity"
+            android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:label="@string/title_activity_search"
+            android:theme="@style/coolBlueNav" />
+        <activity
             android:name=".browserActivity.RecantTabActivity"
             android:exported="false" />
         <activity
             android:name=".browserActivity.TabActivity"
             android:exported="false"
-            android:theme="@style/TransparentTheme">
-
-        </activity>
+            android:theme="@style/TransparentTheme" />
         <activity
             android:name=".browserActivity.OfflineMhtmlActivity"
             android:exported="true">
@@ -101,14 +108,44 @@
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".browserActivity.PlayerFileActivity"
-            android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|layoutDirection"
             android:exported="true"
-            android:launchMode="singleTask"
+            android:label="Play Video"
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"
             tools:ignore="ObsoleteSdkInt"
-            tools:targetApi="n" />
+            tools:targetApi="n">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:mimeType="video/*" />
+                <data android:scheme="https" />
+                <data android:mimeType="video/*" />
+                <data android:scheme="content" />
+                <data android:mimeType="video/*" />
+                <data android:scheme="file" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".Settings.MoreSettingNav"
             android:exported="false" />
@@ -130,18 +167,21 @@
         <activity
             android:name=".browserActivity.HistoryBrowser"
             android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".browserActivity.ImageViewerActivity"
+            android:exported="true"
             android:label="View with SeeA"
             android:launchMode="singleInstance"
             android:taskAffinity=""
-            android:exported="true"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
@@ -193,16 +233,13 @@
         <activity
             android:name=".browserActivity.BookmarkActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"
-            />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".browserActivity.LinkTubeActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="true"
-            android:windowSoftInputMode="adjustPan"
-           >
-
-        </activity>
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".recantFragment.ReMusicPlayerActivity"
             android:exported="false"
@@ -247,42 +284,11 @@
             android:name=".PlayerActivity"
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|layoutDirection"
             android:exported="true"
-            android:label="Play Video"
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"
             tools:ignore="ObsoleteSdkInt"
-            tools:targetApi="n">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="http" />
-                <data android:mimeType="video/*" />
-                <data android:scheme="https" />
-                <data android:mimeType="video/*" />
-                <data android:scheme="content" />
-                <data android:mimeType="video/*" />
-                <data android:scheme="file" />
-                <data android:mimeType="video/*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="video/*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="video/*" />
-            </intent-filter>
-        </activity>
+            tools:targetApi="n"/>
         <activity
             android:name=".FoldersActivity"
             android:exported="false" />

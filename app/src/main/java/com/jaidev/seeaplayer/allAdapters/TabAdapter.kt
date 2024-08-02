@@ -161,11 +161,13 @@ class TabAdapter(private val context: Context, private val dialog: AlertDialog?
             if (selectedItems.isEmpty()) {
                 actionMode?.title = "Select tabs"
             } else {
-                actionMode?.title = "${selectedItems.size} Selected"
+                updateActionModeTitle()
             }
         }
         }
-
+    private fun updateActionModeTitle() {
+        actionMode?.title = "${selectedItems.size} / ${LinkTubeActivity.tabsList.size} Selected"
+    }
     inner class Tab2ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val cancelBtn: ImageView = itemView.findViewById(R.id.cancelBtn)
         private val name: TextView = itemView.findViewById(R.id.tabName)

@@ -16,6 +16,8 @@
         android:layout_height="wrap_content"
         >
 
+
+
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/videoImage"
             android:layout_width="100dp"
@@ -32,6 +34,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
+
+        <TextView
+            android:id="@+id/newIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_new_indicator"
+            android:text="NEW"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:visibility="gone"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="4dp"
+            android:paddingHorizontal="2dp"
+            app:layout_constraintStart_toStartOf="@+id/videoImage"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </TextView>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,7 +64,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:background="@drawable/curver_video_image"
                 android:layout_marginBottom="3dp"
-                android:padding = "2dp"
+                android:gravity="center"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
                 android:layout_marginEnd="4dp"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -55,8 +76,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="00:00"
-                    android:textSize="12dp"
-                    android:textColor="@color/cool_blue" />
+                    android:textSize="10dp"
+                    android:textColor="@color/white" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -18,6 +18,7 @@
 
         <com.github.vkay94.dtpv.DoubleTapPlayerView
             android:id="@+id/playerView"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/black"
@@ -25,7 +26,6 @@
             app:controller_layout_id="@layout/custom_control_view"
             app:dtpv_controller="@id/ytOverlay"
             app:show_buffering="always" >
-
 
             <com.github.vkay94.dtpv.youtube.YouTubeOverlay
                 android:id="@+id/ytOverlay"
@@ -57,6 +57,17 @@
 
     </FrameLayout>
 
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/durationChangeTextView"
@@ -106,7 +117,8 @@
             android:max="100"
             android:progress="50"
             android:progressDrawable="@drawable/vertical_progress_bar"
-            />
+            />       <!-- Vertical SeekBar for Volume -->
+
 
         <ImageView
             android:layout_width="wrap_content"

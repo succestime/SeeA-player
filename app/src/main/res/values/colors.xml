@@ -20,6 +20,8 @@
     <color name="dialog_custom_color">#3C3A3A</color>
     <color name="cool_pink">#E91E63</color>
     <color name="transparent__">#78564E</color>
+    <color name="transparent_">#7E636262</color>
+    <color name="transparent___">#0A15E4</color>
 
     <color name="red">#FFFF0000</color>
     <color name="green">#FF00FF00</color>
@@ -45,6 +47,8 @@
 <!--    <color name="dark_gray" tools:ignore="MissingDefaultResource">#474747</color>-->
     <color name="dark_blue">#FF00007F</color>
     <color name="dark_yellow">#FF7F7F00</color>
+    <color name="dark_gray">#FF404040</color>
+
     <color name="light_dark">#74000000</color>
     <color name="dark_cool_blue">#F2032C42</color>
     <color name="dark_F_cool_blue">#0F4D6C</color>

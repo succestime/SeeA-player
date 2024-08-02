@@ -354,9 +354,11 @@ class TabActivity : AppCompatActivity() {
         actionMode?.title = if (adapter.selectedItems.isEmpty()) {
             "Select tabs"
         } else {
-            "${adapter.selectedItems.size} Selected"
+            "${adapter.selectedItems.size} / ${LinkTubeActivity.tabsList.size} Selected"
         }
     }
+
+
     @SuppressLint("NotifyDataSetChanged")
     private fun showClearAllTabsDialog() {
         try {

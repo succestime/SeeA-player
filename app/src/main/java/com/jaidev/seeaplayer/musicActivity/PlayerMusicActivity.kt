@@ -40,9 +40,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     private var appOpenAd : AppOpenAd? = null
 
     companion object {
-        private const val CHECK_INTERVAL = 5000L // Check every 5 seconds
-
-        lateinit var musicListPA: ArrayList<Music>
+        var musicListPA: ArrayList<Music> = ArrayList()
         var songPosition: Int = 0
         var isPlaying: Boolean = false
         var min10: Boolean = false
@@ -52,15 +50,12 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         var min60: Boolean = false
         var isFavourite : Boolean = false
         var fIndex : Int = 0
-        private var isServiceBound = false
         var musicService: MusicService? = null
-        const val FAVOURITES_PREF_KEY = "FavouriteSongs"
         var nowMusicPlayingId : String = ""
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: ActivityPlayerMusicBinding
         var repeat: Boolean = false
         lateinit var loudnessEnhancer: LoudnessEnhancer
-        private const val APP_OPEN_AD_SHOWN_KEY = "app_open_ad_shown"
         private var isAdDisplayed = false
         var isShuffleEnabled = false
         private lateinit var originalMusicListPA: ArrayList<Music> // Original playlist order
@@ -90,7 +85,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         updateNextMusicTitle()
 
 
-        playerMusicLayout = binding.PlayerMusicLayout as ConstraintLayout
+        playerMusicLayout = binding.PlayerMusicLayout
         // Set the background color of SwipeRefreshLayout based on app theme
         setMusicLayoutBackgroundColor()
 
@@ -115,6 +110,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
 
     }
+
 
     fun getCurrentSong(): Music {
         // Assuming you have a list of songs and a variable to store the current song position
@@ -345,7 +341,6 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
     private fun setLayout() {
         if (!fileExists(musicListPA[songPosition].path)) {
-            Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
             prevNextSong(true) // Skip to the next song
             return
         }
@@ -376,7 +371,6 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     private fun createMediaPlayer() {
         try {
             if (!fileExists(musicListPA[songPosition].path)) {
-                Toast.makeText(this, "File does not exist", Toast.LENGTH_SHORT).show()
                 prevNextSong(true) // Skip to the next song
                 return
             }
@@ -392,6 +386,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             binding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
             binding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
             binding.seekBarPA.progress = 0
+            NowPlaying.binding.root.visibility = View.VISIBLE
             binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
             nowMusicPlayingId = musicListPA[songPosition].id
@@ -422,7 +417,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
      musicService!!.mediaPlayer!!.pause()
 
     }
-    fun setSongPosition(increment: Boolean) {
+    private fun setSongPosition(increment: Boolean) {
         songPosition = if (increment) {
             if (isShuffleEnabled) {
                 (songPosition + 1) % musicListPA.size
@@ -506,7 +501,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         if (requestCode == 13 || resultCode == RESULT_OK)
             return
     }
-    fun loadAppOpenAd() {
+    private fun loadAppOpenAd() {
         if (!isAdDisplayed) {
             val adRequest = AdRequest.Builder().build()
             AppOpenAd.load(

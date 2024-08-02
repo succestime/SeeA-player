@@ -8,7 +8,8 @@ data class RecantVideo(var title: String,
                        duration: Long = 0,
                        var path: String,
                        var artUri: Uri,
-                       val size : String
+                       val size : String,
+
 
 
 ) {

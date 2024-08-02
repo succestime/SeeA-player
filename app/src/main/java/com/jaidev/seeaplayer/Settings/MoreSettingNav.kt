@@ -15,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browserActivity.FileActivity
+import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.databinding.ActivityMoreSettingNavBinding
 
@@ -72,6 +73,10 @@ binding.mySubscribeLayout.setOnClickListener {
 
         binding.signOut.setOnClickListener {
             val intent = Intent(this@MoreSettingNav, FileActivity::class.java)
+            startActivity(intent)
+        }
+      binding.history.setOnClickListener {
+            val intent = Intent(this@MoreSettingNav, HistoryBrowser::class.java)
             startActivity(intent)
         }
 

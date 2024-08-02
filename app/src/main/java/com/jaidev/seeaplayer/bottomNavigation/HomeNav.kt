@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -20,18 +21,26 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.SearchActivity
 import com.jaidev.seeaplayer.Subscription.SeeAOne
 import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
+import com.jaidev.seeaplayer.allAdapters.VideoSearchAdapter
+import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
+import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
 
-class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
-    lateinit var adapter: VideoAdapter
+class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSearchAdapter.OnItemClickListener{
     private lateinit var foldersAdapter: FoldersAdapter
+    private lateinit var searchAdapter: VideoSearchAdapter
+
     private lateinit var binding: FragmentHomeNavBinding
     private var isSearchViewClicked = false
     private lateinit var searchView: SearchView
+
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var searchItem: MenuItem
+
     lateinit var mAdView: AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,8 +53,6 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
-        adapter = VideoAdapter(requireContext(), MainActivity.videoList ,isFolder = true, this )
-
 
         binding.folderRV.setHasFixedSize(true)
         binding.folderRV.setItemViewCacheSize(10)
@@ -53,11 +60,12 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
         foldersAdapter = FoldersAdapter(requireContext(), MainActivity.folderList)
         binding.folderRV.adapter = foldersAdapter
 
+        searchAdapter = VideoSearchAdapter(requireContext(), MainActivity.videoList, isSearchActivity = false , isFolder = true, isShort = true , this)
         binding.searchRecyclerView.setHasFixedSize(true)
         binding.searchRecyclerView.setItemViewCacheSize(10)
         binding.searchRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.searchRecyclerView.visibility = View.GONE
-        binding.searchRecyclerView.adapter = adapter
+        binding.searchRecyclerView.adapter = searchAdapter
         setupActionBar()
 
         swipeRefreshLayout = binding.swipeRefreshFolder
@@ -91,7 +99,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
         (activity as MainActivity).refreshFolderList()
         // Update the adapter with the new data
         foldersAdapter.notifyDataSetChanged()
-        adapter.notifyDataSetChanged()
+        searchAdapter.notifyDataSetChanged()
 
         binding.totalFolder.text = "${MainActivity.folderList.size} Folders"
         swipeRefreshLayout.isRefreshing = false
@@ -149,15 +157,14 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_view_menu, menu)
-        val searchItem = menu.findItem(R.id.searchView)
+        searchItem = menu.findItem(R.id.searchView)
 
-        searchView = searchItem?.actionView as SearchView
+        searchView = searchItem.actionView as SearchView
 
         // Set a collapse listener to track when the search view is closed
         searchView.setOnCloseListener {
             isSearchViewClicked = false
             binding.searchRecyclerView.visibility = View.GONE
-//            binding.searchBackBtn.visibility = View.GONE
             false
         }
 
@@ -172,11 +179,10 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
                         // Filter videos based on the user's input
                         if (video.title.lowercase().contains(queryText)) {
                             MainActivity.searchList.add(video)
-
                         }
                     }
                     MainActivity.search = true
-                    adapter.updateList(searchList = MainActivity.searchList)
+                    searchAdapter.updateList(searchList = MainActivity.searchList)
                 }
 
                 // Check if the search view is clicked or if there is text in the search view
@@ -203,4 +209,17 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener {
     override fun onFileCountChanged(newCount: Int) {
         binding.totalFolder.text = "$newCount Folders"
     }
+
+    override fun onItemClick(fileItem: VideoData) {
+       PlayerFileActivity.pipStatus = 1
+        val intent = Intent(requireContext(), SearchActivity::class.java)
+        intent.putExtra("videoData", fileItem)
+        startActivity(intent)
+        // Collapse the SearchView
+        searchItem.collapseActionView()
+
+    }
+
+
+
 }

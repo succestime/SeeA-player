@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
-import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
@@ -29,23 +28,22 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.RecantVideo
-import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.RecantDownloadViewBinding
 import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
+import com.jaidev.seeaplayer.recantFragment.DaysDownload
 import com.jaidev.seeaplayer.recantFragment.ReVideoPlayerActivity
 import java.io.File
 
 class RecentVideoAdapter(private val context: Context,
                          private var videoReList: ArrayList<RecantVideo> ,
                          private val isRecantVideo: Boolean = false,
-                         val fileCountChangeListener: OnFileCountChangeListener
+                         val fileCountChangeListener: OnFileCountChangeListener,
 ) :
     RecyclerView.Adapter<RecentVideoAdapter.MyAdapter>() {
     interface OnFileCountChangeListener {
@@ -55,6 +53,33 @@ class RecentVideoAdapter(private val context: Context,
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
     private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
+    private var isAllSelected = false // Add this flag
+
+
+    companion object {
+        @SuppressLint("StaticFieldLeak")
+        private var adapterInstance: RecentVideoAdapter? = null
+
+        fun updateNewIndicator(videoId: String) {
+            adapterInstance?.let { adapter ->
+                val index = adapter.videoReList.indexOfFirst { it.id == videoId }
+                if (index != -1) {
+                    adapter.notifyItemChanged(index)
+                }
+            }
+        }
+    }
+
+    init {
+        adapterInstance = this
+    }
+
+
+
+
+
+
+
 
     class MyAdapter(binding: RecantDownloadViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.videoName
@@ -64,6 +89,8 @@ class RecentVideoAdapter(private val context: Context,
         val root = binding.root
         val emptyCheck = binding.emptyCheck
         val fillCheck = binding.fillCheck
+        val newIndicator = binding.newIndicator
+
     }
 
 
@@ -79,6 +106,8 @@ class RecentVideoAdapter(private val context: Context,
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
+        val video = videoReList[position]
+
         holder.title.text = videoReList[position].title
         holder.duration.text = DateUtils.formatElapsedTime(videoReList[position].duration / 1000)
         Glide.with(context)
@@ -86,6 +115,14 @@ class RecentVideoAdapter(private val context: Context,
             .load(videoReList[position].artUri)
             .apply(RequestOptions().placeholder(R.color.place_holder_video).centerCrop())
             .into(holder.image)
+
+        // Check if the video has been played
+        if (isVideoPlayed(video.id)) {
+            holder.newIndicator.visibility = View.GONE
+        } else {
+            holder.newIndicator.visibility = View.VISIBLE
+
+        }
 
         if (selectedItems.contains(position)) {
             holder.emptyCheck.visibility = View.GONE
@@ -121,6 +158,9 @@ class RecentVideoAdapter(private val context: Context,
                     isRecantVideo -> {
                         ReVideoPlayerActivity.pipStatus = 1
                         sendIntent(pos = position, ref = "RecantVideo")
+                        markVideoAsPlayed(video.id) // Mark video as played
+                        notifyItemChanged(position) // Update the item
+
                     }
                 }
             }
@@ -183,30 +223,29 @@ class RecentVideoAdapter(private val context: Context,
             }
 
             bindingMf.infoBtn.setOnClickListener {
-                dialog.dismiss()
-                val customDialogIF =
-                    LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
-                val bindingIF = DetailsViewBinding.bind(customDialogIF)
-                val dialogIF = MaterialAlertDialogBuilder(context).setView(customDialogIF)
-                    .setCancelable(false)
-                    .setPositiveButton("OK") { self, _ ->
-                        self.dismiss()
-                    }
-                    .create()
-                dialogIF.show()
-                val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
-                    .append(videoReList[position].title)
-                    .bold { append("\n\nDuration : ") }
-                    .append(DateUtils.formatElapsedTime(videoReList[position].duration / 1000))
-                    .bold { append("\n\nFile Size : ") }.append(
-                        Formatter.formatShortFileSize(
-                            context,
-                            videoReList[position].size.toLong()
-                        )
-                    )
-                    .bold { append("\n\nLocation : ") }.append(videoReList[position].path)
-                bindingIF.detailTV.text = infoText
 
+                dialog.dismiss()
+                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+                // Populate dialog views with data
+                fileNameTextView.text = videoReList[position].title
+                durationTextView.text = DateUtils.formatElapsedTime(videoReList[position].duration / 1000)
+                sizeTextView.text = Formatter.formatShortFileSize(context, videoReList[position].size.toLong())
+                locationTextView.text = videoReList[position].path
+
+                val dialogIF = MaterialAlertDialogBuilder(context)
+                    .setView(customDialogIF)
+                    .setCancelable(false)
+                    .create()
+                positiveButton.setOnClickListener {
+                    dialogIF.dismiss()
+                }
+                dialogIF.show()
             }
 
         }
@@ -235,7 +274,7 @@ class RecentVideoAdapter(private val context: Context,
         }
 
         notifyItemChanged(position) // Update selected state for the item
-        actionMode?.title = "${selectedItems.size} selected" // Update action mode title
+        updateActionModeTitle()
         actionMode?.invalidate()
 
     }
@@ -250,9 +289,11 @@ class RecentVideoAdapter(private val context: Context,
             notifyDataSetChanged() // Update all item views to hide the "more" button
 
         }
-        actionMode?.title = "${selectedItems.size} selected"
+        updateActionModeTitle()
     }
-
+    private fun updateActionModeTitle() {
+        actionMode?.title = "${selectedItems.size} / ${videoReList.size} Selected"
+    }
     // Action mode callback
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -273,6 +314,11 @@ class RecentVideoAdapter(private val context: Context,
         @SuppressLint("NotifyDataSetChanged", "ResourceType")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             when (item?.itemId) {
+                R.id.checkMulti -> {
+                    toggleSelectAllItems(item)
+
+                }
+
                 R.id.shareMulti -> {
                     shareSelectedFiles()
 
@@ -295,13 +341,15 @@ class RecentVideoAdapter(private val context: Context,
                                     if (file.exists() && file.delete()) {
                                         MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
                                         videoReList.removeAt(position)
+                                        DaysDownload.updateEmptyViewVisibility()
+
                                     }
                                 }
 
                                 selectedItems.clear()
-                                mode?.finish()
                                 notifyDataSetChanged()
-                                // Notify listener of the file count change
+                                updateActionModeTitle()
+                                DaysDownload.updateEmptyViewVisibility()
                                 fileCountChangeListener.onFileCountChanged(videoReList.size)
                             }
                             .setNegativeButton("Cancel") { dialog, _ ->
@@ -323,9 +371,30 @@ class RecentVideoAdapter(private val context: Context,
             selectedItems.clear()
             actionMode = null
             isSelectionModeEnabled = false // Disable selection mode
+
+            notifyDataSetChanged()
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        private fun toggleSelectAllItems(item: MenuItem) {
+            isAllSelected = if (isAllSelected) {
+                // Unselect all items
+                selectedItems.clear()
+                item.setIcon(R.drawable.round_crop_square_24)
+                false
+            } else {
+                // Select all items
+                for (i in 0 until videoReList.size) {
+                    selectedItems.add(i)
+                }
+                item.setIcon(R.drawable.check_box_24)
+                true
+            }
+            updateActionModeTitle()
             notifyDataSetChanged()
         }
     }
+
 
     @SuppressLint("NotifyDataSetChanged")
     private fun showDeleteDialog(position: Int) {
@@ -398,7 +467,7 @@ class RecentVideoAdapter(private val context: Context,
             notifyDataSetChanged()
             // If action mode is active, finish it after deletion
             actionMode?.finish()
-            // Notify listener of the file count change
+            DaysDownload.updateEmptyViewVisibility()
             fileCountChangeListener.onFileCountChanged(videoReList.size)
         } else {
             Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()
@@ -441,8 +510,6 @@ class RecentVideoAdapter(private val context: Context,
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
         chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooserIntent)
-
-        actionMode?.finish()
     }
 
 
@@ -462,6 +529,17 @@ class RecentVideoAdapter(private val context: Context,
         ContextCompat.startActivity(context, intent, null)
 
     }
+    private fun markVideoAsPlayed(videoId: String) {
+        val sharedPreferences = context.getSharedPreferences("played_videos", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putBoolean(videoId, true)
+            apply()
+        }
+    }
 
+    private fun isVideoPlayed(videoId: String): Boolean {
+        val sharedPreferences = context.getSharedPreferences("played_videos", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean(videoId, false)
+    }
 
 }

@@ -159,7 +159,8 @@ class BookmarkAdapter(private val context: Context, private val isActivity: Bool
         }
         private fun startActionMode() {
             actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
-            actionMode?.title = "${selectedItems.size} selected"
+            updateActionModeTitle()
+
             actionMode?.invalidate()
         }
 
@@ -175,7 +176,7 @@ class BookmarkAdapter(private val context: Context, private val isActivity: Bool
             if (selectedItems.isEmpty()) {
                 actionMode?.finish()
             } else {
-                actionMode?.title = "${selectedItems.size} selected"
+                updateActionModeTitle()
                 actionMode?.invalidate()
             }
             notifyDataSetChanged()
@@ -293,7 +294,9 @@ class BookmarkAdapter(private val context: Context, private val isActivity: Bool
         notifyItemMoved(fromPosition, toPosition)
         saveBookmarks()
     }
-
+    private fun updateActionModeTitle() {
+        actionMode?.title = "${selectedItems.size} / ${filteredBookmarkList.size} Selected"
+    }
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.multiple_bookmark_select_menu, menu)
@@ -304,8 +307,7 @@ class BookmarkAdapter(private val context: Context, private val isActivity: Bool
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            mode?.title = "${selectedItems.size} selected"
-
+            updateActionModeTitle()
             val hasRestrictedBookmarks = selectedItems.any { position ->
                 val bookmark = filteredBookmarkList[position]
                 bookmark.name == "Wikipedia - Default" || bookmark.name == "Google - Default" || bookmark.name == "YouTube - Default"

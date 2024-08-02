@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -34,7 +35,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.text.bold
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -43,17 +43,20 @@ import com.jaidev.seeaplayer.FoldersActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
 import com.jaidev.seeaplayer.dataClass.VideoData
-import com.jaidev.seeaplayer.databinding.DetailsViewBinding
 import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import java.io.File
+import java.text.NumberFormat
 
+@SuppressLint("NotifyDataSetChanged")
 class VideoAdapter(private val context: Context,
                    private var videoList: ArrayList<VideoData>,
                    private val isFolder: Boolean = false,
-                   private val fileCountChangeListener: OnFileCountChangeListener
-)
+                   private val fileCountChangeListener: OnFileCountChangeListener,
+
+                   )
     : RecyclerView.Adapter<VideoAdapter.MyHolder>() {
     interface OnFileCountChangeListener {
         fun onFileCountChanged(newCount: Int)
@@ -69,17 +72,183 @@ class VideoAdapter(private val context: Context,
     var actionMode: ActionMode? = null
     private var isGridMode = false
     private var isSelectionModeEnabled = false
+    private var isAllSelected = false // Add this flag
 
-    companion object {
-        private const val PREF_NAME = "video_titles"
-    }
+    private lateinit var bottomToolbar: View
+    private lateinit var deleteBtn: ImageView
+    private lateinit var checkBtn: ImageView
+    private lateinit var labelBtn: ImageView
+    private lateinit var shareBtn: ImageView
+    private lateinit var renameBtn: ImageView
+
     init {
+        adapterInstance = this
+
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        // Load saved music titles
         loadVideoTitles()
+        loadVideoList() // Initialize videoList with saved isNew status
+
+    }
+    companion object {
+        const val PREF_NAME = "video_titles"
+
+        @SuppressLint("StaticFieldLeak")
+        private var adapterInstance: VideoAdapter? = null
+
+        fun updateNewIndicator(videoId: String) {
+            adapterInstance?.let { adapter ->
+                adapter.videoList.find { it.id == videoId }?.let { video ->
+                    video.isNew = false
+                    adapter.saveIsNewStatus(video.id, false )
+                    adapter.markVideoAsPlayed(video.id)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
     }
 
-    private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
+
+
+
+    init {
+        if (context is AppCompatActivity) {
+            bottomToolbar = (context).findViewById(R.id.bottomToolbar)
+            deleteBtn = bottomToolbar.findViewById(R.id.deleteBtn)
+            shareBtn = bottomToolbar.findViewById(R.id.shareBtn)
+            renameBtn = bottomToolbar.findViewById(R.id.renameBtn)
+            checkBtn = bottomToolbar.findViewById(R.id.checkBtn)
+            labelBtn = bottomToolbar.findViewById(R.id.labelBtn)
+
+            // Set click listeners for bottom toolbar actions
+            deleteBtn.setOnClickListener {
+
+                if (selectedItems.isNotEmpty()) {
+                        // Build confirmation dialog
+                        AlertDialog.Builder(context)
+                            .setTitle("Confirm Delete")
+                            .setMessage("Are you sure you want to delete these ${selectedItems.size} selected videos?")
+                            .setPositiveButton("Delete") { _, _ ->
+                                // User clicked Delete, proceed with deletion
+                                val positionsToDelete = ArrayList(selectedItems)
+                                positionsToDelete.sortDescending()
+
+                                for (position in positionsToDelete) {
+                                    val video = videoList[position]
+                                    val file = File(video.path)
+
+                                    if (file.exists() && file.delete()) {
+                                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
+                                        videoList.removeAt(position)
+                                    }
+                                }
+                                selectedItems.clear()
+                                notifyDataSetChanged()
+                                updateActionModeTitle()
+                                fileCountChangeListener.onFileCountChanged(videoList.size)
+                            }
+                            .setNegativeButton("Cancel") { dialog, _ ->
+                                // User clicked Cancel, dismiss dialog
+                                dialog.dismiss()
+                            }
+                            .show()
+
+                }
+            }
+            shareBtn.setOnClickListener {
+                shareSelectedFiles()
+            }
+            renameBtn.setOnClickListener {
+                // Call the showRenameDialog method here
+                if (selectedItems.size == 1) {
+                    val selectedPosition = selectedItems.first()
+                    val defaultName = videoList[selectedPosition].title
+                    showRenameDialog(selectedPosition, defaultName)
+                } else {
+                    updateRenameButtonState()
+                }
+
+            }
+
+            checkBtn.setOnClickListener {
+                toggleSelectAllItems()
+
+            }
+            labelBtn.setOnClickListener {
+                showLabelDialog()
+            }
+        }
+
+    }
+    private fun showLabelDialog() {
+        val builder = AlertDialog.Builder(context)
+        val inflater = LayoutInflater.from(context)
+        val dialogView = inflater.inflate(R.layout.label_acton_mode_dialog, null)
+        builder.setView(dialogView)
+
+        val makeNew = dialogView.findViewById<TextView>(R.id.makeNew)
+        val makeNone = dialogView.findViewById<TextView>(R.id.makeNone)
+        val makeFinished = dialogView.findViewById<TextView>(R.id.makeFinished)
+
+        val dialog = builder.create()
+        dialog.show()
+
+        makeNew.setOnClickListener {
+            updateIndicatorVisibility(true)
+            dialog.dismiss()
+        }
+
+        makeNone.setOnClickListener {
+            updateIndicatorVisibility(false)
+            dialog.dismiss()
+        }
+        makeFinished.setOnClickListener {
+            updateIndicatorVisibility(false)
+            dialog.dismiss()
+        }
+    }
+
+    private fun updateIndicatorVisibility(show: Boolean) {
+        for (position in selectedItems) {
+            val video = videoList[position]
+            video.isNew = show
+
+            // Persist the 'isNew' status
+            saveIsNewStatus(video.id, show)
+
+            // If 'show' is false, mark as played if necessary
+            if (!show) {
+                markVideoAsPlayed(video.id)
+            }
+        }
+        notifyDataSetChanged()
+    }
+    private fun loadVideoList() {
+        // Load your video list data
+        videoList.forEach { video ->
+            video.isNew = loadIsNewStatus(video.id)
+        }
+    }
+
+
+    private fun toggleSelectAllItems() {
+        isAllSelected = if (isAllSelected) {
+            // Unselect all items
+            selectedItems.clear()
+            false
+        } else {
+            // Select all items
+            for (i in 0 until videoList.size) {
+                selectedItems.add(i)
+            }
+            true
+        }
+            notifyDataSetChanged()
+            updateActionModeTitle()
+
+
+    }
+
+
     interface VideoDeleteListener {
         fun onVideoDeleted()
     }
@@ -101,6 +270,8 @@ class VideoAdapter(private val context: Context,
         val duration = binding.duration
         val image = binding.videoImage
         val more = binding.MoreChoose
+val indicator = binding.newIndicator
+
         val root = binding.root
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
@@ -110,8 +281,9 @@ class VideoAdapter(private val context: Context,
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: MyHolder, @SuppressLint("RecyclerView") position: Int) {
-        holder.title.text = videoList[position].title
+        val video = videoList[position]
 
+        holder.title.text = videoList[position].title
         holder.duration.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
         Glide.with(context)
             .load(videoList[position].artUri)
@@ -119,6 +291,11 @@ class VideoAdapter(private val context: Context,
             .into(holder.image)
 
         setIconTint(holder.more)
+
+        // Show the indicator if the video is new
+        holder.indicator.visibility = if (video.isNew) View.VISIBLE else View.GONE
+
+
         // Determine if the item is currently selected
         if (selectedItems.contains(position)) {
             // Set your custom selected background on the root view of the item
@@ -128,7 +305,11 @@ class VideoAdapter(private val context: Context,
         }
 
         // Hide or show the more button based on selection mode
-        holder.more.visibility = if (isSelectionModeEnabled) View.GONE else View.VISIBLE
+      if (isSelectionModeEnabled) {
+          holder.more.visibility =  View.GONE
+        } else {
+          holder.more.visibility = View.VISIBLE
+        }
 
 
         holder.root.setOnLongClickListener {
@@ -141,25 +322,19 @@ class VideoAdapter(private val context: Context,
                 toggleSelection(position)
             } else {
                 when {
-
                     isFolder -> {
                         PlayerActivity.pipStatus = 1
                         sendIntent(pos = position, ref = "FoldersActivity")
-                    }
-                    MainActivity.search -> {
-                        PlayerActivity.pipStatus = 2
-                        sendIntent(pos = position, ref = "SearchVideos")
+                        markVideoAsPlayed(video.id)
+                        notifyDataSetChanged()
                     }
 
                     videoList[position].id == PlayerActivity.nowPlayingId -> {
                         sendIntent(pos = position, ref = "NowPlaying")
                     }
 
-                    else -> {
-                        // Only play the video without enabling selection
-                        sendIntent(pos = position, ref = "NormalClick")
-                    }
                 }
+
             }
         }
 
@@ -219,27 +394,29 @@ class VideoAdapter(private val context: Context,
 
 
             bindingMf.infoBtn.setOnClickListener {
-                dialog.dismiss()
-                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
-                val bindingIF = DetailsViewBinding.bind(customDialogIF)
+
+               dialog.dismiss()
+                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+                // Populate dialog views with data
+                fileNameTextView.text = videoList[position].title
+                durationTextView.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
+                sizeTextView.text = Formatter.formatShortFileSize(context, videoList[position].size.toLong())
+                locationTextView.text = videoList[position].path
+
                 val dialogIF = MaterialAlertDialogBuilder(context)
                     .setView(customDialogIF)
                     .setCancelable(false)
-                    .setPositiveButton("OK") { self, _ ->
-                        self.dismiss()
-                    }
                     .create()
+                positiveButton.setOnClickListener {
+                    dialogIF.dismiss()
+                }
                 dialogIF.show()
-
-                val infoText = SpannableStringBuilder().bold { append("DETAILS\n\nName : ") }
-                    .append(videoList[position].title)
-                    .bold { append("\n\nDuration : ") }
-                    .append(DateUtils.formatElapsedTime(videoList[position].duration / 1000))
-                    .bold { append("\n\nFile Size : ") }.append(
-                        Formatter.formatShortFileSize(context, videoList[position].size.toLong())
-                    )
-                    .bold { append("\n\nLocation : ") }.append(videoList[position].path)
-                bindingIF.detailTV.text = infoText
             }
 
             bindingMf.renameBtn.setOnClickListener {
@@ -259,6 +436,9 @@ class VideoAdapter(private val context: Context,
         }
 
     }
+
+
+
     @RequiresApi(Build.VERSION_CODES.R)
     private fun showPermissionRequestDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.video_music_delete_permission_dialog, null)
@@ -320,6 +500,8 @@ class VideoAdapter(private val context: Context,
                         MainActivity.dataChanged = true
                         videoList.removeAt(position)
                         notifyDataSetChanged()
+                        videoDeleteListener?.onVideoDeleted()
+
                     }
                     isFolder -> {
                         MainActivity.dataChanged = true
@@ -401,12 +583,14 @@ class VideoAdapter(private val context: Context,
         }
     }
 
-
-
-
-    fun updateVideoTitle(position: Int, newName: String) {
-        videoList[position].title = newName
-        notifyItemChanged(position)
+    private fun updateRenameButtonState() {
+        if (selectedItems.size != 1) {
+            renameBtn.isEnabled = false
+            renameBtn.setColorFilter(ContextCompat.getColor(context, R.color.gray), PorterDuff.Mode.SRC_IN)
+        } else {
+            renameBtn.isEnabled = true
+            renameBtn.clearColorFilter()
+        }
     }
 
     private fun toggleSelection(position: Int) {
@@ -425,7 +609,8 @@ class VideoAdapter(private val context: Context,
         }
 
         notifyItemChanged(position) // Update selected state for the item
-        actionMode?.title = "${selectedItems.size} selected" // Update action mode title
+        updateActionModeTitle()
+        updateRenameButtonState()
         actionMode?.invalidate()
 
     }
@@ -438,97 +623,118 @@ class VideoAdapter(private val context: Context,
             actionMode = (context as AppCompatActivity).startActionMode(actionModeCallback)
             isSelectionModeEnabled = true // Enable selection mode
             notifyDataSetChanged() // Update all item views to hide the "more" button
+              bottomToolbar.visibility = View.VISIBLE // Show bottom toolbar
+
         }
-        actionMode?.title = "${selectedItems.size} selected"
+        updateActionModeTitle()
 
     }
-
+    // Update action mode title with selected and total item counts
+    private fun updateActionModeTitle() {
+        actionMode?.title = "${selectedItems.size} / ${videoList.size} Selected"
+    }
     // Action mode callback
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             // Inflate action mode menu
-            mode?.menuInflater?.inflate(R.menu.multiple_player_select_menu, menu)
+            mode?.menuInflater?.inflate(R.menu.multiple_player_select_menu_two, menu)
             isSelectionModeEnabled = true // Enable selection mode
 
             return true
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            // Hide the menu_rename item if more than one item is selected
-            val renameItem = menu?.findItem(R.id.renameMulti)
-            renameItem?.isVisible = selectedItems.size == 1
+
 
             return true
         }
 
 
-        @SuppressLint("NotifyDataSetChanged", "ResourceType")
+        @SuppressLint("NotifyDataSetChanged", "ResourceType", "SetTextI18n")
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            // Handle action mode menu items
-            val actionMode = mode
             when (item?.itemId) {
-                R.id.renameMulti -> {
-                    // Call the showRenameDialog method here
-                    if (selectedItems.size == 1) {
+                R.id.playMulti -> {
+                    val selectedUris = selectedItems.map { videoList[it].artUri }
+                    val intent = Intent(context, PlayerFileActivity::class.java).apply {
+                        action = Intent.ACTION_SEND_MULTIPLE
+                        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(selectedUris))
+                    }
+                    context.startActivity(intent)
+                    return true
+                }
+
+                R.id.infoMulti -> {
+                    if (selectedItems.size > 1) {
+                        // More than one item is selected
+                        val totalSize = selectedItems.sumOf { videoList[it].size.toLong() }
+                        val totalSizeFormatted = Formatter.formatShortFileSize(context, totalSize)
+                        val totalSizeBytesFormatted = NumberFormat.getInstance().format(totalSize)
+
+                        // Calculate the total duration
+                        val totalDuration = selectedItems.sumOf { videoList[it].duration }
+                        val totalDurationFormatted = formatDurationWithApproximation(totalDuration)
+
+                        val customDialogView = LayoutInflater.from(context).inflate(R.layout.info_dialog, null, false)
+                        val containsDetailView = customDialogView.findViewById<TextView>(R.id.containsDetail)
+                        val durationDetailView = customDialogView.findViewById<TextView>(R.id.durationDetail)
+                        val totalSizeDetailView = customDialogView.findViewById<TextView>(R.id.totalSizeDetail)
+                        val positiveButton = customDialogView.findViewById<Button>(R.id.positiveButton)
+
+                        containsDetailView.text = "${selectedItems.size} videos"
+                        durationDetailView.text = totalDurationFormatted
+                        totalSizeDetailView.text = "$totalSizeFormatted ($totalSizeBytesFormatted bytes)"
+
+                        val dialog = MaterialAlertDialogBuilder(context)
+                            .setView(customDialogView)
+                            .create()
+
+                        positiveButton.setOnClickListener {
+                            dialog.dismiss()
+                        }
+
+                        dialog.show()
+                    }
+                    else if (selectedItems.size == 1) {
+                        // Only one item is selected
+                        val selectedInfo = SpannableStringBuilder()
                         val selectedPosition = selectedItems.first()
-                        val defaultName = videoList[selectedPosition].title
-                      showRenameDialog(selectedPosition, defaultName)
-                    } else {
-                        Toast.makeText(context, "Please select only one video to rename", Toast.LENGTH_SHORT).show()
-                    }
-                    // Dismiss action mode
-                    actionMode?.finish()
-                    return true
-                }
+                        val video = videoList[selectedPosition]
 
-                R.id.shareMulti -> {
-                    shareSelectedFiles()
-                }
-                R.id.deleteMulti -> {
-                    if (selectedItems.isNotEmpty()) {
-                        // Build confirmation dialog
-                        AlertDialog.Builder(context)
-                            .setTitle("Confirm Delete")
-                            .setMessage("Are you sure you want to delete these ${selectedItems.size} selected videos?")
-                            .setPositiveButton("Delete") { _, _ ->
-                                // User clicked Delete, proceed with deletion
-                                val positionsToDelete = ArrayList(selectedItems)
-                                positionsToDelete.sortDescending()
+                        val customDialogView = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null, false)
+                        val titleView = customDialogView.findViewById<TextView>(R.id.titleText)
+                        val fileNameView = customDialogView.findViewById<TextView>(R.id.fileName)
+                        val durationDetailView = customDialogView.findViewById<TextView>(R.id.DurationDetail)
+                        val sizeDetailView = customDialogView.findViewById<TextView>(R.id.sizeDetail)
+                        val locationDetailView = customDialogView.findViewById<TextView>(R.id.locationDetail)
+                        val positiveButton = customDialogView.findViewById<Button>(R.id.positiveButton)
 
-                                for (position in positionsToDelete) {
-                                    val video = videoList[position]
-                                    val file = File(video.path)
-
-                                    if (file.exists() && file.delete()) {
-                                        MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
-                                        videoList.removeAt(position)
-                                    }
-                                }
-
-                                selectedItems.clear()
-                                mode?.finish()
-                                notifyDataSetChanged()
-                                // Dismiss action mode
-                                actionMode?.finish()
-                                // Notify listener of the file count change
-                                fileCountChangeListener.onFileCountChanged(videoList.size)
-                            }
-                            .setNegativeButton("Cancel") { dialog, _ ->
-                                // User clicked Cancel, dismiss dialog
-                                dialog.dismiss()
-                            }
-                            .show()
+                        titleView.text = "Properties"
+                        fileNameView.text = video.title
+                        durationDetailView.text = DateUtils.formatElapsedTime(video.duration / 1000)
+                        sizeDetailView.text = Formatter.formatShortFileSize(context, video.size.toLong())
+                        locationDetailView.text = video.path
 
 
+                        val dialog = MaterialAlertDialogBuilder(context)
+                            .setView(customDialogView)
+                            .setCancelable(false)
+                            .create()
+
+                        positiveButton.setOnClickListener{
+                            dialog.dismiss()
+                        }
+
+                        dialog.show()
                     }
 
-                    return true
                 }
 
             }
 
             return false
         }
+
+
         @SuppressLint("NotifyDataSetChanged")
         override fun onDestroyActionMode(mode: ActionMode?) {
             // Clear selection and action mode
@@ -536,9 +742,22 @@ class VideoAdapter(private val context: Context,
             actionMode = null
             isSelectionModeEnabled = false // Disable selection mode
             notifyDataSetChanged()
+            bottomToolbar.visibility = View.GONE // Hide bottom toolbar
+
         }
     }
 
+    fun formatDurationWithApproximation(duration: Long): String {
+        val seconds = duration / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+
+        return when {
+            hours > 0 -> String.format("%02d:%02d:%02d (%d hours approx)", hours, minutes % 60, seconds % 60, hours)
+            minutes > 0 -> String.format("%02d:%02d (%d minutes approx)", minutes, seconds % 60, minutes)
+            else -> String.format("%02d (%d seconds)", seconds, seconds)
+        }
+    }
     private fun shareSelectedFiles() {
         val uris = mutableListOf<Uri>()
         for (position in selectedItems) {
@@ -577,7 +796,6 @@ class VideoAdapter(private val context: Context,
         chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(chooserIntent)
 
-        actionMode?.finish()
     }
 
 
@@ -588,17 +806,30 @@ class VideoAdapter(private val context: Context,
         PlayerActivity.position = pos
         val intent = Intent(context, PlayerActivity::class.java)
         intent.putExtra("class", ref)
+
         startActivity(context, intent, null)
 
     }
 
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateList(searchList: ArrayList<VideoData>) {
-        videoList = ArrayList()
-        videoList.addAll(searchList)
-        notifyDataSetChanged()
+    private fun markVideoAsPlayed(videoId: String) {
+        // Set the isNew flag to false for the played video
+        videoList.find { it.id == videoId }?.let { video ->
+            video.isNew = false
+            saveIsNewStatus(video.id, false)
+        }
+
+        // Save the played status
+        val sharedPreferences = context.getSharedPreferences("played_videos", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putBoolean(videoId, true)
+            apply()
+        }
+
+        notifyDataSetChanged() // Update the adapter to reflect the changes
     }
+
+
 
 
     private fun setIconTint(imageView: ImageView) {
@@ -620,6 +851,17 @@ class VideoAdapter(private val context: Context,
 
         // Set the modified drawable to your ImageView or wherever you're using it
         imageView.setImageDrawable(drawable)
+    }
+    private fun saveIsNewStatus(videoId: String, isNew: Boolean) {
+        val sharedPreferences = context.getSharedPreferences("new_videos", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putBoolean(videoId, isNew)
+            apply()
+        }
+    }
+    private fun loadIsNewStatus(videoId: String): Boolean {
+        val sharedPreferences = context.getSharedPreferences("new_videos", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean(videoId, false)
     }
 
 }

@@ -214,6 +214,7 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
 
 
     private fun openPlayerActivity(videoUri: String, videoTitle: String) {
+        PlayerFileActivity.pipStatus = 2
         val intent = Intent(this, PlayerFileActivity::class.java).apply {
             putExtra("videoUri", videoUri)
             putExtra("videoTitle", videoTitle)

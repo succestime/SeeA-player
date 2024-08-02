@@ -760,6 +760,7 @@ class FileAdapter(
         }
         // Update selected items
         notifyDataSetChanged()
+        updateActionModeTitle()
         actionMode?.invalidate()
     }
 
@@ -772,9 +773,11 @@ class FileAdapter(
             isSelectionModeEnabled = true
             notifyDataSetChanged()
         }
-        actionMode?.title = "${selectedItems.size} selected"
+        updateActionModeTitle()
     }
-
+    private fun updateActionModeTitle() {
+        actionMode?.title = "${selectedItems.size} / ${fileList.size} Selected"
+    }
     // Action mode callback
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {

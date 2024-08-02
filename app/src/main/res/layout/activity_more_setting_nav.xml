@@ -282,7 +282,66 @@ android:layout_marginHorizontal="10dp"
 
 
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/history"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginHorizontal="10dp"
 
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signOut">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#294653"
+
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="25dp"
+                    android:src="@drawable/history_browser"
+                    app:tint="@color/white"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/history_two"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/history_settings"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/round_navigate_next"
+                    app:tint="@color/white" />
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/thirdeRow"
@@ -295,7 +354,7 @@ android:layout_marginHorizontal="10dp"
         android:paddingStart="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signOut"
+        app:layout_constraintTop_toBottomOf="@+id/history"
         tools:ignore="RtlSymmetry" />
 
     <LinearLayout

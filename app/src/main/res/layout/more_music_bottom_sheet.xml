@@ -41,6 +41,7 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:layout_marginTop="15dp"
+        android:gravity="center_vertical"
         android:text="Itachi Uchiha AMV-Infected(1080p)"
         android:layout_marginStart="10dp"
         android:textSize="18sp"
@@ -59,6 +60,8 @@
         android:paddingEnd="8dp"
         android:text="Anime Densetsu"
         android:textColor="#B85A5A"
+        android:gravity="center_vertical"
+
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/title_music"
         app:layout_constraintStart_toStartOf="@+id/title_music"

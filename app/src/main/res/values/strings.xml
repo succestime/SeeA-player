@@ -281,6 +281,7 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="close_button">close tab</string>
+    <string name="title_activity_search">SearchActivity</string>
 
 
 </resources>

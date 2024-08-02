@@ -6,7 +6,7 @@
     <item android:id="@+id/background_shape">
         <shape android:shape="rectangle">
             <!-- Semi-transparent background color -->
-            <solid android:color="#0F4D6C" /> <!-- Set your desired semi-transparent color here -->
+            <solid android:color="#4684A3" /> <!-- Set your desired semi-transparent color here -->
             <!-- Rounded corners -->
             <corners android:radius="10dp" />
         </shape>

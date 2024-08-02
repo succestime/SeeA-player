@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/empty_state_image"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="150dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/empty_folder" />
 
@@ -26,11 +26,13 @@
 
     <TextView
         android:id="@+id/empty_state_description"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/empty_state_title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
+        android:maxLines="2"
+
         android:gravity="center_horizontal"
         android:text="There are no music here firstly download any music"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
