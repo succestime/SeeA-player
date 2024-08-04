@@ -17,9 +17,9 @@
         app:tabMode="fixed"
         android:background="#012030"
         app:tabIndicatorAnimationMode="elastic"
-        app:tabIndicatorColor="@color/cool_blue"
+        app:tabIndicatorColor="?attr/themeColor"
         app:tabTextColor="@color/white"
-        app:tabSelectedTextColor="@color/cool_blue"
+        app:tabSelectedTextColor="?attr/themeColor"
         app:tabTextAppearance="@style/TabTextAppearance"
     app:layout_constraintTop_toTopOf="parent">
 

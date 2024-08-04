@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivitySelectionBinding
 
 class SelectionActivity : AppCompatActivity() {
@@ -20,8 +21,10 @@ class SelectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivitySelectionBinding.inflate(layoutInflater)
-//        setTheme(More.themesList[More.themeIndex])
+
         setContentView(binding.root)
         supportActionBar?.hide()
         binding.selectionRV.setHasFixedSize(true)

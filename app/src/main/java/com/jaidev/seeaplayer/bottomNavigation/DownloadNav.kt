@@ -2,6 +2,7 @@ package com.jaidev.seeaplayer.bottomNavigation
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,10 +20,8 @@ import com.jaidev.seeaplayer.databinding.FragmentDownloadNavBinding
 
 
 class downloadNav : Fragment() {
-   private lateinit var adapter: ReDownloadAdapter
+    private lateinit var adapter: ReDownloadAdapter
     private lateinit var binding: FragmentDownloadNavBinding
-
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_download_nav, container, false)
@@ -32,9 +31,9 @@ class downloadNav : Fragment() {
         val supportFragmentManager = childFragmentManager
         adapter = ReDownloadAdapter(supportFragmentManager , lifecycle  )
 
-            setupActionBar()
+        setupActionBar()
 
-     binding.myTabLayout.addTab( binding.myTabLayout.newTab().setText("Recant Video"))
+        binding.myTabLayout.addTab( binding.myTabLayout.newTab().setText("Recant Video"))
         binding.myTabLayout.addTab( binding.myTabLayout.newTab().setText("Recant Music"))
         binding.viewPagerDownload.adapter = adapter
 
@@ -65,6 +64,14 @@ class downloadNav : Fragment() {
         val titleTextView = customActionBarView.findViewById<TextView>(R.id.titleTextView)
         titleTextView.text = "Downloads"
 
+        // Get the current theme
+        val typedValue = TypedValue()
+        val theme = requireContext().theme
+        theme.resolveAttribute(R.attr.titleTextColor, typedValue, true)
+        val titleTextColor = typedValue.data
+
+        // Set the title text color based on the current theme
+        titleTextView.setTextColor(titleTextColor)
         val subscribeTextView = customActionBarView.findViewById<TextView>(R.id.subscribe)
         if (isInternetAvailable(requireContext())) {
             subscribeTextView.visibility = View.VISIBLE

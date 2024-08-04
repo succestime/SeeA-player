@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivitySeeaEduProcessBinding
 
 class SeeaEduProcess : AppCompatActivity() {
@@ -26,6 +27,8 @@ class SeeaEduProcess : AppCompatActivity() {
     private lateinit var seeaeduprocess: RelativeLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         supportActionBar?.hide()
         binding = ActivitySeeaEduProcessBinding.inflate(layoutInflater)
         supportActionBar?.hide()

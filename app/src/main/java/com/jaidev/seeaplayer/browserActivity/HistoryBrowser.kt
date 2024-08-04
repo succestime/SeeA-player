@@ -30,6 +30,7 @@ import com.jaidev.seeaplayer.allAdapters.HistoryAdapter
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityHistoryBrowserBinding
 
 class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
@@ -49,6 +50,8 @@ class HistoryBrowser : AppCompatActivity(), HistoryAdapter.ItemClickListener {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityHistoryBrowserBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()

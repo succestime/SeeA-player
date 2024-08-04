@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,6 +28,7 @@ import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.allAdapters.VideoSearchAdapter
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
 
@@ -53,7 +55,8 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
-
+        val theme = ThemeHelper.getSavedTheme(requireContext())
+        ThemeHelper.applyTheme(requireContext(),theme)
         binding.folderRV.setHasFixedSize(true)
         binding.folderRV.setItemViewCacheSize(10)
         binding.folderRV.layoutManager = LinearLayoutManager(requireContext())
@@ -118,7 +121,14 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
 
         val titleTextView = customActionBarView.findViewById<TextView>(R.id.titleTextView)
         titleTextView.text = "Folders"
+        // Get the current theme
+        val typedValue = TypedValue()
+        val theme = requireContext().theme
+        theme.resolveAttribute(R.attr.titleTextColor, typedValue, true)
+        val titleTextColor = typedValue.data
 
+        // Set the title text color based on the current theme
+        titleTextView.setTextColor(titleTextColor)
         val subscribeTextView = customActionBarView.findViewById<TextView>(R.id.subscribe)
         if (MainActivity.isInternetAvailable(requireContext())) {
             subscribeTextView.visibility = View.VISIBLE
@@ -211,11 +221,10 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
     }
 
     override fun onItemClick(fileItem: VideoData) {
-       PlayerFileActivity.pipStatus = 1
+        PlayerFileActivity.pipStatus = 1
         val intent = Intent(requireContext(), SearchActivity::class.java)
         intent.putExtra("videoData", fileItem)
         startActivity(intent)
-        // Collapse the SearchView
         searchItem.collapseActionView()
 
     }

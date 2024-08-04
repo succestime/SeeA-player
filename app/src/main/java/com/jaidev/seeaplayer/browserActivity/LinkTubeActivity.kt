@@ -55,7 +55,6 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
@@ -92,12 +91,8 @@ class LinkTubeActivity : AppCompatActivity(), BookmarkAdapter.BookmarkSaver {
     private var printJob : PrintJob? = null
     lateinit var mAdView: AdView
     private var mInterstitialAd : InterstitialAd? = null
-    private var rewardedInterstitialAd : RewardedInterstitialAd? = null
     @SuppressLint("StaticFieldLeak")
     lateinit var binding: ActivityLinkTubeBinding
-    val MAX_HISTORY_SIZE = 150
-    private var currentPopupWindow: PopupWindow? = null
-
     private lateinit var bookmarkSaver: SharedPreferencesBookmarkSaver
 
     companion object {
@@ -1219,7 +1214,7 @@ class LinkTubeActivity : AppCompatActivity(), BookmarkAdapter.BookmarkSaver {
         val data = GsonBuilder().create().toJson(bookmarkList)
         editor.putString("bookmarkList", data)
         editor.apply()
-        
+
     }
     private fun updateBookmarkIcon(bookmarkMenu: ImageView) {
         var frag: BrowseFragment? = null

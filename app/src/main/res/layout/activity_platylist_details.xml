@@ -101,7 +101,7 @@
             android:drawableTop="@drawable/add_music_icon"
             android:text="@string/add_song"
             android:textAllCaps="false"
-            android:textColor="?attr/colorPrimary" />
+            android:textColor="@color/cool_blue" />
 
         <!--Remove Button-->
         <Button
@@ -114,7 +114,7 @@
             android:drawableTop="@drawable/remove_icon"
             android:text="@string/remove_all"
             android:textAllCaps="false"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/cool_blue"
 
             />
 

@@ -9,6 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:startIconDrawable="@drawable/ic_edit_icon"
+        app:boxStrokeColor="@color/cool_blue"
+
         app:startIconTint="@color/cool_blue"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="5dp"

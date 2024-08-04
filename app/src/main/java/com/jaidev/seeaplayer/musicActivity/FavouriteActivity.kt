@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,6 +15,7 @@ import com.google.gson.reflect.TypeToken
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.FavouriteAdapter
 import com.jaidev.seeaplayer.dataClass.Music
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.checkPlaylist
 import com.jaidev.seeaplayer.databinding.ActivityFavouriteBinding
 
@@ -34,6 +34,8 @@ class FavouriteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityFavouriteBinding.inflate(layoutInflater)
         supportActionBar?.title = "Favourite"
         setContentView(binding.root)
@@ -48,7 +50,7 @@ class FavouriteActivity : AppCompatActivity() {
         favouritesChanged = false
 
         shuffleEmpty()
-        setActionBarGradient()
+//        setActionBarGradient()
         favouritelayout = binding.favouriteLayout
         // Set the background color of SwipeRefreshLayout based on app theme
         setSwipeRefreshBackgroundColor()
@@ -100,59 +102,59 @@ class FavouriteActivity : AppCompatActivity() {
         }
     }
 
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FavouriteActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FavouriteActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@FavouriteActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@FavouriteActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
-    }
+//    private fun setActionBarGradient() {
+//        // Check the current night mode
+//        val nightMode = AppCompatDelegate.getDefaultNightMode()
+//        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+//            // Light mode is applied
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@FavouriteActivity,
+//                        R.drawable.background_actionbar_light
+//                    )
+//                )
+//            }
+//        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+//            // Dark mode is applied
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@FavouriteActivity,
+//                        R.drawable.background_actionbar
+//                    )
+//                )
+//            }
+//        } else {
+//            // System Default mode is applied
+//            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+//                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+//                else -> false
+//            }
+//            // Set the ActionBar color based on the System Default mode
+//            if (isSystemDefaultDarkMode) {
+//                // System Default mode is dark
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@FavouriteActivity,
+//                            R.drawable.background_actionbar
+//                        )
+//                    )
+//                }
+//            } else {
+//                // System Default mode is light
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@FavouriteActivity,
+//                            R.drawable.background_actionbar_light
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//    }
 
 
 

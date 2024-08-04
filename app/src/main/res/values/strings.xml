@@ -238,9 +238,7 @@
     <string name="share_via">Share link</string>
     <string name="menu_iocns">Menu Icons</string>
     <string name="title_activity_tab_actvity">TabActvity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
@@ -282,6 +280,7 @@
     </string>
     <string name="close_button">close tab</string>
     <string name="title_activity_search">SearchActivity</string>
+
 
 
 </resources>

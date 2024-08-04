@@ -555,7 +555,9 @@ val indicator = binding.newIndicator
             }
         dialogRF = dialogBuilder.create()
         dialogRF.show()
-
+        // Set the positive and negative button colors to cool_blue
+        dialogRF.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.cool_blue))
+        dialogRF.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(context, R.color.cool_blue))
     }
     private fun renameVideo(position: Int, newName: String) {
         val music = videoList[position]

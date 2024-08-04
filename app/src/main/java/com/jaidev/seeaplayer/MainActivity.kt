@@ -35,7 +35,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -46,7 +45,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.Services.FolderDetectionService
-import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.bottomNavigation.downloadNav
 import com.jaidev.seeaplayer.bottomNavigation.homeNav
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
@@ -55,6 +53,7 @@ import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.RecantVideo
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.dataClass.exitApplication
 import com.jaidev.seeaplayer.databinding.ActivityMainBinding
@@ -66,20 +65,16 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var currentFragment: Fragment
     private lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var adapter: VideoAdapter
     private  var runnable : Runnable? = null
     private lateinit var drawerLayout: DrawerLayout
     private var mInterstitialAd: InterstitialAd? = null
     private var doubleBackToExitPressedOnce = false
     private var adLoaded = false // Flag to track if the ad is loaded
-
     private lateinit var linkTubeActivityResultLauncher: ActivityResultLauncher<Intent>
-    private var retryRequestedPermissions = false
+
 
 
     companion object {
-
-        private const val PREFS_NAME = "speed_preferences"
 
         var videoRecantList = ArrayList<RecantVideo>()
         var musicRecantList = ArrayList<RecantMusic>()
@@ -152,7 +147,6 @@ class MainActivity : AppCompatActivity() {
                     val path = it.getString(pathC)
                     val artUri = Uri.parse("content://media/external/video/media/$id")
 
-                    // Check if duration is greater than 0 milliseconds
                     if (duration > 0) {
                         val video = RecantVideo(title, timestamp, id, duration, path, artUri, size)
                         recantVList.add(video)
@@ -229,20 +223,13 @@ class MainActivity : AppCompatActivity() {
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = this.getSharedPreferences("themes", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.apply()
-
-        // Clear the saved speed when the app starts
-        val sharedPreferencesMusic = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        with(sharedPreferencesMusic.edit()) {
-            clear()
-            apply()
-        }
+        applyTheme()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // Register for theme changes
+        registerReceiver(themeChangeReceiver, IntentFilter("THEME_CHANGED"))
         loadAd()
-
+     musicListSearch   = ArrayList()
         // Register BroadcastReceiver
         val filter = IntentFilter("com.yourapp.LINK_TUBE_OPENED")
         registerReceiver(linkTubeOpenedReceiver, filter)
@@ -254,20 +241,18 @@ class MainActivity : AppCompatActivity() {
             setFragment(homeNav())
             binding.bottomNav.selectedItemId = R.id.home // Manually set the selected item
         }
+
         bottomNav()
         funRequestRuntimePermission()
         setBottomLayoutBackgroundColor()
-        setActionBarGradient()
-        // Check internet connectivity and show/hide the "Subscribe" TextView
+
+
         checkInternetConnection()
 
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
 
-//        setupActionBar()
-//        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNav)
-//        bottomNavigationView.itemIconTintList = null // This line ensures that the icon will use its actual color
 
         drawerLayout = binding.drawerLayoutMA
 
@@ -287,7 +272,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val themeChangeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            applyTheme()
+            recreate()
+        }
+    }
 
+    private fun applyTheme() {
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this, theme)
+    }
     private fun bottomNav() {
         binding.bottomNav.setOnItemSelectedListener {
             try {
@@ -665,7 +660,7 @@ class MainActivity : AppCompatActivity() {
                                 isNew = isNewVideo,
 
 
-                            )
+                                )
 
                             if (file.exists()) tempList.add(video)
                         }
@@ -769,66 +764,14 @@ class MainActivity : AppCompatActivity() {
             exitApplication()
         }
         unregisterReceiver(linkTubeOpenedReceiver)
+        unregisterReceiver(themeChangeReceiver)
 
-    }
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@MainActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@MainActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@MainActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@MainActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
     }
 
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
     override fun onResume() {
         super.onResume()
-        setActionBarGradient()
+
         if (!adLoaded) { // Check if the ad has already been loaded
             loadAd()
             adLoaded = true // Set the flag to true after loading the ad

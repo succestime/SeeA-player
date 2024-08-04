@@ -8,7 +8,6 @@ import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.BookmarkAdapter
 import com.jaidev.seeaplayer.dataClass.Bookmark
 import com.jaidev.seeaplayer.dataClass.SharedPreferencesBookmarkSaver
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityBookmarkBinding
 
 class BookmarkActivity : AppCompatActivity(), BookmarkAdapter.BookmarkAdapterCallback, BookmarkAdapter.BookmarkSaver{
@@ -30,6 +30,8 @@ class BookmarkActivity : AppCompatActivity(), BookmarkAdapter.BookmarkAdapterCal
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
        binding = ActivityBookmarkBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -46,7 +48,6 @@ class BookmarkActivity : AppCompatActivity(), BookmarkAdapter.BookmarkAdapterCal
         bookmarkSaver = SharedPreferencesBookmarkSaver(this)
         bookmarkList = bookmarkSaver.loadBookmarks()
 
-        setActionBarGradient()
         allBookMarkLayout = binding.allBookmarkLayout
         // Set the background color of SwipeRefreshLayout based on app theme
         setRelativeLayoutBackgroundColor()
@@ -143,59 +144,6 @@ class BookmarkActivity : AppCompatActivity(), BookmarkAdapter.BookmarkAdapterCal
         }
     }
 
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@BookmarkActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@BookmarkActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@BookmarkActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@BookmarkActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
-    }
 
     override fun onListEmpty(isEmpty: Boolean) {
         binding.bookmarkEmptyStateLayout.visibility = if (isEmpty) View.VISIBLE else View.GONE

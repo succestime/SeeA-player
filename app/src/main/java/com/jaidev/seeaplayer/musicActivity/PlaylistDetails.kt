@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +14,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.checkPlaylist
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.ActivityPlatylistDetailsBinding
@@ -30,7 +30,8 @@ class PlaylistDetails : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(R.style.coolBlueNav)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         supportActionBar?.title = "Playlist Album"
         binding = ActivityPlatylistDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -48,7 +49,7 @@ class PlaylistDetails : AppCompatActivity() {
         binding.playlistDetailsRV.adapter = adapter
 
         shuffleAddRemove()
-        setActionBarGradient()
+//        setActionBarGradient()
         playlistdetailsLayout = binding.playlistDetailsLayout
 
         // Set the background color of SwipeRefreshLayout based on app theme
@@ -114,59 +115,59 @@ class PlaylistDetails : AppCompatActivity() {
         }
     }
 
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@PlaylistDetails,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@PlaylistDetails,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@PlaylistDetails,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@PlaylistDetails,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
-    }
+//    private fun setActionBarGradient() {
+//        // Check the current night mode
+//        val nightMode = AppCompatDelegate.getDefaultNightMode()
+//        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+//            // Light mode is applied
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@PlaylistDetails,
+//                        R.drawable.background_actionbar_light
+//                    )
+//                )
+//            }
+//        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+//            // Dark mode is applied
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@PlaylistDetails,
+//                        R.drawable.background_actionbar
+//                    )
+//                )
+//            }
+//        } else {
+//            // System Default mode is applied
+//            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+//                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+//                else -> false
+//            }
+//            // Set the ActionBar color based on the System Default mode
+//            if (isSystemDefaultDarkMode) {
+//                // System Default mode is dark
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@PlaylistDetails,
+//                            R.drawable.background_actionbar
+//                        )
+//                    )
+//                }
+//            } else {
+//                // System Default mode is light
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@PlaylistDetails,
+//                            R.drawable.background_actionbar_light
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//    }
 
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onResume() {

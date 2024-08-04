@@ -14,9 +14,11 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.ThemeActivity
 import com.jaidev.seeaplayer.browserActivity.FileActivity
 import com.jaidev.seeaplayer.browserActivity.HistoryBrowser
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityMoreSettingNavBinding
 
 class MoreSettingNav : AppCompatActivity() {
@@ -27,14 +29,17 @@ private lateinit var binding:ActivityMoreSettingNavBinding
     private val CHECKED_ITEM = "checked_item"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityMoreSettingNavBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setActionBarGradient()
+//        setActionBarGradient()
         supportActionBar?.title = "Settings"
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Enable the Up button
 
         binding.appThemelayout.setOnClickListener {
-            showDialog()
+            startActivity(Intent(this, ThemeActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         }
         binding.Settingslayout.setOnClickListener {
             val menuItems = arrayOf(
@@ -110,60 +115,6 @@ binding.mySubscribeLayout.setOnClickListener {
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
-        }
-    }
-
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-           supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                       this@MoreSettingNav,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@MoreSettingNav,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@MoreSettingNav,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-               supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@MoreSettingNav,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
         }
     }
 

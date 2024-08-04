@@ -14,7 +14,7 @@
         app:boxBackgroundMode="filled"
         app:startIconDrawable="@drawable/playlist_icon"
         app:startIconTint="@color/cool_blue"
-
+app:hintTextColor="@color/cool_blue"
         android:hint="@string/playlist_name"
 
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

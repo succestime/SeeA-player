@@ -12,40 +12,67 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Adaptive Theme Card -->
-        <View
-            android:id="@+id/adaptiveTheme"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/sdfdsg"
             android:layout_width="0dp"
-            android:layout_height="70sp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/curver"
-            android:backgroundTint="#8CCFFF"
-            app:layout_constraintEnd_toStartOf="@+id/lightTheme"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/sdfg"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Light Theme Card -->
-        <View
-            android:id="@+id/lightTheme"
-            android:layout_width="0dp"
-            android:layout_height="70sp"
+            app:layout_constraintTop_toTopOf="parent">
+        <ImageButton
+            android:id="@+id/adaptiveTheme"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:scaleType="centerCrop"
             android:background="@drawable/curver"
-            android:backgroundTint="#FFEC8B"
+       android:src="@drawable/adaptive"
+     />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/sdfg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toStartOf="@+id/darkTheme"
-            app:layout_constraintStart_toEndOf="@+id/adaptiveTheme"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Dark Theme Card -->
-        <View
-            android:id="@+id/darkTheme"
-            android:layout_width="0dp"
-            android:layout_height="70sp"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/sdfdrgg"
+            app:layout_constraintStart_toEndOf="@+id/sdfdsg"
+            app:layout_constraintTop_toTopOf="parent">
+        <ImageButton
+            android:id="@+id/lightTheme"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:src="@drawable/light"
+            android:scaleType="centerCrop"
             android:background="@drawable/curver"
-            android:backgroundTint="#37474F"
+
+            />
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/sdfdrgg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/lightTheme"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/sdfg"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <!-- Dark Theme Card -->
+            <ImageButton
+                android:id="@+id/darkTheme"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/curver"
+
+                android:src="@drawable/dark"
+                />
+        </androidx.cardview.widget.CardView>
 
         <!-- Classic Themes Label -->
         <TextView
@@ -56,7 +83,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/adaptiveTheme" />
+            app:layout_constraintTop_toBottomOf="@+id/sdfdsg" />
 
         <!-- Classic Themes Grid -->
         <GridLayout
@@ -72,6 +99,7 @@
 
             <!-- Row 1 -->
             <View
+                android:id="@+id/view1"
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -81,6 +109,8 @@
                 android:background="@drawable/curver" />
 
             <View
+                android:id="@+id/view2"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -91,6 +121,8 @@
                 />
 
             <View
+                android:id="@+id/view3"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -100,6 +132,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view4"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -110,6 +144,8 @@
 
             <!-- Row 4 -->
             <View
+                android:id="@+id/view5"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -119,6 +155,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view6"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -128,6 +166,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view7"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -137,6 +177,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view8"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -146,6 +188,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view9"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -155,6 +199,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view10"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -164,6 +210,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view11"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -173,6 +221,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view12"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -182,6 +232,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view13"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -191,6 +243,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view14"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -200,6 +254,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view15"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -209,6 +265,8 @@
                 android:background="@drawable/curver"/>
 
             <View
+                android:id="@+id/view16"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -219,6 +277,8 @@
 
             <!-- Double Views with split colors -->
             <View
+                android:id="@+id/view17"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -228,6 +288,8 @@
                 android:background="@drawable/split_color"/>
 
             <View
+                android:id="@+id/view18"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -237,6 +299,8 @@
                 android:background="@drawable/split_color_two"/>
 
             <View
+                android:id="@+id/view19"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -245,6 +309,8 @@
                 android:background="@drawable/split_color_three"/>
 
             <View
+                android:id="@+id/view20"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -253,6 +319,8 @@
                 android:background="@drawable/split_color_four"/>
 
             <View
+                android:id="@+id/view21"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -261,6 +329,8 @@
                 android:background="@drawable/split_color_five"/>
 
             <View
+                android:id="@+id/view22"
+
                 android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
@@ -268,63 +338,80 @@
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_six"/>
  <View
-                android:layout_width="30dp"
+     android:id="@+id/view23"
+
+     android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_seven"/>
  <View
-                android:layout_width="30dp"
+     android:id="@+id/view24"
+
+     android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_eight"/>
  <View
-                android:layout_width="30dp"
+     android:id="@+id/view25"
+
+     android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_nine"/>
  <View
-                android:layout_width="30dp"
+     android:id="@+id/view26"
+
+     android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_ten"/>
  <View
-                android:layout_width="30dp"
+     android:id="@+id/view27"
+
+     android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_eleven"/>
  <View
-                android:layout_width="30dp"
+     android:id="@+id/view28"
+
+     android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_twelve"/>
  <View
-                android:layout_width="30dp"
+     android:id="@+id/view29"
+
+     android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_13"/>
  <View
-                android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
+
+         android:id="@+id/view30"
+         android:layout_width="30dp"
+          android:layout_height="100dp"
+          android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_margin="4dp"
                 android:background="@drawable/split_color_14"/>
- <View
-                android:layout_width="30dp"
+              <View
+                  android:id="@+id/view31"
+                  android:layout_width="30dp"
                 android:layout_height="100dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"

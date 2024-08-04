@@ -7,8 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +21,7 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.PlaylistViewAdapter
 import com.jaidev.seeaplayer.dataClass.MusicPlaylist
 import com.jaidev.seeaplayer.dataClass.Playlist
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityPlaylistBinding
 import com.jaidev.seeaplayer.databinding.AddPlaylistDialogBinding
 import java.text.SimpleDateFormat
@@ -41,6 +42,8 @@ class PlaylistActivity : AppCompatActivity() , PlaylistViewAdapter.OnItemClickLi
     private val PLAYLIST_KEY = "playlists"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityPlaylistBinding.inflate(layoutInflater)
         supportActionBar?.title = "Playlist"
         setContentView(binding.root)
@@ -56,8 +59,8 @@ class PlaylistActivity : AppCompatActivity() , PlaylistViewAdapter.OnItemClickLi
 binding.addPlaylistBtn.setOnClickListener {
     customAlertDialog()
 }
-
-        setActionBarGradient()
+//
+//        setActionBarGradient()
         playListLayout = binding.playlistLayout
 
         // Set the background color of SwipeRefreshLayout based on app theme
@@ -98,59 +101,59 @@ binding.addPlaylistBtn.setOnClickListener {
         // Add transition animation here
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
     }
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@PlaylistActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@PlaylistActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@PlaylistActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@PlaylistActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
-    }
+//    private fun setActionBarGradient() {
+//        // Check the current night mode
+//        val nightMode = AppCompatDelegate.getDefaultNightMode()
+//        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+//            // Light mode is applied
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@PlaylistActivity,
+//                        R.drawable.background_actionbar_light
+//                    )
+//                )
+//            }
+//        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+//            // Dark mode is applied
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@PlaylistActivity,
+//                        R.drawable.background_actionbar
+//                    )
+//                )
+//            }
+//        } else {
+//            // System Default mode is applied
+//            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+//                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+//                else -> false
+//            }
+//            // Set the ActionBar color based on the System Default mode
+//            if (isSystemDefaultDarkMode) {
+//                // System Default mode is dark
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@PlaylistActivity,
+//                            R.drawable.background_actionbar
+//                        )
+//                    )
+//                }
+//            } else {
+//                // System Default mode is light
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@PlaylistActivity,
+//                            R.drawable.background_actionbar_light
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//    }
 
 
     private fun customAlertDialog(){
@@ -163,15 +166,18 @@ binding.addPlaylistBtn.setOnClickListener {
                 val playlistName = binder.playlistName.text
                 val createdBy = binder.playlistName.text
                 if(playlistName != null && createdBy != null)
-                    if(playlistName.isNotEmpty() && createdBy.isNotEmpty())
-                    {
+                    if(playlistName.isNotEmpty() && createdBy.isNotEmpty()) {
                         addPlaylist(playlistName.toString(), createdBy.toString())
                     }
                 loadAd()
                 mInterstitialAd?.show(this)
                 dialog.dismiss()
-            }.show()
+            }
+        val dialog = builder.create()
+        dialog.show()
 
+        // Set the positive button color to cool_blue
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.cool_blue))
     }
     private fun addPlaylist(name: String, createdBy: String) {
         val playlistExists = musicPlaylist.ref.any { it.name == name }

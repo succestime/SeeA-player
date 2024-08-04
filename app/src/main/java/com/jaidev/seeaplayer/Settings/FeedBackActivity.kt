@@ -7,9 +7,9 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityFeedBackBinding
 
 class FeedBackActivity : AppCompatActivity() {
@@ -22,6 +22,8 @@ class FeedBackActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityFeedBackBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.title = "Feedback"
@@ -64,7 +66,6 @@ class FeedBackActivity : AppCompatActivity() {
             }
         }
 
-        setActionBarGradient()
         swipeRefreshLayout = binding.feedBackActivity
         setSwipeRefreshBackgroundColor()
     }
@@ -92,32 +93,6 @@ class FeedBackActivity : AppCompatActivity() {
         }
     }
 
-    private fun setActionBarGradient() {
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar_light))
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar))
-            }
-        } else {
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            if (isSystemDefaultDarkMode) {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar))
-                }
-            } else {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(ContextCompat.getDrawable(this@FeedBackActivity, R.drawable.background_actionbar_light))
-                }
-            }
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

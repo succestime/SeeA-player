@@ -26,7 +26,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -40,6 +39,7 @@ import com.jaidev.seeaplayer.allAdapters.FileAdapter
 import com.jaidev.seeaplayer.dataClass.FileDownloader
 import com.jaidev.seeaplayer.dataClass.FileItem
 import com.jaidev.seeaplayer.dataClass.FileType
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityFileBinding
 import com.jaidev.seeaplayer.databinding.ActivitySettingDownloadsBinding
 import org.jsoup.Jsoup
@@ -74,10 +74,11 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
     @SuppressLint("NotifyDataSetChanged", "ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityFileBinding.inflate(layoutInflater)
         setContentView(binding.root)
        supportActionBar?.hide()
-        setActionBarGradient()
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         // banner ads
@@ -833,35 +834,9 @@ class FileActivity : AppCompatActivity() , FileAdapter.OnItemClickListener,
             return null
         }
     }
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FileActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else {
-            // Dark mode is applied or the mode is set to follow system
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FileActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        }
-    }
 
     override fun onResume() {
         super.onResume()
-        setActionBarGradient()
         updateEmptyStateVisibility()
         sortFilesByTimestamp()
 

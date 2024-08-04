@@ -19,6 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.caverock.androidsvg.SVG
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityImageViewerBinding
 import java.io.File
 
@@ -29,6 +30,8 @@ class ImageViewerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

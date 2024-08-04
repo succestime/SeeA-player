@@ -10,8 +10,8 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivitySplashBinding
 
 @SuppressLint("CustomSplashScreen")
@@ -22,16 +22,11 @@ class SplashActivity : AppCompatActivity() {
     @SuppressLint("ObsoleteSdkInt")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Apply your chosen theme here
-        when (getCheckedItem()) {
-            0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
-
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-supportActionBar?.hide()
+        supportActionBar?.hide()
 
         // Create a SpannableString to set different styles for different parts of the text
         val spannableString = SpannableString("SeeA Player")

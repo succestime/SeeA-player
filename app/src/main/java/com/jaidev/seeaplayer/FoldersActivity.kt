@@ -1,8 +1,10 @@
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -13,7 +15,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
@@ -29,6 +30,7 @@ import com.jaidev.seeaplayer.allAdapters.VideoSearchAdapter
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
 import com.jaidev.seeaplayer.dataClass.Folder
 import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivityFoldersBinding
 import java.io.File
@@ -52,13 +54,15 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
 
     }
 
-    @SuppressLint("SetTextI18n", "SuspiciousIndentation")
+    @SuppressLint("SetTextI18n", "SuspiciousIndentation", "UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applyThemeChange()
         binding = ActivityFoldersBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         MobileAds.initialize(this) {}
+        registerReceiver(themeChangeReceiver, IntentFilter("THEME_CHANGED_FOLDER"))
 
         val position = intent.getIntExtra("position", 0)
         currentFolderVideos = getAllVideos(folderList[position].id)
@@ -91,7 +95,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
 
         initializeBinding()
         toggleLayoutManager()
-        setActionBarGradient()
         swipeRefreshLayout = binding.swipeRefreshFolder
         setSwipeRefreshBackgroundColor()
 
@@ -129,7 +132,16 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
             setListLayoutManager()
         }
     }
-
+    private val themeChangeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            applyThemeChange()
+            recreate()
+        }
+    }
+    private fun applyThemeChange() {
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this, theme)
+    }
     private fun setGridLayoutManager() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         binding.videoRVFA.layoutManager = gridLayoutManager
@@ -170,10 +182,8 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         }
 
         if (isDarkMode) {
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
         } else {
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         }
@@ -364,57 +374,15 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         return true
     }
 
-    private fun setActionBarGradient() {
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FoldersActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@FoldersActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            if (isSystemDefaultDarkMode) {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@FoldersActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@FoldersActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
-    }
+override fun onDestroy() {
+    super.onDestroy()
+    unregisterReceiver(themeChangeReceiver)
 
+}
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation", "SetTextI18n")
     override fun onResume() {
         super.onResume()
-        setActionBarGradient()
+//        setActionBarGradient()
         if (PlayerActivity.position != -1) binding.nowPlayingBtn.visibility = View.VISIBLE
         if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
         MainActivity.adapterChanged = false

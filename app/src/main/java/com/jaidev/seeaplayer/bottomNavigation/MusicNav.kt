@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -29,7 +30,7 @@ import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
 
 class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdapter.MusicDeleteListener ,    RecantMusicAdapter.OnFileCountChangeListener
- {
+{
 
     lateinit var adapter: MusicAdapter
     private lateinit var adapterf: RecantMusicAdapter
@@ -105,7 +106,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
             MusicListMA.clear()
             MusicListMA.addAll(updatedMusicList)
             adapter.updateMusicList(MusicListMA)
-             adapter.notifyDataSetChanged()
+            adapter.notifyDataSetChanged()
             updateEmptyState()
         }
     }
@@ -116,6 +117,14 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
         val titleTextView = customActionBarView.findViewById<TextView>(R.id.titleTextView)
         titleTextView.text = "Musics"
 
+        // Get the current theme
+        val typedValue = TypedValue()
+        val theme = requireContext().theme
+        theme.resolveAttribute(R.attr.titleTextColor, typedValue, true)
+        val titleTextColor = typedValue.data
+
+        // Set the title text color based on the current theme
+        titleTextView.setTextColor(titleTextColor)
         val subscribeTextView = customActionBarView.findViewById<TextView>(R.id.subscribe)
         if (MainActivity.isInternetAvailable(requireContext())) {
             subscribeTextView.visibility = View.VISIBLE
@@ -205,9 +214,9 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
 
     }
 
-     override fun onFileCountChanged(newCount: Int) {
-         TODO("Not yet implemented")
-     }
+    override fun onFileCountChanged(newCount: Int) {
+        TODO("Not yet implemented")
+    }
 
 
- }
+}

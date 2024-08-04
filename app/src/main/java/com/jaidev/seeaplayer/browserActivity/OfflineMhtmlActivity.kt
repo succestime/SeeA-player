@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityOfflineMhtmlBinding
 import java.io.File
 
@@ -21,6 +22,8 @@ class OfflineMhtmlActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityOfflineMhtmlBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()

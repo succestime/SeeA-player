@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -15,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaidev.seeaplayer.MainActivity.Companion.videoList
 import com.jaidev.seeaplayer.allAdapters.VideoSearchAdapter
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.ActivitySearchBinding
 import java.io.File
@@ -30,15 +30,15 @@ class SearchActivity : AppCompatActivity()  , VideoSearchAdapter.OnItemClickList
     var isSearchViewClicked = false
 companion object{
     private lateinit var binding: ActivitySearchBinding
-
 }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         val videoData: VideoData? = intent.getParcelableExtra("videoData")
-        setActionBarGradient()
         if (videoData != null) {
             val videoList = ArrayList<VideoData>()
             videoList.add(videoData)
@@ -134,59 +134,57 @@ companion object{
         }
 
         if (isDarkMode) {
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(R.color.dark_cool_blue))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
         } else {
-            swipeRefreshLayout.setBackgroundColor(resources.getColor(android.R.color.white))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         }
     }
-    private fun setActionBarGradient() {
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@SearchActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@SearchActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            if (isSystemDefaultDarkMode) {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@SearchActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@SearchActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
-    }
+//    private fun setActionBarGradient() {
+//        val nightMode = AppCompatDelegate.getDefaultNightMode()
+//        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@SearchActivity,
+//                        R.drawable.background_actionbar_light
+//                    )
+//                )
+//            }
+//        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+//            supportActionBar?.apply {
+//                setBackgroundDrawable(
+//                    ContextCompat.getDrawable(
+//                        this@SearchActivity,
+//                        R.drawable.background_actionbar
+//                    )
+//                )
+//            }
+//        } else {
+//            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+//                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+//                else -> false
+//            }
+//            if (isSystemDefaultDarkMode) {
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@SearchActivity,
+//                            R.drawable.background_actionbar
+//                        )
+//                    )
+//                }
+//            } else {
+//                supportActionBar?.apply {
+//                    setBackgroundDrawable(
+//                        ContextCompat.getDrawable(
+//                            this@SearchActivity,
+//                            R.drawable.background_actionbar_light
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//    }
 
 }

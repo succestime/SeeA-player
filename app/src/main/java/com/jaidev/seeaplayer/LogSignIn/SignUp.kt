@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -13,14 +12,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.More
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.bottomNavigation.moreNav
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityLoginBinding
 
 class SignUp : AppCompatActivity() {
     private lateinit var swipeRefreshLayout: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         val binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
@@ -41,7 +43,7 @@ class SignUp : AppCompatActivity() {
                 val password = binding.passwordLogin.text.toString()
 
                 if (email.isNotEmpty() && password.isNotEmpty())
-                    moreNav.auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+                    More.auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
                         if (it.isSuccessful) {
                             Toast.makeText(this, "SignUp Successful", Toast.LENGTH_LONG).show()
                             finish()
@@ -56,8 +58,6 @@ class SignUp : AppCompatActivity() {
             }
         }
 
-
-        setActionBarGradient()
 
         binding.googleBtn.setOnClickListener {
             if (MainActivity.isInternetAvailable(this)) {
@@ -74,7 +74,7 @@ class SignUp : AppCompatActivity() {
     }
     private fun firebaseAuthWithGoogle(idToken : String){
         val credential = GoogleAuthProvider.getCredential(idToken , null)
-        moreNav.auth.signInWithCredential(credential)
+        More.auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "SignUp Successful", Toast.LENGTH_LONG).show()
@@ -111,59 +111,6 @@ class SignUp : AppCompatActivity() {
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
-        }
-    }
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@SignUp,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@SignUp,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@SignUp,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@SignUp,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
         }
     }
 }

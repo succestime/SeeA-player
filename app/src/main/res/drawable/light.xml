@@ -6,18 +6,18 @@
 
     <!-- Background -->
     <path
-        android:fillColor="#E0F7FA"
+        android:fillColor="#A3F4F4"
         android:pathData="M0,0h108v54H0z"/>
 
     <!-- Sun -->
     <path
         android:fillColor="#FFEB3B"
-        android:pathData="M90,10a8,8 0 1,0 0,16a8,8 0 1,0 0,-16"/>
+        android:pathData="M85,15a9,8 0 1,0 0,16a8,8 0 1,0 0,-16"/>
 
     <!-- Cloud -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M68,14c0,-4.418 3.582,-8 8,-8s8,3.582 8,8c2.209,0 4,1.791 4,4s-1.791,4 -4,4H68c-2.209,0 -4,-1.791 -4,-4s1.791,-4 4,-4z"/>
+        android:pathData="M68,25c0,-4.418 3.582,-8 8,-8s8,3.582 8,8c2.209,0 4,1.791 4,4s-1.791,4 -4,4H68c-2.209,0 -4,-1.791 -4,-4s1.791,-4 4,-4z"/>
 
 
 </vector>

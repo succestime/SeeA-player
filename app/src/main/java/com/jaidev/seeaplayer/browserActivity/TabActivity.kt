@@ -18,7 +18,6 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
@@ -26,6 +25,7 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.TabAdapter
 import com.jaidev.seeaplayer.allAdapters.TabQuickButtonAdapter
 import com.jaidev.seeaplayer.browseFregment.HomeFragment
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityTabBinding
 
 class TabActivity : AppCompatActivity() {
@@ -35,6 +35,8 @@ class TabActivity : AppCompatActivity() {
     private var actionMode: ActionMode? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         try {
             binding = ActivityTabBinding.inflate(layoutInflater)
             setContentView(binding.root)
@@ -44,7 +46,6 @@ class TabActivity : AppCompatActivity() {
             adapter = TabAdapter(this , null, isLinktubeActivity = false)
             binding.tabsRV.adapter = adapter
 
-            setActionBarGradient()
             updateEmptyViewVisibility()
             setupActionBar()
 
@@ -412,56 +413,6 @@ class TabActivity : AppCompatActivity() {
         }
     }
 
-    private fun setActionBarGradient() {
-        try {
-            val nightMode = AppCompatDelegate.getDefaultNightMode()
-            if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@TabActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@TabActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                    android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                    else -> false
-                }
-                if (isSystemDefaultDarkMode) {
-                    supportActionBar?.apply {
-                        setBackgroundDrawable(
-                            ContextCompat.getDrawable(
-                                this@TabActivity,
-                                R.drawable.background_actionbar
-                            )
-                        )
-                    }
-                } else {
-                    supportActionBar?.apply {
-                        setBackgroundDrawable(
-                            ContextCompat.getDrawable(
-                                this@TabActivity,
-                                R.drawable.background_actionbar_light
-                            )
-                        )
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            showErrorToast()
-        }
-    }
 
     @SuppressLint("MissingInflatedId")
     private fun setupActionBar() {

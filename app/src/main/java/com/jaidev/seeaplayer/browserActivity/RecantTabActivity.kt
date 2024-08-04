@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +15,7 @@ import com.jaidev.seeaplayer.allAdapters.RecentTabAdapter
 import com.jaidev.seeaplayer.browseFregment.BrowseFragment
 import com.jaidev.seeaplayer.dataClass.HistoryItem
 import com.jaidev.seeaplayer.dataClass.HistoryManager
+import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityRecantTabActivityBinding
 
 class RecantTabActivity : AppCompatActivity(), RecentTabAdapter.ItemClickListener{
@@ -26,6 +26,8 @@ class RecantTabActivity : AppCompatActivity(), RecentTabAdapter.ItemClickListene
     private lateinit var historyList: MutableList<HistoryItem>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val theme = ThemeHelper.getSavedTheme(this)
+        ThemeHelper.applyTheme(this,theme)
         binding = ActivityRecantTabActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -47,7 +49,6 @@ class RecantTabActivity : AppCompatActivity(), RecentTabAdapter.ItemClickListene
         binding.recantCosed.setOnClickListener {
             toggleVisibility()
         }
-        setActionBarGradient()
         recantTabActivity = binding.recantTabActivity
         setSwipeRefreshBackgroundColor()
     }
@@ -60,52 +61,6 @@ class RecantTabActivity : AppCompatActivity(), RecentTabAdapter.ItemClickListene
         return true
     }
 
-    private fun setActionBarGradient() {
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@RecantTabActivity,
-                        R.drawable.background_actionbar_light
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@RecantTabActivity,
-                        R.drawable.background_actionbar
-                    )
-                )
-            }
-        } else {
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            if (isSystemDefaultDarkMode) {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@RecantTabActivity,
-                            R.drawable.background_actionbar
-                        )
-                    )
-                }
-            } else {
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@RecantTabActivity,
-                            R.drawable.background_actionbar_light
-                        )
-                    )
-                }
-            }
-        }
-    }
 
     @SuppressLint("ObsoleteSdkInt")
     private fun setSwipeRefreshBackgroundColor() {
