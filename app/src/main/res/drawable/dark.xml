@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="50dp"
+    android:viewportWidth="100"
+    android:viewportHeight="50">
+
+    <!-- Background rectangle -->
+    <path
+        android:fillColor="#455A64"
+        android:pathData="M2,0h96a2,2 0,0 1,2 2v46a2,2 0,0 1,-2 2h-96a2,2 0,0 1,-2 -2v-46a2,2 0,0 1,2 -2z" />
+
+    <!-- Moon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M70,32a10,10 0,1 0,-7 -17 8,8 0,1 1,0 14 10,10 0,0 0,7 3z" />
+    <!-- Stars -->
+
+
+    <!-- Stars -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,15l1,2l2,0l-1.5,1.5l0.5,2l-1.5,-1l-1.5,1l0.5,-2L48,17l2,0zM60,30l1,2l2,0l-1.5,1.5l0.5,2l-1.5,-1l-1.5,1l0.5,-2L58,32l2,0zM85,15l1,2l2,0l-1.5,1.5l0.5,2l-1.5,-1l-1.5,1l0.5,-2L83,17l2,0zM85,35l1,2l2,0l-1.5,1.5l0.5,2l-1.5,-1l-1.5,1l0.5,-2L83,37l2,0z"/>
+
+</vector>

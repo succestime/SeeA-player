@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="100dp"
+    android:viewportWidth="200"
+    android:viewportHeight="100">
+
+    <!-- Background rectangle -->
+    <path
+        android:fillColor="#82D7F3"
+        android:pathData="M0,0 h200 v100 h-200 z" />
+
+
+
+    <!-- Phone screen with increased height and rounded corners -->
+    <path
+        android:fillColor="#CDF1F6"
+        android:pathData="M125,18 h40 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-40 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z"
+        android:strokeWidth="1"
+        android:strokeColor="#6FE9FA" />
+
+    <!-- Sun circle -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M145,20 a15,15 0 1,0 30,0 a15,15 0 1,0 -30,0" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M145,25 c0,-4.418 3.582,-8 8,-8 s8,3.582 8,8 c2.209,0 4,1.791 4,4 s-1.791,4 -4,4 h-16 c-2.209,0 -4,-1.791 -4,-4 s1.791,-4 4,-4z" />
+
+
+    <!-- Moon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M130,85a15,15 0,1 0,-10.5 -25.5 12,12 0,1 1,0 21 15,15 0,0 0,10.5 4.5" />
+
+    <!-- Stars -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M115,80 l2,4 l4,0 l-3,2.5 l1,4 l-3.5,-2.5 l-3.5,2.5 l1,-4 l-3,-2.5 l4,0 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M135,86 l1,2 l2,0 l-1.5,1 l0.5,2 l-1.5,-1 l-1.5,1 l0.5,-2 l-1.5,-1 l2,0 z" />
+ <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M115,70 l1,2 l2,0 l-1.5,1 l0.5,2 l-1.5,-1 l-1.5,1 l0.5,-2 l-1.5,-1 l2,0 z" />
+<path
+        android:fillColor="#FFFFFF"
+        android:pathData="M127,65 l1,2 l2,0 l-1.5,1 l0.5,2 l-1.5,-1 l-1.5,1 l0.5,-2 l-1.5,-1 l2,0 z" />
+
+    <!-- Border from top-left to bottom-right of the phone -->
+    <path
+        android:fillColor="@color/transparent"
+        android:strokeColor="#94D1D1"
+        android:strokeWidth="0.9"
+        android:pathData="M120,18 l50,70" />
+    <!-- Text -->
+    <group
+        android:translateX="20"
+        android:translateY="60">
+        <path
+            android:fillColor="#000000"
+            android:text="Adaptive"
+            android:textSize="16dp"
+            />
+    </group>
+</vector>
