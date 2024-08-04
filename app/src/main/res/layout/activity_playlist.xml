@@ -36,8 +36,8 @@
         android:background="@drawable/button_background"
         android:drawableLeft="@drawable/round_playlist_music"
         android:text="Create New Playlist"
-        android:drawableTint="?attr/themeColor"
-        android:textColor="?attr/themeColor"
+        android:drawableTint="@color/cool_blue"
+        android:textColor="@color/cool_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
