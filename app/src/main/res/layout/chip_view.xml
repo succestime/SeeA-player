@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="10sp"
+    android:clickable="true"
+    android:focusable="true"
+    >
+
+    <!-- Circle background -->
+    <FrameLayout
+        android:id="@+id/icon_frame"
+        android:layout_width="56sp"
+        android:layout_height="40sp"
+        android:background="@drawable/curver_music"
+        android:layout_centerHorizontal="true">
+
+        <!-- Icon in the center -->
+        <ImageView
+            android:id="@+id/chipIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/info_share"
+            android:layout_gravity="center"
+             />
+
+
+
+    </FrameLayout>
+
+    <!-- Text label -->
+    <TextView
+        android:id="@+id/chipTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share"
+        android:layout_below="@id/icon_frame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="4dp"/>
+</RelativeLayout>

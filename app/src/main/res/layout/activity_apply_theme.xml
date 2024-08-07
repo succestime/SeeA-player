@@ -1,0 +1,1359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ApplyThemeActivity">
+
+    <!-- Toolbar -->
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:backgroundTint="@color/transparent"
+       >
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="0dp"
+            android:background="@android:color/transparent"
+            android:padding="16dp"
+            android:src="@drawable/back_browser" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/color_picker"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:paddingHorizontal="55sp"
+        android:paddingVertical="10sp"
+       >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/designer" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/color_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/use_now_button"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="15sp"
+        android:layout_marginStart="15sp"
+        android:gravity="center"
+        android:orientation="horizontal"
+       >
+
+        <!-- HorizontalScrollView for color options -->
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+          android:scrollbars="none"
+            >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="90dp"
+
+                android:orientation="horizontal">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:background="@drawable/curver"
+                        android:backgroundTint="#FF5A5A"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/newIndicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_1"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_1"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:backgroundTint="#FFA64C"
+                        android:background="@drawable/curver"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_2"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_2"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_2"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:backgroundTint="#FFD54F"
+                        android:background="@drawable/curver"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_3"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_3"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_3"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:backgroundTint="#8B4513"
+                        android:background="@drawable/curver"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_4"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_4"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_4"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_5"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:backgroundTint="#CDDC39"
+                        android:background="@drawable/curver"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_5"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+                    <TextView
+                        android:id="@+id/newIndicator4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_5"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_5"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_6"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:backgroundTint="#8BC34A"
+                        android:background="@drawable/curver"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_6"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_6"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_6"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_7"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:backgroundTint="#00E676"
+                        android:background="@drawable/curver"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_7"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_7"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_7"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_8"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:backgroundTint="#4CAF50"
+                        android:background="@drawable/curver"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_8"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_8"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_8"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                <View
+                    android:id="@+id/color_view_9"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#14A0DF"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_9"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_9"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_9"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                <View
+                    android:id="@+id/color_view_10"
+
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:backgroundTint="#2979FF"
+                    android:background="@drawable/curver"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_10"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_10"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_10"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+                <View
+                    android:id="@+id/color_view_11"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:backgroundTint="#651FFF"
+                    android:background="@drawable/curver" app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_11"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_11"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_11"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+                <View
+                    android:id="@+id/color_view_12"
+
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:backgroundTint="#E040FB"
+                    android:background="@drawable/curver"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_12"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_12"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_12"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+                <View
+                    android:id="@+id/color_view_13"
+
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:backgroundTint="#9C27B0"
+                    android:background="@drawable/curver"  app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <View
+                    android:id="@+id/selected_indicator_13"
+                    android:layout_width="40sp"
+                    android:layout_height="4sp"
+                    android:background="@drawable/rounded_bottom_view"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_13"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_13"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+                <View
+                    android:id="@+id/color_view_14"
+
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:backgroundTint="#FF3D7F"
+                    android:background="@drawable/curver"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_14"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator13"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_14"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_14"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+                <View
+                    android:id="@+id/color_view_15"
+
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:backgroundTint="#F50057"
+                    android:background="@drawable/curver"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_15"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_15"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_15"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+                <View
+                    android:id="@+id/color_view_16"
+
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:backgroundTint="#BDBDBD"
+                    android:background="@drawable/curver"  app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_16"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_16"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_16"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+                <View
+                    android:id="@+id/color_view_17"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@drawable/split_color_1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:id="@+id/selected_indicator_17"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator16"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_17"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_17"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_18"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_two_2"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_18"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator17"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_18"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_18"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_19"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_three_3"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_19"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator18"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_19"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_19"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_20"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_four_4"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_20"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator19"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_20"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_20"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_21"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_five_5"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_21"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_21"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_21"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_22"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_six_6"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_22"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_22"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_22"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_23"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_seven_7"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_23"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/newIndicator22"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_23"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_23"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_24"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_eight_8"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_24"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/newIndicator23"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_24"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_24"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_25"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_nine_9"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_25"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/newIndicator24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_25"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_25"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_26"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_ten_10"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_26"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/newIndicator25"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_26"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_26"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_27"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_eleven_11"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_27"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator26"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_27"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_27"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_28"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_twelve_12"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_28"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator27"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_28"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_28"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_29"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_13_13"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_29"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator28"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_29"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_29"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_30"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_14_14"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_30"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator29"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_30"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_30"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp">
+
+                    <View
+                        android:id="@+id/color_view_31"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/split_color_15_15"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/selected_indicator_31"
+                        android:layout_width="40sp"
+                        android:layout_height="4sp"
+                        android:background="@drawable/rounded_bottom_view"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/newIndicator30"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_new_indicator"
+                        android:text="Using"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:visibility="invisible"
+                        android:paddingHorizontal="2dp"
+                        app:layout_constraintTop_toTopOf="@id/color_view_31"
+                        app:layout_constraintEnd_toEndOf="@id/color_view_31"
+                        android:layout_marginStart="3dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+    </LinearLayout>
+    <!-- Use Now Button -->
+    <Button
+        android:id="@+id/use_now_button"
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:textStyle="bold"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginHorizontal="100sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="50dp"
+        android:textAllCaps="false"
+/>
+
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/mainActivityProgressbar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone">
+
+    <androidx.cardview.widget.CardView
+
+        android:layout_width="wrap_content"
+        android:layout_height="50sp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="5sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:background="#434343"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="15sp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:text="Applying Theme"
+                android:textColor="@color/white"
+                android:textSize="18sp">
+
+            </TextView>
+
+            <ProgressBar
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="15sp">
+
+            </ProgressBar>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
