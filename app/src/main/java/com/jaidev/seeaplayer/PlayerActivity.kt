@@ -125,7 +125,6 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         private lateinit var loudnessEnhancer: LoudnessEnhancer
         private var speed: Float = 1.0f
         private var initialSpeed: Float = 1.0f
-        private lateinit var adapter: VideoAdapter
 
         private var timer: Timer? = null
         var nowPlayingId: String = ""

@@ -54,7 +54,9 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
 
     }
 
-    @SuppressLint("SetTextI18n", "SuspiciousIndentation", "UnspecifiedRegisterReceiverFlag")
+    @SuppressLint("SetTextI18n", "SuspiciousIndentation", "Unspecifi" +
+            "edRegisterReceiverFlag", "UnspecifiedRegisterReceiverFlag"
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyThemeChange()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Bottom color layer -->
-    <item android:bottom="50dp">
+    <item android:bottom="35dp">
         <shape android:shape="rectangle">
             <solid android:color="#E040FB"/>
             <corners
@@ -13,9 +13,9 @@
     </item>
 
     <!-- Top color layer -->
-    <item android:top="50dp">
+    <item android:top="40dp">
         <shape android:shape="rectangle">
-            <solid android:color="#F2032C42"/>
+            <solid android:color="#F2043D5C"/>
             <corners
                 android:topLeftRadius="0dp"
                 android:topRightRadius="0dp"

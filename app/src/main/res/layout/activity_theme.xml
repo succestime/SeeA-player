@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <!-- Adaptive Theme Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/sdfdsg"
             android:layout_width="0dp"
@@ -21,16 +22,58 @@
             app:layout_constraintEnd_toStartOf="@+id/sdfg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-        <ImageButton
-            android:id="@+id/adaptiveTheme"
-            android:layout_width="match_parent"
-            android:layout_height="65dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/curver"
-       android:src="@drawable/adaptive"
-     />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+               >
+
+                <ImageButton
+                    android:id="@+id/adaptiveTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:background="@drawable/curver"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/adaptive"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/newIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="100sp"
+                android:layout_height="match_parent"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Adaptive"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </TextView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Light Theme Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/sdfg"
             android:layout_width="0dp"
@@ -40,18 +83,61 @@
             app:layout_constraintEnd_toStartOf="@+id/sdfdrgg"
             app:layout_constraintStart_toEndOf="@+id/sdfdsg"
             app:layout_constraintTop_toTopOf="parent">
-        <ImageButton
-            android:id="@+id/lightTheme"
-            android:layout_width="match_parent"
-            android:layout_height="65dp"
-            android:src="@drawable/light"
-            android:scaleType="centerCrop"
-            android:background="@drawable/curver"
 
-            />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+            >
+
+                <ImageButton
+                    android:id="@+id/lightTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:background="@drawable/curver"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/light"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/newIndicator1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:layout_marginStart="3dp"
+                    android:visibility="invisible"
+                    android:paddingHorizontal="2dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="100sp"
+                android:layout_height="match_parent"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Light theme"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </TextView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
 
+        <!-- Dark Theme Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/sdfdrgg"
             android:layout_width="0dp"
@@ -61,17 +147,56 @@
             app:layout_constraintStart_toEndOf="@+id/sdfg"
             app:layout_constraintTop_toTopOf="parent">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+               >
 
-            <!-- Dark Theme Card -->
             <ImageButton
                 android:id="@+id/darkTheme"
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:scaleType="centerCrop"
                 android:background="@drawable/curver"
-
                 android:src="@drawable/dark"
-                />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+                <TextView
+                    android:id="@+id/newIndicator2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:visibility="invisible"
+                    android:textSize="10sp"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="100sp"
+                android:layout_height="match_parent"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dark theme"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </TextView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
         <!-- Classic Themes Label -->
@@ -79,7 +204,7 @@
             android:id="@+id/classicThemesLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Classic Themes"
+            android:text="Classic Light &amp; Dark Themes"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -91,334 +216,904 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="700sp"
-            android:columnCount="3"
+            android:columnCount="4"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@+id/classicThemesLabel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <!-- Row 1 -->
-            <View
-                android:id="@+id/view1"
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
+                android:layout_height="90sp"
+                android:layout_margin="4dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
+              >
+
+
+                <View
+                    android:id="@+id/view1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#FF5A5A" />
+
+                <TextView
+                    android:id="@+id/newIndicator3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Row 1 -->
+            <FrameLayout
+                android:layout_width="30dp"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#FF5A5A"
-                android:background="@drawable/curver" />
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                >
 
             <View
                 android:id="@+id/view2"
-
-                android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
                 android:backgroundTint="#FFA64C"
                 android:background="@drawable/curver"
                 />
 
-            <View
-                android:id="@+id/view3"
-
+                <TextView
+                    android:id="@+id/newIndicator4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+            <!-- Add FrameLayout for view3 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#FFD54F"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view4"
+                <View
+                    android:id="@+id/view3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#FFD54F" />
 
+                <TextView
+                    android:id="@+id/newIndicator5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Add FrameLayout for view4 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#8B4513"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <!-- Row 4 -->
-            <View
-                android:id="@+id/view5"
+                <View
+                    android:id="@+id/view4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#8B4513" />
 
+                <TextView
+                    android:id="@+id/newIndicator6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Add FrameLayout for view5 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#CDDC39"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view6"
+                <View
+                    android:id="@+id/view5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#CDDC39" />
 
+                <TextView
+                    android:id="@+id/newIndicator7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Add FrameLayout for view6 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#8BC34A"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view7"
+                <View
+                    android:id="@+id/view6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#8BC34A" />
 
+                <TextView
+                    android:id="@+id/newIndicator8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Add FrameLayout for view7 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#00E676"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view8"
+                <View
+                    android:id="@+id/view7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#00E676" />
 
+                <TextView
+                    android:id="@+id/newIndicator9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Add FrameLayout for view8 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#4CAF50"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view9"
+                <View
+                    android:id="@+id/view8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#4CAF50" />
 
+                <TextView
+                    android:id="@+id/newIndicator10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Add FrameLayout for view9 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#4FC3F7"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view10"
+                <View
+                    android:id="@+id/view9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#14A0DF" />
 
+                <TextView
+                    android:id="@+id/newIndicator11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- Add FrameLayout for view10 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#2979FF"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view11"
+                <View
+                    android:id="@+id/view10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#2979FF" />
 
+                <TextView
+                    android:id="@+id/newIndicator12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+            <!-- View 11 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#651FFF"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view12"
+                <View
+                    android:id="@+id/view11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#651FFF" />
 
+                <TextView
+                    android:id="@+id/newIndicator13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- View 12 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#E040FB"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view13"
+                <View
+                    android:id="@+id/view12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#E040FB" />
 
+                <TextView
+                    android:id="@+id/newIndicator14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- View 13 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#9C27B0"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view14"
+                <View
+                    android:id="@+id/view13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#9C27B0" />
 
+                <TextView
+                    android:id="@+id/newIndicator15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- View 14 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#E91E63"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view15"
+                <View
+                    android:id="@+id/view14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#FF3D7F" />
 
+                <TextView
+                    android:id="@+id/newIndicator16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- View 15 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#F50057"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <View
-                android:id="@+id/view16"
+                <View
+                    android:id="@+id/view15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#F50057" />
 
+                <TextView
+                    android:id="@+id/newIndicator17"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- View 16 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
-                android:backgroundTint="#BDBDBD"
-                android:background="@drawable/curver"/>
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-            <!-- Double Views with split colors -->
-            <View
-                android:id="@+id/view17"
+                <View
+                    android:id="@+id/view16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/curver"
+                    android:backgroundTint="#BDBDBD" />
 
+                <TextView
+                    android:id="@+id/newIndicator18"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+            <!-- View 17 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-                android:background="@drawable/split_color"/>
+                <View
+                    android:id="@+id/view17"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/split_color" />
 
-            <View
-                android:id="@+id/view18"
+                <TextView
+                    android:id="@+id/newIndicator19"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
 
+            <!-- View 18 with newIndicator -->
+            <FrameLayout
                 android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
+                android:layout_height="90sp"
                 android:layout_margin="4dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1">
 
-                android:background="@drawable/split_color_two"/>
+                <View
+                    android:id="@+id/view18"
+                    android:layout_width="wrap_content"
+                    android:layout_height="90sp"
+                    android:background="@drawable/split_color_two" />
+
+                <TextView
+                    android:id="@+id/newIndicator20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_new_indicator"
+                    android:text="Using"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="invisible"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="3dp"
+                    android:paddingHorizontal="2dp" />
+            </FrameLayout>
+
+        <!-- View 19 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
 
             <View
                 android:id="@+id/view19"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_three" />
 
-                android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_three"/>
+            <TextView
+                android:id="@+id/newIndicator21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 20 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
 
             <View
                 android:id="@+id/view20"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_four" />
 
-                android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_four"/>
+            <TextView
+                android:id="@+id/newIndicator22"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 21 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
 
             <View
                 android:id="@+id/view21"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_five" />
 
-                android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_five"/>
+            <TextView
+                android:id="@+id/newIndicator23"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 22 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
 
             <View
                 android:id="@+id/view22"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_six" />
 
-                android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_six"/>
- <View
-     android:id="@+id/view23"
+            <TextView
+                android:id="@+id/newIndicator24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
 
-     android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_seven"/>
- <View
-     android:id="@+id/view24"
+        <!-- View 23 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
 
-     android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_eight"/>
- <View
-     android:id="@+id/view25"
+            <View
+                android:id="@+id/view23"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_seven" />
 
-     android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_nine"/>
- <View
-     android:id="@+id/view26"
+            <TextView
+                android:id="@+id/newIndicator25"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
 
-     android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_ten"/>
- <View
-     android:id="@+id/view27"
+        <!-- View 24 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
 
-     android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_eleven"/>
- <View
-     android:id="@+id/view28"
+            <View
+                android:id="@+id/view24"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_eight" />
 
-     android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_twelve"/>
- <View
-     android:id="@+id/view29"
+            <TextView
+                android:id="@+id/newIndicator26"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
 
-     android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_13"/>
- <View
+        <!-- View 25 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
 
-         android:id="@+id/view30"
-         android:layout_width="30dp"
-          android:layout_height="100dp"
-          android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_14"/>
-              <View
-                  android:id="@+id/view31"
-                  android:layout_width="30dp"
-                android:layout_height="100dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="4dp"
-                android:background="@drawable/split_color_15"/>
+            <View
+                android:id="@+id/view25"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_nine" />
 
+            <TextView
+                android:id="@+id/newIndicator27"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
 
+        <!-- View 26 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
+
+            <View
+                android:id="@+id/view26"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_ten" />
+
+            <TextView
+                android:id="@+id/newIndicator28"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 27 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
+
+            <View
+                android:id="@+id/view27"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_eleven" />
+
+            <TextView
+                android:id="@+id/newIndicator29"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 28 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
+
+            <View
+                android:id="@+id/view28"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_twelve" />
+
+            <TextView
+                android:id="@+id/newIndicator30"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 29 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
+
+            <View
+                android:id="@+id/view29"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_13" />
+
+            <TextView
+                android:id="@+id/newIndicator31"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 30 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
+
+            <View
+                android:id="@+id/view30"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_14" />
+
+            <TextView
+                android:id="@+id/newIndicator32"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
+
+        <!-- View 31 with newIndicator -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="90sp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1">
+
+            <View
+                android:id="@+id/view31"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:background="@drawable/split_color_15" />
+
+            <TextView
+                android:id="@+id/newIndicator33"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_new_indicator"
+                android:text="Using"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                android:layout_gravity="top|end"
+                android:layout_marginStart="3dp"
+                android:paddingHorizontal="2dp" />
+        </FrameLayout>
         </GridLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

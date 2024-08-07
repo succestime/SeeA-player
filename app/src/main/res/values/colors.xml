@@ -34,7 +34,9 @@
     <color name="colorEnd">#011B29</color>
     <color name="light_black">#FF7F7F7F</color>
     <color name="light_white">#FFFEFEFE</color>
-<!--    <color name="light_red">#FFFF7F7F</color>-->
+    <color name="button_background_default">#E0E0E0</color>
+
+    <!--    <color name="light_red">#FFFF7F7F</color>-->
 <!--    <color name="light_green">#FF7FFF7F</color>-->
 <!--    <color name="light_blue">#FF7F7FFF</color>-->
 <!--    <color name="light_yellow">#FFFFFF7F</color>-->

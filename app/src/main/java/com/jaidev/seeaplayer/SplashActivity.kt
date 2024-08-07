@@ -1,24 +1,23 @@
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivitySplashBinding
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
-    private var checkedItem: Int = 0
-    private val CHECKED_ITEM = "checked_item"
     private lateinit var binding: ActivitySplashBinding
+    @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("ObsoleteSdkInt")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +43,7 @@ class SplashActivity : AppCompatActivity() {
 
 
 
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue )
+//
 
         // Delay for 2 seconds and then start the main activity
         Handler(Looper.getMainLooper()).postDelayed({
@@ -57,12 +56,6 @@ class SplashActivity : AppCompatActivity() {
 
     }
 
-
-
-    private fun getCheckedItem(): Int {
-        return this.getSharedPreferences("YourSharedPreferencesName", Context.MODE_PRIVATE)
-            .getInt(CHECKED_ITEM, checkedItem)
-    }
 
 
 

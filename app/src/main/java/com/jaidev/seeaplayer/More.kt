@@ -105,7 +105,9 @@ class More : AppCompatActivity() {
             }
         }
 
-
+binding.adsRemove.setOnClickListener {
+    binding.adsLayout.visibility = View.GONE
+}
     }
     private val themeChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -144,7 +146,10 @@ class More : AppCompatActivity() {
         }
     }
 
-
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
     private fun updateData(): String {
 
         return "User : ${auth.currentUser?.displayName}"
@@ -200,5 +205,9 @@ class More : AppCompatActivity() {
         binding.userDetails.text = updateData()
 
     }
-
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.from_left, R.anim.to_right)
+    }
 }

@@ -1,44 +1,397 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme. -->
+    <attr name="themeColor" format="color"/>
+    <attr name="titleTextColor" format="color" />
     //Theme for Activities
     <style name="coolBlueNav" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-
+        <item name="themeColor">@color/cool_blue</item>
         <item name="colorPrimary">@color/cool_blue</item>
         <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/black</item>
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/white</item>
+        <item name="actionBarStyle">@style/AppTheme.LightActionModeBars</item>
         <item name="android:statusBarColor" >#0F4D6C</item>
-        <!--        <item name="android:actionBarStyle">@style/CustomActionBar</item>-->
         <item name="android:textColor">@color/white</item>
         <item name="actionModeStyle">@style/AppTheme.DarkActionMode</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="progressBarStyle">@color/cool_blue</item>
+        <item name="titleTextColor">@color/white</item>
+        <item name="android:windowBackground">#032C42</item>
 
     </style>
+
+
+    <style name="coolBlueNav1" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#FF5A5A</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+        <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+        <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">#F2032C42</item>
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+        </style>
+        <style name="coolBlueNav2" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#EA7B0A</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+        </style>
+        <style name="coolBlueNav3" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#C19508</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item>
+
+        </style>
+        <style name="coolBlueNav4" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#8B4513</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+        </style>
+        <style name="coolBlueNav5" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#AFC10B</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+        </style>
+        <style name="coolBlueNav6" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#589F05</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+        </style>
+        <style name="coolBlueNav7" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#2DAE6F</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+        </style>
+        <style name="coolBlueNav8" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#4CAF50</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+
+        </style>
+        <style name="coolBlueNav9" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#14A0DF</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+
+        </style>
+        <style name="coolBlueNav10" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#2979FF</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/white</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+
+        </style>
+        <style name="coolBlueNav11" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#651FFF</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+
+        </style>
+        <style name="coolBlueNav12" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#E040FB</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+
+        </style>
+        <style name="coolBlueNav13" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#9C27B0</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+
+        </style>
+        <style name="coolBlueNav14" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#FF3D7F</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item> <!-- Added line -->
+
+
+        </style>
+        <style name="coolBlueNav15" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+            <item name="themeColor">#F50057</item>
+            <item name="colorPrimary">@color/cool_blue</item>
+            <item name="colorPrimaryVariant">@color/white</item>
+            <item name="android:statusBarColor">?attr/themeColor</item>
+            <item name="actionBarStyle">@style/AppTheme.DarkActionBars.themes</item>
+
+            <item name="colorOnPrimary">@color/black</item>
+            <item name="colorSecondary">@color/teal_200</item>
+            <item name="colorSecondaryVariant">@color/teal_700</item>
+            <item name="colorOnSecondary">@color/white</item>
+            <item name="android:textColor">@color/white</item>
+            <item name="actionModeStyle">@style/AppTheme.DarkActionMode.theme</item>
+            <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
+            <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+            <item name="titleTextColor">@color/white</item>
+            <item name="android:windowBackground">#032C42</item>
+
+        </style>
+
+
+
+
+
+
+    <style name="statusBarTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/cool_blue</item>
+        <item name="colorPrimaryVariant">?attr/themeColor</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="titleTextColor">#F2032C42</item>
+        <item name="android:statusBarColor">@color/dark_cool_blue</item>
+        <item name="android:windowBackground">#032C42</item>
+        <item name="android:windowLightStatusBar">false</item> <!-- Dark status bar icons -->
+    </style>
+
+
+    <style name="statusBarPlaylistTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/cool_blue</item>
+        <item name="colorPrimaryVariant">?attr/themeColor</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="titleTextColor">@color/black</item>
+        <item name="android:statusBarColor">#BAB9B9</item>
+        <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+    </style>
+
+
+
+
+
+
 
     <style name="TransparentActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:statusBarColor">@color/white</item>
     </style>
     <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
         <!--        <item name="android:windowFullscreen">true</item>-->
         <item name="android:statusBarColor" >@color/dark_cool_blue</item>
         <item name="android:textColor">@color/white</item>
-
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
     <style name="AppTheme.DarkActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="background">@drawable/background_actionbar</item>
+    </style>
 
+    <style name="AppTheme.DarkActionMode.theme" parent="Widget.AppCompat.ActionMode">
+        <item name="background">@drawable/background_actionbar_light_three</item>
+    </style>
 
+    <style name="AppTheme.LightActionModeBars" parent="Widget.AppCompat.ActionBar">
+        <item name="background">@drawable/background_actionbar</item>
+    </style>
+
+    <style name="AppTheme.DarkActionBars.themes" parent="Widget.AppCompat.ActionBar">
+        <item name="background">@drawable/background_actionbar_light_three</item>
     </style>
 
     <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
@@ -50,13 +403,16 @@
     <style name="Widget.AppCompat.ActionMode.Title" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@color/white</item> <!-- Customize title text color -->
     </style>
-
-    <style name="AppBottomSheetDiaolgTheme" parent="Theme.Design.BottomSheetDialog">
+    <style name="AppBottomSheetDiaolgTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/AppModelStyle</item>
+
     </style>
-    <style name="AppModelStyle" parent="Widget.Design.BottomSheet.Modal" >
-        <item name="android:background">@drawable/rounded_bottom_sheet_gray</item>
+
+    <style name="AppModelStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_bottom_sheet</item>
+
     </style>
+
 
     <style name="TransparentTheme" parent="Theme.AppCompat.DayNight">
         <item name="android:statusBarColor">#0F4D6C</item>

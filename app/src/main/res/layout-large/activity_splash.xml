@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/splashActivity"
-    android:background="@color/dark_cool_blue"
+
 
     android:fitsSystemWindows="true"
     android:gravity="center"
     tools:context=".SplashActivity">
-
+<!--    android:background="@color/dark_cool_blue"-->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="100dp"

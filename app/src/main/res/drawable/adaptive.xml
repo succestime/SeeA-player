@@ -54,14 +54,9 @@
         android:strokeColor="#94D1D1"
         android:strokeWidth="0.9"
         android:pathData="M120,18 l50,70" />
-    <!-- Text -->
-    <group
-        android:translateX="20"
-        android:translateY="60">
-        <path
-            android:fillColor="#000000"
-            android:text="Adaptive"
-            android:textSize="16dp"
-            />
-    </group>
+
+
+
+
+
 </vector>

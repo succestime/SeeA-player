@@ -112,8 +112,8 @@ class VideoAdapter(private val context: Context,
 
     init {
         if (context is AppCompatActivity) {
-            bottomToolbar = (context).findViewById(R.id.bottomToolbar)
-            deleteBtn = bottomToolbar.findViewById(R.id.deleteBtn)
+            bottomToolbar = context.findViewById(R.id.bottomToolbar)
+        deleteBtn = bottomToolbar.findViewById(R.id.deleteBtn)
             shareBtn = bottomToolbar.findViewById(R.id.shareBtn)
             renameBtn = bottomToolbar.findViewById(R.id.renameBtn)
             checkBtn = bottomToolbar.findViewById(R.id.checkBtn)

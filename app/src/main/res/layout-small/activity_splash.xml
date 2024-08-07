@@ -6,10 +6,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/splashActivity"
     android:fitsSystemWindows="true"
-    android:background="@color/dark_cool_blue"
 
     android:gravity="center"
     tools:context=".SplashActivity">
+<!--    android:background="@color/dark_cool_blue"-->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"

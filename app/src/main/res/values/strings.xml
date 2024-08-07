@@ -50,6 +50,7 @@
     <string name="playlist_btn">Playlist</string>
     <string name="favourites_btn">Favourite</string>
     <string name="shuffle_btn">Play</string>
+    <string name="playlist_shuffle_btn">Play All</string>
     <string name="total_songs">Total Songs</string>
     <string name="world_of_music">World Of Music</string>
     <string name="song_name">Song Name</string>
@@ -280,7 +281,6 @@
     </string>
     <string name="close_button">close tab</string>
     <string name="title_activity_search">SearchActivity</string>
-
 
 
 </resources>

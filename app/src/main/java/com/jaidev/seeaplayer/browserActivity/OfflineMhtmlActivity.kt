@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -17,7 +16,6 @@ import java.io.File
 
 class OfflineMhtmlActivity : AppCompatActivity() {
     private lateinit var webView: WebView
-    private lateinit var linearLayout14: LinearLayout
     private lateinit var binding : ActivityOfflineMhtmlBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +44,6 @@ class OfflineMhtmlActivity : AppCompatActivity() {
             finish()
         }
 
-
-
-        linearLayout14 = binding.linearLayout14
         setSwipeRefreshBackgroundColor()
     }
 
@@ -60,10 +55,8 @@ class OfflineMhtmlActivity : AppCompatActivity() {
         }
 
         if (isDarkMode) {
-            linearLayout14.setBackgroundColor(resources.getColor(R.color.black_statusBar))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
         } else {
-            linearLayout14.setBackgroundColor(resources.getColor(R.color.light_statusBar))
             window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
             window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         }

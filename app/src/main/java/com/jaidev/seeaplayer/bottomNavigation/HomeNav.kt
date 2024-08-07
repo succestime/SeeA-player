@@ -17,17 +17,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.PlaylistFolderActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.SearchActivity
 import com.jaidev.seeaplayer.Subscription.SeeAOne
+import com.jaidev.seeaplayer.allAdapters.ChipAdapter
 import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
 import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.allAdapters.VideoSearchAdapter
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
+import com.jaidev.seeaplayer.dataClass.ChipItem
 import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
@@ -42,6 +46,9 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
 
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var searchItem: MenuItem
+    private val iconModelArrayList = ArrayList<ChipItem>()
+    private lateinit var chipsAdapter: ChipAdapter
+    private lateinit var playbackIconsAdapter: ChipAdapter
 
     lateinit var mAdView: AdView
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +80,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
 
         swipeRefreshLayout = binding.swipeRefreshFolder
 
-        binding.totalFolder.text = "${MainActivity.folderList.size} folders"
+//        binding.totalFolder.text = "${MainActivity.folderList.size} folders"
 
 
         binding.swipeRefreshFolder.setOnRefreshListener {
@@ -90,12 +97,63 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
         }
 
         MobileAds.initialize(requireContext()){}
-//       mAdView = binding.adView
-
+        horizontalIconList()
         return binding.root
     }
+    @SuppressLint("NotifyDataSetChanged")
+    private fun horizontalIconList() {
 
-    @RequiresApi(Build.VERSION_CODES.R)
+        iconModelArrayList.add(ChipItem("Playlist", R.drawable.round_playlist_music))
+        iconModelArrayList.add(ChipItem("Share", R.drawable.share_svgrepo_com))
+
+        playbackIconsAdapter = ChipAdapter(requireContext() , iconModelArrayList)
+        val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        binding.chipRecyclerView.layoutManager = layoutManager
+        binding.chipRecyclerView.adapter = playbackIconsAdapter
+        playbackIconsAdapter.notifyDataSetChanged()
+
+
+        playbackIconsAdapter.setOnItemClickListener(object : ChipAdapter.OnItemClickListener {
+            @SuppressLint("Range", "SourceLockedOrientationActivity")
+            override fun onItemClick(position: Int) {
+                when (position) {
+                    0 -> {
+                        startActivity(Intent(requireContext(), PlaylistFolderActivity::class.java))
+                    }
+                    1->{
+                        startActivity(Intent(requireContext(), PlaylistFolderActivity::class.java))
+                    }
+                    else -> {
+                        // Handle any other positions if needed
+                    }
+                }
+            }
+        })
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun refreshFolderList() {
         // Call the refresh function in MainActivity
@@ -104,7 +162,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
         foldersAdapter.notifyDataSetChanged()
         searchAdapter.notifyDataSetChanged()
 
-        binding.totalFolder.text = "${MainActivity.folderList.size} Folders"
+//        binding.totalFolder.text = "${MainActivity.folderList.size} Folders"
         swipeRefreshLayout.isRefreshing = false
 
         if (MainActivity.folderList.isEmpty()) {
@@ -217,7 +275,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
 
     @SuppressLint("SetTextI18n")
     override fun onFileCountChanged(newCount: Int) {
-        binding.totalFolder.text = "$newCount Folders"
+//        binding.totalFolder.text = "$newCount Folders"
     }
 
     override fun onItemClick(fileItem: VideoData) {

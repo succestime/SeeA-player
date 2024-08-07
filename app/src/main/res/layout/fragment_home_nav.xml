@@ -12,20 +12,26 @@
         android:layout_height="wrap_content">
 
 
-
-
-
-        <TextView
-            android:id="@+id/totalFolder"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chipRecyclerView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/total_folders"
-            android:textSize="15sp"
-            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/totalFolder"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:text="@string/total_folders"-->
+<!--            android:textSize="15sp"-->
+<!--            android:textStyle="bold"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
         <ViewStub
             android:id="@+id/videoEmptyStateLayout"
             android:layout_width="wrap_content"
@@ -43,13 +49,13 @@
             android:id="@+id/folderRV"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="5sp"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/totalFolder"
+            app:layout_constraintTop_toBottomOf="@id/chipRecyclerView"
             app:layout_constraintVertical_weight="1" />
 
 

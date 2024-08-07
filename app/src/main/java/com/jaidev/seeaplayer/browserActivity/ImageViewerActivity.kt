@@ -9,7 +9,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -75,7 +74,6 @@ class ImageViewerActivity : AppCompatActivity() {
         }
 
         loadImage()
-        setActionBarGradient()
         swipeRefreshLayout = binding.ImageViewerActivity
 
         // Set the background color of SwipeRefreshLayout based on app theme
@@ -258,59 +256,6 @@ class ImageViewerActivity : AppCompatActivity() {
         }
     }
 
-    private fun setActionBarGradient() {
-        // Check the current night mode
-        val nightMode = AppCompatDelegate.getDefaultNightMode()
-        if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-            // Light mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@ImageViewerActivity,
-                        R.color.light_statusBar
-                    )
-                )
-            }
-        } else if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Dark mode is applied
-            supportActionBar?.apply {
-                setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        this@ImageViewerActivity,
-                        R.color.black_statusBar
-                    )
-                )
-            }
-        } else {
-            // System Default mode is applied
-            val isSystemDefaultDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
-                else -> false
-            }
-            // Set the ActionBar color based on the System Default mode
-            if (isSystemDefaultDarkMode) {
-                // System Default mode is dark
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@ImageViewerActivity,
-                            R.color.black_statusBar
-                        )
-                    )
-                }
-            } else {
-                // System Default mode is light
-                supportActionBar?.apply {
-                    setBackgroundDrawable(
-                        ContextCompat.getDrawable(
-                            this@ImageViewerActivity,
-                            R.color.light_statusBar
-                        )
-                    )
-                }
-            }
-        }
-    }
 
     private fun getImageUri(imagePath: String?): Uri? {
         return imagePath?.let {
