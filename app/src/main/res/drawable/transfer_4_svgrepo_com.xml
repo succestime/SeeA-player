@@ -1,6 +1,6 @@
 <vector android:height="24dp" android:viewportHeight="24"
     android:viewportWidth="24" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="#000000" android:fillType="nonZero"
+    <path android:fillColor="#FFFFFF" android:fillType="nonZero"
         android:pathData="M16.496,6.5C17.324,6.5 17.996,7.172 17.996,8L17.996,16.414L18.97,15.439C19.556,14.854 20.506,14.854 21.092,15.439C21.678,16.025 21.678,16.975 21.092,17.561L17.556,21.096C16.97,21.682 16.021,21.682 15.435,21.096L11.899,17.561C11.314,16.975 11.314,16.025 11.899,15.439C12.485,14.854 13.435,14.854 14.021,15.439L14.996,16.414L14.996,8C14.996,7.172 15.667,6.5 16.496,6.5ZM8.556,2.904L12.092,6.439C12.678,7.025 12.678,7.975 12.092,8.561C11.506,9.146 10.556,9.146 9.97,8.561L8.996,7.586L8.996,16C8.996,16.828 8.324,17.5 7.496,17.5C6.667,17.5 5.996,16.828 5.996,16L5.996,7.586L5.021,8.561C4.435,9.146 3.485,9.146 2.899,8.561C2.314,7.975 2.314,7.025 2.899,6.439L6.435,2.904C7.021,2.318 7.97,2.318 8.556,2.904Z"
-        android:strokeColor="#00000000" android:strokeWidth="1"/>
+        android:strokeColor="#FFFFFF" android:strokeWidth="1"/>
 </vector>

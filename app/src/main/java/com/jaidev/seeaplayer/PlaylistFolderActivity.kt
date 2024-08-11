@@ -1,10 +1,15 @@
 package com.jaidev.seeaplayer
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaidev.seeaplayer.allAdapters.PlaylistAdapter
 import com.jaidev.seeaplayer.dataClass.DatabaseClient
@@ -22,6 +27,13 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
     private lateinit var playlistAdapter: PlaylistAdapter // Adapter for the RecyclerView
     private val db by lazy { DatabaseClient.getInstance(this) }
 
+    private val updatePlaylistReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            // Refresh the playlists
+            refreshPlaylists()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val theme = ThemeHelper.getSavedTheme(this)
@@ -30,10 +42,27 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
         setContentView(binding.root)
         supportActionBar?.hide()
 
+        // Register the receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            updatePlaylistReceiver,
+            IntentFilter("UPDATE_PLAYLIST_FOLDER")
+        )
 
+        // Load playlists
+        loadPlaylists()
 
+        // Set up menu item click listener
+        binding.playlistToolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.closePlaylist -> {
+                    // Handle the first menu item click
+                    finish()
+                    true
+                }
 
-        // Initialize RecyclerView
+                else -> false
+            }
+        }// Initialize RecyclerView
         playlistAdapter = PlaylistAdapter(this , mutableListOf())
         binding.playlistRecyclerview.apply {
             layoutManager = LinearLayoutManager(this@PlaylistFolderActivity)
@@ -86,6 +115,31 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
             binding.noPlaylistsText.visibility = View.VISIBLE
         } else {
             binding.noPlaylistsText.visibility = View.GONE
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister the receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updatePlaylistReceiver)
+
+    }
+
+    private fun refreshPlaylists() {
+        // Reload the playlists from the database
+        loadPlaylists()
+        loadPlaylistsFromDatabase()
+
+    }
+    private fun loadPlaylists() {
+        lifecycleScope.launch {
+            // Fetch playlists from the database
+            val playlists = withContext(Dispatchers.IO) {
+                db.playlistDao().getAllPlaylists()
+            }
+            // Update the adapter with the fetched playlists
+            playlistAdapter.updatePlaylists(playlists.map { PlaylistVideo(it.id, it.name) })
+            // Update the visibility of the "No Playlists" text
+            updateNoPlaylistsTextVisibility()
         }
     }
 

@@ -22,6 +22,7 @@
     <color name="transparent__">#78564E</color>
     <color name="transparent_">#7E636262</color>
     <color name="transparent___">#0A15E4</color>
+    <color name="placeholder_image">#BAB9B9</color>
 
     <color name="red">#FFFF0000</color>
     <color name="green">#FF00FF00</color>

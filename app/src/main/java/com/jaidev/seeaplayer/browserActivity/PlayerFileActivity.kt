@@ -98,6 +98,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
     private var videoUriList: ArrayList<Uri>? = null
     private var videoTitleList: ArrayList<String>? = null
     private var currentIndex: Int = 0
+    private var shuffleCurrentIndex: Int = 0
     private var isPlayingBeforePause = false
     private var isSwipingToChangeDuration = false
     private var isSwipingForward = false
@@ -114,6 +115,8 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
     private var sleepTimerPosition = -1
     private var boosterPosition = -1
     private var speedPosition = -1
+    private var playlistId: Long = -1 // Declare playlistId
+
     companion object {
         private var brightness: Int = 0
         private var volume: Int = 0
@@ -124,7 +127,11 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         private const val MAX_PROGRESS = 100
         private lateinit var loudnessEnhancer: LoudnessEnhancer
     }
-    private val videoHistory = mutableListOf<Pair<Uri, String>>()
+    private var isRepeatMode: Boolean = false
+    private var isShuffleMode: Boolean = false
+    private var shuffledVideoUriList: ArrayList<Uri>? = null
+    private var shuffledVideoTitleList: ArrayList<String>? = null
+
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("MissingInflatedId", "ObsoleteSdkInt", "NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,6 +164,9 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
+        isRepeatMode = intent.getBooleanExtra("isRepeatMode", false)
+        isShuffleMode = intent.getBooleanExtra("isShuffleMode", false)
+
         when (intent.action) {
             Intent.ACTION_VIEW -> {
                 // Check if the intent action is ACTION_VIEW for shared video
@@ -178,7 +188,9 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 videoUriList = videoUris?.filterNotNull() as ArrayList<Uri>?
                 videoTitleList = videoUriList?.map { getVideoTitle(it) ?: "Shared Video" } as ArrayList<String>?
                 currentIndex = -1
+                shuffleCurrentIndex = -1
                 if (videoUriList.isNullOrEmpty().not()) {
+                    if (isShuffleMode) shuffleVideos()
                     playNextVideo()
                 } else {
                     Toast.makeText(this, "No Videos to Play", Toast.LENGTH_SHORT).show()
@@ -192,6 +204,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 initializePlayer(videoUri, videoTitle)
             }
         }
+
 
 
         binding.playerView.setOnApplyWindowInsetsListener { view, insets ->
@@ -211,26 +224,85 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
     }
 
     private fun playNextVideo() {
-        if (videoUriList != null && videoUriList!!.isNotEmpty() && currentIndex < videoUriList!!.size - 1) {
+        if (isShuffleMode && isRepeatMode) {
+            playShuffledNextVideo()
+        } else if (isShuffleMode) {
+            playShuffledNextVideo()
+        } else if (isRepeatMode && videoUriList!!.isNotEmpty()) {
             currentIndex++
-            val nextUri = videoUriList!![currentIndex]
-            val nextTitle = videoTitleList!![currentIndex]
-            initializePlayer(nextUri, nextTitle)
+            if (currentIndex >= videoUriList!!.size) {
+                currentIndex = 0 // Restart from the beginning
+            }
+            val nextUri = videoUriList?.get(currentIndex)
+            val nextTitle = videoTitleList?.get(currentIndex)
+            initializePlayer(nextUri!!, nextTitle)
         } else {
-            Toast.makeText(this, "No Next Video", Toast.LENGTH_SHORT).show()
+            if (videoUriList != null && videoUriList!!.isNotEmpty()) {
+                currentIndex++
+                if (currentIndex < videoUriList!!.size) {
+                    val nextUri = videoUriList!![currentIndex]
+                    val nextTitle = videoTitleList?.get(currentIndex)
+                    initializePlayer(nextUri, nextTitle)
+                } else {
+                    finish() // Finish if no more videos are left and repeat mode is not enabled
+                }
+            } else {
+                finish() // Finish if no videos are available
+            }
         }
     }
 
+
     private fun playPreviousVideo() {
-        if (currentIndex > 0) {
+        if (isRepeatMode && videoUriList!!.isNotEmpty()) {
             currentIndex--
+            if (currentIndex < 0) {
+                currentIndex = videoUriList!!.size - 1 // Restart from the end
+            }
             val previousUri = videoUriList!![currentIndex]
             val previousTitle = videoTitleList!![currentIndex]
             initializePlayer(previousUri, previousTitle)
+            findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
         } else {
-            Toast.makeText(this, "No Previous Video", Toast.LENGTH_SHORT).show()
+            if (currentIndex > 0) {
+                currentIndex--
+                val previousUri = videoUriList!![currentIndex]
+                val previousTitle = videoTitleList!![currentIndex]
+                initializePlayer(previousUri, previousTitle)
+                findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
+            } else {
+                Toast.makeText(this, "No Previous Video", Toast.LENGTH_SHORT).show()
+            }
         }
     }
+
+    private fun playShuffledNextVideo() {
+        if (shuffledVideoUriList != null && shuffledVideoUriList!!.isNotEmpty()) {
+            shuffleCurrentIndex++
+            if (shuffleCurrentIndex >= shuffledVideoUriList!!.size) {
+                if (isRepeatMode) {
+                    shuffleCurrentIndex = 0 // Restart from the beginning if repeat mode is on
+                } else {
+                    finish()
+                    return
+                }
+            }
+            val nextUri = shuffledVideoUriList?.get(shuffleCurrentIndex)
+            val nextTitle = shuffledVideoTitleList?.get(shuffleCurrentIndex)
+            initializePlayer(nextUri!!, nextTitle)
+        } else {
+            finish() // End the activity if no videos are available
+        }
+    }
+
+
+    private fun shuffleVideos() {
+        shuffledVideoUriList = ArrayList(videoUriList!!)
+        shuffledVideoUriList!!.shuffle()
+        shuffledVideoTitleList = shuffledVideoUriList!!.map { getVideoTitle(it) ?: "Shared Video" } as ArrayList<String>?
+    }
+
+
 
 
 
@@ -274,8 +346,12 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         videoTitleTextView = findViewById(R.id.videoTitle)
         videoTitleTextView.text = videoTitle
 
-        // Update the currentIndex based on the URI
+
+// Update the currentIndex based on the URI
+        shuffleCurrentIndex = shuffledVideoUriList?.indexOf(videoUri) ?: videoUriList?.indexOf(videoUri) ?: 0
+
         currentIndex = videoUriList?.indexOf(videoUri) ?: 0
+
     }
 
     private fun setupPlayerControls() {
@@ -318,33 +394,65 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         findViewById<ImageButton>(R.id.backBtn).setOnClickListener {
             finish()
         }
-        // Initialize next button
+
+// Initialize next button
         findViewById<ImageButton>(R.id.nextBtn).setOnClickListener {
-            if (repeat) {
-                Toast.makeText(this, "Repeat mode is on", Toast.LENGTH_SHORT).show()
-                // If repeat mode is enabled, do nothing and call the functionality
-                // This will not play the previous video
-                // You can add a message or just leave it empty
-            } else {
+            if (isShuffleMode && !repeat) {
+                if (videoUriList.isNullOrEmpty() || currentIndex >= videoUriList!!.size - 1) {
+                    Toast.makeText(this, "No Next Video", Toast.LENGTH_SHORT).show()
+                } else {
+                    currentIndex++
+                    if (currentIndex < videoUriList!!.size) {
+                        val nextUri = videoUriList!![currentIndex]
+                        val nextTitle = videoTitleList?.get(currentIndex)
+                        initializePlayer(nextUri, nextTitle)
+                    } else {
+                        finish()
+                    }
+                }
+            } else if (isRepeatMode && videoUriList!!.isNotEmpty()) {
                 playNextVideo()
                 findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
-
+            } else if (!repeat) {
+                if (videoUriList.isNullOrEmpty() || currentIndex >= videoUriList!!.size - 1) {
+                    Toast.makeText(this, "No Next Video", Toast.LENGTH_SHORT).show()
+                } else {
+                    playNextVideo()
+                    findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
+                }
+            } else {
+                Toast.makeText(this, "Repeat mode is on", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Initialize previous button
+// Initialize previous button
         findViewById<ImageButton>(R.id.prevBtn).setOnClickListener {
-            if (repeat) {
-                Toast.makeText(this, "Repeat mode is on", Toast.LENGTH_SHORT).show()
-                // If repeat mode is enabled, do nothing and call the functionality
-                // This will not play the previous video
-                // You can add a message or just leave it empty
-            } else {
+            if (isShuffleMode && !repeat) {
+                if (currentIndex <= 0) {
+                    Toast.makeText(this, "No Previous Video", Toast.LENGTH_SHORT).show()
+                } else {
+                    currentIndex--
+                    val previousUri = videoUriList!![currentIndex]
+                    val previousTitle = videoTitleList!![currentIndex]
+                    initializePlayer(previousUri, previousTitle)
+                    findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
+                }
+            } else if (isRepeatMode && videoUriList!!.isNotEmpty()) {
                 playPreviousVideo()
                 findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
+            } else if (!repeat) {
+                if (currentIndex <= 0) {
+                    Toast.makeText(this, "No Previous Video", Toast.LENGTH_SHORT).show()
+                } else {
+                    playPreviousVideo()
+                    findViewById<ImageButton>(R.id.playPauseBtn).setImageResource(R.drawable.round_pause_24)
+                }
+            } else {
+                Toast.makeText(this, "Repeat mode is on", Toast.LENGTH_SHORT).show()
             }
-
         }
+
+
         val lockBtn = findViewById<ImageButton>(R.id.openButton)
 
         lockBtn.setOnClickListener {
@@ -405,7 +513,6 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         fullScreenBtn.setOnClickListener {
             toggleFullscreen()
         }
-
         findViewById<ImageButton>(R.id.repeatBtn).setOnClickListener {
             if (repeat) {
                 repeat = false
@@ -417,6 +524,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 findViewById<ImageButton>(R.id.repeatBtn).setImageResource(R.drawable.round_repeat_on)
             }
         }
+
         // Play video in fullscreen mode initially
         playInFullscreen(enable = false)
         doubleTapEnable()
@@ -460,7 +568,13 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
                 if (state == Player.STATE_ENDED) {
-                    if (videoUriList.isNullOrEmpty()) {
+                    if (isShuffleMode && isRepeatMode) {
+                        playShuffledNextVideo()
+                    } else if (isShuffleMode) {
+                        playShuffledNextVideo()
+                    } else if (isRepeatMode && videoUriList!!.isNotEmpty()) {
+                        playNextVideo()
+                    } else if (videoUriList.isNullOrEmpty()) {
                         finish() // Finish the activity if no more videos are left
                     } else {
                         playNextVideo() // Play the next video if available
@@ -651,7 +765,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                             val intent = Intent(this@PlayerFileActivity, LinkTubeActivity::class.java)
                             startLinkTubeActivityLauncher.launch(intent)
                         }, 100) // Delay of 500 milliseconds
-                                      }
+                    }
                     6 -> {
                         boosterPosition = position
 
@@ -798,7 +912,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 // dialog.dismiss()
                 binding.playerView.showContextMenu()
                 playVideo()
-             pipStatus = 0
+                pipStatus = 0
             } else {
                 val intent = Intent(
                     "android.settings.PICTURE_IN_PICTURE_SETTINGS",
@@ -978,8 +1092,8 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                 .setMessage("If you want to stop the sleep timer, click on Stop")
                 .setPositiveButton("Stop") { dialog, _ ->
                     // Cancel the ongoing timer
-               timer?.cancel()
-                timer = null
+                    timer?.cancel()
+                    timer = null
                     isSleepTimerRunning = false
                     // Update the icon and background
                     iconModelArrayList[sleepTimerPosition] = IconModel(
@@ -1201,7 +1315,7 @@ class PlayerFileActivity : AppCompatActivity() , GestureDetector.OnGestureListen
                                 val increase = deltaY > 0
                                 val newValue = if (increase) volume - 1 else volume + 1
                                 if (newValue in 0..maxVolume) volume = newValue
-                               audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
+                                audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
                                     volume, 0)
                             }
 

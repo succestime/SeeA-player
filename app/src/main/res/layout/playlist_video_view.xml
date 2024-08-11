@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_height="65dp"
+    android:layout_height="wrap_content"
     android:id="@+id/multyLayout"
     android:clickable="true"
     android:focusable="true"
+    android:layout_marginTop="15sp"
     android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground">
 
@@ -15,25 +16,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
+        <LinearLayout
+            android:layout_width="85dp"
+            android:layout_height="3dp"
+            android:layout_marginStart="7dp"
+android:layout_marginTop="1dp"
+            android:backgroundTint="#45667A"
+            android:background="@drawable/curver"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
+        <LinearLayout
+            android:layout_width="90dp"
+            android:layout_height="3dp"
+            android:layout_marginStart="7dp"
+android:layout_marginTop="3.5dp"
+            android:backgroundTint="#45667A"
+            android:background="@drawable/curver"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/playlistImage"
-            android:layout_width="100dp"
-            android:layout_height="55dp"
+            android:layout_width="110dp"
+            android:layout_height="65dp"
             app:shapeAppearanceOverlay="@style/curved_image_video"
-         android:src="@drawable/play_circle_svgrepo_com"
-            android:background="@color/black"
+            android:background="@drawable/curver"
+            android:backgroundTint="@color/black"
             android:layout_marginStart="7dp"
+            android:layout_marginTop="6dp"
+            android:scaleType="centerCrop"
             app:cardBackgroundColor="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.455"/>
+          />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+<!--    android:src="@drawable/play_circle_svgrepo_com"-->
 
 
     <LinearLayout
@@ -80,7 +104,7 @@
 
 
     <ImageButton
-        android:id="@+id/playlistDelete"
+        android:id="@+id/playlistMore"
         android:layout_width="25dp"
         android:layout_height="30dp"
         android:layout_gravity="center"

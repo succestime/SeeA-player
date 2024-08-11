@@ -40,7 +40,9 @@
         <activity
             android:name=".PlaylistVideoActivity"
             android:exported="false"
-            android:theme="@style/statusBarPlaylistTheme"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/statusBarPlaylistTheme"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".PlaylistFolderActivity"
             android:exported="false"

@@ -49,6 +49,9 @@ import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
 import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import java.io.File
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @SuppressLint("NotifyDataSetChanged")
 class VideoAdapter(private val context: Context,
@@ -402,12 +405,18 @@ val indicator = binding.newIndicator
                 val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
                 val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
                 val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+                val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
 
                 // Populate dialog views with data
                 fileNameTextView.text = videoList[position].title
                 durationTextView.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
                 sizeTextView.text = Formatter.formatShortFileSize(context, videoList[position].size.toLong())
                 locationTextView.text = videoList[position].path
+
+                // Format and set the date
+                val dateFormat = SimpleDateFormat("MMMM d, yyyy, HH:mm", Locale.getDefault())
+                dateTextView.text = videoList[position].dateAdded?.let { it1 -> Date(it1) }
+                    ?.let { it2 -> dateFormat.format(it2) }
 
                 val dialogIF = MaterialAlertDialogBuilder(context)
                     .setView(customDialogIF)

@@ -5,9 +5,11 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class VideoData(val id : String, var title : String, val duration : Long = 0, val folderName : String, val size : String,
-                     var path : String, var artUri : Uri ,val dateAdded: Long?,var isNew: Boolean = false , var selected: Boolean = false ,     var isPlayed: Boolean = false  // Flag to check if the video has been played
+                     var path : String, var artUri : Uri ,val dateAdded: Long? ,var isNew: Boolean = false , var selected: Boolean = false ,     var isPlayed: Boolean = false
 ) :
     Parcelable {
+
+
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readString()!!,
@@ -16,7 +18,7 @@ data class VideoData(val id : String, var title : String, val duration : Long = 
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readParcelable(Uri::class.java.classLoader)!!,
-        parcel.readValue(Long::class.java.classLoader) as? Long,
+        parcel.readLong() ,
         parcel.readByte() != 0.toByte(),
         parcel.readByte() != 0.toByte()
     )
@@ -29,7 +31,7 @@ data class VideoData(val id : String, var title : String, val duration : Long = 
         parcel.writeString(size)
         parcel.writeString(path)
         parcel.writeParcelable(artUri, flags)
-        parcel.writeValue(dateAdded)
+        parcel.writeLong(dateAdded!!)
         parcel.writeByte(if (isNew) 1 else 0)
         parcel.writeByte(if (selected) 1 else 0)
     }

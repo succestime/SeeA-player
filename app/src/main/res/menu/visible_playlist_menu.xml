@@ -10,7 +10,7 @@
 
     <item android:id="@+id/morePlaylist"
         android:title="Share"
-        android:icon="@drawable/icon_dark"
+        android:icon="@drawable/icon_dark_2"
         app:showAsAction="always"
         />
 
