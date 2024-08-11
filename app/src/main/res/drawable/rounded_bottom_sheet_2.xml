@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/rounded_bottom_sheet.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/bottomSheetBackgroundColor" />
+    <corners android:topLeftRadius="16dp"
+        android:topRightRadius="16dp"/>
+</shape>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:layout_marginBottom="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
+
+    <ImageButton
+        android:id="@+id/emptyCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/round_crop_square_24"
+        android:layout_marginVertical="15dp"
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="5dp"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint" />
+    <ImageButton
+        android:id="@+id/fillCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/check_box_24"
+        android:background="@color/transparent"
+        android:layout_marginEnd="7dp"
+        android:layout_marginVertical="15dp"
+        android:layout_marginStart="5dp"
+        android:visibility="gone"
+        tools:ignore="UseAppTint" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/videoImage"
+            android:layout_width="100dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:background="@color/black"
+            android:contentDescription="video_image"
+            app:shapeAppearanceOverlay="@style/curved_image_video"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+        <TextView
+            android:id="@+id/newIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_new_indicator"
+            android:text="NEW"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:visibility="gone"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="4dp"
+            android:paddingHorizontal="2dp"
+            app:layout_constraintStart_toStartOf="@+id/videoImage"
+            app:layout_constraintTop_toTopOf="parent"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/curver_video_image"
+                android:layout_marginBottom="3dp"
+                android:gravity="center"
+                android:paddingStart="2.5dp"
+                android:paddingEnd="2.5dp"
+                android:layout_marginEnd="4dp"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    android:id="@+id/duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="00:00"
+                    android:textSize="11dp"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <ImageView
+            android:id="@+id/multiIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/complete_svgrepo_com"
+            android:gravity="center"
+            android:backgroundTint="@color/red"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:visibility="gone">
+
+        </ImageView>
+
+        <TextView
+            android:id="@+id/recantnewIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/background_new_indicator"
+            android:padding="4dp"
+            android:text="NEW"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="2dp"
+        android:gravity="center_vertical"
+
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/videoName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="video title"
+            android:layout_marginStart="5dp"
+            android:maxLines="2"
+            android:layout_gravity="center_vertical"/>
+
+
+
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/MoreChoose"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/icon_dark"
+        app:tint="?android:attr/textColorPrimary"
+        android:layout_marginVertical="15dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="3dp"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint" />
+
+
+</LinearLayout>
