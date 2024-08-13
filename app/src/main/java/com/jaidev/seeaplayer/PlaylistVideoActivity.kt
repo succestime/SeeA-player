@@ -596,8 +596,8 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
                     SortType.DURATION_DESC -> db.playlistDao().getVideosSortedByDurationDesc(playlistId)
                     SortType.DATE_NEWEST -> db.playlistDao().getVideosSortedByNewest(playlistId)
                     SortType.DATE_OLDEST -> db.playlistDao().getVideosSortedByOldest(playlistId)
-                    SortType.SIZE_LARGEST -> db.playlistDao().getVideosSortedByLargestSize(playlistId)
-                    SortType.SIZE_SMALLEST -> db.playlistDao().getVideosSortedBySmallestSize(playlistId)
+                    SortType.SIZE_LARGEST -> db.playlistDao().getVideosSortedBySizeDesc(playlistId)
+                    SortType.SIZE_SMALLEST -> db.playlistDao().getVideosSortedBySizeAsc(playlistId)
                 }
                 videoList.clear()
                 videoList.addAll(sortedVideos.map {
@@ -751,8 +751,8 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
                     SortType.DURATION_DESC -> db.playlistDao().getVideosSortedByDurationDesc(playlistId)
                     SortType.DATE_NEWEST -> db.playlistDao().getVideosSortedByNewest(playlistId)
                     SortType.DATE_OLDEST -> db.playlistDao().getVideosSortedByOldest(playlistId)
-                    SortType.SIZE_LARGEST -> db.playlistDao().getVideosSortedByLargestSize(playlistId)
-                    SortType.SIZE_SMALLEST -> db.playlistDao().getVideosSortedBySmallestSize(playlistId)
+                    SortType.SIZE_LARGEST -> db.playlistDao().getVideosSortedBySizeDesc(playlistId)
+                    SortType.SIZE_SMALLEST -> db.playlistDao().getVideosSortedBySizeAsc(playlistId)
                 }
             }
 

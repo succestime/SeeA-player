@@ -222,26 +222,25 @@ interface PlaylistDao {
     )
     suspend fun getVideosSortedByOldest(playlistId: Long): List<VideoEntity>
 
-    // Sort by largest size
-//    -- Sort by largest size
+    // Sort by size largest first
     @Query(
         """
-    SELECT * FROM videos
-    WHERE id IN (SELECT videoId FROM PlaylistVideoCrossRef WHERE playlistId = :playlistId)
-    ORDER BY size DESC
-"""
+        SELECT * FROM videos
+        WHERE id IN (SELECT videoId FROM PlaylistVideoCrossRef WHERE playlistId = :playlistId)
+        ORDER BY size DESC
+    """
     )
-    suspend fun getVideosSortedByLargestSize(playlistId: Long): List<VideoEntity>
+    suspend fun getVideosSortedBySizeDesc(playlistId: Long): List<VideoEntity>
 
-    //    -- Sort by smallest size
+    // Sort by size smallest first
     @Query(
         """
-    SELECT * FROM videos
-    WHERE id IN (SELECT videoId FROM PlaylistVideoCrossRef WHERE playlistId = :playlistId)
-    ORDER BY size ASC
-"""
+        SELECT * FROM videos
+        WHERE id IN (SELECT videoId FROM PlaylistVideoCrossRef WHERE playlistId = :playlistId)
+        ORDER BY size ASC
+    """
     )
-    suspend fun getVideosSortedBySmallestSize(playlistId: Long): List<VideoEntity>
+    suspend fun getVideosSortedBySizeAsc(playlistId: Long): List<VideoEntity>
 
     @Query("UPDATE playlists SET sortOrder = :sortOrder WHERE id = :playlistId")
     suspend fun updateSortOrder(playlistId: Long, sortOrder: PlaylistVideoActivity.SortType)
