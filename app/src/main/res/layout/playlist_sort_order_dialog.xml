@@ -146,7 +146,7 @@ android:textStyle="bold"
 
         <!-- Z to A Option -->
         <LinearLayout
-            android:id="@+id/ZtoAOption"
+            android:id="@+id/titleOption"
             android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
     tools:context=".PlaylistVideoActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,6 +18,9 @@
              android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
+            android:layout_marginTop="-100dp"
+        android:fitsSystemWindows="true"
+        android:transitionName="shared_element_transition_name"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout27"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,22 +32,24 @@
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="50sp"
             android:backgroundTint="@color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:liftOnScroll="true">
+            >
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/playlist_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="80sp"
+                android:layout_height="?attr/actionBarSize"
                 android:gravity="center_vertical"
                 app:layout_scrollFlags="scroll|enterAlwaysCollapsed|enterAlways|snap|snapMargins"
                 app:menu="@menu/visible_playlist_menu"
                 app:navigationIcon="@drawable/back_browser"
                 app:navigationIconTint="@color/white"
                 app:titleMarginStart="20sp"
+                android:background="@android:color/transparent"
                 app:titleTextAppearance="@style/CustomToolbarTitleText"
                 app:titleTextColor="?attr/titleTextColor">
 
@@ -102,11 +108,18 @@
             app:layout_constraintTop_toBottomOf="@+id/playlistTitleAndDuration"
             app:layout_constraintVertical_bias="0.0">
 
-
-
         </LinearLayout>
 
-
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
         <LinearLayout
             android:id="@+id/linearLayout27"
             android:layout_width="match_parent"

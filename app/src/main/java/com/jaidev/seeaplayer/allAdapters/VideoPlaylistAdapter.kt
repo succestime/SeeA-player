@@ -78,13 +78,16 @@ class PlaylistAdapter(private val context: Context, private var playlists: Mutab
 
             // Fetch and display the video count and total duration
             binding.root.post {
+
                 CoroutineScope(Dispatchers.IO).launch {
+                    val sortOrder = dao.getSortOrder(playlist.id)
+
                     val videoCount = dao.getVideoCountForPlaylist(playlist.id)
                     val totalDurationMillis =
                         if (videoCount > 0) dao.getTotalDurationForPlaylist(playlist.id) else 0
                     val totalDurationFormatted =
                         if (totalDurationMillis > 0) formatDuration(totalDurationMillis) else ""
-                    val firstVideoImageUri = dao.getFirstVideoImageUri(playlist.id)
+                    val firstVideoImageUri = dao.getFirstVideoImageUri(playlist.id, sortOrder)
 
                     withContext(Dispatchers.Main) {
                         binding.totalVideoContain.text = if (videoCount > 0) {
@@ -138,8 +141,9 @@ class PlaylistAdapter(private val context: Context, private var playlists: Mutab
 
             // Launch a coroutine to call the suspend functions
             CoroutineScope(Dispatchers.IO).launch {
+                val sortOrder = dao.getSortOrder(playlist.id)
                 val videoCount = dao.getVideoCountForPlaylist(playlist.id)
-                val imageUri = dao.getFirstVideoImageUri(playlist.id)
+                val imageUri = dao.getFirstVideoImageUri(playlist.id, sortOrder)
 
                 withContext(Dispatchers.Main) {
                     textSubtitle.text = "$videoCount videos"
@@ -288,7 +292,9 @@ class PlaylistAdapter(private val context: Context, private var playlists: Mutab
             playlistName.text = playlist.name
             // Load the playlist image using Glide
             CoroutineScope(Dispatchers.IO).launch {
-                val imageUri = dao.getFirstVideoImageUri(playlist.id)
+                val sortOrder = dao.getSortOrder(playlist.id)
+
+                val imageUri = dao.getFirstVideoImageUri(playlist.id , sortOrder)
                 withContext(Dispatchers.Main) {
                     Glide.with(context)
                         .load(imageUri)

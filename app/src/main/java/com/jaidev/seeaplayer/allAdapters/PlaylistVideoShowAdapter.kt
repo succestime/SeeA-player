@@ -36,6 +36,8 @@ class PlaylistVideoShowAdapter(
 
     var isSelectionMode = false
     interface OnSelectionChangeListener {
+
+
         fun onSelectionChanged(isAllSelected: Boolean)
     }
 
@@ -130,7 +132,7 @@ class PlaylistVideoShowAdapter(
         return VideoViewHolder(view)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "UseCompatLoadingForDrawables")
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val video = videoList[position]
         holder.titleTextView.text = video.title

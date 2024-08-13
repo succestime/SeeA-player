@@ -68,6 +68,7 @@ class MorePlaylistBottomSheetFragment : BottomSheetDialogFragment() {
 
         lifecycleScope.launch {
             val playlist = playlistDao.getPlaylistWithVideos(playlistId)
+            val sortOrder = playlistDao.getSortOrder(playlistId)
 
             // Set the playlist folder name
             binding.videoTitle.text = playlist.playlist.name
@@ -77,7 +78,7 @@ class MorePlaylistBottomSheetFragment : BottomSheetDialogFragment() {
             binding.totalVideoTitle.text = "$videoCount videos"
 
             // Set the thumbnail image for the first video
-            val firstVideoUri = playlistDao.getFirstVideoImageUri(playlistId)
+            val firstVideoUri = playlistDao.getFirstVideoImageUri(playlistId , sortOrder)
             Glide.with(this@MorePlaylistBottomSheetFragment)
                 .load(firstVideoUri)
                 .centerCrop()

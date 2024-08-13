@@ -374,14 +374,15 @@
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:textColor">@color/white</item>
         <item name="titleTextColor">@color/white</item>
-        <item name="android:statusBarColor">#BAB9B9</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
         <item name="android:windowBackground">#032C42</item>
         <item name="bottomSheetBackgroundColor">#064566</item>
         <item name="bottomActionModeBackgroundColor">#064566</item>
         <item name="alertDialogTheme">@style/CustomAlertDialogTheme</item> <!-- Apply the custom alert dialog theme -->
-
+<item name="android:windowTranslucentStatus">true</item>
     </style>
     <style name="CustomAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="android:background">#064566</item>

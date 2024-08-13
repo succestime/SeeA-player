@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.Button
@@ -23,6 +24,7 @@ import androidx.core.graphics.drawable.DrawableCompat.clearColorFilter
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.room.Query
 import com.bumptech.glide.Glide
 import com.jaidev.seeaplayer.allAdapters.PlaylistVideoShowAdapter
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity.Companion.adapter
@@ -46,6 +48,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
     private val videoList = mutableListOf<VideoData>()
     private var isAllSelected = false
     private var isActionModeEnabled = false
+    private var selectedSortType: SortType? = null
 
     private val updatePlaylistReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -57,6 +60,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             }
         }
     }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -220,6 +224,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
         bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
     }
 
+
     private fun handleSecondMenuItemClick() {
         // Inflate the custom layout
         val dialogView = layoutInflater.inflate(R.layout.playlist_sort_order_dialog, null)
@@ -245,7 +250,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
         val cancel_btn = dialogView.findViewById<TextView>(R.id.cancel_btn)
         val btn_done = dialogView.findViewById<TextView>(R.id.btn_done)
 
-        val ZtoAOption = dialogView.findViewById<LinearLayout>(R.id.ZtoAOption)
+        val ZtoAOption = dialogView.findViewById<LinearLayout>(R.id.titleOption)
         val lengthOption = dialogView.findViewById<LinearLayout>(R.id.lengthOption)
         val dateOption = dialogView.findViewById<LinearLayout>(R.id.dateOption)
         val sizeOption = dialogView.findViewById<LinearLayout>(R.id.SizeOption)
@@ -276,18 +281,19 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
         val option8ImageView = dialogView.findViewById<ImageView>(R.id.option8ImageView)
 
         // Initialize sorting option visibility
-        ZtoAOption.visibility = View.GONE  // Make ZtoAOption visible by default
+        ZtoAOption.visibility = View.GONE
         lengthOption.visibility = View.GONE
         dateOption.visibility = View.GONE
         sizeOption.visibility = View.GONE
 
-        fun clearSelection(excludeLayout: LinearLayout? = null) {
-            // Get the default text color from the theme (android:attr/textColorPrimary)
-            val typedValue = TypedValue()
-            val theme = this.theme
-            theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
-            val defaultTextColor = ContextCompat.getColor(this, typedValue.resourceId)
+        // Get the default text color from the theme (android:attr/textColorPrimary)
+        val typedValue = TypedValue()
+        val theme = this.theme
+        theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+        val defaultTextColor = ContextCompat.getColor(this, typedValue.resourceId)
 
+        // Function to clear selection
+        fun clearSelection(excludeLayout: LinearLayout? = null) {
             // Reset backgrounds, text colors, and clear icon color filters for all layouts
             listOf(
                 Pair(tv_a_to_zLayout, Pair(option1TextView, option1ImageView)),
@@ -313,14 +319,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             }
         }
 
-
         fun clearSelection() {
-            // Get the default text color from the theme (android:attr/textColorPrimary)
-            val typedValue = TypedValue()
-            val theme = this.theme
-            theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
-            val defaultTextColor = ContextCompat.getColor(this, typedValue.resourceId)
-
             listOf(tvSortTitle, tvSortLength, tvSortDate, tvSortSize).forEach {
                 it.setTextColor(defaultTextColor)
             }
@@ -328,8 +327,6 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
                 it.clearColorFilter()
             }
         }
-
-
 
         // Function to handle sorting option selection
         fun selectOption(selectedLayout: LinearLayout, optionsToShow: List<LinearLayout>, icon: ImageView, textView: TextView) {
@@ -344,82 +341,151 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             icon.setColorFilter(ContextCompat.getColor(this, R.color.cool_blue))
         }
 
-        fun handleIndividualSelection(layout: LinearLayout, textView: TextView, imageView: ImageView, isLeftSide: Boolean, isSelected: Boolean) {
-            val backgroundResId = if (isSelected) {
-                if (isLeftSide) R.drawable.combined_background_left_cool_blue else R.drawable.combined_background_right_cool_blue
-            } else {
-                if (isLeftSide) R.drawable.combined_background_left else R.drawable.combined_background_right
+        fun handleIndividualSelection(layout: LinearLayout, textView: TextView, imageView: ImageView, isLeftSide: Boolean, isSelected: Boolean, sortType: SortType) {
+            if (isSelected) {
+                val color = ContextCompat.getColor(this, R.color.cool_blue)
+                val selectedResId = if (isLeftSide) R.drawable.combined_background_left_cool_blue else R.drawable.combined_background_right_cool_blue
+                layout.setBackgroundResource(selectedResId)
+                clearSelection(layout)
+                textView.setTextColor(color)
+                imageView.setColorFilter(color)
+                selectedSortType = sortType
             }
-
-            clearSelection(layout)
-            layout.setBackgroundResource(backgroundResId)
-            textView.setTextColor(ContextCompat.getColor(this, if (isSelected) R.color.cool_blue else R.color.black))
-            imageView.setColorFilter(ContextCompat.getColor(this, if (isSelected) R.color.cool_blue else R.color.black))
         }
 
-        selectOption(layoutSortTitle, listOf(ZtoAOption), tvSortTitleIcon, tvSortTitle)
-
-        btn_done.setOnClickListener {
-
-        }
-
-
-        // Set up click listeners for sorting options
+        // Set click listeners for the sort options
         layoutSortTitle.setOnClickListener {
-
             selectOption(layoutSortTitle, listOf(ZtoAOption), tvSortTitleIcon, tvSortTitle)
+            handleIndividualSelection(tv_a_to_zLayout, option1TextView, option1ImageView, isLeftSide = true, isSelected = true, sortType = SortType.TITLE_ASC)
         }
 
         layoutSortDuration.setOnClickListener {
             selectOption(layoutSortDuration, listOf(lengthOption), tvSortLengthIcon, tvSortLength)
+            handleIndividualSelection(LongestLayout, option4TextView, option4ImageView, isLeftSide = false, isSelected = true, sortType = SortType.DURATION_DESC)
         }
 
         layoutSortDateAdded.setOnClickListener {
             selectOption(layoutSortDateAdded, listOf(dateOption), tvSortDateIcon, tvSortDate)
+            handleIndividualSelection(newestLayout, option6TextView, option6ImageView, isLeftSide = false, isSelected = true, sortType = SortType.DATE_NEWEST)
         }
 
         layoutSortSize.setOnClickListener {
             selectOption(layoutSortSize, listOf(sizeOption), tvSortSizeIcon, tvSortSize)
+            handleIndividualSelection(LargestLayout, option8TextView, option8ImageView, isLeftSide = false, isSelected = true, sortType = SortType.SIZE_LARGEST)
         }
 
-        // Set up click listeners for individual options within sorting
         tv_a_to_zLayout.setOnClickListener {
-            handleIndividualSelection(tv_a_to_zLayout, option1TextView, option1ImageView, isLeftSide = true, isSelected = true)
+            handleIndividualSelection(tv_a_to_zLayout, option1TextView, option1ImageView, isLeftSide = true, isSelected = true, sortType = SortType.TITLE_ASC)
+            handleIndividualSelection(tv_z_to_aLayout, option2TextView, option2ImageView, isLeftSide = false, isSelected = false, sortType = SortType.TITLE_DESC)
         }
 
         tv_z_to_aLayout.setOnClickListener {
-            handleIndividualSelection(tv_z_to_aLayout, option2TextView, option2ImageView, isLeftSide = false, isSelected = true)
+            handleIndividualSelection(tv_z_to_aLayout, option2TextView, option2ImageView, isLeftSide = false, isSelected = true, sortType = SortType.TITLE_DESC)
+            handleIndividualSelection(tv_a_to_zLayout, option1TextView, option1ImageView, isLeftSide = true, isSelected = false, sortType = SortType.TITLE_ASC)
         }
 
         shortestLayout.setOnClickListener {
-            handleIndividualSelection(shortestLayout, option3TextView, option3ImageView, isLeftSide = true, isSelected = true)
+            handleIndividualSelection(shortestLayout, option3TextView, option3ImageView, isLeftSide = true, isSelected = true, sortType = SortType.DURATION_ASC)
+            handleIndividualSelection(LongestLayout, option4TextView, option4ImageView, isLeftSide = false, isSelected = false, sortType = SortType.DURATION_DESC)
         }
 
         LongestLayout.setOnClickListener {
-            handleIndividualSelection(LongestLayout, option4TextView, option4ImageView, isLeftSide = false, isSelected = true)
+            handleIndividualSelection(LongestLayout, option4TextView, option4ImageView, isLeftSide = false, isSelected = true, sortType = SortType.DURATION_DESC)
+            handleIndividualSelection(shortestLayout, option3TextView, option3ImageView, isLeftSide = true, isSelected = false, sortType = SortType.DURATION_ASC)
         }
 
         OldestLayout.setOnClickListener {
-            handleIndividualSelection(OldestLayout, option5TextView, option5ImageView, isLeftSide = true, isSelected = true)
+            handleIndividualSelection(OldestLayout, option5TextView, option5ImageView, isLeftSide = true, isSelected = true, sortType = SortType.DATE_OLDEST)
+            handleIndividualSelection(newestLayout, option6TextView, option6ImageView, isLeftSide = false, isSelected = false, sortType = SortType.DATE_NEWEST)
         }
 
         newestLayout.setOnClickListener {
-            handleIndividualSelection(newestLayout, option6TextView, option6ImageView, isLeftSide = false, isSelected = true)
+            handleIndividualSelection(newestLayout, option6TextView, option6ImageView, isLeftSide = false, isSelected = true, sortType = SortType.DATE_NEWEST)
+            handleIndividualSelection(OldestLayout, option5TextView, option5ImageView, isLeftSide = true, isSelected = false, sortType = SortType.DATE_OLDEST)
         }
 
         SmallestLayout.setOnClickListener {
-            handleIndividualSelection(SmallestLayout, option7TextView, option7ImageView, isLeftSide = true, isSelected = true)
+            handleIndividualSelection(SmallestLayout, option7TextView, option7ImageView, isLeftSide = true, isSelected = true, sortType = SortType.SIZE_SMALLEST)
+            handleIndividualSelection(LargestLayout, option8TextView, option8ImageView, isLeftSide = false, isSelected = false, sortType = SortType.SIZE_LARGEST)
         }
 
         LargestLayout.setOnClickListener {
-            handleIndividualSelection(LargestLayout, option8TextView, option8ImageView, isLeftSide = false, isSelected = true)
+            handleIndividualSelection(LargestLayout, option8TextView, option8ImageView, isLeftSide = false, isSelected = true, sortType = SortType.SIZE_LARGEST)
+            handleIndividualSelection(SmallestLayout, option7TextView, option7ImageView, isLeftSide = true, isSelected = false, sortType = SortType.SIZE_SMALLEST)
         }
 
-        // Show the AlertDialog
+        cancel_btn.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btn_done.setOnClickListener {
+            selectedSortType?.let {
+                lifecycleScope.launch {
+                    saveSortOrder(it)
+                    sortVideos(it)
+                }
+            }
+            dialog.dismiss() // Close the dialog
+        }
+
+        // Show the dialog
         dialog.show()
+        fun updateSortOrderUI(sortType: SortType) {
+
+            when (sortType) {
+                SortType.TITLE_ASC, SortType.TITLE_DESC -> {
+                    selectOption(layoutSortTitle, listOf(ZtoAOption), tvSortTitleIcon, tvSortTitle)
+                    handleIndividualSelection(
+                        if (sortType == SortType.TITLE_ASC) tv_a_to_zLayout else tv_z_to_aLayout,
+                        if (sortType == SortType.TITLE_ASC) option1TextView else option2TextView,
+                        if (sortType == SortType.TITLE_ASC) option1ImageView else option2ImageView,
+                        isLeftSide = sortType == SortType.TITLE_ASC,
+                        isSelected = true,
+                        sortType = sortType
+                    )
+                }
+                SortType.DURATION_ASC, SortType.DURATION_DESC -> {
+                    selectOption(layoutSortDuration, listOf(lengthOption), tvSortLengthIcon, tvSortLength)
+                    handleIndividualSelection(
+                        if (sortType == SortType.DURATION_ASC) shortestLayout else LongestLayout,
+                        if (sortType == SortType.DURATION_ASC) option3TextView else option4TextView,
+                        if (sortType == SortType.DURATION_ASC) option3ImageView else option4ImageView,
+                        isLeftSide = sortType == SortType.DURATION_ASC,
+                        isSelected = true,
+                        sortType = sortType
+                    )
+                }
+                SortType.DATE_NEWEST, SortType.DATE_OLDEST -> {
+                    selectOption(layoutSortDateAdded, listOf(dateOption), tvSortDateIcon, tvSortDate)
+                    handleIndividualSelection(
+                        if (sortType == SortType.DATE_OLDEST) OldestLayout else newestLayout,
+                        if (sortType == SortType.DATE_OLDEST) option5TextView else option6TextView,
+                        if (sortType == SortType.DATE_OLDEST) option5ImageView else option6ImageView,
+                        isLeftSide = sortType == SortType.DATE_OLDEST,
+                        isSelected = true,
+                        sortType = sortType
+                    )
+                }
+                SortType.SIZE_SMALLEST, SortType.SIZE_LARGEST -> {
+                    selectOption(layoutSortSize, listOf(sizeOption), tvSortSizeIcon, tvSortSize)
+                    handleIndividualSelection(
+                        if (sortType == SortType.SIZE_SMALLEST) SmallestLayout else LargestLayout,
+                        if (sortType == SortType.SIZE_SMALLEST) option7TextView else option8TextView,
+                        if (sortType == SortType.SIZE_SMALLEST) option7ImageView else option8ImageView,
+                        isLeftSide = sortType == SortType.SIZE_SMALLEST,
+                        isSelected = true,
+                        sortType = sortType
+                    )
+                }
+            }
+        }
+
+        // Initialize the UI state based on the current sort order
+        lifecycleScope.launch {
+            val currentSortOrder = db.playlistDao().getSortOrder(playlistId)
+            updateSortOrderUI(currentSortOrder)
+        }
     }
-
-
 
 
     private fun toggleRepeatMode() {
@@ -481,7 +547,10 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
 
 
     private suspend fun loadVideosForPlaylist() {
-        val playlistWithVideos = withContext(Dispatchers.IO) { db.playlistDao().getPlaylistWithVideos(playlistId) }
+        val playlistWithVideos = withContext(Dispatchers.IO) {
+            db.playlistDao().getPlaylistWithVideos(playlistId)
+        }
+
         videoList.clear()
         videoList.addAll(playlistWithVideos.videos.map {
             VideoData(
@@ -499,8 +568,64 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
         })
         videoAdapter.updateVideoList(videoList)
         checkIfRecyclerViewIsEmpty()
+        // Fetch the saved sort order
+        val sortOrder = db.playlistDao().getSortOrder(playlistId)
+        sortVideos(sortOrder)
+
+    }
+    // Enum to define sorting types
+    enum class SortType {
+        TITLE_ASC, TITLE_DESC, DURATION_ASC, DURATION_DESC,
+        DATE_NEWEST, DATE_OLDEST, SIZE_LARGEST, SIZE_SMALLEST
+    }
+    private suspend fun saveSortOrder(sortType: SortType) {
+        withContext(Dispatchers.IO) {
+            db.playlistDao().updateSortOrder(playlistId, sortType)
+        }
     }
 
+
+    private fun sortVideos(sortType: SortType) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                db.playlistDao().updateSortOrder(playlistId, sortType) // Save the sort order
+                val sortedVideos = when (sortType) {
+                    SortType.TITLE_ASC -> db.playlistDao().getVideosSortedByTitleAsc(playlistId)
+                    SortType.TITLE_DESC -> db.playlistDao().getVideosSortedByTitleDesc(playlistId)
+                    SortType.DURATION_ASC -> db.playlistDao().getVideosSortedByDurationAsc(playlistId)
+                    SortType.DURATION_DESC -> db.playlistDao().getVideosSortedByDurationDesc(playlistId)
+                    SortType.DATE_NEWEST -> db.playlistDao().getVideosSortedByNewest(playlistId)
+                    SortType.DATE_OLDEST -> db.playlistDao().getVideosSortedByOldest(playlistId)
+                    SortType.SIZE_LARGEST -> db.playlistDao().getVideosSortedByLargestSize(playlistId)
+                    SortType.SIZE_SMALLEST -> db.playlistDao().getVideosSortedBySmallestSize(playlistId)
+                }
+                videoList.clear()
+                videoList.addAll(sortedVideos.map {
+                    VideoData(
+                        id = it.id,
+                        title = it.title,
+                        duration = it.duration,
+                        folderName = it.folderName,
+                        size = it.size,
+                        path = it.path,
+                        artUri = Uri.parse(it.artUri),
+                        dateAdded = it.dateAdded,
+                        isNew = it.isNew,
+                        isPlayed = it.isPlayed
+                    )
+                })
+                withContext(Dispatchers.Main) {
+                    // Update your UI here
+                    videoAdapter.updateVideoList(videoList)
+                    loadVideosFromDatabase()
+                    // Send a broadcast to notify the PlaylistFolderActivity
+                    val intent = Intent("UPDATE_PLAYLIST_FOLDER")
+                    LocalBroadcastManager.getInstance(this@PlaylistVideoActivity).sendBroadcast(intent)
+                }
+
+            }
+        }
+    }
 
     fun addSelectedVideos(selectedVideos: List<VideoData>) {
         lifecycleScope.launch(Dispatchers.IO) {  // Use Dispatchers.IO to run on a background thread
@@ -514,7 +639,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
                         title = video.title,
                         duration = video.duration,
                         folderName = video.folderName,
-                        size = video.size,
+                        size = video.size.toString(),
                         path = video.path,
                         artUri = video.artUri.toString(),
                         dateAdded = video.dateAdded,
@@ -545,7 +670,6 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             }
         }
     }
-
 
 
     private fun setSwipeRefreshBackgroundColor() {
@@ -601,21 +725,46 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
         }
     }
 
-    private fun loadVideosFromDatabase() {
+    private fun onSortOrderChanged(newSortOrder: SortType) {
+        // Update the sort order in the database
         lifecycleScope.launch {
-            // Fetch playlist with videos
-            val playlistWithVideos = db.playlistDao().getPlaylistWithVideos(playlistId)
+            db.playlistDao().updateSortOrder(playlistId, newSortOrder)
+            // Reload the videos after sort order has changed
+            loadVideosFromDatabase()
+
+        }
+    }
+
+    private fun loadVideosFromDatabase() {
+        binding.progressBar.visibility = View.VISIBLE // Show ProgressBar
+
+        lifecycleScope.launch {
+            // Fetch the saved sort order
+            val sortOrder = db.playlistDao().getSortOrder(playlistId)
+
+            // Fetch playlist with videos, sorted by the saved sort order
+            val sortedVideos = withContext(Dispatchers.IO) {
+                when (sortOrder) {
+                    SortType.TITLE_ASC -> db.playlistDao().getVideosSortedByTitleAsc(playlistId)
+                    SortType.TITLE_DESC -> db.playlistDao().getVideosSortedByTitleDesc(playlistId)
+                    SortType.DURATION_ASC -> db.playlistDao().getVideosSortedByDurationAsc(playlistId)
+                    SortType.DURATION_DESC -> db.playlistDao().getVideosSortedByDurationDesc(playlistId)
+                    SortType.DATE_NEWEST -> db.playlistDao().getVideosSortedByNewest(playlistId)
+                    SortType.DATE_OLDEST -> db.playlistDao().getVideosSortedByOldest(playlistId)
+                    SortType.SIZE_LARGEST -> db.playlistDao().getVideosSortedByLargestSize(playlistId)
+                    SortType.SIZE_SMALLEST -> db.playlistDao().getVideosSortedBySmallestSize(playlistId)
+                }
+            }
 
             // Fetch playlist details
+            val playlistWithVideos = db.playlistDao().getPlaylistWithVideos(playlistId)
             val playlistName = playlistWithVideos.playlist.name
             val videoCount = db.playlistDao().getVideoCountForPlaylist(playlistId)
             val totalDurationMillis = db.playlistDao().getTotalDurationForPlaylist(playlistId)
             val totalDuration = formatDuration(totalDurationMillis)
-
             // Fetch the URI of the first video's image
-            val firstVideoImageUri = db.playlistDao().getFirstVideoImageUri(playlistId)
+            val firstVideoImageUri = db.playlistDao().getFirstVideoImageUri(playlistId, sortOrder)
 
-            // Update UI
             binding.playlistName.text = playlistName
 
             // Check if there are videos in the playlist
@@ -626,7 +775,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             }
             binding.videoCount.text = videoCountText
 
-// Set the first video's image if available
+            // Set the first video's image if available
             if (firstVideoImageUri != null) {
                 Glide.with(this@PlaylistVideoActivity)
                     .load(firstVideoImageUri)
@@ -636,9 +785,10 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
                 // Optionally, you can set a default image or hide the ImageView if no image is available
                 binding.playlistFirstVideoImage.setImageResource(R.color.placeholder_image) // Replace with a default image
             }
+            binding.playlistFirstVideoImage.foreground = ContextCompat.getDrawable(this@PlaylistVideoActivity, R.drawable.gray_overlay)
 
-            // Map videos to VideoData and update the adapter
-            val videoDataList = playlistWithVideos.videos.map { videoEntity ->
+            // Map sorted videos to VideoData and update the adapter
+            val videoDataList = sortedVideos.map { videoEntity ->
                 VideoData(
                     id = videoEntity.id,
                     title = videoEntity.title,
@@ -654,11 +804,16 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             }
             videoAdapter.updateVideoList(videoDataList)
             checkIfRecyclerViewIsEmpty()
+            binding.progressBar.visibility = View.GONE // Hide ProgressBar
+
             // Update the playlist name with the current selection count
             val selectedCount = videoAdapter.getSelectedVideos().size
             updatePlaylistName(selectedCount)
         }
     }
+
+
+
     // Method to update the playlist name based on the selected items
     fun updatePlaylistName(selectedCount: Int = 0) {
         lifecycleScope.launch {
