@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/checkMulti"
+        android:title="Select All"
+        android:icon="@drawable/round_crop_square_24"
+        android:contentDescription="select All"
+
+        app:showAsAction="ifRoom"
+        tools:ignore="MissingClass"
+        />
+
+
+
+</menu>

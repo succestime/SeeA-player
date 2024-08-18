@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16sp"
+    android:layout_gravity="bottom"
+    android:nestedScrollingEnabled="true"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <!-- Top section with thumbnail, title, and subtitle -->
+    <LinearLayout
+        android:id="@+id/thumbnailSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Thumbnail image -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imageThumbnail"
+            android:layout_width="70sp"
+            android:layout_height="70sp"
+            android:scaleType="centerCrop"
+            android:background="@color/black"
+            app:shapeAppearanceOverlay="@style/curved_image_video" />
+
+        <!-- Text section -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="16sp"
+            android:paddingLeft="16sp">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/textTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="jrt"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Subtitle -->
+            <TextView
+                android:id="@+id/textSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5 musics"
+                android:textSize="16sp"
+                android:paddingTop="4sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Horizontal line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="16sp"
+        android:layout_marginBottom="16sp" />
+
+    <!-- ScrollView wrapping the button section -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="350sp"
+        android:scrollbars="none"
+        android:fillViewport="false"
+        android:nestedScrollingEnabled="true">
+
+        <LinearLayout
+            android:id="@+id/buttonSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="20sp">
+
+
+            <LinearLayout
+                android:id="@+id/addToPlaylistButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="5sp"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical"
+                android:padding="20sp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/playlist_add_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add to Playlist
+"
+                    android:textSize="18sp"
+                    android:paddingStart="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/removeToFavouriteButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5sp"
+                android:layout_gravity="center_vertical"
+                android:padding="20sp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/round_favorite_music" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Added to Favourites"
+                    android:textSize="18sp"
+                    android:paddingStart="16sp" />
+            </LinearLayout>
+
+            <!-- Play button -->
+            <LinearLayout
+                android:id="@+id/playButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5sp"
+                android:layout_gravity="center_vertical"
+                android:padding="20sp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/play_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Play"
+                    android:textSize="18sp"
+                    android:paddingStart="16sp" />
+            </LinearLayout>
+
+            <!-- Remove button -->
+            <LinearLayout
+                android:id="@+id/removeButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5sp"
+                android:layout_gravity="center_vertical"
+                android:padding="20sp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/remove_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remove"
+                    android:textSize="18sp"
+                    android:paddingStart="16sp" />
+            </LinearLayout>
+
+            <!-- Set as Ringtone button -->
+            <LinearLayout
+                android:id="@+id/ringtoneButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5sp"
+                android:layout_gravity="center_vertical"
+                android:padding="20sp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/phone_call_ringing_svgrepo_com" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set as Ringtone"
+                    android:textSize="18sp"
+                    android:paddingStart="16sp" />
+            </LinearLayout>
+
+            <!-- Share button -->
+            <LinearLayout
+                android:id="@+id/shareButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5sp"
+                android:layout_gravity="center_vertical"
+                android:padding="20sp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/share_communication_arrow_svgrepo_com" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Share"
+                    android:textSize="18sp"
+                    android:paddingStart="16sp" />
+            </LinearLayout>
+
+            <!-- Properties button -->
+            <LinearLayout
+                android:id="@+id/propertiesButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5sp"
+                android:layout_gravity="center_vertical"
+                android:padding="20sp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/round_info" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Properties"
+                    android:textSize="18sp"
+                    android:paddingStart="16sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

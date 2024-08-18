@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16sp"
+>
+
+    <!-- Thumbnail and Details Container -->
+    <LinearLayout
+        android:id="@+id/ThumbnailAndDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8sp">
+
+        <!-- Container for Video Thumbnail and Overlay -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <!-- Video Thumbnail -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/videoThumbnail"
+                android:layout_width="70sp"
+                android:layout_height="60sp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/curved_image_video"
+                android:background="#B8B8B8" />
+
+            <!-- Overlay for Bottom Right Corner -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginBottom="3sp"
+                android:layout_marginEnd="4sp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/curver_video_image"
+                    android:gravity="center"
+                    android:paddingStart="2sp"
+                    android:paddingEnd="2sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <TextView
+                        android:id="@+id/duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="00:00"
+                        android:textColor="@color/white"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+
+        <!-- Video Details (Title, Resolution, etc.) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="8sp">
+
+            <!-- Video Title -->
+            <TextView
+                android:id="@+id/videoTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Video Title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="Sample Video Title That Is Very Long and Might Wrap to Two Lines" />
+     <TextView
+                android:id="@+id/albumTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="album Title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:ellipsize="end"
+         android:layout_marginTop="1.5sp"
+         android:textColor="@color/gray"
+                android:maxLines="1"
+         android:textSize="11sp"
+                tools:text="Sample Video Title That Is Very Long and Might Wrap to Two Lines" />
+
+        </LinearLayout>
+    </LinearLayout>
+    <!-- Horizontal Line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
+
+    <!-- Options List -->
+    <LinearLayout
+        android:id="@+id/OptionsList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="20sp">
+
+        <!-- Play Option -->
+        <LinearLayout
+            android:id="@+id/playOptionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="18sp">
+
+            <ImageView
+                android:layout_width="24sp"
+                android:layout_height="24sp"
+                android:src="@drawable/play_icon"
+               />
+
+            <TextView
+                android:id="@+id/playOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:text="Play"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+
+
+        <!-- Remove Option -->
+        <LinearLayout
+            android:id="@+id/removeOptionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="18sp">
+
+            <ImageView
+                android:layout_width="24sp"
+                android:layout_height="24sp"
+                android:src="@drawable/outline_delete_24"
+              />
+
+            <TextView
+                android:id="@+id/removeOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:text="Remove"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+
+        <!-- Properties Option -->
+        <LinearLayout
+            android:id="@+id/propertiesOptionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="18sp">
+
+            <ImageView
+                android:layout_width="24sp"
+                android:layout_height="24sp"
+                android:src="@drawable/round_info"
+              />
+
+            <TextView
+                android:id="@+id/propertiesOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:text="Properties"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
