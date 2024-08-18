@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_delete_playlist"
         android:layout_marginBottom="32dp"
-        android:background="@android:color/darker_gray"
+        android:background="#888787"
         android:padding="8dp">
 
         <com.google.android.material.imageview.ShapeableImageView
@@ -31,7 +31,7 @@
             android:layout_width="60dp"
             android:layout_height="55dp"
             android:background="@drawable/curver"
-android:backgroundTint="@color/black"
+            android:backgroundTint="#B8B8B8"
             android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/curved_image_video"
             android:layout_alignParentStart="true"

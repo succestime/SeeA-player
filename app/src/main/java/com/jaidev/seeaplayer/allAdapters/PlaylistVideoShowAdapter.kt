@@ -11,12 +11,14 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
+import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.PlaylistVideoActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
@@ -27,13 +29,13 @@ import java.util.Locale
 
 class PlaylistVideoShowAdapter(
     private val context: Context,
-    private var videoList: List<VideoData>,
+    private var videoList: ArrayList<VideoData>,
     private val onVideoRemoved: (VideoData) -> Unit
 ) : RecyclerView.Adapter<PlaylistVideoShowAdapter.VideoViewHolder>() {
 
     private val selectedItems = mutableSetOf<Int>()
-    private val selectedVideos = mutableSetOf<VideoData>()
 
+    private var isAllSelected = false // Add this flag
     var isSelectionMode = false
     interface OnSelectionChangeListener {
 
@@ -42,14 +44,17 @@ class PlaylistVideoShowAdapter(
     }
 
     var selectionChangeListener: OnSelectionChangeListener? = null
-    fun getVideos(): List<VideoData> {
+    fun getVideos(): ArrayList<VideoData> {
         return videoList
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateVideoList(newList: List<VideoData>) {
-        videoList = newList
+    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
+    fun updateVideoList(newList: ArrayList<VideoData>) {
+      videoList = newList
         notifyDataSetChanged()
+    }
+    fun getSelectedVideos(): List<VideoData> {
+        return videoList.filter { it.selected }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -64,27 +69,6 @@ class PlaylistVideoShowAdapter(
         activity.updateSelectionMode(true)
         activity.updatePlaylistName(0)
     }
-    fun getSelectedVideos(): List<VideoData> {
-        return videoList.filter { it.selected }
-    }
-    // Inside PlaylistVideoShowAdapter class
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun selectAll() {
-        selectedItems.clear()
-        for (i in videoList.indices) {
-            selectedItems.add(i)
-        }
-        notifyDataSetChanged()
-
-        // Update selection mode and notify listener
-        isSelectionMode = true
-        val activity = context as PlaylistVideoActivity
-        activity.updateSelectionMode(true)
-        activity.updatePlaylistName(selectedItems.size)
-        selectionChangeListener?.onSelectionChanged(selectedItems.size == videoList.size)
-    }
-
     @SuppressLint("NotifyDataSetChanged")
     private fun updateSelectionMode() {
         val activity = context as PlaylistVideoActivity
@@ -116,6 +100,26 @@ class PlaylistVideoShowAdapter(
         activity.updatePlaylistName(0) // Set to "0 videos selected"
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun selectAllVideos(select: Boolean) {
+        selectedItems.clear()
+        if (select) {
+            videoList.forEachIndexed { index, video ->
+                video.selected = true
+                selectedItems.add(index)
+            }
+        } else {
+            videoList.forEach { video ->
+                video.selected = false
+            }
+        }
+        notifyDataSetChanged()
+        isSelectionMode = true
+        val activity = context as PlaylistVideoActivity
+        activity.updateSelectionMode(true)
+        activity.updatePlaylistName(selectedItems.size)
+        selectionChangeListener?.onSelectionChanged(select)
+    }
 
     inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.videoName)
@@ -166,11 +170,8 @@ class PlaylistVideoShowAdapter(
             if (isSelectionMode) {
                 toggleSelection(position)
             } else {
-                val intent = Intent(context, PlayerFileActivity::class.java).apply {
-                    putExtra("videoUri", video.path)
-                    putExtra("videoTitle", video.title)
-                }
-                context.startActivity(intent)
+                sendIntent(pos = position, ref = "playlistPlaying")
+
             }
         }
 
@@ -193,6 +194,14 @@ class PlaylistVideoShowAdapter(
         }
     }
 
+    private fun sendIntent(pos: Int, ref: String) {
+        PlayerActivity.position = pos
+        val intent = Intent(context, PlayerActivity::class.java)
+        intent.putExtra("class", ref)
+
+        ContextCompat.startActivity(context, intent, null)
+
+    }
     private fun toggleSelection(position: Int) {
         if (selectedItems.contains(position)) {
             selectedItems.remove(position)
@@ -203,7 +212,7 @@ class PlaylistVideoShowAdapter(
         video.selected = !video.selected
         notifyItemChanged(position)
         updateSelectionMode()
-        updateSelectionMode()
+
     }
 
 

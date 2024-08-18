@@ -48,8 +48,6 @@ import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.binding
-import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
-import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import com.jaidev.seeaplayer.musicNav
 import java.io.File
 import java.text.NumberFormat
@@ -244,7 +242,7 @@ class MusicAdapter(
                         when (item.itemId) {
                             id.remove_item -> {
                                 // Handle the removal of the item from the playlist
-                                removeItemFromPlaylist(position)
+//                                removeItemFromPlaylist(position)
                                 true
                             }
                             else -> false
@@ -257,14 +255,14 @@ class MusicAdapter(
             selectionActivity ->{
          holder.emptyCheck.visibility = View.VISIBLE
                 holder.root.setOnClickListener {
-                    if(addSong(musicList[position])) {
-                        holder.emptyCheck.visibility = View.GONE
-                        holder.fillCheck.visibility = View.VISIBLE
-                    }
-                    else{
-                    holder.emptyCheck.visibility = View.VISIBLE
-                    holder.fillCheck.visibility = View.GONE
-                }
+//                    if(addSong(musicList[position])) {
+//                        holder.emptyCheck.visibility = View.GONE
+//                        holder.fillCheck.visibility = View.VISIBLE
+//                    }
+//                    else{
+//                    holder.emptyCheck.visibility = View.VISIBLE
+//                    holder.fillCheck.visibility = View.GONE
+//                }
                 }
             }
         }
@@ -460,22 +458,22 @@ class MusicAdapter(
         alertDialog.show()
 }
 
-    private fun removeItemFromPlaylist(position: Int) {
-        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(position)
-        notifyItemRangeChanged(position, musicList.size)
-    }
-
-
-    private fun addSong(song: Music): Boolean{
-        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.forEachIndexed { index, music ->
-            if(song.id == music.id){
-                PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(index)
-                return false
-            }
-        }
-        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.add(song)
-        return true
-    }
+//    private fun removeItemFromPlaylist(position: Int) {
+//        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(position)
+//        notifyItemRangeChanged(position, musicList.size)
+//    }
+//
+//
+//    private fun addSong(song: Music): Boolean{
+//        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.forEachIndexed { index, music ->
+//            if(song.id == music.id){
+//                PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(index)
+//                return false
+//            }
+//        }
+//        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.add(song)
+//        return true
+//    }
 
     // Toggle selection for multi-select
     // Toggle selection for multi-select

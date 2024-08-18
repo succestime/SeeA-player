@@ -1,20 +1,67 @@
 
 package com.jaidev.seeaplayer.dataClass
 
+
 import android.media.MediaMetadataRetriever
+import android.os.Parcel
+import android.os.Parcelable
 import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-
 data class Music(
-    val id: String, var title: String, val album: String,
-    val artist: String, val duration: Long = 0, var path: String,
+    val id: String,
+    var title: String,
+    val album: String,
+    val artist: String,
+    val duration: Long = 0,
+    var path: String,
     val size: String,
-    var artUri: String
-) {
+    var artUri: String,
+    val dateAdded: Long?,
+    var selected: Boolean = false
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readLong(),
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readValue(Long::class.java.classLoader) as? Long,
+        parcel.readByte() != 0.toByte()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(id)
+        parcel.writeString(title)
+        parcel.writeString(album)
+        parcel.writeString(artist)
+        parcel.writeLong(duration)
+        parcel.writeString(path)
+        parcel.writeString(size)
+        parcel.writeString(artUri)
+        parcel.writeValue(dateAdded)
+        parcel.writeByte(if (selected) 1 else 0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Music> {
+        override fun createFromParcel(parcel: Parcel): Music {
+            return Music(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Music?> {
+            return arrayOfNulls(size)
+        }
+    }
 }
 
 

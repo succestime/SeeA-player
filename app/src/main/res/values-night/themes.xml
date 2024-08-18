@@ -376,7 +376,7 @@
         <item name="titleTextColor">@color/white</item>
         <item name="android:statusBarColor">@color/transparent</item>
 
-        <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDiaolgTheme</item>
         <item name="android:windowBackground">#032C42</item>
         <item name="bottomSheetBackgroundColor">#064566</item>

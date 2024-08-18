@@ -342,9 +342,9 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
 
                         // Ensure folder is added to MainActivity.folderList
                         if (folderList.none { it.id == folderIdC }) {
-                            folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory"
-                             }))
-
+                            val videoCount = getVideoCountInFolder(folderIdC)  // Get video count
+                            folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" },
+                                videoCount = videoCount))
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -352,6 +352,7 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
                 } while (it.moveToNext())
             }
         }
+
 
         if (sortValue == 2 || sortValue == 3) {
             tempList.sortWith(Comparator { o1, o2 ->
@@ -368,6 +369,23 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
         }
 
         return tempList
+    }
+    @SuppressLint("Range")
+    private fun getVideoCountInFolder(folderId: String): Int {
+        val projection = arrayOf(
+            MediaStore.Video.Media._ID
+        )
+        val selection = "${MediaStore.Video.Media.BUCKET_ID} = ?"
+        val cursor = this.contentResolver.query(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            arrayOf(folderId),
+            null
+        )
+        val count = cursor?.count ?: 0
+        cursor?.close()
+        return count
     }
 
 

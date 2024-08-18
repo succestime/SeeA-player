@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
 
-    android:padding="16dp">
+    android:padding="16sp">
 
     <!-- Top section with thumbnail, title and subtitle -->
     <LinearLayout
@@ -32,8 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingLeft="16dp">
+            android:paddingStart="16sp"
+            android:paddingLeft="16sp">
 
             <!-- Title -->
             <TextView
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:text="5 videos"
                 android:textSize="16sp"
-                android:paddingTop="4dp" />
+                android:paddingTop="4sp" />
         </LinearLayout>
     </LinearLayout>
     <!-- Horizontal line -->
@@ -59,8 +59,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginTop="16sp"
+        android:layout_marginBottom="16sp" />
     <!-- Button section -->
     <LinearLayout
         android:id="@+id/buttonSection"
@@ -94,8 +94,8 @@
                 android:text="Play"
                 android:textSize="18sp"
 
-                android:paddingStart="16dp"
-                android:paddingLeft="16dp" />
+                android:paddingStart="16sp"
+                android:paddingLeft="16sp" />
         </LinearLayout>
 
         <!-- Rename button -->
@@ -118,8 +118,8 @@
                 android:layout_height="wrap_content"
                 android:text="Rename"
                 android:textSize="18sp"
-                android:paddingStart="16dp"
-                android:paddingLeft="16dp" />
+                android:paddingStart="16sp"
+                android:paddingLeft="16sp" />
         </LinearLayout>
 
         <!-- Delete button -->
@@ -142,8 +142,8 @@
                 android:layout_height="wrap_content"
                 android:text="Delete"
                 android:textSize="18sp"
-                android:paddingStart="16dp"
-                android:paddingLeft="16dp" />
+                android:paddingStart="16sp"
+                android:paddingLeft="16sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

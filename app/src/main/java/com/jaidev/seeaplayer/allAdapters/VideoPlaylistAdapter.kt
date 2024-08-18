@@ -109,6 +109,7 @@ class PlaylistAdapter(private val context: Context, private var playlists: Mutab
             binding.root.setOnClickListener {
                 val intent = Intent(context, PlaylistVideoActivity::class.java).apply {
                     putExtra("playlistId", playlist.id)
+                    PlaylistVideoActivity.videoList.clear()
                 }
                 context.startActivity(intent)
                 (context as Activity).overridePendingTransition(

@@ -1,56 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/playlistLayout"
-    tools:context=".musicActivity.PlaylistActivity"
-    >
+    tools:context=".musicActivity.PlaylistActivity">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/themeColor"
+        app:liftOnScroll="true">
 
-    <FrameLayout
-        android:id="@+id/frameLayout3"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/playlist_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlwaysCollapsed|enterAlways|snap|snapMargins"
+            app:title="MUSIC PLAYLISTS"
+            app:titleMarginStart="20sp"
+            android:gravity="center_vertical"
+            app:menu="@menu/close_playlist"
+            app:titleTextColor="?attr/titleTextColor"
+            app:titleTextAppearance="@style/CustomToolbarTitleText">
+
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <ViewStub
-            android:id="@+id/emptyStateLayout"
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/addPlaylistBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_background"
+                    android:drawableLeft="@drawable/round_playlist_music"
+                    android:text="Create New Playlist"
+                    android:layout_margin="20sp"
+                    android:drawableTint="@color/cool_blue"
+                    android:textColor="@color/cool_blue"
+                    android:textAllCaps="false" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/playlistRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    app:layout_constraintTop_toBottomOf="@id/create_playlist_button"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+        <TextView
+            android:id="@+id/no_playlists_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout="@layout/playlist_empty_state_layout"
-            android:visibility="visible" />
-
-
-    </FrameLayout>
-
-
-
-    <Button
-        android:id="@+id/addPlaylistBtn"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
-        android:background="@drawable/button_background"
-        android:drawableLeft="@drawable/round_playlist_music"
-        android:text="Create New Playlist"
-        android:drawableTint="@color/cool_blue"
-        android:textColor="@color/cool_blue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playlistRV"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addPlaylistBtn" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="No Playlists found."
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -77,7 +77,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAd
                 .into(binding.songImgNP)
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
             if(PlayerMusicActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
-            else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+            else binding.playPauseBtnNP.setIconResource(R.drawable.play_icon)
 
         }
         }catch (e: Exception) {
@@ -89,13 +89,13 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAd
     private fun playMusic(){
         PlayerMusicActivity.isPlaying = true
         PlayerMusicActivity.musicService!!.mediaPlayer!!.start()
-        binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+        binding.playPauseBtnNP.setIconResource(R.drawable.pause_circle_outline_24)
         PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_pause_24)
     }
     private fun pauseMusic(){
         PlayerMusicActivity.isPlaying = false
         PlayerMusicActivity.musicService!!.mediaPlayer!!.pause()
-        binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+        binding.playPauseBtnNP.setIconResource(R.drawable.play_icon)
         PlayerMusicActivity.musicService!!.showNotification(R.drawable.round_play)
     }
 

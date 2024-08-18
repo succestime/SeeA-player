@@ -274,6 +274,7 @@
             android:name=".musicActivity.PlaylistDetails"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/statusBarPlaylistTheme"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".musicActivity.PlaylistActivity"

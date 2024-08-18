@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -34,6 +36,7 @@ import com.jaidev.seeaplayer.dataClass.PlaylistVideoCrossRef
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.dataClass.VideoEntity
 import com.jaidev.seeaplayer.databinding.ActivityPlaylistVideoBinding
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,11 +48,14 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
     private var playlistId: Long = -1
     private var isClick: Boolean = false // Flag for repeat mode
     private var isClickShuffle: Boolean = false // Flag for repeat mode
-    private val videoList = mutableListOf<VideoData>()
     private var isAllSelected = false
     private var isActionModeEnabled = false
     private var selectedSortType: SortType? = null
 
+    companion object{
+   val videoList = ArrayList<VideoData>()
+
+    }
     private val updatePlaylistReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val receivedPlaylistId = intent?.getLongExtra("playlistId", -1)
@@ -77,7 +83,12 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
 
         setupRecyclerView()
         loadVideosFromDatabase()
-        // Set up the navigation icon click listener to finish the activity
+
+        videoAdapter.selectionChangeListener = this // Set the listener for selection changes
+
+        // Initialize the buttons in the disabled state
+        updateButtonStates()
+
         binding.playlistToolbar.setNavigationOnClickListener {
             finish()
         }
@@ -87,7 +98,6 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
         binding.playlistToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.morePlaylist -> {
-                    // Handle the first menu item click
                     handleFirstMenuItemClick()
                     true
                 }
@@ -115,19 +125,11 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             toggleShuffleMode()
         }
         binding.selectAll.setOnClickListener {
-            if (isAllSelected) {
-                // Deselect all items
-                videoAdapter.clearSelection()
-            } else {
-                // Select all items
-                videoAdapter.selectAll()
-            }
-            // Toggle the flag
             isAllSelected = !isAllSelected
-
-            // Update the selectAll button icon
+            videoAdapter.selectAllVideos(isAllSelected)
             updateSelectAllIcon(isAllSelected)
         }
+
 
         binding.playVideo.setOnClickListener {
             val selectedVideos = videoAdapter.getSelectedVideos()
@@ -208,6 +210,30 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
 
 
     }
+
+
+
+    override fun onSelectionChanged(isAllSelected: Boolean) {
+        // Update the `selectAll` button based on selection state
+        if (isAllSelected) {
+            binding.selectAll.setCompoundDrawablesWithIntrinsicBounds(R.drawable.check_box_24, 0, 0, 0)
+        } else {
+            binding.selectAll.setCompoundDrawablesWithIntrinsicBounds(R.drawable.round_crop_square_24, 0, 0, 0)
+        }
+
+        if (isActionModeEnabled) {
+            if (videoAdapter.getVideos().isNotEmpty()) {
+
+                showBottomToolbar()
+            } else {
+
+                hideBottomToolbar()
+            }
+        }
+        updateSelectAllIcon(isAllSelected)
+        updateButtonStates()
+    }
+
     private fun updateSelectAllIcon(isSelected: Boolean) {
         if (isSelected) {
             binding.selectAll.setCompoundDrawablesWithIntrinsicBounds(R.drawable.check_box_24, 0, 0, 0)
@@ -215,7 +241,24 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             binding.selectAll.setCompoundDrawablesWithIntrinsicBounds(R.drawable.round_crop_square_24, 0, 0, 0)
         }
     }
+    private fun updateButtonStates() {
+        val selectedVideos = videoAdapter.getSelectedVideos()
+        val hasSelection = selectedVideos.isNotEmpty()
 
+        // Update playVideo button state
+        binding.playVideo.apply {
+            isEnabled = hasSelection
+            isClickable = hasSelection
+            alpha = if (hasSelection) 1.0f else 0.5f // Change alpha to indicate disabled state
+        }
+
+        // Update removeVideo button state
+        binding.removeVideo.apply {
+            isEnabled = hasSelection
+            isClickable = hasSelection
+            alpha = if (hasSelection) 1.0f else 0.5f // Change alpha to indicate disabled state
+        }
+    }
 
 
     private fun handleFirstMenuItemClick() {
@@ -705,11 +748,13 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             // Hide menu and layout elements when the playlist is empty
             updateToolbarMenu(false)
             binding.linearLayout27.visibility = View.GONE
+            binding.playlistFirstVideoImage.visibility = View.INVISIBLE
             binding.AddVideoLayout.visibility = View.VISIBLE
         } else {
             // Show menu and layout elements when the playlist is not empty
             updateToolbarMenu(true)
             binding.linearLayout27.visibility = View.VISIBLE
+            binding.playlistFirstVideoImage.visibility = View.VISIBLE
             binding.AddVideoLayout.visibility = View.GONE
         }
     }
@@ -787,8 +832,8 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
             }
             binding.playlistFirstVideoImage.foreground = ContextCompat.getDrawable(this@PlaylistVideoActivity, R.drawable.gray_overlay)
 
-            // Map sorted videos to VideoData and update the adapter
-            val videoDataList = sortedVideos.map { videoEntity ->
+           videoList.clear()
+            videoList.addAll(sortedVideos.map { videoEntity ->
                 VideoData(
                     id = videoEntity.id,
                     title = videoEntity.title,
@@ -801,10 +846,15 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
                     isNew = videoEntity.isNew,
                     isPlayed = videoEntity.isPlayed
                 )
-            }
-            videoAdapter.updateVideoList(videoDataList)
-            checkIfRecyclerViewIsEmpty()
+            })
             binding.progressBar.visibility = View.GONE // Hide ProgressBar
+
+            if (sortedVideos.isEmpty()) {
+                checkIfRecyclerViewIsEmpty()
+                return@launch // Exit early if the playlist is empty
+            }
+            videoAdapter.updateVideoList(videoList)
+            checkIfRecyclerViewIsEmpty()
 
             // Update the playlist name with the current selection count
             val selectedCount = videoAdapter.getSelectedVideos().size
@@ -831,25 +881,7 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
         }
     }
 
-    override fun onSelectionChanged(isAllSelected: Boolean) {
-        // Update the `selectAll` button based on selection state
-        if (isAllSelected) {
-            binding.selectAll.setCompoundDrawablesWithIntrinsicBounds(R.drawable.check_box_24, 0, 0, 0)
-        } else {
-            binding.selectAll.setCompoundDrawablesWithIntrinsicBounds(R.drawable.round_crop_square_24, 0, 0, 0)
-        }
 
-        if (isActionModeEnabled) {
-            if (videoAdapter.getVideos().isNotEmpty()) {
-
-                showBottomToolbar()
-            } else {
-
-                hideBottomToolbar()
-            }
-        }
-
-    }
     private fun showBottomToolbar() {
         binding.bottomToolbarF.visibility = View.VISIBLE
     }

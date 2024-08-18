@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="16sp"
 >
 
     <!-- Thumbnail and Details Container -->
@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8sp">
 
         <!-- Container for Video Thumbnail and Overlay -->
         <FrameLayout
@@ -25,8 +25,8 @@
             <!-- Video Thumbnail -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/videoThumbnail"
-                android:layout_width="100dp"
-                android:layout_height="60dp"
+                android:layout_width="110sp"
+                android:layout_height="60sp"
                 android:scaleType="centerCrop"
                 app:shapeAppearanceOverlay="@style/curved_image_video"
                 android:background="@color/black" />
@@ -36,21 +36,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:layout_marginBottom="3dp"
-                android:layout_marginEnd="4dp">
+                android:layout_marginBottom="3sp"
+                android:layout_marginEnd="4sp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/curver_video_image"
                     android:gravity="center"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginEnd="4dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:paddingStart="2sp"
+                    android:paddingEnd="2sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
                     <TextView
                         android:id="@+id/duration"
@@ -59,7 +56,7 @@
                         android:gravity="center_horizontal"
                         android:text="00:00"
                         android:textColor="@color/white"
-                        android:textSize="10dp" />
+                        android:textSize="10sp" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
@@ -70,7 +67,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingStart="8dp">
+            android:paddingStart="8sp">
 
             <!-- Video Title -->
             <TextView
@@ -80,7 +77,19 @@
                 android:text="Video Title"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:ellipsize="end"
-                android:maxLines="2"
+                android:maxLines="1"
+                tools:text="Sample Video Title That Is Very Long and Might Wrap to Two Lines" />
+     <TextView
+                android:id="@+id/albumTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="album Title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:ellipsize="end"
+         android:layout_marginTop="1.5sp"
+         android:textColor="@color/gray"
+                android:maxLines="1"
+         android:textSize="11sp"
                 tools:text="Sample Video Title That Is Very Long and Might Wrap to Two Lines" />
 
         </LinearLayout>
@@ -109,8 +118,8 @@
             android:padding="18sp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="24sp"
+                android:layout_height="24sp"
                 android:src="@drawable/play_icon"
                />
 
@@ -118,7 +127,7 @@
                 android:id="@+id/playOption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="16sp"
                 android:text="Play"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         </LinearLayout>
@@ -133,8 +142,8 @@
             android:padding="18sp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="24sp"
+                android:layout_height="24sp"
                 android:src="@drawable/outline_delete_24"
               />
 
@@ -142,7 +151,7 @@
                 android:id="@+id/removeOption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="16sp"
                 android:text="Remove"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         </LinearLayout>
@@ -156,8 +165,8 @@
             android:padding="18sp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="24sp"
+                android:layout_height="24sp"
                 android:src="@drawable/round_info"
               />
 
@@ -165,7 +174,7 @@
                 android:id="@+id/propertiesOption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="16sp"
                 android:text="Properties"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         </LinearLayout>

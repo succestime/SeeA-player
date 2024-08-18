@@ -27,10 +27,15 @@ import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.dataClass.Music
+import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
+import com.jaidev.seeaplayer.dataClass.MusicFavEntity
 import com.jaidev.seeaplayer.dataClass.favouriteChecker
 import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.ActivityPlayerMusicBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer.OnCompletionListener, SpeedMusicBottomSheet.SpeedSelectionListener {
@@ -38,9 +43,10 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     private lateinit var playerMusicLayout: ConstraintLayout
     lateinit var mAdView: AdView
     private var appOpenAd : AppOpenAd? = null
+    private lateinit var musicDatabase: MusicFavDatabase
 
     companion object {
-        var musicListPA: ArrayList<Music> = ArrayList()
+        lateinit var musicListPA: ArrayList<Music>
         var songPosition: Int = 0
         var isPlaying: Boolean = false
         var min10: Boolean = false
@@ -74,15 +80,36 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         binding = ActivityPlayerMusicBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+        musicDatabase = MusicFavDatabase.getDatabase(this)
 
         MobileAds.initialize(this){}
         mAdView = findViewById(R.id.adView)
         // banner ads
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
+
+        // Check if the activity was started with a list of selected music
+        val selectedMusicList = intent.getParcelableArrayListExtra<Music>("SelectedMusicList")
+
+        if (selectedMusicList != null && selectedMusicList.isNotEmpty()) {
+            musicListPA = ArrayList(selectedMusicList) // Use selected music list
+            originalMusicListPA = ArrayList(musicListPA) // Save the original list order
+            songPosition = 0 // Start playing from the first song in the list
+
+            // Initialize the music service and start playing
+            val intentService = Intent(this, MusicService::class.java)
+            bindService(intentService, this, BIND_AUTO_CREATE)
+            startService(intentService)
+
+            setLayout() // Update the UI with the current song details
+        } else {
+            initializeLayout() // Handle other cases, e.g., playing from another source
+        }
+
         unKnown()
         initializeBinding()
         updateNextMusicTitle()
+
 
 
         playerMusicLayout = binding.PlayerMusicLayout
@@ -110,6 +137,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
 
     }
+
 
 
     fun getCurrentSong(): Music {
@@ -142,8 +170,25 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             prevNextSong(increment = false)
         }
         binding.nextBtnPA.setOnClickListener {
-            prevNextSong(increment = true)
+            if (isShuffleEnabled) {
+                if (musicListPA.isNotEmpty()) {
+                    musicListPA.removeAt(songPosition) // Remove the currently playing song
+                    songPosition = if (musicListPA.isNotEmpty()) {
+                        0 // Always play the first song in the shuffled list
+                    } else {
+                        // Reset to the original list or stop playback
+                        musicListPA.addAll(originalMusicListPA)
+                        0
+                    }
+                }
+            } else {
+                prevNextSong(increment = true)
+            }
+
+            setLayout()
+            createMediaPlayer()
         }
+
 
         // Inside onCreate or wherever you initialize your layout and bindings
         binding.shuffleBtnPA.setOnClickListener {
@@ -211,16 +256,60 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
         binding.favouriteBtnPA.setOnClickListener {
             fIndex = favouriteChecker(musicListPA[songPosition].id)
-            if(isFavourite){
+            val currentMusic = musicListPA[songPosition]
+
+            if(isFavourite) {
                 isFavourite = false
                 binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_border_music)
-                FavouriteActivity.favouriteSongs.removeAt(fIndex)
-
-            } else{
+                // Call deleteFromFavorites when a song is removed from favorites
+                deleteFromFavorites(currentMusic)
+            } else {
                 isFavourite = true
                 binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_music)
-                FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
+                // Call addToFavorites when a song is added to favorites
+                addToFavorites(currentMusic)
+                FavouriteActivity.favouriteSongs.add(currentMusic)
             }
+        }
+
+
+
+    }
+
+
+    private fun addToFavorites(music: Music) {
+        val musicFavEntity = MusicFavEntity(
+            id = music.id,
+            title = music.title,
+            album = music.album,
+            artist = music.artist,
+            duration = music.duration,
+            path = music.path,
+            size = music.size.toString(),
+            artUri = music.artUri,
+            dateAdded = music.dateAdded
+        )
+
+        CoroutineScope(Dispatchers.IO).launch {
+            musicDatabase.musicFavDao().insertMusic(musicFavEntity)
+        }
+    }
+
+    private fun deleteFromFavorites(music: Music) {
+        val musicFavEntity = MusicFavEntity(
+           id = music.id,
+            title = music.title,
+            album = music.album,
+            artist = music.artist,
+            duration = music.duration,
+            path = music.path,
+            size = music.size.toString(),
+            artUri = music.artUri,
+            dateAdded = music.dateAdded
+        )
+
+        CoroutineScope(Dispatchers.IO).launch {
+            musicDatabase.musicFavDao().deleteMusic(musicFavEntity)
         }
     }
 
@@ -253,7 +342,17 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 startService(intent)
                 musicListPA = ArrayList()
                 musicListPA.addAll(FavouriteActivity.favouriteSongs)
-                originalMusicListPA = ArrayList(musicListPA) // Save original list
+                originalMusicListPA = ArrayList(musicListPA)
+                setLayout()
+            }
+
+            "FavouriteBottomAdapter" -> {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+                musicListPA = ArrayList()
+                musicListPA.addAll(FavouriteActivity.favouriteSongs)
+                originalMusicListPA = ArrayList(musicListPA)
                 setLayout()
             }
             "NowPlaying" ->{
@@ -271,18 +370,55 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 startService(intent)
                 musicListPA = ArrayList()
                 musicListPA.addAll(MainActivity.MusicListMA)
-                originalMusicListPA = ArrayList(musicListPA) // Save original list
+                originalMusicListPA = ArrayList(musicListPA)
                 setLayout()
 
             }
+            "FavouriteMultiSelect" -> {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+                originalMusicListPA = ArrayList(musicListPA)
+                setLayout()
+                createMediaPlayer()
+            }
+            "FavouriteAShuffle" -> {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+               musicListPA = ArrayList()
+                musicListPA.addAll(PlaylistDetails.videoList)
+              originalMusicListPA = ArrayList(musicListPA)
+                setLayout()
+            }
 
+            "PlaylistDetails" -> {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+                musicListPA = intent.getParcelableArrayListExtra("musicList") ?: ArrayList()
+                originalMusicListPA = ArrayList(musicListPA)
+                setLayout()
+            }
+            "bottomSheetPlay" -> {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+                musicListPA = ArrayList()
+                musicListPA.addAll(PlaylistDetails.videoList)
+                originalMusicListPA = ArrayList(musicListPA)
+                setLayout()
+            }
+            "PlaylistDetailsShuffle" -> {
+
+            }
             "MusicNav" -> {
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
                 musicListPA = ArrayList()
                 musicListPA.addAll(MainActivity.MusicListMA)
-                originalMusicListPA = ArrayList(musicListPA) // Save original list
+                originalMusicListPA = ArrayList(musicListPA)
                 musicListPA.shuffle()
                 setLayout()
 
@@ -293,7 +429,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 startService(intent)
                 musicListPA = ArrayList()
                 musicListPA.addAll(MainActivity.musicListSearch)
-                originalMusicListPA = ArrayList(musicListPA) // Save original list
+                originalMusicListPA = ArrayList(musicListPA)
                 setLayout()
             }
             "FavouriteShuffle" -> {
@@ -312,7 +448,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 startService(intent)
                 musicListPA = ArrayList()
                 musicListPA.addAll(MainActivity.MusicListMA)
-                originalMusicListPA = ArrayList(musicListPA) // Save original list
+                originalMusicListPA = ArrayList(musicListPA)
                 setLayout()
             }
 
@@ -321,29 +457,15 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
                 musicListPA = ArrayList()
-                musicListPA.addAll(PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist)
-                originalMusicListPA = ArrayList(musicListPA) // Save original list
+                originalMusicListPA = ArrayList(musicListPA)
 
                 setLayout()
             }
-            "PlaylistDetailsShuffle"->{
-                val intent = Intent(this, MusicService::class.java)
-                bindService(intent, this, BIND_AUTO_CREATE)
-                startService(intent)
-                musicListPA = ArrayList()
-                musicListPA.addAll(PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist)
-                originalMusicListPA = ArrayList(musicListPA) // Save original list
-                musicListPA.shuffle()
-                setLayout()
-            }
+
         }
     }
 
     private fun setLayout() {
-        if (!fileExists(musicListPA[songPosition].path)) {
-            prevNextSong(true) // Skip to the next song
-            return
-        }
         fIndex = favouriteChecker(musicListPA[songPosition].id)
 
         Glide.with(applicationContext)

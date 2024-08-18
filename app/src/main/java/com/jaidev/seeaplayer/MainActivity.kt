@@ -666,7 +666,9 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         if (folderList.none { it.id == folderIdC }) {
-                            folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" }))
+                            val videoCount = getVideoCountInFolder(folderIdC)  // Get video count
+
+                            folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" } , videoCount = videoCount))
 
 
                         }
@@ -694,6 +696,24 @@ class MainActivity : AppCompatActivity() {
         return tempList
     }
 
+    @SuppressLint("Range")
+    private fun getVideoCountInFolder(folderId: String): Int {
+        val projection = arrayOf(
+            MediaStore.Video.Media._ID
+        )
+        val selection = "${MediaStore.Video.Media.BUCKET_ID} = ?"
+        val cursor = this.contentResolver.query(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            arrayOf(folderId),
+            null
+        )
+        val count = cursor?.count ?: 0
+        cursor?.close()
+        return count
+    }
+
     @SuppressLint("Recycle", "Range")
     @RequiresApi(Build.VERSION_CODES.R)
     fun getAllAudio(): ArrayList<Music>{
@@ -715,6 +735,7 @@ class MainActivity : AppCompatActivity() {
                     val idC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))?:"Unknown"
                     val albumC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))?:"Unknown"
                     val artistC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))?:"Unknown"
+                    val dateC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)).toLong() * 1000
                     val pathC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
                     val durationC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
                     val albumIdC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)).toString()
@@ -732,7 +753,8 @@ class MainActivity : AppCompatActivity() {
                             path = pathC,
                             duration = durationC,
                             artUri = artUriC,
-                            size = sizeC
+                            size = sizeC ,
+                            dateAdded = dateC
                         )
                         val file = File(music.path)
                         if (file.exists()) tempList.add(music)

@@ -222,6 +222,11 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 playerList.addAll(FoldersActivity.currentFolderVideos)
                 createPlayer()
             }
+ "playlistPlaying" -> {
+                playerList = ArrayList()
+                playerList.addAll(PlaylistVideoActivity.videoList)
+                createPlayer()
+            }
 
             "NowPlaying" -> {
                 speed = 1.0f

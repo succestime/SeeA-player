@@ -82,12 +82,12 @@
                 app:icon="@drawable/shuffle_icon"
                 app:iconSize="35dp"
 
-                app:iconTint="@color/cool_blue"
+                app:iconTint="?attr/themeColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.852"
-                app:strokeColor="@color/cool_blue"
+                app:strokeColor="?attr/themeColor"
                 app:strokeWidth="2dp"
                 tools:ignore="MissingConstraints" />
 

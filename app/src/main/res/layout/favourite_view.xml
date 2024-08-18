@@ -1,30 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_margin="10dp"
-    >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:layout_marginBottom="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
 
-    <com.google.android.material.imageview.ShapeableImageView
-       android:id="@+id/songImgFA"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:shapeAppearanceOverlay="@style/curved"
-        android:contentDescription="@string/song_name"
-        android:background="#B8B8B8"
-        android:src="@drawable/music_note_svgrepo_com"
-       />
-
-    <TextView
-        android:id="@+id/songNameFA"
-        android:layout_width="100dp"
+    <ImageButton
+        android:id="@+id/emptyCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/round_crop_square_24"
+        android:layout_marginVertical="15sp"
+        android:layout_marginEnd="7sp"
+        android:layout_marginStart="10sp"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint" />
+    <ImageButton
+        android:id="@+id/fillCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/check_box_24"
+        android:background="@color/transparent"
+        android:layout_marginEnd="7sp"
+        android:layout_marginVertical="15sp"
+        android:layout_marginStart="10sp"
+        android:visibility="gone"
+        tools:ignore="UseAppTint" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/song_name"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:singleLine="true"/>
+        >
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/videoImage"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:background="#B8B8B8"
+            android:contentDescription="video_image"
+            app:shapeAppearanceOverlay="@style/curved_image_video"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="2dp"
+        android:gravity="center_vertical"
+
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/videoName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="video title"
+            android:layout_marginStart="5dp"
+            android:maxLines="1"
+            android:layout_gravity="center_vertical"/>
+
+
+        <TextView
+            android:id="@+id/videoAlbum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="video Artist"
+            android:layout_marginStart="5dp"
+            android:maxLines="2"
+            android:textSize="10sp"
+            android:layout_gravity="center_vertical"/>
+
+
+
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/MoreChoose"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/icon_dark"
+        app:tint="?android:attr/textColorPrimary"
+        android:layout_marginVertical="15dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="3dp"
+        android:background="@android:color/transparent"
+        tools:ignore="UseAppTint" />
+
 
 </LinearLayout>

@@ -2,78 +2,82 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="60sp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".musicActivity.NowPlaying"
-    android:layout_marginStart="5dp"
-    android:layout_marginEnd="10dp"
+    android:layout_marginStart="5sp"
+    android:layout_marginEnd="7sp"
     android:background="@drawable/curved_nowpalying_background">
 
 
     <!-- Music Disk Image -->
     <ImageView
         android:id="@+id/musicDisk"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginStart="13dp"
-        android:layout_alignStart="@id/songImgNP"
+        android:layout_width="80sp"
+        android:layout_height="80sp"
         android:layout_alignTop="@id/songImgNP"
         android:layout_alignBottom="@id/songImgNP"
-        android:src="@drawable/music_disc_removebg_preview"
-        android:scaleType="fitCenter" />
-
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="14sp"
+        android:layout_marginTop="2sp"
+        android:layout_marginBottom="2sp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/music_disc_removebg_preview" />
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/songImgNP"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="62sp"
+        android:layout_height="wrap_content"
         app:shapeAppearanceOverlay="@style/curved_image_nowPlaying"
+android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/music_speaker_three" />
+        android:src="@drawable/music_speaker_three"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-       android:id="@+id/nextBtnNP"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:id="@+id/nextBtnNP"
+        android:layout_width="20sp"
+        android:layout_height="20sp"
         android:layout_alignParentEnd="true"
-        app:icon="@drawable/round_navigate_next"
-        app:iconTint="@color/white"
-        android:backgroundTint="#F2053853"
+        app:iconSize="35sp"
+        app:icon="@drawable/round_skip_next_24"
+
+        app:iconTint="?attr/titleTextColor"
+        android:stateListAnimator="@null"
+        android:backgroundTint="?attr/themeColor"
         android:layout_centerVertical="true"
-        app:iconSize="35dp"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginEnd="15sp"/>
 
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/playPauseBtnNP"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:icon="@drawable/round_play"
-        app:iconTint="@color/white"
-        app:iconSize="35dp"
+        android:layout_width="20sp"
+        android:layout_height="20sp"
+        app:icon="@drawable/play_icon"
+        app:iconSize="35sp"
+        app:iconTint="?attr/titleTextColor"
         android:layout_centerVertical="true"
-        android:backgroundTint="#F2053853"
+        android:stateListAnimator="@null"
+        android:backgroundTint="?attr/themeColor"
         android:layout_toStartOf="@id/nextBtnNP"
-        android:layout_marginHorizontal="5dp"
-        android:layout_marginEnd="10dp"/>
+        />
 
     <TextView
         android:id="@+id/songNameNP"
         android:layout_width="wrap_content"
-        android:layout_height="60dp"
+        android:layout_height="60sp"
         android:text="@string/song_name"
         android:textSize="18sp"
-        android:textColor="@color/white"
+        android:textColor="?attr/titleTextColor"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginEnd="4dp"
         android:layout_toStartOf="@id/playPauseBtnNP"
-        android:layout_toEndOf="@id/songImgNP"
+        android:layout_toEndOf="@id/musicDisk"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:singleLine="true"
         />
+
 
 
 </RelativeLayout>
