@@ -40,6 +40,7 @@ import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnSelectionChangeListener{
     lateinit var binding: ActivityPlaylistVideoBinding
@@ -779,11 +780,41 @@ class PlaylistVideoActivity : AppCompatActivity() , PlaylistVideoShowAdapter.OnS
 
         }
     }
+    private suspend fun removeDeletedSongsFromPlaylist(deletedMusicPath: String) {
+        withContext(Dispatchers.IO) {
+            val deletedMusic = db.playlistDao().getVideoByPath(deletedMusicPath)
+            if (deletedMusic != null) {
+                // Remove the music from the playlist
+                db.playlistDao().deleteVideoFromPlaylist(PlaylistDetails.playlistId, deletedMusic.id)
+
+                // Remove the music from the database
+                db.playlistDao().deleteVideo(deletedMusic.id)
+            }
+        }
+        withContext(Dispatchers.Main) {
+            loadVideosFromDatabase()
+            loadVideosForPlaylist()
+
+            val intent = Intent("UPDATE_PLAYLIST_MUSIC")
+            LocalBroadcastManager.getInstance(this@PlaylistVideoActivity).sendBroadcast(intent)
+        }
+    }
+    private suspend fun checkForDeletedSongs() {
+        withContext(Dispatchers.IO) {
+            val allMusic = db.playlistDao().getAllVideo()
+            for (music in allMusic) {
+                if (!File(music.path).exists()) {
+                    removeDeletedSongsFromPlaylist(music.path)
+                }
+            }
+        }
+    }
 
     private fun loadVideosFromDatabase() {
         binding.progressBar.visibility = View.VISIBLE // Show ProgressBar
 
         lifecycleScope.launch {
+            checkForDeletedSongs()
             // Fetch the saved sort order
             val sortOrder = db.playlistDao().getSortOrder(playlistId)
 

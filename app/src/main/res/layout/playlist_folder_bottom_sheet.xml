@@ -78,7 +78,8 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_gravity="center_vertical"
-            android:padding="18sp"
+            android:padding="20sp"
+            android:layout_marginBottom="5sp"
             >
 
             <ImageView
@@ -106,7 +107,8 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_gravity="center_vertical"
-            android:padding="18sp">
+            android:padding="20sp"
+            android:layout_marginBottom="5sp">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -130,7 +132,8 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_gravity="center_vertical"
-            android:padding="18sp">
+            android:padding="20sp"
+            android:layout_marginBottom="5sp">
 
             <ImageView
                 android:layout_width="wrap_content"

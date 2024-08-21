@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:nestedScrollingEnabled="true"
     android:padding="16sp"
 >
 
@@ -15,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="8sp">
+        android:layout_marginTop="5sp"
+        android:paddingBottom="15sp">
 
         <!-- Container for Video Thumbnail and Overlay -->
         <FrameLayout
@@ -98,9 +100,18 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginBottom="5sp"
         android:background="@android:color/darker_gray" />
 
     <!-- Options List -->
+
+    <!-- ScrollView wrapping the button section -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="385.8sp"
+        android:scrollbars="none"
+        android:fillViewport="false"
+        android:nestedScrollingEnabled="true">
     <LinearLayout
         android:id="@+id/OptionsList"
         android:layout_width="match_parent"
@@ -115,7 +126,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="18sp">
+            android:layout_marginBottom="5sp"
+            android:padding="20sp">
 
             <ImageView
                 android:layout_width="24sp"
@@ -131,6 +143,74 @@
                 android:text="Play"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/addToFavLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5sp"
+            android:padding="20sp">
+
+            <ImageView
+                android:id="@+id/favsIcon"
+                android:layout_width="24sp"
+                android:layout_height="24sp"
+                android:src="@drawable/round_favorite_border_music"
+                />
+
+            <TextView
+                android:id="@+id/addToFavTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:text="Add to Favourites"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/setAsRingtoneLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5sp"
+            android:padding="20sp">
+
+            <ImageView
+                android:layout_width="24sp"
+                android:layout_height="24sp"
+                android:src="@drawable/phone_call_ringing_svgrepo_com"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:text="Set as Ringtone"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/shareLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5sp"
+            android:padding="20sp">
+
+            <ImageView
+                android:layout_width="24sp"
+                android:layout_height="24sp"
+                android:src="@drawable/share_communication_arrow_svgrepo_com"
+               />
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:text="Share"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+
+
 
 
         <!-- Remove Option -->
@@ -139,7 +219,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="18sp">
+            android:layout_marginBottom="5sp"
+            android:padding="20sp">
 
             <ImageView
                 android:layout_width="24sp"
@@ -162,7 +243,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="18sp">
+            android:layout_marginBottom="15sp"
+            android:padding="20sp">
 
             <ImageView
                 android:layout_width="24sp"
@@ -179,4 +261,5 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         </LinearLayout>
     </LinearLayout>
+    </ScrollView>
 </LinearLayout>

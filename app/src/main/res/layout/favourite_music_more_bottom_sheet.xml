@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -41,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:text="jrt"
+                android:text="My Favourites"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -64,13 +65,7 @@
         android:layout_marginTop="16sp"
         android:layout_marginBottom="16sp" />
 
-    <!-- ScrollView wrapping the button section -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="350sp"
-        android:scrollbars="none"
-        android:fillViewport="false"
-        android:nestedScrollingEnabled="true">
+
 
         <LinearLayout
             android:id="@+id/buttonSection"
@@ -81,7 +76,7 @@
 
 
             <LinearLayout
-                android:id="@+id/addToPlaylistButton"
+                android:id="@+id/addSongInFavouritesButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -103,33 +98,33 @@
                     android:paddingStart="16sp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/removeToFavouriteButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5sp"
-                android:layout_gravity="center_vertical"
-                android:padding="20sp">
+<!--            <LinearLayout-->
+<!--                android:id="@+id/addToHomeScreenButton"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:layout_marginBottom="5sp"-->
+<!--                android:layout_gravity="center_vertical"-->
+<!--                android:padding="20sp">-->
 
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/outline_add_box_24" />
+<!--                <ImageView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:src="@drawable/outline_add_box_24" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add to Home Screen"
-                    android:textSize="18sp"
-                    android:paddingStart="16sp" />
-            </LinearLayout>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Add to Home Screen"-->
+<!--                    android:textSize="18sp"-->
+<!--                    android:paddingStart="16sp" />-->
+<!--            </LinearLayout>-->
 
             <!-- Play button -->
             <LinearLayout
-                android:id="@+id/playButton"
+                android:id="@+id/multipleItemSelectButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -153,7 +148,7 @@
 
             <!-- Remove button -->
             <LinearLayout
-                android:id="@+id/removeButton"
+                android:id="@+id/shareButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -170,14 +165,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Share"
+                    android:text="Share All Favourites"
                     android:textSize="18sp"
                     android:paddingStart="16sp" />
             </LinearLayout>
 
             <!-- Set as Ringtone button -->
             <LinearLayout
-                android:id="@+id/ringtoneButton"
+                android:id="@+id/removeAllButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -202,5 +197,5 @@
 
 
         </LinearLayout>
-    </ScrollView>
+
 </LinearLayout>

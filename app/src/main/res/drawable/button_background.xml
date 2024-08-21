@@ -10,5 +10,7 @@
         android:width="2dp"
         android:color="@color/cool_blue" /> <!-- Replace with your desired color -->
 
-    <!-- Optional: Add corner radius if you want rounded corners -->
+    <!-- Add corner radius for rounded corners -->
+    <corners android:radius="5dp" /> <!-- Adjust the radius value as needed -->
+
 </shape>

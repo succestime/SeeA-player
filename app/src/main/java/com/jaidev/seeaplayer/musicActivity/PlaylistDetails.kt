@@ -34,12 +34,14 @@ import com.jaidev.seeaplayer.databinding.ActivityPlatylistDetailsBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectionChangeListener {
     lateinit var binding: ActivityPlatylistDetailsBinding
 
-    private lateinit var videoAdapter: PlaylistMusicShowAdapter
+    lateinit var videoAdapter: PlaylistMusicShowAdapter
     private val db by lazy { DatabaseClientMusic.getInstance(this) }
+    private lateinit var musicDatabase: DatabaseClientMusic
     companion object{
         val videoList = ArrayList<Music>()
         var playlistId: Long = -1
@@ -128,6 +130,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
             }
         }
 
+        // Initialize the video adapter and set the listener
 
 
         binding.selectAll.setOnClickListener {
@@ -208,7 +211,116 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
 
 
     }
+    private suspend fun removeDeletedSongsFromPlaylist(deletedMusicPath: String) {
+        withContext(Dispatchers.IO) {
+            val deletedMusic = db.playlistMusicDao().getMusicByPath(deletedMusicPath)
+            if (deletedMusic != null) {
+                // Remove the music from the playlist
+                db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, deletedMusic.musicid)
 
+                // Remove the music from the database
+                db.playlistMusicDao().deleteMusic(deletedMusic.musicid)
+            }
+        }
+        withContext(Dispatchers.Main) {
+            loadVideosFromDatabase()
+            loadVideosForPlaylist()
+
+            val intent = Intent("UPDATE_PLAYLIST_MUSIC")
+            LocalBroadcastManager.getInstance(this@PlaylistDetails).sendBroadcast(intent)
+        }
+    }
+    private suspend fun checkForDeletedSongs() {
+        withContext(Dispatchers.IO) {
+            val allMusic = db.playlistMusicDao().getAllMusic()
+            for (music in allMusic) {
+                if (!File(music.path).exists()) {
+                    removeDeletedSongsFromPlaylist(music.path)
+                }
+            }
+        }
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    private fun loadVideosFromDatabase() {
+        binding.progressBar.visibility = View.VISIBLE // Show ProgressBar
+
+        lifecycleScope.launch {
+            checkForDeletedSongs()  // Check for any deleted songs
+
+            val sortOrder = db.playlistMusicDao().getSortOrder(playlistId)
+
+            // Fetch playlist with videos, sorted by the saved sort order
+            val sortedVideos = withContext(Dispatchers.IO) {
+                when (sortOrder) {
+                    PlaylistVideoActivity.SortType.TITLE_ASC -> db.playlistMusicDao().getMusicSortedByTitleAsc(playlistId)
+                    PlaylistVideoActivity.SortType.TITLE_DESC -> db.playlistMusicDao().getMusicSortedByTitleDesc(playlistId)
+                    PlaylistVideoActivity.SortType.DURATION_ASC -> db.playlistMusicDao().getMusicSortedByDurationAsc(playlistId)
+                    PlaylistVideoActivity.SortType.DURATION_DESC -> db.playlistMusicDao().getMusicSortedByDurationDesc(playlistId)
+                    PlaylistVideoActivity.SortType.DATE_NEWEST -> db.playlistMusicDao().getMusicSortedByNewest(playlistId)
+                    PlaylistVideoActivity.SortType.DATE_OLDEST -> db.playlistMusicDao().getMusicSortedByOldest(playlistId)
+                    PlaylistVideoActivity.SortType.SIZE_LARGEST -> db.playlistMusicDao().getMusicSortedBySizeDesc(playlistId)
+                    PlaylistVideoActivity.SortType.SIZE_SMALLEST -> db.playlistMusicDao().getMusicSortedBySizeAsc(playlistId)
+                }
+            }
+
+            // Fetch playlist details
+            val playlistWithVideos = db.playlistMusicDao().getPlaylistWithMusic(playlistId)
+            val playlistName = playlistWithVideos.playlistMusic.name
+            val videoCount = db.playlistMusicDao().getMusicCountForPlaylist(playlistId)
+            val totalDurationMillis = db.playlistMusicDao().getTotalDurationForPlaylist(playlistId)
+            val totalDuration = formatDuration(totalDurationMillis)
+            val firstVideoImageUri = db.playlistMusicDao().getFirstMusicImageUri(playlistId, sortOrder)
+
+            binding.playlistName.text = playlistName
+
+            val videoCountText = if (videoCount == 0) {
+                "$videoCount musics"
+            } else {
+                "$videoCount musics • $totalDuration"
+            }
+            binding.videoCount.text = videoCountText
+
+            // Set the first video's image if available
+            if (firstVideoImageUri != null) {
+                Glide.with(this@PlaylistDetails)
+                    .load(firstVideoImageUri)
+                    .placeholder(R.color.placeholder_image)
+                    .into(binding.playlistFirstVideoImage)
+            } else {
+                binding.playlistFirstVideoImage.setImageResource(R.color.placeholder_image) // Replace with a default image
+            }
+            binding.playlistFirstVideoImage.foreground = ContextCompat.getDrawable(this@PlaylistDetails, R.drawable.gray_overlay)
+
+            videoList.clear()
+            videoList.addAll(sortedVideos.map { videoEntity ->
+                Music(
+                    id = videoEntity.musicid,
+                    title = videoEntity.title,
+                    duration = videoEntity.duration,
+                    size = videoEntity.size,
+                    path = videoEntity.path,
+                    artUri = videoEntity.artUri,
+                    dateAdded = videoEntity.dateAdded,
+                    album = videoEntity.album,
+                    artist = videoEntity.artist
+                )
+            })
+            videoAdapter.updateVideoList(videoList)
+            videoAdapter.notifyDataSetChanged()
+
+            binding.progressBar.visibility = View.GONE // Hide ProgressBar
+
+            if (sortedVideos.isEmpty()) {
+                checkIfRecyclerViewIsEmpty()
+                return@launch // Exit early if the playlist is empty
+            }
+
+            // Update the playlist name with the current selection count
+            val selectedCount = videoAdapter.getSelectedVideos().size
+            updatePlaylistName(selectedCount)
+            checkIfRecyclerViewIsEmpty()
+        }
+    }
     override fun onSelectionChanged(isAllSelected: Boolean) {
         // Update the `selectAll` button based on selection state
         if (isAllSelected) {
@@ -534,7 +646,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
                 loadVideosForPlaylist()
             }
         }
-        videoAdapter.selectionChangeListener = this@PlaylistDetails // Set the listener
+        videoAdapter.selectionChangeListener = this@PlaylistDetails
         binding.videoOfPlaylistRV.layoutManager = LinearLayoutManager(this)
         binding.videoOfPlaylistRV.adapter = videoAdapter
     }
@@ -675,86 +787,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
             }
         }
     }
-    @SuppressLint("NotifyDataSetChanged")
-    private fun loadVideosFromDatabase() {
-        binding.progressBar.visibility = View.VISIBLE // Show ProgressBar
 
-        lifecycleScope.launch {
-            // Fetch the saved sort order
-            val sortOrder = db.playlistMusicDao().getSortOrder(playlistId)
-
-            // Fetch playlist with videos, sorted by the saved sort order
-            val sortedVideos = withContext(Dispatchers.IO) {
-                when (sortOrder) {
-                    PlaylistVideoActivity.SortType.TITLE_ASC -> db.playlistMusicDao().getMusicSortedByTitleAsc(playlistId)
-                    PlaylistVideoActivity.SortType.TITLE_DESC -> db.playlistMusicDao().getMusicSortedByTitleDesc(playlistId)
-                    PlaylistVideoActivity.SortType.DURATION_ASC -> db.playlistMusicDao().getMusicSortedByDurationAsc(playlistId)
-                    PlaylistVideoActivity.SortType.DURATION_DESC -> db.playlistMusicDao().getMusicSortedByDurationDesc(playlistId)
-                    PlaylistVideoActivity.SortType.DATE_NEWEST -> db.playlistMusicDao().getMusicSortedByNewest(playlistId)
-                    PlaylistVideoActivity.SortType.DATE_OLDEST -> db.playlistMusicDao().getMusicSortedByOldest(playlistId)
-                    PlaylistVideoActivity.SortType.SIZE_LARGEST -> db.playlistMusicDao().getMusicSortedBySizeDesc(playlistId)
-                    PlaylistVideoActivity.SortType.SIZE_SMALLEST -> db.playlistMusicDao().getMusicSortedBySizeAsc(playlistId)
-                }
-            }
-
-            // Fetch playlist details
-            val playlistWithVideos = db.playlistMusicDao().getPlaylistWithMusic(playlistId)
-            val playlistName = playlistWithVideos.playlistMusic.name
-            val videoCount = db.playlistMusicDao().getMusicCountForPlaylist(playlistId)
-            val totalDurationMillis = db.playlistMusicDao().getTotalDurationForPlaylist(playlistId)
-            val totalDuration = formatDuration(totalDurationMillis)
-            val firstVideoImageUri = db.playlistMusicDao().getFirstMusicImageUri(playlistId, sortOrder)
-
-            binding.playlistName.text = playlistName
-
-            val videoCountText = if (videoCount == 0) {
-                "$videoCount musics"
-            } else {
-                "$videoCount musics • $totalDuration"
-            }
-            binding.videoCount.text = videoCountText
-
-            // Set the first video's image if available
-            if (firstVideoImageUri != null) {
-                Glide.with(this@PlaylistDetails)
-                    .load(firstVideoImageUri)
-                    .placeholder(R.color.placeholder_image)
-                    .into(binding.playlistFirstVideoImage)
-            } else {
-                binding.playlistFirstVideoImage.setImageResource(R.color.placeholder_image) // Replace with a default image
-            }
-            binding.playlistFirstVideoImage.foreground = ContextCompat.getDrawable(this@PlaylistDetails, R.drawable.gray_overlay)
-
-            videoList.clear()
-            videoList.addAll(sortedVideos.map { videoEntity ->
-                Music(
-                    id = videoEntity.musicid,
-                    title = videoEntity.title,
-                    duration = videoEntity.duration,
-                    size = videoEntity.size,
-                    path = videoEntity.path,
-                    artUri = videoEntity.artUri,
-                    dateAdded = videoEntity.dateAdded,
-                    album = videoEntity.album,
-                    artist = videoEntity.artist
-                )
-            })
-            videoAdapter.updateVideoList(videoList)
-            videoAdapter.notifyDataSetChanged()
-
-            binding.progressBar.visibility = View.GONE // Hide ProgressBar
-
-            if (sortedVideos.isEmpty()) {
-                checkIfRecyclerViewIsEmpty()
-                return@launch // Exit early if the playlist is empty
-            }
-
-            // Update the playlist name with the current selection count
-            val selectedCount = videoAdapter.getSelectedVideos().size
-            updatePlaylistName(selectedCount)
-            checkIfRecyclerViewIsEmpty()
-        }
-    }
 
     fun updatePlaylistName(selectedCount: Int = 0) {
         lifecycleScope.launch {
@@ -773,7 +806,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
     }
 
 
-    private fun showBottomToolbar() {
+    fun showBottomToolbar() {
         binding.bottomToolbarF.visibility = View.VISIBLE
     }
 

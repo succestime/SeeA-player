@@ -18,9 +18,11 @@ import com.jaidev.seeaplayer.dataClass.PlaylistEntity
 import com.jaidev.seeaplayer.dataClass.PlaylistVideo
 import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.ActivityPlaylistFolderBinding
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
     private lateinit var binding: ActivityPlaylistFolderBinding
@@ -33,6 +35,8 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
             refreshPlaylists()
         }
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +52,9 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
             IntentFilter("UPDATE_PLAYLIST_FOLDER")
         )
 
-        // Load playlists
-        loadPlaylists()
 
+        setSwipeRefreshBackgroundColor()
+        refreshPlaylists()
         // Set up menu item click listener
         binding.playlistToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -75,8 +79,6 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
             bottomSheet.show(supportFragmentManager, bottomSheet.tag)
         }
 
-        setSwipeRefreshBackgroundColor()
-        loadPlaylistsFromDatabase()
     }
 
     override fun onPlaylistCreated(playlistName: String) {
@@ -123,7 +125,34 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updatePlaylistReceiver)
 
     }
+    private suspend fun removeDeletedSongsFromPlaylist(deletedMusicPath: String) {
+        withContext(Dispatchers.IO) {
+            val deletedMusic = db.playlistDao().getVideoByPath(deletedMusicPath)
+            if (deletedMusic != null) {
+                // Remove the music from the playlist
+                db.playlistDao().deleteVideoFromPlaylist(PlaylistDetails.playlistId, deletedMusic.id)
 
+                // Remove the music from the database
+                db.playlistDao().deleteVideo(deletedMusic.id)
+            }
+        }
+        withContext(Dispatchers.Main) {
+            refreshPlaylists()
+
+            val intent = Intent("UPDATE_PLAYLIST_MUSIC")
+            LocalBroadcastManager.getInstance(this@PlaylistFolderActivity).sendBroadcast(intent)
+        }
+    }
+    private suspend fun checkForDeletedSongs() {
+        withContext(Dispatchers.IO) {
+            val allMusic = db.playlistDao().getAllVideo()
+            for (music in allMusic) {
+                if (!File(music.path).exists()) {
+                    removeDeletedSongsFromPlaylist(music.path)
+                }
+            }
+        }
+    }
     private fun refreshPlaylists() {
         // Reload the playlists from the database
         loadPlaylists()
@@ -132,6 +161,7 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
     }
     private fun loadPlaylists() {
         lifecycleScope.launch {
+            checkForDeletedSongs()
             // Fetch playlists from the database
             val playlists = withContext(Dispatchers.IO) {
                 db.playlistDao().getAllPlaylists()
@@ -145,6 +175,7 @@ class PlaylistFolderActivity : AppCompatActivity(), OnPlaylistCreatedListener {
 
     private fun loadPlaylistsFromDatabase() {
         lifecycleScope.launch {
+            checkForDeletedSongs()
             val playlists = withContext(Dispatchers.IO) {
                 db.playlistDao().getAllPlaylists()
             }

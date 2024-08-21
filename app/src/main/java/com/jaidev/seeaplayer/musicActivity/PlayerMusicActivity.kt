@@ -107,6 +107,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
 
         unKnown()
+        setLayout()
         initializeBinding()
         updateNextMusicTitle()
 
@@ -132,6 +133,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 .into(binding.songImgPA)
 
             binding.songNamePA.text = musicListPA[songPosition].title
+            setLayout()
         }
         else initializeLayout()
 
@@ -345,7 +347,15 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 originalMusicListPA = ArrayList(musicListPA)
                 setLayout()
             }
-
+          "MusicMP3Adapter" ->{
+              val intent = Intent(this, MusicService::class.java)
+              bindService(intent, this, BIND_AUTO_CREATE)
+              startService(intent)
+              musicListPA = ArrayList()
+              musicListPA.addAll(MainActivity.MusicListMA)
+              originalMusicListPA = ArrayList(musicListPA)
+              setLayout()
+          }
             "FavouriteBottomAdapter" -> {
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
@@ -365,6 +375,16 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 else binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
             }
             "MusicAdapter" -> {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+                musicListPA = ArrayList()
+                musicListPA.addAll(MainActivity.MusicListMA)
+                originalMusicListPA = ArrayList(musicListPA)
+                setLayout()
+
+            }
+            "MusicBottomPlayAdapter" -> {
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)

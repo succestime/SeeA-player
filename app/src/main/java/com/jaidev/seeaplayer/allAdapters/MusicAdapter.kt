@@ -4,20 +4,25 @@ package com.jaidev.seeaplayer.allAdapters
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ComponentName
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.PorterDuff
 import android.media.MediaScannerConnection
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
+import android.text.Editable
 import android.text.SpannableStringBuilder
+import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -26,6 +31,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -34,21 +40,36 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textfield.TextInputEditText
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.R.*
+import com.jaidev.seeaplayer.dataClass.DatabaseClientMusic
 import com.jaidev.seeaplayer.dataClass.Music
+import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
+import com.jaidev.seeaplayer.dataClass.MusicFavEntity
+import com.jaidev.seeaplayer.dataClass.PlaylistMusic
+import com.jaidev.seeaplayer.dataClass.PlaylistMusicCrossRef
+import com.jaidev.seeaplayer.dataClass.PlaylistMusicEntity
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
-import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.binding
 import com.jaidev.seeaplayer.musicNav
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.NumberFormat
 
@@ -111,9 +132,10 @@ class MusicAdapter(
         return MyAdapter(MusicViewBinding.inflate(LayoutInflater.from(context), parent, false))
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("NotifyDataSetChanged", "MissingInflatedId", "ResourceType",
-        "SuspiciousIndentation"
+        "SuspiciousIndentation", "ObsoleteSdkInt"
     )
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
 
@@ -241,8 +263,7 @@ class MusicAdapter(
                     popupMenu.setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             id.remove_item -> {
-                                // Handle the removal of the item from the playlist
-//                                removeItemFromPlaylist(position)
+
                                 true
                             }
                             else -> false
@@ -254,97 +275,369 @@ class MusicAdapter(
 
             selectionActivity ->{
          holder.emptyCheck.visibility = View.VISIBLE
-                holder.root.setOnClickListener {
-//                    if(addSong(musicList[position])) {
-//                        holder.emptyCheck.visibility = View.GONE
-//                        holder.fillCheck.visibility = View.VISIBLE
-//                    }
-//                    else{
-//                    holder.emptyCheck.visibility = View.VISIBLE
-//                    holder.fillCheck.visibility = View.GONE
-//                }
-                }
+
             }
         }
-        // Show/hide multi-select icon based on selection
-//        holder.button.visibility = if (selectedItems.contains(position)) View.VISIBLE else View.GONE
 
         holder.more.setOnClickListener {
-            newPosition = position
-            // Inflate the custom dialog layout
-            val customDialog = LayoutInflater.from(context).inflate(layout.video_more_features, holder.root, false)
-            val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
-            // Create the dialog
-            val dialogBuilder = MaterialAlertDialogBuilder(context)
-                .setView(customDialog)
-            val dialog = dialogBuilder.create()
-            dialog.show()
-
-            // Get the window attributes of the dialog
-            val window = dialog.window
-            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
-            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
-
-            bindingMf.shareBtn.setOnClickListener {
-
-                dialog.dismiss()
-                val shareIntent = Intent()
-                shareIntent.action = Intent.ACTION_SEND
-                shareIntent.type = "audio/*"
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(musicList[position].path))
-                startActivity(
-                    context,
-                    Intent.createChooser(shareIntent, "Sharing Music File!!"),
-                    null
-                )
+            val music = musicList[position]
+            showBottomSheetDialog(music, position)
+        }
 
 
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n", "ObsoleteSdkInt")
+    private fun showBottomSheetDialog(video: Music , position: Int) {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context).inflate(R.layout.music_more_bottom_sheet, null)
+        bottomSheetDialog.setContentView(view)
+        view.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
+
+        val imageThumbnail = view.findViewById<ShapeableImageView>(R.id.imageThumbnail)
+        val textTitle = view.findViewById<TextView>(R.id.textTitle)
+        val textSubtitle = view.findViewById<TextView>(R.id.textSubtitle)
+        val ringtoneButton = view.findViewById<LinearLayout>(R.id.ringtoneButton)
+        val deleteButton = view.findViewById<LinearLayout>(R.id.deleteButton)
+        val playButton = view.findViewById<LinearLayout>(R.id.playButton)
+        val shareButton = view.findViewById<LinearLayout>(R.id.shareButton)
+        val propertiesButton = view.findViewById<LinearLayout>(R.id.propertiesButton)
+        val addToPlaylistButton = view.findViewById<LinearLayout>(R.id.addToPlaylistButton)
+        val addToFavouriteButton = view.findViewById<LinearLayout>(R.id.addToFavouriteButton)
+        val renameButton = view.findViewById<LinearLayout>(R.id.renameButton)
+        val favouriteIcon = view.findViewById<ImageView>(R.id.favouriteIcon)
+        val favouriteTitle = view.findViewById<TextView>(R.id.favouriteTitle)
+
+
+        textSubtitle.text = video.album
+        textTitle.text = video.title
+        Glide.with(context)
+            .load(video.artUri)
+            .apply(
+                RequestOptions()
+                    .placeholder(R.color.gray) // Use the newly created drawable
+                    .error(R.drawable.music_note_svgrepo_com) // Use the newly created drawable
+                    .centerCrop()
+            )
+            .into(imageThumbnail)
+
+
+        // Fetch the MusicFavDao once
+        val musicDao = MusicFavDatabase.getDatabase(context).musicFavDao()
+
+        // Check if the song is already in favorites and update UI
+        GlobalScope.launch(Dispatchers.Main) {
+            val isFavorite = withContext(Dispatchers.IO) {
+                musicDao.getAllMusic().any { it.id == video.id }
             }
-            bindingMf.infoBtn.setOnClickListener {
-                dialog.dismiss()
-                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
-                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
-                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
-                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
-                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
-                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
 
-                // Populate dialog views with data
-                fileNameTextView.text = musicList[position].title
-                durationTextView.text = DateUtils.formatElapsedTime(musicList[position].duration / 1000)
-                sizeTextView.text = Formatter.formatShortFileSize(context, musicList[position].size.toLong())
-                locationTextView.text = musicList[position].path
+            if (isFavorite) {
+                favouriteIcon.setImageResource(R.drawable.round_favorite_music)
+                favouriteTitle.text = "Added to Favourites"
+            } else {
+                favouriteIcon.setImageResource(R.drawable.round_favorite_border_music)
+                favouriteTitle.text = "Add to Favourites"
+            }
 
-                val dialogIF = MaterialAlertDialogBuilder(context)
-                    .setView(customDialogIF)
-                    .setCancelable(false)
-                    .create()
-                positiveButton.setOnClickListener {
-                    dialogIF.dismiss()
+            addToFavouriteButton.setOnClickListener {
+                GlobalScope.launch(Dispatchers.IO) {
+                    if (isFavorite) {
+                        musicDao.deleteMusic(
+                            MusicFavEntity(
+                                id = video.id,
+                                title = video.title,
+                                album = video.album,
+                                artist = video.artist,
+                                duration = video.duration,
+                                path = video.path,
+                                size = video.size,
+                                artUri = video.artUri,
+                                dateAdded = video.dateAdded
+                            )
+                        )
+                    } else {
+                        musicDao.insertMusic(
+                            MusicFavEntity(
+                                id = video.id,
+                                title = video.title,
+                                album = video.album,
+                                artist = video.artist,
+                                duration = video.duration,
+                                path = video.path,
+                                size = video.size,
+                                artUri = video.artUri,
+                                dateAdded = video.dateAdded
+                            )
+                        )
+                    }
                 }
-                dialogIF.show()
-            }
-
-            bindingMf.renameBtn.setOnClickListener {
-                dialog.dismiss()
-                // Get the current music title as default text
-                val defaultTitle = musicList[position].title
-                // Show the rename dialog with the current music title as default text
-                showRenameDialog(position, defaultTitle)
-            }
-
-            bindingMf.deleteBtn.setOnClickListener {
-                dialog.dismiss()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-                    showPermissionRequestDialog()
-                } else {
-                    showDeleteDialog(position)
-                }
-
+                bottomSheetDialog.dismiss()
             }
         }
 
 
+        addToPlaylistButton.setOnClickListener {
+            // Create and show a new BottomSheetDialog for adding to playlist
+            val bottomSheetPLDialog = BottomSheetDialog(context)
+            val bottomSheetPLView = LayoutInflater.from(context).inflate(
+                R.layout.add_to_playlist_bottom_sheet, null
+            )
+            bottomSheetPLDialog.setContentView(bottomSheetPLView)
+
+            val createPlaylistButton = bottomSheetPLView.findViewById<Button>(R.id.create_playlist_button)
+            val playlistRecyclerView = bottomSheetPLView.findViewById<RecyclerView>(R.id.playlistRecyclerview)
+
+            // Set up RecyclerView
+            playlistRecyclerView.layoutManager = LinearLayoutManager(context)
+
+            // Fetch playlists from the database
+            CoroutineScope(Dispatchers.IO).launch {
+                val dao = DatabaseClientMusic.getInstance(context).playlistMusicDao()
+                val playlistEntities = dao.getAllPlaylists() // Fetch PlaylistMusicEntity list
+
+                // Convert PlaylistMusicEntity list to PlaylistMusic list
+                val playlists = playlistEntities.map { mapEntityToPlaylistMusic(it) }
+
+                withContext(Dispatchers.Main) {
+                    // Initialize and set the adapter
+                    val playlistAdapter = AddToPlaylistViewAdapter(
+                        context,
+                        playlists.toMutableList(),
+                        video, // Single song
+                        bottomSheetPLDialog,
+                        selectedSongs = emptyList() // No multiple selection here
+                    )
+                    playlistRecyclerView.adapter = playlistAdapter
+                }
+            }
+
+            // Handle the create playlist button click
+            createPlaylistButton.setOnClickListener {
+                // Inflate the new bottom sheet layout for creating a playlist
+                val createPlaylistView = LayoutInflater.from(context).inflate(
+                    R.layout.video_playlist_bottom_dialog, null
+                )
+
+                val createPlaylistDialog = BottomSheetDialog(context)
+                createPlaylistDialog.setContentView(createPlaylistView)
+
+                // Find the views in the create playlist bottom sheet layout
+                val renameField = createPlaylistView.findViewById<TextInputEditText>(R.id.renameField)
+                val createButton = createPlaylistView.findViewById<Button>(R.id.button_create_playlist)
+
+                renameField.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+                    override fun afterTextChanged(s: Editable?) {
+                        createButton.setBackgroundColor(
+                            if (s.isNullOrEmpty()) {
+                                ContextCompat.getColor(context, R.color.button_background_default)
+                            } else {
+                                ContextCompat.getColor(context, R.color.cool_blue)
+                            }
+                        )
+                    }
+                })
+
+                createButton.setOnClickListener {
+                    val playlistName = renameField.text.toString().trim()
+                    if (playlistName.isNotEmpty()) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val dao = DatabaseClientMusic.getInstance(context).playlistMusicDao()
+
+                            // Create a new playlist entity
+                            val newPlaylist = PlaylistMusicEntity(
+                                name = playlistName
+                            )
+
+                            // Insert the new playlist into the database and get its ID
+                            val playlistId = dao.insertPlaylist(newPlaylist)
+
+                            // Add the selected song to the newly created playlist
+                            val crossRef = PlaylistMusicCrossRef(
+                                playlistMusicId = playlistId,
+                                musicId = video.id // Assuming playlist is of type Music
+                            )
+                            dao.insertPlaylistMusicCrossRef(crossRef)
+
+                            withContext(Dispatchers.Main) {
+                                // Dismiss the dialogs
+                                createPlaylistDialog.dismiss()
+                                bottomSheetPLDialog.dismiss()
+                                val numberOfSongs = 1 // Change this if you are adding multiple songs
+                                Toast.makeText(context, "$numberOfSongs song(s) added to the playlist '$playlistName'", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        // Handle empty name case (e.g., show an error message)
+                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                // Show the create playlist bottom sheet
+                createPlaylistDialog.show()
+                bottomSheetPLDialog.dismiss()
+            }
+
+            bottomSheetPLDialog.show()
+            bottomSheetDialog.dismiss()
+        }
+
+        ringtoneButton.setOnClickListener {
+            val builderTone = AlertDialog.Builder(context)
+            val dialogViewTone =
+                LayoutInflater.from(context).inflate(layout.favurite_ringtone, null)
+            builderTone.setView(dialogViewTone)
+
+            val dialogTone = builderTone.create()
+
+            val notButton: Button = dialogViewTone.findViewById(id.not_button)
+            val yesButton: Button = dialogViewTone.findViewById(id.yes_button)
+
+            notButton.setOnClickListener {
+                dialogTone.dismiss()
+            }
+
+            yesButton.setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!Settings.System.canWrite(context)) {
+                        // Request permission
+                        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                        intent.data = Uri.parse("package:" + context.packageName)
+                        startActivity(context, intent, null)
+                    } else {
+                        setRingtone(musicList[position].path)
+                    }
+                } else {
+                    setRingtone(musicList[position].path)
+                }
+                dialogTone.dismiss()
+                bottomSheetDialog.dismiss()
+            }
+
+            dialogTone.show()
+            bottomSheetDialog.dismiss()
+        }
+        playButton.setOnClickListener {
+            sendIntent(ref = "MusicBottomPlayAdapter", pos = position)
+            bottomSheetDialog.dismiss()
+        }
+        renameButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            // Get the current music title as default text
+            val defaultTitle = musicList[position].title
+            // Show the rename dialog with the current music title as default text
+            showRenameDialog(position, defaultTitle)
+        }
+        deleteButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                showPermissionRequestDialog()
+            } else {
+                showDeleteDialog(position)
+            }
+        }
+        propertiesButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+            val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+            val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+            val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+            val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+            val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+            // Populate dialog views with data
+            fileNameTextView.text = musicList[position].title
+            durationTextView.text = DateUtils.formatElapsedTime(musicList[position].duration / 1000)
+            sizeTextView.text = Formatter.formatShortFileSize(context, musicList[position].size.toLong())
+            locationTextView.text = musicList[position].path
+
+            val dialogIF = MaterialAlertDialogBuilder(context)
+                .setView(customDialogIF)
+                .setCancelable(false)
+                .create()
+            positiveButton.setOnClickListener {
+                dialogIF.dismiss()
+            }
+            dialogIF.show()
+        }
+        shareButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.type = "audio/*"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(musicList[position].path))
+            startActivity(
+                context,
+                Intent.createChooser(shareIntent, "Sharing Music File!!"),
+                null
+            )
+        }
+
+
+        bottomSheetDialog.show()
+    }
+    private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
+        return PlaylistMusic(
+            id = entity.musicid,
+            name = entity.name,
+            music = listOf() // Initialize with an empty list or fetch actual music if needed
+        )
+    }
+
+    private fun setRingtone(filePath: String) {
+        val file = File(filePath)
+        val contentUri = Uri.fromFile(file)
+
+        if (contentUri != null) {
+            val resolver = context.contentResolver
+            val ringtoneUri = MediaStore.Audio.Media.getContentUriForPath(filePath)
+
+            // Check if the file is already in the MediaStore
+            val cursor = resolver.query(
+                ringtoneUri!!,
+                arrayOf(MediaStore.MediaColumns._ID),
+                MediaStore.MediaColumns.DATA + "=?",
+                arrayOf(file.absolutePath),
+                null
+            )
+
+            var uri: Uri? = null
+
+            if (cursor != null && cursor.moveToFirst()) {
+                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID))
+                uri = ContentUris.withAppendedId(ringtoneUri, id)
+            } else {
+                val contentValues = ContentValues()
+                contentValues.put(MediaStore.MediaColumns.DATA, file.absolutePath)
+                contentValues.put(MediaStore.MediaColumns.TITLE, file.name)
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3")
+                contentValues.put(MediaStore.Audio.Media.IS_RINGTONE, true)
+                contentValues.put(MediaStore.Audio.Media.IS_NOTIFICATION, false)
+                contentValues.put(MediaStore.Audio.Media.IS_ALARM, false)
+                contentValues.put(MediaStore.Audio.Media.IS_MUSIC, false)
+
+                // Insert the ringtone into the media store
+                uri = resolver.insert(ringtoneUri, contentValues)
+            }
+
+            cursor?.close()
+
+            // Set the ringtone
+            if (uri != null) {
+                RingtoneManager.setActualDefaultRingtoneUri(
+                    context,
+                    RingtoneManager.TYPE_RINGTONE,
+                    uri
+                )
+                Toast.makeText(context, "Ringtone set successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to set ringtone", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     @RequiresApi(Build.VERSION_CODES.R)
     private fun showPermissionRequestDialog() {
@@ -359,7 +652,7 @@ class MusicAdapter(
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                 intent.data = Uri.parse("package:${context.packageName}")
-                ContextCompat.startActivity(context, intent, null)
+                startActivity(context, intent, null)
                 alertDialog.dismiss()
             }
 
@@ -458,25 +751,7 @@ class MusicAdapter(
         alertDialog.show()
 }
 
-//    private fun removeItemFromPlaylist(position: Int) {
-//        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(position)
-//        notifyItemRangeChanged(position, musicList.size)
-//    }
-//
-//
-//    private fun addSong(song: Music): Boolean{
-//        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.forEachIndexed { index, music ->
-//            if(song.id == music.id){
-//                PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(index)
-//                return false
-//            }
-//        }
-//        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.add(song)
-//        return true
-//    }
 
-    // Toggle selection for multi-select
-    // Toggle selection for multi-select
     private fun toggleSelection(position: Int) {
         if (selectedItems.contains(position)) {
             selectedItems.remove(position)
@@ -520,7 +795,7 @@ class MusicAdapter(
 
         if (activity != null) {
             // Find the included layout container
-            val bottomActionModeContainer = activity.findViewById<View>(R.id.bottom_action_mode_container)
+            val bottomActionModeContainer = activity.findViewById<View>(id.bottom_action_mode_container)
 
             // Ensure the container is not null and set it to visible
             if (bottomActionModeContainer != null) {
@@ -541,7 +816,7 @@ class MusicAdapter(
 
         if (activity != null) {
             // Find the included layout container
-            val bottomActionModeContainer = activity.findViewById<View>(R.id.bottom_action_mode_container)
+            val bottomActionModeContainer = activity.findViewById<View>(id.bottom_action_mode_container)
 
             // Ensure the container is not null and set it to gone
             if (bottomActionModeContainer != null) {
@@ -558,7 +833,7 @@ class MusicAdapter(
     private fun setupBottomActionModeBarListeners() {
         // Find buttons and set up listeners
         val activity = context as? AppCompatActivity
-        val bottomActionModeContainer = activity?.findViewById<View>(R.id.bottom_action_mode_container)
+        val bottomActionModeContainer = activity?.findViewById<View>(id.bottom_action_mode_container)
 
         bottomActionModeContainer?.let {
             val checkBtn = it.findViewById<ImageView>(R.id.checkBtn)
@@ -712,12 +987,12 @@ class MusicAdapter(
     }
     private fun updateRenameButtonState() {
         val activity = context as? AppCompatActivity
-        val bottomActionModeContainer = activity?.findViewById<View>(R.id.bottom_action_mode_container)
+        val bottomActionModeContainer = activity?.findViewById<View>(id.bottom_action_mode_container)
         bottomActionModeContainer?.let {
             val renameBtn = it.findViewById<ImageView>(R.id.renameBtn)
             if (selectedItems.size != 1) {
                 renameBtn.isEnabled = false
-                renameBtn.setColorFilter(ContextCompat.getColor(context, R.color.gray), PorterDuff.Mode.SRC_IN)
+                renameBtn.setColorFilter(ContextCompat.getColor(context, color.gray), PorterDuff.Mode.SRC_IN)
             } else {
                 renameBtn.isEnabled = true
                 renameBtn.clearColorFilter()
@@ -916,11 +1191,6 @@ class MusicAdapter(
         notifyDataSetChanged()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun refreshPlaylist() {
-        musicList = ArrayList()
-        notifyDataSetChanged()
-    }
 
     @SuppressLint("NotifyDataSetChanged")
     fun addAll(selectedSongs: ArrayList<Music>) {
@@ -931,6 +1201,3 @@ class MusicAdapter(
 
 
 }
-
-
-

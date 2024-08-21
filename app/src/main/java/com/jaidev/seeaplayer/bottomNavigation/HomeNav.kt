@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.jaidev.seeaplayer.MP3ConverterActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.PlaylistFolderActivity
 import com.jaidev.seeaplayer.R
@@ -105,6 +106,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
 
         iconModelArrayList.add(ChipItem("Playlist", R.drawable.round_playlist_music))
         iconModelArrayList.add(ChipItem("Share", R.drawable.share_svgrepo_com))
+        iconModelArrayList.add(ChipItem("MP3 Converter", R.drawable.outline_headphones_24))
 
         playbackIconsAdapter = ChipAdapter(requireContext() , iconModelArrayList)
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
@@ -123,6 +125,10 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
                     1->{
                         startActivity(Intent(requireContext(), PlaylistFolderActivity::class.java))
                     }
+                    2->{
+                        startActivity(Intent(requireContext(), MP3ConverterActivity::class.java))
+                    }
+
                     else -> {
                         // Handle any other positions if needed
                     }
@@ -130,27 +136,6 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
             }
         })
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         @RequiresApi(Build.VERSION_CODES.R)

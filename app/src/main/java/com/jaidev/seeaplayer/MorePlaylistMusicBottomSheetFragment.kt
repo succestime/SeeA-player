@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bumptech.glide.Glide
@@ -18,9 +20,11 @@ import com.jaidev.seeaplayer.dataClass.DatabaseClientMusic
 import com.jaidev.seeaplayer.dataClass.PlaylistMusicDao
 import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.databinding.PlaylistMusicMenuBottomSheetBinding
+import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class MorePlaylistMusicBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -62,7 +66,7 @@ private lateinit var playlistMusicDao : PlaylistMusicDao
         return binding.root
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val theme = ThemeHelper.getSavedTheme(requireContext())
@@ -92,6 +96,53 @@ private lateinit var playlistMusicDao : PlaylistMusicDao
                 .into(binding.musicThumbnail)
         }
 
+        binding.shareLayout.setOnClickListener {
+            lifecycleScope.launch {
+                val playlist = playlistMusicDao.getPlaylistWithMusic(playlistMusicId)
+                if (playlist.music.isNotEmpty()) {
+                    val uris = playlist.music.mapNotNull { music ->
+                        val file = File(music.path)
+                        if (file.exists()) {
+                            FileProvider.getUriForFile(
+                                requireContext(),
+                                "${requireContext().packageName}.provider",
+                                file
+                            )
+                        } else {
+                            null
+                        }
+                    }
+
+                    if (uris.isNotEmpty()) {
+                        val shareIntent = Intent().apply {
+                            action = Intent.ACTION_SEND_MULTIPLE
+                            type = "audio/*"
+                            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+
+                        startActivity(Intent.createChooser(shareIntent, "Share Playlist Songs"))
+                    } else {
+                        Toast.makeText(requireContext(), "No songs available to share.", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Playlist is empty.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            dismiss()
+        }
+
+        binding.multipleItemSelectLayout.setOnClickListener {
+            // Enable selection mode
+            (activity as? PlaylistDetails)?.apply {
+                videoAdapter.isSelectionMode = true
+                videoAdapter.notifyDataSetChanged()
+                updateSelectionMode(true)
+                updatePlaylistName(0)
+
+            }
+            dismiss()
+        }
 
         // Handle click events for the options in the bottom sheet
         binding.playOptionLayout.setOnClickListener {
@@ -137,17 +188,10 @@ private lateinit var playlistMusicDao : PlaylistMusicDao
                 dismiss()
             }
 
-
-
-            // Show the alert dialog
             alertDialog.show()
         }
 
-
-        // Handle other options similarly...
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

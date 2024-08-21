@@ -21,8 +21,7 @@ class SplashActivity : AppCompatActivity() {
     @SuppressLint("ObsoleteSdkInt")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val theme = ThemeHelper.getSavedTheme(this)
-        ThemeHelper.applyTheme(this,theme)
+
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
@@ -41,13 +40,11 @@ class SplashActivity : AppCompatActivity() {
         // Set the modified SpannableString to the TextView
         binding.textView.text = spannableString
 
-
-
-//
-
         // Delay for 2 seconds and then start the main activity
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            val theme = ThemeHelper.getSavedTheme(this)
+            ThemeHelper.applyTheme(this,theme)
             finish()
 
         }, 200)

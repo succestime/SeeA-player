@@ -21,6 +21,7 @@
         <item name="progressBarStyle">@color/cool_blue</item>
         <item name="titleTextColor">@color/black</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
 
@@ -41,6 +42,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
 
     </style>
@@ -60,6 +62,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/black</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav3" parent="Theme.MaterialComponents.Light">
@@ -79,6 +82,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/black</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
 
     </style>
@@ -99,6 +103,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav5" parent="Theme.MaterialComponents.Light">
@@ -118,6 +123,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/black</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav6" parent="Theme.MaterialComponents.Light">
@@ -137,6 +143,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/black</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav7" parent="Theme.MaterialComponents.Light">
@@ -156,6 +163,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav8" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -175,6 +183,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav9" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -194,6 +203,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav10" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -213,6 +223,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
 
     </style>
@@ -233,6 +244,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
 
     </style>
@@ -253,6 +265,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav13" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -272,6 +285,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav14" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -291,6 +305,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav15" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -310,6 +325,7 @@
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowLightStatusBar">false</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
     <style name="coolBlueNav16" parent="Theme.MaterialComponents.Light">
@@ -330,10 +346,12 @@
         <item name="titleTextColor">@color/black</item>
 <item name="bottomSheetStyle">@style/AppBottomSheetDiaolgTheme</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="bottomActionModeBackgroundColor">#ECE9E9</item>
 
     </style>
 
     <style name="statusBarPlaylistTheme" parent="Theme.MaterialComponents.Light">
+        <item name="themeColor">@color/cool_green</item>
         <item name="colorPrimary">@color/cool_blue</item>
         <item name="colorPrimaryVariant">?attr/themeColor</item>
         <item name="colorOnPrimary">@color/black</item>
@@ -389,12 +407,14 @@
 
     </style>
 
-    <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
         <!--        <item name="android:windowFullscreen">true</item>-->
-        <item name="android:textColor">@color/white</item>
-        <item name="android:statusBarColor">@color/dark_cool_blue</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowLightStatusBar">true</item> <!-- Light status bar icons -->
+        <item name="android:windowBackground">#FFFFFF</item>
+
 
     </style>
 

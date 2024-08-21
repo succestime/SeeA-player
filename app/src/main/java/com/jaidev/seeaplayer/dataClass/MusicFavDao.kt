@@ -19,4 +19,6 @@ interface MusicFavDao {
     suspend fun deleteMusic(music: MusicFavEntity)
 
 
+    @Query("DELETE FROM music_table")
+    suspend fun deleteAllMusic()  // New method to delete all songs
 }

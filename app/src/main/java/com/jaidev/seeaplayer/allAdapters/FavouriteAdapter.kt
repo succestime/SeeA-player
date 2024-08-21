@@ -58,6 +58,12 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
     interface OnSelectionModeChangeListener {
         fun onSelectionModeChanged(isSelectionMode: Boolean, selectedCount: Int, totalCount: Int)
     }
+    // In your FavouriteAdapter class
+    @SuppressLint("NotifyDataSetChanged")
+    fun enableSelectionMode() {
+        isSelectionMode = true
+        notifyDataSetChanged()  // To refresh the UI and show selection checkboxes, if applicable
+    }
 
     fun getSelectedItemCount(): Int {
         return selectedItems.size
@@ -104,7 +110,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
 
 
         // If selection mode is enabled
-        if (isSelectionMode && musicList.isNotEmpty()) {
+        if (isSelectionMode ) {
             holder.emptyCheck.visibility = View.VISIBLE
             holder.moreChoose.visibility = View.GONE
 
@@ -139,7 +145,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
 
 
         holder.root.setOnLongClickListener {
-            if (!isSelectionMode && musicList.isNotEmpty()) {
+            if (!isSelectionMode) {
                 isSelectionMode = true
                 toggleSelection(position)
                 notifyDataSetChanged() // Refresh all items to update their visibility

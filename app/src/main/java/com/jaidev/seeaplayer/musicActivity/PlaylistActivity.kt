@@ -24,6 +24,7 @@ import com.jaidev.seeaplayer.databinding.ActivityPlaylistBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
     lateinit var binding: ActivityPlaylistBinding
@@ -32,7 +33,6 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
 
     private val updatePlaylistReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            // Refresh the playlists
             refreshPlaylists()
         }
     }
@@ -52,9 +52,8 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
             IntentFilter("UPDATE_PLAYLIST_MUSIC")
         )
 
-        // Load playlists
-        loadPlaylists()
-
+// Refresh the playlists
+        refreshPlaylists()
         // Set up menu item click listener
         binding.playlistToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -80,9 +79,34 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
         }
 
         setSwipeRefreshBackgroundColor()
-        loadPlaylistsFromDatabase()
-    }
 
+    }
+    private suspend fun removeDeletedSongsFromPlaylist(deletedMusicPath: String) {
+        withContext(Dispatchers.IO) {
+            val deletedMusic = db.playlistMusicDao().getMusicByPath(deletedMusicPath)
+            if (deletedMusic != null) {
+                // Remove the music from the playlist
+                db.playlistMusicDao().deleteMusicFromPlaylist(PlaylistDetails.playlistId, deletedMusic.musicid)
+
+                // Remove the music from the database
+                db.playlistMusicDao().deleteMusic(deletedMusic.musicid)
+            }
+        }
+        withContext(Dispatchers.Main) {
+            refreshPlaylists()
+
+        }
+    }
+    private suspend fun checkForDeletedSongs() {
+        withContext(Dispatchers.IO) {
+            val allMusic = db.playlistMusicDao().getAllMusic()
+            for (music in allMusic) {
+                if (!File(music.path).exists()) {
+                    removeDeletedSongsFromPlaylist(music.path)
+                }
+            }
+        }
+    }
     override fun onPlaylistMusicCreated(playlistName: String) {
         lifecycleScope.launch {
             val newPlaylistId = insertPlaylist(playlistName)
@@ -134,7 +158,7 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
     }
     private fun loadPlaylists() {
         lifecycleScope.launch {
-            // Fetch playlists from the database
+            checkForDeletedSongs()
             val playlists = withContext(Dispatchers.IO) {
                 db.playlistMusicDao().getAllPlaylists()
             }
@@ -147,6 +171,7 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
 
     private fun loadPlaylistsFromDatabase() {
         lifecycleScope.launch {
+            checkForDeletedSongs()
             val playlists = withContext(Dispatchers.IO) {
                 db.playlistMusicDao().getAllPlaylists()
             }

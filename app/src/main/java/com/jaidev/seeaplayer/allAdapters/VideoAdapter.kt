@@ -8,16 +8,18 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
+import android.media.MediaMetadataRetriever
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
+import android.text.Editable
 import android.text.SpannableStringBuilder
+import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -26,32 +28,55 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.arthenica.mobileffmpeg.Config
+import com.arthenica.mobileffmpeg.FFmpeg
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 import com.jaidev.seeaplayer.FoldersActivity
+import com.jaidev.seeaplayer.MP3ConverterActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
+import com.jaidev.seeaplayer.dataClass.DatabaseClient
+import com.jaidev.seeaplayer.dataClass.MP3AppDatabase
+import com.jaidev.seeaplayer.dataClass.MP3FileData
+import com.jaidev.seeaplayer.dataClass.MP3FileEntity
+import com.jaidev.seeaplayer.dataClass.PlaylistEntity
+import com.jaidev.seeaplayer.dataClass.PlaylistVideo
+import com.jaidev.seeaplayer.dataClass.PlaylistVideoCrossRef
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
-import com.jaidev.seeaplayer.databinding.VideoMoreFeaturesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 @SuppressLint("NotifyDataSetChanged")
 class VideoAdapter(private val context: Context,
@@ -264,10 +289,7 @@ class VideoAdapter(private val context: Context,
         notifyDataSetChanged()
     }
 
-    fun isSelectionModeEnabled(): Boolean {
 
-        return isSelectionModeEnabled
-    }
     class MyHolder(binding: GridVideoViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.videoName
         val duration = binding.duration
@@ -282,7 +304,7 @@ val indicator = binding.newIndicator
 
 }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "UseCompatLoadingForDrawables")
     override fun onBindViewHolder(holder: MyHolder, @SuppressLint("RecyclerView") position: Int) {
         val video = videoList[position]
 
@@ -342,112 +364,336 @@ val indicator = binding.newIndicator
         }
 
         holder.more.setOnClickListener {
-            newPosition = position
 
-            // Inflate the custom dialog layout
-            val customDialog = LayoutInflater.from(context).inflate(R.layout.video_more_features, holder.root, false)
-            val bindingMf = VideoMoreFeaturesBinding.bind(customDialog)
-            // Create the dialog
-            val dialogBuilder = MaterialAlertDialogBuilder(context)
-                .setView(customDialog)
-            val dialog = dialogBuilder.create()
-
-            // Show the dialog
-            dialog.show()
-
-            // Get the window attributes of the dialog
-            val window = dialog.window
-            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
-            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
-
-            // Set click listeners for dialog buttons
-            bindingMf.shareBtn.setOnClickListener {
-                dialog.dismiss()
-
-                // Create an ACTION_SEND intent to share the video
-                val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
-                shareIntent.type = "video/*"
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoList[position].path))
-                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                // Get the list of apps that can handle the intent
-                val packageManager = context.packageManager
-                val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
-                val excludedComponents = mutableListOf<ComponentName>()
-
-
-                // Iterate through the list and exclude your app
-                for (resolvedActivity in resolvedActivityList) {
-                    if (resolvedActivity.activityInfo.packageName == context.packageName) {
-                        excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
-                    }
-                }
-
-                // Create a chooser intent
-                val chooserIntent = Intent.createChooser(shareIntent, "Sharing Video")
-
-                // Exclude your app from the chooser intent
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-                }
-
-                chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(context, chooserIntent, null)
-            }
-
-
-            bindingMf.infoBtn.setOnClickListener {
-
-               dialog.dismiss()
-                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
-                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
-                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
-                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
-                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
-                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
-                val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
-
-                // Populate dialog views with data
-                fileNameTextView.text = videoList[position].title
-                durationTextView.text = DateUtils.formatElapsedTime(videoList[position].duration / 1000)
-                sizeTextView.text = Formatter.formatShortFileSize(context, videoList[position].size.toLong())
-                locationTextView.text = videoList[position].path
-
-                // Format and set the date
-                val dateFormat = SimpleDateFormat("MMMM d, yyyy, HH:mm", Locale.getDefault())
-                dateTextView.text = videoList[position].dateAdded?.let { it1 -> Date(it1) }
-                    ?.let { it2 -> dateFormat.format(it2) }
-
-                val dialogIF = MaterialAlertDialogBuilder(context)
-                    .setView(customDialogIF)
-                    .setCancelable(false)
-                    .create()
-                positiveButton.setOnClickListener {
-                    dialogIF.dismiss()
-                }
-                dialogIF.show()
-            }
-
-            bindingMf.renameBtn.setOnClickListener {
-                dialog.dismiss()
-                showRenameDialog(position, videoList[position].title)
-            }
-
-
-            bindingMf.deleteBtn.setOnClickListener {
-                dialog.dismiss()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-                    showPermissionRequestDialog()
-                } else {
-                    showDeleteDialog(position)
-                }
-            }
+            showBottomSheetDialog(video, position)
         }
 
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n", "ObsoleteSdkInt")
+    private fun showBottomSheetDialog(video: VideoData, position: Int) {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context).inflate(R.layout.video_more_bottom_sheet, null)
+        bottomSheetDialog.setContentView(view)
+        view.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
+
+        val textTitle = view.findViewById<TextView>(R.id.textTitle)
+        val deleteButton = view.findViewById<LinearLayout>(R.id.deleteButton)
+        val playButton = view.findViewById<LinearLayout>(R.id.playButton)
+        val shareButton = view.findViewById<LinearLayout>(R.id.shareButton)
+        val propertiesButton = view.findViewById<LinearLayout>(R.id.propertiesButton)
+        val addToPlaylistButton = view.findViewById<LinearLayout>(R.id.addToPlaylistButton)
+        val renameButton = view.findViewById<LinearLayout>(R.id.renameButton)
+        val convertToMP3Button = view.findViewById<LinearLayout>(R.id.convertToMP3Button)
 
 
+        textTitle.text = video.title
+
+        addToPlaylistButton.setOnClickListener {
+            // Create and show a new BottomSheetDialog for adding to playlist
+            val bottomSheetPLDialog = BottomSheetDialog(context)
+            val bottomSheetPLView = LayoutInflater.from(context).inflate(
+                R.layout.add_to_playlist_video_bottom_sheet, null
+            )
+            bottomSheetPLDialog.setContentView(bottomSheetPLView)
+
+            val createPlaylistButton = bottomSheetPLView.findViewById<Button>(R.id.create_playlist_button)
+            val playlistRecyclerView = bottomSheetPLView.findViewById<RecyclerView>(R.id.playlistRecyclerview)
+
+            // Set up RecyclerView
+            playlistRecyclerView.layoutManager = LinearLayoutManager(context)
+            CoroutineScope(Dispatchers.IO).launch {
+                val dao = DatabaseClient.getInstance(context).playlistDao()
+                val playlistEntities = dao.getAllPlaylists()
+
+                val playlists = playlistEntities.map { mapEntityToPlaylistMusic(it) }
+
+                withContext(Dispatchers.Main) {
+                    val playlistAdapter = AddToPlaylistVideoViewAdapter(
+                        context,
+                        playlists.toMutableList(),
+                        video,
+                        bottomSheetPLDialog,
+                        selectedSongs = emptyList()
+                    )
+                    playlistRecyclerView.adapter = playlistAdapter
+                }
+            }
+
+            createPlaylistButton.setOnClickListener {
+                val createPlaylistView = LayoutInflater.from(context).inflate(
+                    R.layout.video_playlist_bottom_dialog, null
+                )
+
+                val createPlaylistDialog = BottomSheetDialog(context)
+                createPlaylistDialog.setContentView(createPlaylistView)
+
+                val renameField = createPlaylistView.findViewById<TextInputEditText>(R.id.renameField)
+                val createButton = createPlaylistView.findViewById<Button>(R.id.button_create_playlist)
+
+                renameField.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+                    override fun afterTextChanged(s: Editable?) {
+                        createButton.setBackgroundColor(
+                            if (s.isNullOrEmpty()) {
+                                ContextCompat.getColor(context, R.color.button_background_default)
+                            } else {
+                                ContextCompat.getColor(context, R.color.cool_blue)
+                            }
+                        )
+                    }
+                })
+
+                createButton.setOnClickListener {
+                    val playlistName = renameField.text.toString().trim()
+                    if (playlistName.isNotEmpty()) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val dao = DatabaseClient.getInstance(context).playlistDao()
+
+                            val newPlaylist = PlaylistEntity(
+                                name = playlistName
+                            )
+
+                            val playlistId = dao.insertPlaylist(newPlaylist)
+
+                            val crossRef = PlaylistVideoCrossRef(
+                                playlistId = playlistId,
+                                videoId = video.id
+                            )
+                            dao.insertPlaylistVideoCrossRef(crossRef)
+
+                            withContext(Dispatchers.Main) {
+                                createPlaylistDialog.dismiss()
+                                bottomSheetPLDialog.dismiss()
+                                val numberOfSongs = 1
+                                Toast.makeText(context, "$numberOfSongs video(s) added to the playlist '$playlistName'", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                createPlaylistDialog.show()
+                bottomSheetPLDialog.dismiss()
+            }
+
+            bottomSheetPLDialog.show()
+            bottomSheetDialog.dismiss()
+        }
+        convertToMP3Button.setOnClickListener {
+            // Show the MP3 conversion dialog
+            val bottomSheetMP3Dialog = BottomSheetDialog(context)
+            val mp3View = LayoutInflater.from(context).inflate(R.layout.mp3_converter_layout, null)
+            bottomSheetMP3Dialog.setContentView(mp3View)
+            mp3View.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
+
+            val convertingTextView = mp3View.findViewById<TextView>(R.id.convertingTextView)
+            val percentageTextView = mp3View.findViewById<TextView>(R.id.percentageTextView)
+            val cancelButton = mp3View.findViewById<TextView>(R.id.cancelButton)
+            val progressBar = mp3View.findViewById<ProgressBar>(R.id.progressBar)
+            val convertingView = mp3View.findViewById<RelativeLayout>(R.id.convertingView)
+            val completeBottomSheet = mp3View.findViewById<ConstraintLayout>(R.id.complete_bottomSheet)
+            val videoPathAndTitle = mp3View.findViewById<TextView>(R.id.videoPathAndTitle)
+
+            bottomSheetDialog.dismiss()
+            bottomSheetMP3Dialog.show()
+
+            val inputFilePath = video.path
+            // Extract the base name of the video file without extension
+            val baseName = video.title.substringBeforeLast(".")
+            // Create the output file name with ".mp3.mp3"
+            val outputFilePath = "${context.getExternalFilesDir(null)}/$baseName.mp3.mp3"
+
+            convertingView.visibility = View.VISIBLE
+            completeBottomSheet.visibility = View.GONE
+
+            GlobalScope.launch(Dispatchers.IO) {
+                val ffmpegCommand = arrayOf("-i", inputFilePath, "-q:a", "0", "-map", "a", outputFilePath)
+
+                val rc = FFmpeg.execute(ffmpegCommand)
+                withContext(Dispatchers.Main) {
+                    if (rc == Config.RETURN_CODE_SUCCESS) {
+                        // File details
+                        val file = File(outputFilePath)
+                        val fileSize = formatFileSize(file.length())
+                        val dateAdded = System.currentTimeMillis() // Use current time as the date added
+
+                        // Get the duration of the MP3 file
+                        val duration = getMP3Duration(outputFilePath)
+
+                        // Update the UI on conversion success
+                        convertingTextView.text = "Conversion Complete!"
+                        progressBar.progress = 100
+                        percentageTextView.text = "100%"
+
+                        convertingView.visibility = View.GONE
+                        completeBottomSheet.visibility = View.VISIBLE
+                        videoPathAndTitle.text = "Saved to : SeeA MP3 Converter\n\nConverted_$baseName.mp3.mp3"
+
+                        val mp3FileData = MP3FileData(
+                            id = UUID.randomUUID().toString(),
+                            title = "$baseName.mp3.mp3",
+                            duration = duration,
+                            size = fileSize,
+                            dateAdded = dateAdded,
+                            path = outputFilePath
+                        )
+
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val db = MP3AppDatabase.getDatabase(context)
+                            db.mp3FileDao().insert(
+                                MP3FileEntity(
+                                id = mp3FileData.id,
+                                title = mp3FileData.title,
+                                duration = mp3FileData.duration,
+                                size = mp3FileData.size,
+                                dateAdded = mp3FileData.dateAdded,
+                                path = mp3FileData.path
+                            )
+                            )
+                        }
+
+                        // Update the UI or notify MP3ConverterActivity if necessary
+                        if (context is MP3ConverterActivity) {
+                            context.addMP3File(mp3FileData)
+                        }
+                    }else {
+                        convertingTextView.text = "Conversion Failed!"
+                    }
+                }
+
+
+            }
+
+            // Track progress
+            Config.enableStatisticsCallback { stats ->
+                GlobalScope.launch(Dispatchers.Main) {
+                    val progress = (stats.time.toFloat() / video.duration) * 100
+                    progressBar.progress = progress.toInt()
+                    percentageTextView.text = "${progress.toInt()}%"
+                }
+            }
+
+            // Handle cancel button click
+            cancelButton.setOnClickListener {
+                FFmpeg.cancel()
+                bottomSheetMP3Dialog.dismiss()
+            }
+        }
+
+
+        renameButton.setOnClickListener {
+    bottomSheetDialog.dismiss()
+    showRenameDialog(position, video.title)
+}
+
+        deleteButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                showPermissionRequestDialog()
+            } else {
+                showDeleteDialog(position)
+            }
+        }
+
+        shareButton.setOnClickListener{
+            bottomSheetDialog.dismiss()
+            val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+            shareIntent.type = "video/*"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+// Get the list of apps that can handle the intent
+            val packageManager = context.packageManager
+            val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
+            val excludedComponents = mutableListOf<ComponentName>()
+// Iterate through the list and exclude your app
+            for (resolvedActivity in resolvedActivityList) {
+                if (resolvedActivity.activityInfo.packageName == context.packageName) {
+                    excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+                }
+            }
+// Create a chooser intent
+            val chooserIntent = Intent.createChooser(shareIntent, "Sharing Video")
+// Exclude your app from the chooser intent
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+            }
+            chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(context, chooserIntent, null)
+        }
+
+        propertiesButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+            val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+            val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+            val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+            val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+            val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+            val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
+// Populate dialog views with data
+            fileNameTextView.text = video.title
+            durationTextView.text = DateUtils.formatElapsedTime(video.duration / 1000)
+            sizeTextView.text = Formatter.formatShortFileSize(context, video.size.toLong())
+            locationTextView.text = video.path
+// Format and set the date
+            val dateFormat = SimpleDateFormat("MMMM d, yyyy, HH:mm", Locale.getDefault())
+            dateTextView.text = video.dateAdded?.let { it1 -> Date(it1) }
+                ?.let { it2 -> dateFormat.format(it2) }
+            val dialogIF = MaterialAlertDialogBuilder(context)
+                .setView(customDialogIF)
+                .setCancelable(false)
+                .create()
+            positiveButton.setOnClickListener {
+                dialogIF.dismiss()
+            }
+            dialogIF.show()
+        }
+
+        playButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            sendIntent(pos = position, ref = "VideoMoreAdapter")
+        }
+
+        bottomSheetDialog.show()
+    }
+    private fun mapEntityToPlaylistMusic(entity: PlaylistEntity): PlaylistVideo {
+        return PlaylistVideo(
+            id = entity.id,
+            name = entity.name,
+            video = listOf() // Initialize with an empty list or fetch actual music if needed
+
+        )
+    }
+    private fun formatFileSize(sizeInBytes: Long): String {
+        val kb = sizeInBytes / 1024
+        val mb = kb / 1024
+        return when {
+            mb > 0 -> "${mb} MB"
+            kb > 0 -> "${kb} KB"
+            else -> "${sizeInBytes} B"
+        }
+    }
+
+    // Function to get MP3 duration
+    private fun getMP3Duration(filePath: String): Long {
+        val mediaMetadataRetriever = MediaMetadataRetriever()
+        return try {
+            mediaMetadataRetriever.setDataSource(filePath)
+            val durationStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            durationStr?.toLongOrNull() ?: 0L
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0L
+        } finally {
+            mediaMetadataRetriever.release()
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.R)
     private fun showPermissionRequestDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.video_music_delete_permission_dialog, null)
@@ -876,4 +1122,11 @@ val indicator = binding.newIndicator
     }
 
 }
+
+
+
+
+
+
+
 

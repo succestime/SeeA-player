@@ -222,9 +222,19 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 playerList.addAll(FoldersActivity.currentFolderVideos)
                 createPlayer()
             }
+            "FoldersMP3Activity" -> {
+                playerList = ArrayList()
+                playerList.addAll(PlaylistVideoActivity.videoList)
+                createPlayer()
+            }
  "playlistPlaying" -> {
                 playerList = ArrayList()
                 playerList.addAll(PlaylistVideoActivity.videoList)
+                createPlayer()
+            }
+            "VideoMoreAdapter" -> {
+                playerList = ArrayList()
+                playerList.addAll(FoldersActivity.currentFolderVideos)
                 createPlayer()
             }
 
@@ -874,7 +884,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         }
         speed = 1.0f
         trackSelector = DefaultTrackSelector(this)
-     videoTitle.isSelected = true
+    videoTitle.isSelected = true
         videoTitle.text = playerList[position].title
         player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         doubleTapEnable()

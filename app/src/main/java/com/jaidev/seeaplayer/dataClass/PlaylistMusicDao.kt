@@ -255,6 +255,11 @@ interface PlaylistMusicDao {
     @Query("SELECT sortOrder FROM musicPlaylists WHERE musicid = :playlistMusicId")
     suspend fun getSortOrder(playlistMusicId: Long): PlaylistVideoActivity.SortType
 
+    @Query("SELECT * FROM music WHERE path = :path LIMIT 1")
+    suspend fun getMusicByPath(path: String): MusicEntity?
 
-
+    @Query("DELETE FROM music WHERE musicid = :musicId")
+    suspend fun deleteMusic(musicId: String)
+    @Query("SELECT * FROM music")
+    suspend fun getAllMusic(): List<MusicEntity>
 }

@@ -38,6 +38,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".MP3playerActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
+            android:exported="false" />
+        <activity
+            android:name=".MP3ConverterActivity"
+            android:exported="false" />
+        <activity
             android:name=".PlaylistVideoActivity"
             android:exported="false"
             android:screenOrientation="portrait"
@@ -323,6 +330,7 @@
             tools:ignore="LockedOrientationActivity" />
 
         <service android:name=".Services.MusicService" />
+        <service android:name=".dataClass.MediaPlayerService" />
         <service android:name=".Services.FolderDetectionService" />
         <service android:name=".Services.FileDownloadService" />
 

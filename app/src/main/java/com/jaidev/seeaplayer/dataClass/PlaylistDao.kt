@@ -248,6 +248,12 @@ interface PlaylistDao {
     // Get the sort order for a specific playlist
     @Query("SELECT sortOrder FROM playlists WHERE id = :playlistId")
     suspend fun getSortOrder(playlistId: Long): PlaylistVideoActivity.SortType
+    @Query("SELECT * FROM videos WHERE path = :path LIMIT 1")
+    suspend fun getVideoByPath(path: String): VideoEntity?
 
+    @Query("DELETE FROM videos WHERE id = :videoId")
+    suspend fun deleteVideo(videoId: String)
+    @Query("SELECT * FROM videos")
+    suspend fun getAllVideo(): List<VideoEntity>
 
 }

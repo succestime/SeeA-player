@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter2
 import com.jaidev.seeaplayer.dataClass.DatabaseClientMusic
@@ -107,7 +108,7 @@ class AddMusicBottomSheetFragment : BottomSheetDialogFragment(), MusicAdapter2.O
 
     @SuppressLint("SetTextI18n")
     private fun updateTotalVideoSelectedText(count: Int) {
-        binding.totalVideoSelected.text = "Add to Playlist ($count ${if (count == 1) "music" else "musics"})"
+        binding.totalVideoSelected.text = "Add to Playlist ($count ${if (count == 1) "song" else "songs"})"
     }
     private fun updateAddSelectedVideoButtonVisibility() {
         if (this::adapter.isInitialized && adapter.getSelectedItemCount() > 0) {
@@ -120,8 +121,11 @@ class AddMusicBottomSheetFragment : BottomSheetDialogFragment(), MusicAdapter2.O
         super.onStart()
 
         dialog?.let {
-            val bottomSheet = it.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheet?.layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
+
+            val behavior = BottomSheetBehavior.from(bottomSheet!!)
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
 

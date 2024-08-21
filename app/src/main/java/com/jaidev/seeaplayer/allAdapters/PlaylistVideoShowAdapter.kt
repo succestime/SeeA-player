@@ -193,7 +193,6 @@ class PlaylistVideoShowAdapter(
             }
         }
     }
-
     private fun sendIntent(pos: Int, ref: String) {
         PlayerActivity.position = pos
         val intent = Intent(context, PlayerActivity::class.java)
@@ -212,9 +211,7 @@ class PlaylistVideoShowAdapter(
         video.selected = !video.selected
         notifyItemChanged(position)
         updateSelectionMode()
-
     }
-
 
     @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n")
     private fun showBottomSheetDialog(video: VideoData) {
