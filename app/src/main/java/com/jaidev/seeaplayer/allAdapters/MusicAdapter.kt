@@ -17,9 +17,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
-import android.text.Editable
 import android.text.SpannableStringBuilder
-import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
@@ -40,23 +38,19 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.textfield.TextInputEditText
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.R.*
-import com.jaidev.seeaplayer.dataClass.DatabaseClientMusic
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
 import com.jaidev.seeaplayer.dataClass.MusicFavEntity
 import com.jaidev.seeaplayer.dataClass.PlaylistMusic
-import com.jaidev.seeaplayer.dataClass.PlaylistMusicCrossRef
 import com.jaidev.seeaplayer.dataClass.PlaylistMusicEntity
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
@@ -64,7 +58,6 @@ import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.binding
 import com.jaidev.seeaplayer.musicNav
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -303,7 +296,7 @@ class MusicAdapter(
         val playButton = view.findViewById<LinearLayout>(R.id.playButton)
         val shareButton = view.findViewById<LinearLayout>(R.id.shareButton)
         val propertiesButton = view.findViewById<LinearLayout>(R.id.propertiesButton)
-        val addToPlaylistButton = view.findViewById<LinearLayout>(R.id.addToPlaylistButton)
+//        val addToPlaylistButton = view.findViewById<LinearLayout>(R.id.addToPlaylistButton)
         val addToFavouriteButton = view.findViewById<LinearLayout>(R.id.addToFavouriteButton)
         val renameButton = view.findViewById<LinearLayout>(R.id.renameButton)
         val favouriteIcon = view.findViewById<ImageView>(R.id.favouriteIcon)
@@ -377,114 +370,114 @@ class MusicAdapter(
         }
 
 
-        addToPlaylistButton.setOnClickListener {
-            // Create and show a new BottomSheetDialog for adding to playlist
-            val bottomSheetPLDialog = BottomSheetDialog(context)
-            val bottomSheetPLView = LayoutInflater.from(context).inflate(
-                R.layout.add_to_playlist_bottom_sheet, null
-            )
-            bottomSheetPLDialog.setContentView(bottomSheetPLView)
-
-            val createPlaylistButton = bottomSheetPLView.findViewById<Button>(R.id.create_playlist_button)
-            val playlistRecyclerView = bottomSheetPLView.findViewById<RecyclerView>(R.id.playlistRecyclerview)
-
-            // Set up RecyclerView
-            playlistRecyclerView.layoutManager = LinearLayoutManager(context)
-
-            // Fetch playlists from the database
-            CoroutineScope(Dispatchers.IO).launch {
-                val dao = DatabaseClientMusic.getInstance(context).playlistMusicDao()
-                val playlistEntities = dao.getAllPlaylists() // Fetch PlaylistMusicEntity list
-
-                // Convert PlaylistMusicEntity list to PlaylistMusic list
-                val playlists = playlistEntities.map { mapEntityToPlaylistMusic(it) }
-
-                withContext(Dispatchers.Main) {
-                    // Initialize and set the adapter
-                    val playlistAdapter = AddToPlaylistViewAdapter(
-                        context,
-                        playlists.toMutableList(),
-                        video, // Single song
-                        bottomSheetPLDialog,
-                        selectedSongs = emptyList() // No multiple selection here
-                    )
-                    playlistRecyclerView.adapter = playlistAdapter
-                }
-            }
-
-            // Handle the create playlist button click
-            createPlaylistButton.setOnClickListener {
-                // Inflate the new bottom sheet layout for creating a playlist
-                val createPlaylistView = LayoutInflater.from(context).inflate(
-                    R.layout.video_playlist_bottom_dialog, null
-                )
-
-                val createPlaylistDialog = BottomSheetDialog(context)
-                createPlaylistDialog.setContentView(createPlaylistView)
-
-                // Find the views in the create playlist bottom sheet layout
-                val renameField = createPlaylistView.findViewById<TextInputEditText>(R.id.renameField)
-                val createButton = createPlaylistView.findViewById<Button>(R.id.button_create_playlist)
-
-                renameField.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-                    override fun afterTextChanged(s: Editable?) {
-                        createButton.setBackgroundColor(
-                            if (s.isNullOrEmpty()) {
-                                ContextCompat.getColor(context, R.color.button_background_default)
-                            } else {
-                                ContextCompat.getColor(context, R.color.cool_blue)
-                            }
-                        )
-                    }
-                })
-
-                createButton.setOnClickListener {
-                    val playlistName = renameField.text.toString().trim()
-                    if (playlistName.isNotEmpty()) {
-                        GlobalScope.launch(Dispatchers.IO) {
-                            val dao = DatabaseClientMusic.getInstance(context).playlistMusicDao()
-
-                            // Create a new playlist entity
-                            val newPlaylist = PlaylistMusicEntity(
-                                name = playlistName
-                            )
-
-                            // Insert the new playlist into the database and get its ID
-                            val playlistId = dao.insertPlaylist(newPlaylist)
-
-                            // Add the selected song to the newly created playlist
-                            val crossRef = PlaylistMusicCrossRef(
-                                playlistMusicId = playlistId,
-                                musicId = video.id // Assuming playlist is of type Music
-                            )
-                            dao.insertPlaylistMusicCrossRef(crossRef)
-
-                            withContext(Dispatchers.Main) {
-                                // Dismiss the dialogs
-                                createPlaylistDialog.dismiss()
-                                bottomSheetPLDialog.dismiss()
-                                val numberOfSongs = 1 // Change this if you are adding multiple songs
-                                Toast.makeText(context, "$numberOfSongs song(s) added to the playlist '$playlistName'", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    } else {
-                        // Handle empty name case (e.g., show an error message)
-                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                // Show the create playlist bottom sheet
-                createPlaylistDialog.show()
-                bottomSheetPLDialog.dismiss()
-            }
-
-            bottomSheetPLDialog.show()
-            bottomSheetDialog.dismiss()
-        }
+//        addToPlaylistButton.setOnClickListener {
+//            // Create and show a new BottomSheetDialog for adding to playlist
+//            val bottomSheetPLDialog = BottomSheetDialog(context)
+//            val bottomSheetPLView = LayoutInflater.from(context).inflate(
+//                R.layout.add_to_playlist_bottom_sheet, null
+//            )
+//            bottomSheetPLDialog.setContentView(bottomSheetPLView)
+//
+//            val createPlaylistButton = bottomSheetPLView.findViewById<Button>(R.id.create_playlist_button)
+//            val playlistRecyclerView = bottomSheetPLView.findViewById<RecyclerView>(R.id.playlistRecyclerview)
+//
+//            // Set up RecyclerView
+//            playlistRecyclerView.layoutManager = LinearLayoutManager(context)
+//
+//            // Fetch playlists from the database
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val dao = DatabaseClientMusic.getInstance(context).playlistMusicDao()
+//                val playlistEntities = dao.getAllPlaylists() // Fetch PlaylistMusicEntity list
+//
+//                // Convert PlaylistMusicEntity list to PlaylistMusic list
+//                val playlists = playlistEntities.map { mapEntityToPlaylistMusic(it) }
+//
+//                withContext(Dispatchers.Main) {
+//                    // Initialize and set the adapter
+//                    val playlistAdapter = AddToPlaylistViewAdapter(
+//                        context,
+//                        playlists.toMutableList(),
+//                        video, // Single song
+//                        bottomSheetPLDialog,
+//                        selectedSongs = emptyList() // No multiple selection here
+//                    )
+//                    playlistRecyclerView.adapter = playlistAdapter
+//                }
+//            }
+//
+//            // Handle the create playlist button click
+//            createPlaylistButton.setOnClickListener {
+//                // Inflate the new bottom sheet layout for creating a playlist
+//                val createPlaylistView = LayoutInflater.from(context).inflate(
+//                    R.layout.video_playlist_bottom_dialog, null
+//                )
+//
+//                val createPlaylistDialog = BottomSheetDialog(context)
+//                createPlaylistDialog.setContentView(createPlaylistView)
+//
+//                // Find the views in the create playlist bottom sheet layout
+//                val renameField = createPlaylistView.findViewById<TextInputEditText>(R.id.renameField)
+//                val createButton = createPlaylistView.findViewById<Button>(R.id.button_create_playlist)
+//
+//                renameField.addTextChangedListener(object : TextWatcher {
+//                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//
+//                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+//
+//                    override fun afterTextChanged(s: Editable?) {
+//                        createButton.setBackgroundColor(
+//                            if (s.isNullOrEmpty()) {
+//                                ContextCompat.getColor(context, R.color.button_background_default)
+//                            } else {
+//                                ContextCompat.getColor(context, R.color.cool_blue)
+//                            }
+//                        )
+//                    }
+//                })
+//
+//                createButton.setOnClickListener {
+//                    val playlistName = renameField.text.toString().trim()
+//                    if (playlistName.isNotEmpty()) {
+//                        GlobalScope.launch(Dispatchers.IO) {
+//                            val dao = DatabaseClientMusic.getInstance(context).playlistMusicDao()
+//
+//                            // Create a new playlist entity
+//                            val newPlaylist = PlaylistMusicEntity(
+//                                name = playlistName
+//                            )
+//
+//                            // Insert the new playlist into the database and get its ID
+//                            val playlistId = dao.insertPlaylist(newPlaylist)
+//
+//                            // Add the selected song to the newly created playlist
+//                            val crossRef = PlaylistMusicCrossRef(
+//                                playlistMusicId = playlistId,
+//                                musicId = video.id // Assuming playlist is of type Music
+//                            )
+//                            dao.insertPlaylistMusicCrossRef(crossRef)
+//
+//                            withContext(Dispatchers.Main) {
+//                                // Dismiss the dialogs
+//                                createPlaylistDialog.dismiss()
+//                                bottomSheetPLDialog.dismiss()
+//                                val numberOfSongs = 1 // Change this if you are adding multiple songs
+//                                Toast.makeText(context, "$numberOfSongs song(s) added to the playlist '$playlistName'", Toast.LENGTH_SHORT).show()
+//                            }
+//                        }
+//                    } else {
+//                        // Handle empty name case (e.g., show an error message)
+//                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//
+//                // Show the create playlist bottom sheet
+//                createPlaylistDialog.show()
+//                bottomSheetPLDialog.dismiss()
+//            }
+//
+//            bottomSheetPLDialog.show()
+//            bottomSheetDialog.dismiss()
+//        }
 
         ringtoneButton.setOnClickListener {
             val builderTone = AlertDialog.Builder(context)

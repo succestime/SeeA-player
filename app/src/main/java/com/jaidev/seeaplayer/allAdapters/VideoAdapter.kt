@@ -14,9 +14,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
-import android.text.Editable
 import android.text.SpannableStringBuilder
-import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
@@ -41,7 +39,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arthenica.mobileffmpeg.Config
 import com.arthenica.mobileffmpeg.FFmpeg
@@ -49,23 +46,18 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
 import com.jaidev.seeaplayer.FoldersActivity
 import com.jaidev.seeaplayer.MP3ConverterActivity
+import com.jaidev.seeaplayer.MP3playerActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
-import com.jaidev.seeaplayer.dataClass.DatabaseClient
 import com.jaidev.seeaplayer.dataClass.MP3AppDatabase
 import com.jaidev.seeaplayer.dataClass.MP3FileData
 import com.jaidev.seeaplayer.dataClass.MP3FileEntity
-import com.jaidev.seeaplayer.dataClass.PlaylistEntity
-import com.jaidev.seeaplayer.dataClass.PlaylistVideo
-import com.jaidev.seeaplayer.dataClass.PlaylistVideoCrossRef
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.GridVideoViewBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -383,108 +375,121 @@ val indicator = binding.newIndicator
         val playButton = view.findViewById<LinearLayout>(R.id.playButton)
         val shareButton = view.findViewById<LinearLayout>(R.id.shareButton)
         val propertiesButton = view.findViewById<LinearLayout>(R.id.propertiesButton)
-        val addToPlaylistButton = view.findViewById<LinearLayout>(R.id.addToPlaylistButton)
+//        val addToPlaylistButton = view.findViewById<LinearLayout>(R.id.addToPlaylistButton)
         val renameButton = view.findViewById<LinearLayout>(R.id.renameButton)
         val convertToMP3Button = view.findViewById<LinearLayout>(R.id.convertToMP3Button)
 
 
         textTitle.text = video.title
-
-        addToPlaylistButton.setOnClickListener {
-            // Create and show a new BottomSheetDialog for adding to playlist
-            val bottomSheetPLDialog = BottomSheetDialog(context)
-            val bottomSheetPLView = LayoutInflater.from(context).inflate(
-                R.layout.add_to_playlist_video_bottom_sheet, null
-            )
-            bottomSheetPLDialog.setContentView(bottomSheetPLView)
-
-            val createPlaylistButton = bottomSheetPLView.findViewById<Button>(R.id.create_playlist_button)
-            val playlistRecyclerView = bottomSheetPLView.findViewById<RecyclerView>(R.id.playlistRecyclerview)
-
-            // Set up RecyclerView
-            playlistRecyclerView.layoutManager = LinearLayoutManager(context)
-            CoroutineScope(Dispatchers.IO).launch {
-                val dao = DatabaseClient.getInstance(context).playlistDao()
-                val playlistEntities = dao.getAllPlaylists()
-
-                val playlists = playlistEntities.map { mapEntityToPlaylistMusic(it) }
-
-                withContext(Dispatchers.Main) {
-                    val playlistAdapter = AddToPlaylistVideoViewAdapter(
-                        context,
-                        playlists.toMutableList(),
-                        video,
-                        bottomSheetPLDialog,
-                        selectedSongs = emptyList()
-                    )
-                    playlistRecyclerView.adapter = playlistAdapter
-                }
-            }
-
-            createPlaylistButton.setOnClickListener {
-                val createPlaylistView = LayoutInflater.from(context).inflate(
-                    R.layout.video_playlist_bottom_dialog, null
-                )
-
-                val createPlaylistDialog = BottomSheetDialog(context)
-                createPlaylistDialog.setContentView(createPlaylistView)
-
-                val renameField = createPlaylistView.findViewById<TextInputEditText>(R.id.renameField)
-                val createButton = createPlaylistView.findViewById<Button>(R.id.button_create_playlist)
-
-                renameField.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-                    override fun afterTextChanged(s: Editable?) {
-                        createButton.setBackgroundColor(
-                            if (s.isNullOrEmpty()) {
-                                ContextCompat.getColor(context, R.color.button_background_default)
-                            } else {
-                                ContextCompat.getColor(context, R.color.cool_blue)
-                            }
-                        )
-                    }
-                })
-
-                createButton.setOnClickListener {
-                    val playlistName = renameField.text.toString().trim()
-                    if (playlistName.isNotEmpty()) {
-                        GlobalScope.launch(Dispatchers.IO) {
-                            val dao = DatabaseClient.getInstance(context).playlistDao()
-
-                            val newPlaylist = PlaylistEntity(
-                                name = playlistName
-                            )
-
-                            val playlistId = dao.insertPlaylist(newPlaylist)
-
-                            val crossRef = PlaylistVideoCrossRef(
-                                playlistId = playlistId,
-                                videoId = video.id
-                            )
-                            dao.insertPlaylistVideoCrossRef(crossRef)
-
-                            withContext(Dispatchers.Main) {
-                                createPlaylistDialog.dismiss()
-                                bottomSheetPLDialog.dismiss()
-                                val numberOfSongs = 1
-                                Toast.makeText(context, "$numberOfSongs video(s) added to the playlist '$playlistName'", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    } else {
-                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                createPlaylistDialog.show()
-                bottomSheetPLDialog.dismiss()
-            }
-
-            bottomSheetPLDialog.show()
-            bottomSheetDialog.dismiss()
-        }
+//
+//        addToPlaylistButton.setOnClickListener {
+//            // Create and show a new BottomSheetDialog for adding to playlist
+//            val bottomSheetPLDialog = BottomSheetDialog(context)
+//            val bottomSheetPLView = LayoutInflater.from(context).inflate(
+//                R.layout.add_to_playlist_video_bottom_sheet, null
+//            )
+//            bottomSheetPLDialog.setContentView(bottomSheetPLView)
+//
+//            val createPlaylistButton = bottomSheetPLView.findViewById<Button>(R.id.create_playlist_button)
+//            val playlistRecyclerView = bottomSheetPLView.findViewById<RecyclerView>(R.id.playlistRecyclerview)
+//
+//            // Set up RecyclerView
+//            playlistRecyclerView.layoutManager = LinearLayoutManager(context)
+//
+//            // Fetch playlists from the database
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val dao = DatabaseClient.getInstance(context).playlistDao()
+//                val playlistEntities = dao.getAllPlaylists() // Fetch PlaylistMusicEntity list
+//
+//                // Convert PlaylistMusicEntity list to PlaylistMusic list
+//                val playlists = playlistEntities.map { mapEntityToPlaylistMusic(it) }
+//
+//                withContext(Dispatchers.Main) {
+//                    // Initialize and set the adapter
+//                    val playlistAdapter = AddToPlaylistVideoViewAdapter(
+//                        context,
+//                        playlists.toMutableList(),
+//                        video, // Single song
+//                        bottomSheetPLDialog,
+//                        selectedSongs = emptyList() // No multiple selection here
+//                    )
+//                    playlistRecyclerView.adapter = playlistAdapter
+//                }
+//            }
+//
+//            // Handle the create playlist button click
+//            createPlaylistButton.setOnClickListener {
+//                // Inflate the new bottom sheet layout for creating a playlist
+//                val createPlaylistView = LayoutInflater.from(context).inflate(
+//                    R.layout.video_playlist_bottom_dialog, null
+//                )
+//
+//                val createPlaylistDialog = BottomSheetDialog(context)
+//                createPlaylistDialog.setContentView(createPlaylistView)
+//
+//                // Find the views in the create playlist bottom sheet layout
+//                val renameField = createPlaylistView.findViewById<TextInputEditText>(R.id.renameField)
+//                val createButton = createPlaylistView.findViewById<Button>(R.id.button_create_playlist)
+//
+//                renameField.addTextChangedListener(object : TextWatcher {
+//                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//
+//                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+//
+//                    override fun afterTextChanged(s: Editable?) {
+//                        createButton.setBackgroundColor(
+//                            if (s.isNullOrEmpty()) {
+//                                ContextCompat.getColor(context, R.color.button_background_default)
+//                            } else {
+//                                ContextCompat.getColor(context, R.color.cool_blue)
+//                            }
+//                        )
+//                    }
+//                })
+//
+//                createButton.setOnClickListener {
+//                    val playlistName = renameField.text.toString().trim()
+//                    if (playlistName.isNotEmpty()) {
+//                        GlobalScope.launch(Dispatchers.IO) {
+//                            val dao = DatabaseClient.getInstance(context).playlistDao()
+//
+//                            // Create a new playlist entity
+//                            val newPlaylist = PlaylistEntity(
+//                                name = playlistName
+//                            )
+//
+//                            // Insert the new playlist into the database and get its ID
+//                            val playlistId = dao.insertPlaylist(newPlaylist)
+//
+//                            // Add the selected song to the newly created playlist
+//                            val crossRef = PlaylistVideoCrossRef(
+//                                playlistId = playlistId,
+//                                videoId = video.id // Assuming playlist is of type Music
+//                            )
+//                            dao.insertPlaylistVideoCrossRef(crossRef)
+//
+//                            withContext(Dispatchers.Main) {
+//                                // Dismiss the dialogs
+//                                createPlaylistDialog.dismiss()
+//                                bottomSheetPLDialog.dismiss()
+//                                val numberOfSongs = 1 // Change this if you are adding multiple songs
+//                                Toast.makeText(context, "$numberOfSongs song(s) added to the playlist '$playlistName'", Toast.LENGTH_SHORT).show()
+//                            }
+//                        }
+//                    } else {
+//                        // Handle empty name case (e.g., show an error message)
+//                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//
+//                // Show the create playlist bottom sheet
+//                createPlaylistDialog.show()
+//                bottomSheetPLDialog.dismiss()
+//            }
+//
+//            bottomSheetPLDialog.show()
+//            bottomSheetDialog.dismiss()
+//        }
         convertToMP3Button.setOnClickListener {
             // Show the MP3 conversion dialog
             val bottomSheetMP3Dialog = BottomSheetDialog(context)
@@ -499,9 +504,20 @@ val indicator = binding.newIndicator
             val convertingView = mp3View.findViewById<RelativeLayout>(R.id.convertingView)
             val completeBottomSheet = mp3View.findViewById<ConstraintLayout>(R.id.complete_bottomSheet)
             val videoPathAndTitle = mp3View.findViewById<TextView>(R.id.videoPathAndTitle)
+            val openButton = mp3View.findViewById<Button>(R.id.openButton)
+            val playNow = mp3View.findViewById<Button>(R.id.playNow)
 
             bottomSheetDialog.dismiss()
             bottomSheetMP3Dialog.show()
+
+
+            openButton.setOnClickListener {
+                val intent = Intent(context, MP3ConverterActivity::class.java)
+                context.startActivity(intent)
+            }
+
+
+
 
             val inputFilePath = video.path
             // Extract the base name of the video file without extension
@@ -578,7 +594,31 @@ val indicator = binding.newIndicator
                     percentageTextView.text = "${progress.toInt()}%"
                 }
             }
+            playNow.setOnClickListener {
+                val intent = Intent(context, MP3playerActivity::class.java)
+                val file = File(outputFilePath)
+                val fileSize = formatFileSize(file.length())
+                val dateAdded = System.currentTimeMillis() // Use current time as the date added
 
+                // Get the duration of the MP3 file
+                val duration = getMP3Duration(outputFilePath)
+                // Create an MP3FileData object
+                val mp3FileData = MP3FileData(
+                    id = UUID.randomUUID().toString(),
+                    title = "$baseName.mp3.mp3",
+                    duration = duration,
+                    size = fileSize,
+                    dateAdded = dateAdded,
+                    path = outputFilePath
+                )
+
+                // Prepare the MP3 file data to pass to the MP3playerActivity
+                val mp3Files = arrayListOf(mp3FileData)
+                intent.putExtra("mp3Files", mp3Files)
+                intent.putExtra("currentIndex", 0)  // Start playing from the first file
+
+                context.startActivity(intent)
+            }
             // Handle cancel button click
             cancelButton.setOnClickListener {
                 FFmpeg.cancel()
@@ -662,14 +702,14 @@ val indicator = binding.newIndicator
 
         bottomSheetDialog.show()
     }
-    private fun mapEntityToPlaylistMusic(entity: PlaylistEntity): PlaylistVideo {
-        return PlaylistVideo(
-            id = entity.id,
-            name = entity.name,
-            video = listOf() // Initialize with an empty list or fetch actual music if needed
-
-        )
-    }
+//    private fun mapEntityToPlaylistMusic(entity: PlaylistEntity): PlaylistVideo {
+//        return PlaylistVideo(
+//            id = entity.id,
+//            name = entity.name,
+//            video = listOf() // Initialize with an empty list or fetch actual music if needed
+//
+//        )
+//    }
     private fun formatFileSize(sizeInBytes: Long): String {
         val kb = sizeInBytes / 1024
         val mb = kb / 1024

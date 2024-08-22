@@ -330,6 +330,7 @@
             tools:ignore="LockedOrientationActivity" />
 
         <service android:name=".Services.MusicService" />
+        <service android:name=".Services.MusicNotificationService" />
         <service android:name=".dataClass.MediaPlayerService" />
         <service android:name=".Services.FolderDetectionService" />
         <service android:name=".Services.FileDownloadService" />

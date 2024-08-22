@@ -102,11 +102,11 @@ class AddToPlaylistVideoViewAdapter(private val context: Context,
                     val alreadyInPlaylist = musicToAdd.all { dao.isVideoInPlaylist(playlist.id, it.id) }
 
                     if (!alreadyInPlaylist) {
-                        musicToAdd.forEach { video ->
+                        musicToAdd.forEach { music ->
                             dao.insertPlaylistVideoCrossRef(
                                 PlaylistVideoCrossRef(
                                     playlistId = playlist.id,
-                                    videoId = video.id
+                                    videoId = music.id
                                 )
                             )
                         }

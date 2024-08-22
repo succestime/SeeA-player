@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.jaidev.seeaplayer" />
-                  <option name="mobileSdkAppId" value="1:424755529731:android:1f5ad8f4d797e44ccf2636" />
-                  <option name="projectId" value="seea-player" />
-                  <option name="projectNumber" value="424755529731" />
+                  <option name="mobileSdkAppId" value="1:338471719238:android:03b7d29370645e7cb35547" />
+                  <option name="projectId" value="seea-player-2024" />
+                  <option name="projectNumber" value="338471719238" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -5,7 +5,7 @@
 
 
     <style name="coolBlueNav" parent="Theme.MaterialComponents.Light">
-        <item name="themeColor">@color/gray</item>
+        <item name="themeColor">#8ACDF3</item>
         <item name="colorPrimary">@color/cool_blue</item>
         <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/black</item>

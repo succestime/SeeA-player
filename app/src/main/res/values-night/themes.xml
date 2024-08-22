@@ -6,7 +6,7 @@
     <attr name="bottomActionModeBackgroundColor" format="color" tools:ignore="MissingDefaultResource" />
     //Theme for Activities
     <style name="coolBlueNav" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="themeColor">@color/cool_blue</item>
+        <item name="themeColor">#0F4D6C</item>
         <item name="colorPrimary">@color/cool_blue</item>
         <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/black</item>

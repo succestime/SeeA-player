@@ -65,29 +65,29 @@
             android:paddingBottom="20sp">
 
 
-            <LinearLayout
-                android:id="@+id/addToPlaylistButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:layout_marginBottom="5sp"
-                android:padding="20sp">
+<!--            <LinearLayout-->
+<!--                android:id="@+id/addToPlaylistButton"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:layout_gravity="center_vertical"-->
+<!--                android:layout_marginBottom="5sp"-->
+<!--                android:padding="20sp">-->
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/playlist_add_icon" />
+<!--                <ImageView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:src="@drawable/playlist_add_icon" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add to Playlist
-"
-                    android:textSize="18sp"
-                    android:paddingStart="16sp" />
-            </LinearLayout>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Add to Playlist-->
+<!--"-->
+<!--                    android:textSize="18sp"-->
+<!--                    android:paddingStart="16sp" />-->
+<!--            </LinearLayout>-->
 
             <LinearLayout
                 android:id="@+id/convertToMP3Button"
