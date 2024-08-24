@@ -20,11 +20,10 @@ import kotlinx.coroutines.withContext
 class AddMusicBottomSheetFragment : BottomSheetDialogFragment(), MusicAdapter2.OnSelectionChangeListener{
 
     private lateinit var _binding: PlaylsitMusicSelectionBottomSheetBinding
-
-
     private val binding get() = _binding
     private lateinit var adapter: MusicAdapter2
     private var playlistId: Long = 0L
+
     companion object {
         private const val ARG_PLAYLIST_ID = "playlist_id"
 

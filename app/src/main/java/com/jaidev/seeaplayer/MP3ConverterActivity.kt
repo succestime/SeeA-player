@@ -1,8 +1,16 @@
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentContainerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jaidev.seeaplayer.allAdapters.MP3Adapter
@@ -20,13 +28,39 @@ class MP3ConverterActivity : AppCompatActivity() {
 
     private lateinit var mp3Adapter: MP3Adapter
     private val mp3Files = ArrayList<MP3FileData>()
+    private lateinit var nowPlayingFragmentContainer: FragmentContainerView
+    private var mp3FileTitle: String? = null
 
+    private val nowPlayingReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val isPlaying = intent.getBooleanExtra("isPlaying", false)
+            val trackTitle = intent.getStringExtra("trackTitle")
+
+            if (isPlaying) {
+                nowPlayingFragmentContainer.visibility = View.VISIBLE
+
+                // Optionally, update the "Now Playing" fragment with the track title
+            } else {
+                nowPlayingFragmentContainer.visibility = View.GONE
+
+            }
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val theme = ThemeHelper.getSavedTheme(this)
         ThemeHelper.applyTheme(this, theme)
         setContentView(R.layout.activity_mp3_converter)
 supportActionBar?.hide()
+
+        nowPlayingFragmentContainer = findViewById(R.id.nowPlaying)
+
+        // Register the receiver to listen for now playing broadcasts
+        registerReceiver(nowPlayingReceiver, IntentFilter("NOW_PLAYING_ACTION"),
+            RECEIVER_NOT_EXPORTED
+        )
+
         val convertedMP3RecyclerView = findViewById<RecyclerView>(R.id.convertedMP3RecyclerView)
         mp3Adapter = MP3Adapter(this ,mp3Files)
         convertedMP3RecyclerView.adapter = mp3Adapter
@@ -35,6 +69,9 @@ supportActionBar?.hide()
 
         loadMP3Files()
     }
+
+
+    // Method to get the service
 
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("NotifyDataSetChanged")
@@ -79,5 +116,8 @@ supportActionBar?.hide()
             )
         }
     }
-
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(nowPlayingReceiver)
+    }
 }

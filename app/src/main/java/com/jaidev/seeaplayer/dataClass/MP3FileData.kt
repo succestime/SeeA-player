@@ -11,6 +11,8 @@ data class MP3FileData(
     val dateAdded: Long?,
     val path: String
 ) : Parcelable {
+
+
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",

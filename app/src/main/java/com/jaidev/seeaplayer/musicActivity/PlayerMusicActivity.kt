@@ -46,6 +46,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     private lateinit var musicDatabase: MusicFavDatabase
 
     companion object {
+
         lateinit var musicListPA: ArrayList<Music>
         var songPosition: Int = 0
         var isPlaying: Boolean = false

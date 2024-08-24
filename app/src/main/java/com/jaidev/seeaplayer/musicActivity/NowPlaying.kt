@@ -78,8 +78,8 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAd
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
             if(PlayerMusicActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
             else binding.playPauseBtnNP.setIconResource(R.drawable.play_icon)
-
         }
+
         }catch (e: Exception) {
             binding.root.visibility = View.GONE
             PlayerMusicActivity.musicService?.stopService() // Stop the music service

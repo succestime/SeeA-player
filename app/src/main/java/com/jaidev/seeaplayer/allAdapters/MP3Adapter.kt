@@ -32,6 +32,7 @@ class MP3Adapter(private val context: Context, private val mp3Files: ArrayList<M
                 context.startActivity(intent)
             }
 
+
         }
     }
 

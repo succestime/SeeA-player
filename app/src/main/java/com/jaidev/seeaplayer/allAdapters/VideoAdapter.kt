@@ -490,13 +490,14 @@ val indicator = binding.newIndicator
 //            bottomSheetPLDialog.show()
 //            bottomSheetDialog.dismiss()
 //        }
+        // Handle Convert to MP3 button click
         convertToMP3Button.setOnClickListener {
-            // Show the MP3 conversion dialog
             val bottomSheetMP3Dialog = BottomSheetDialog(context)
             val mp3View = LayoutInflater.from(context).inflate(R.layout.mp3_converter_layout, null)
             bottomSheetMP3Dialog.setContentView(mp3View)
             mp3View.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
 
+            // Initialize UI components in the MP3 conversion view
             val convertingTextView = mp3View.findViewById<TextView>(R.id.convertingTextView)
             val percentageTextView = mp3View.findViewById<TextView>(R.id.percentageTextView)
             val cancelButton = mp3View.findViewById<TextView>(R.id.cancelButton)
@@ -510,99 +511,37 @@ val indicator = binding.newIndicator
             bottomSheetDialog.dismiss()
             bottomSheetMP3Dialog.show()
 
-
             openButton.setOnClickListener {
                 val intent = Intent(context, MP3ConverterActivity::class.java)
                 context.startActivity(intent)
+                bottomSheetMP3Dialog.dismiss()
             }
 
-
-
-
             val inputFilePath = video.path
-            // Extract the base name of the video file without extension
             val baseName = video.title.substringBeforeLast(".")
-            // Create the output file name with ".mp3.mp3"
             val outputFilePath = "${context.getExternalFilesDir(null)}/$baseName.mp3.mp3"
 
             convertingView.visibility = View.VISIBLE
             completeBottomSheet.visibility = View.GONE
 
-            GlobalScope.launch(Dispatchers.IO) {
-                val ffmpegCommand = arrayOf("-i", inputFilePath, "-q:a", "0", "-map", "a", outputFilePath)
+            var attempt = 0
+            val maxRetries = 3
 
-                val rc = FFmpeg.execute(ffmpegCommand)
-                withContext(Dispatchers.Main) {
-                    if (rc == Config.RETURN_CODE_SUCCESS) {
-                        // File details
-                        val file = File(outputFilePath)
-                        val fileSize = formatFileSize(file.length())
-                        val dateAdded = System.currentTimeMillis() // Use current time as the date added
+            // Define the onConversionSuccess function
+            fun onConversionSuccess() {
+                convertingTextView.text = "Conversion Complete!"
+                progressBar.progress = 100
+                percentageTextView.text = "100%"
 
-                        // Get the duration of the MP3 file
-                        val duration = getMP3Duration(outputFilePath)
-
-                        // Update the UI on conversion success
-                        convertingTextView.text = "Conversion Complete!"
-                        progressBar.progress = 100
-                        percentageTextView.text = "100%"
-
-                        convertingView.visibility = View.GONE
-                        completeBottomSheet.visibility = View.VISIBLE
-                        videoPathAndTitle.text = "Saved to : SeeA MP3 Converter\n\nConverted_$baseName.mp3.mp3"
-
-                        val mp3FileData = MP3FileData(
-                            id = UUID.randomUUID().toString(),
-                            title = "$baseName.mp3.mp3",
-                            duration = duration,
-                            size = fileSize,
-                            dateAdded = dateAdded,
-                            path = outputFilePath
-                        )
-
-                        GlobalScope.launch(Dispatchers.IO) {
-                            val db = MP3AppDatabase.getDatabase(context)
-                            db.mp3FileDao().insert(
-                                MP3FileEntity(
-                                id = mp3FileData.id,
-                                title = mp3FileData.title,
-                                duration = mp3FileData.duration,
-                                size = mp3FileData.size,
-                                dateAdded = mp3FileData.dateAdded,
-                                path = mp3FileData.path
-                            )
-                            )
-                        }
-
-                        // Update the UI or notify MP3ConverterActivity if necessary
-                        if (context is MP3ConverterActivity) {
-                            context.addMP3File(mp3FileData)
-                        }
-                    }else {
-                        convertingTextView.text = "Conversion Failed!"
-                    }
-                }
-
-
-            }
-
-            // Track progress
-            Config.enableStatisticsCallback { stats ->
-                GlobalScope.launch(Dispatchers.Main) {
-                    val progress = (stats.time.toFloat() / video.duration) * 100
-                    progressBar.progress = progress.toInt()
-                    percentageTextView.text = "${progress.toInt()}%"
-                }
-            }
-            playNow.setOnClickListener {
-                val intent = Intent(context, MP3playerActivity::class.java)
                 val file = File(outputFilePath)
                 val fileSize = formatFileSize(file.length())
-                val dateAdded = System.currentTimeMillis() // Use current time as the date added
-
-                // Get the duration of the MP3 file
+                val dateAdded = System.currentTimeMillis()
                 val duration = getMP3Duration(outputFilePath)
-                // Create an MP3FileData object
+
+                convertingView.visibility = View.GONE
+                completeBottomSheet.visibility = View.VISIBLE
+                videoPathAndTitle.text = "Saved to : SeeA MP3 Converter\n\nConverted_$baseName.mp3.mp3"
+
                 val mp3FileData = MP3FileData(
                     id = UUID.randomUUID().toString(),
                     title = "$baseName.mp3.mp3",
@@ -612,14 +551,86 @@ val indicator = binding.newIndicator
                     path = outputFilePath
                 )
 
-                // Prepare the MP3 file data to pass to the MP3playerActivity
+                GlobalScope.launch(Dispatchers.IO) {
+                    val db = MP3AppDatabase.getDatabase(context)
+                    db.mp3FileDao().insert(
+                        MP3FileEntity(
+                            id = mp3FileData.id,
+                            title = mp3FileData.title,
+                            duration = mp3FileData.duration,
+                            size = mp3FileData.size,
+                            dateAdded = mp3FileData.dateAdded,
+                            path = mp3FileData.path
+                        )
+                    )
+                }
+
+                if (context is MP3ConverterActivity) {
+                    context.addMP3File(mp3FileData)
+                }
+            }
+
+            // Define the onConversionFailed function
+            fun onConversionFailed() {
+                convertingTextView.text = "Conversion Failed!"
+            }
+
+            // Function to handle the conversion process
+            fun convertVideoToMP3() {
+                GlobalScope.launch(Dispatchers.IO) {
+                    attempt++
+                    val ffmpegCommand = arrayOf("-i", inputFilePath, "-q:a", "0", "-map", "a", outputFilePath)
+                    val rc = FFmpeg.execute(ffmpegCommand)
+
+                    withContext(Dispatchers.Main) {
+                        if (rc == Config.RETURN_CODE_SUCCESS) {
+                            onConversionSuccess()
+                        } else {
+                            if (attempt < maxRetries) {
+                                convertVideoToMP3()  // Retry
+                            } else {
+                                onConversionFailed()
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Start the conversion process
+            convertVideoToMP3()
+
+            Config.enableStatisticsCallback { stats ->
+                GlobalScope.launch(Dispatchers.Main) {
+                    val progress = (stats.time.toFloat() / video.duration) * 100
+                    progressBar.progress = progress.toInt()
+                    percentageTextView.text = "${progress.toInt()}%"
+                }
+            }
+
+            playNow.setOnClickListener {
+                val intent = Intent(context, MP3playerActivity::class.java)
+                val file = File(outputFilePath)
+                val fileSize = formatFileSize(file.length())
+                val dateAdded = System.currentTimeMillis()
+                val duration = getMP3Duration(outputFilePath)
+
+                val mp3FileData = MP3FileData(
+                    id = UUID.randomUUID().toString(),
+                    title = "$baseName.mp3.mp3",
+                    duration = duration,
+                    size = fileSize,
+                    dateAdded = dateAdded,
+                    path = outputFilePath
+                )
+
                 val mp3Files = arrayListOf(mp3FileData)
                 intent.putExtra("mp3Files", mp3Files)
-                intent.putExtra("currentIndex", 0)  // Start playing from the first file
+                intent.putExtra("currentIndex", 0)
 
                 context.startActivity(intent)
+                bottomSheetMP3Dialog.dismiss()
             }
-            // Handle cancel button click
+
             cancelButton.setOnClickListener {
                 FFmpeg.cancel()
                 bottomSheetMP3Dialog.dismiss()
@@ -710,6 +721,8 @@ val indicator = binding.newIndicator
 //
 //        )
 //    }
+
+
     private fun formatFileSize(sizeInBytes: Long): String {
         val kb = sizeInBytes / 1024
         val mb = kb / 1024

@@ -43,6 +43,8 @@
             android:exported="false" />
         <activity
             android:name=".MP3ConverterActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
+
             android:exported="false" />
         <activity
             android:name=".PlaylistVideoActivity"
@@ -330,14 +332,27 @@
             tools:ignore="LockedOrientationActivity" />
 
         <service android:name=".Services.MusicService" />
-        <service android:name=".Services.MusicNotificationService" />
-        <service android:name=".dataClass.MediaPlayerService" />
+
+        <service
+            android:name=".Services.MediaPlayerService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="ForegroundServicePermission">
+        </service>
         <service android:name=".Services.FolderDetectionService" />
         <service android:name=".Services.FileDownloadService" />
 
         <receiver
             android:name=".musicActivity.NotificationReceiver"
             android:enabled="true" />
+        <receiver
+            android:name=".Services.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name=".Services.DownloadCompleteReceiver"
             android:enabled="true"
