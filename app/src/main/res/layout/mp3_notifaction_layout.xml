@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="10dp">
+
+    <!-- Audio Title -->
+    <TextView
+        android:id="@+id/titleMP3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="title of MP3"
+        android:textColor="#888"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Play/Pause Button -->
+    <ImageView
+        android:id="@+id/play_pause_button"
+        android:layout_width="24sp"
+        android:layout_height="24sp"
+        android:src="@drawable/round_play_circle_outline_24"
+        android:layout_marginStart="10sp"
+        android:layout_marginTop="15sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleMP3" />
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20sp"
+        android:layout_weight="1"
+        android:progressDrawable="@drawable/custom_seekbar_progress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/play_pause_button"
+        app:layout_constraintTop_toBottomOf="@+id/titleMP3"
+        tools:ignore="NestedWeights" />
+
+    <!-- Audio Duration -->
+    <TextView
+        android:id="@+id/audio_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10sp"
+        android:text="00:00"
+        android:textColor="#888"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_pause_button" />
+</RelativeLayout>
