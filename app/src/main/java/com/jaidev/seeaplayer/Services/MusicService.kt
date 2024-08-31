@@ -19,7 +19,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.jaidev.seeaplayer.ApplicationClass
+import com.jaidev.seeaplayer.MP3ConverterActivity
+import com.jaidev.seeaplayer.MP3playerActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.exitApplication
@@ -27,7 +28,6 @@ import com.jaidev.seeaplayer.dataClass.favouriteChecker
 import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setSongPosition
-import com.jaidev.seeaplayer.musicActivity.NotificationReceiver
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
@@ -49,7 +49,9 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
         mediaPlayer = null
         isPlaying = false
         handler.removeCallbacks(runnable) // Stop the runnable
-
+        PlayerMusicActivity.musicService = null
+        val intent = Intent(MP3ConverterActivity.ACTION_HIDE_NOW_PLAYING)
+        sendBroadcast(intent)
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -63,6 +65,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
         }
     }
 
+
     @SuppressLint("UnspecifiedImmutableFlag", "ForegroundServiceType")
     fun showNotification(playPauseBtn: Int) {
         val intent = Intent(baseContext, MainActivity::class.java)
@@ -73,15 +76,20 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
         }
 
         val contentIntent = PendingIntent.getActivity(this, 0, intent, flag)
-        val prevIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.PREVIOUS)
+        val prevIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(
+            ApplicationClass.PREVIOUS)
         val prevPendingIntent = PendingIntent.getBroadcast(baseContext, 0, prevIntent, flag)
-        val replayIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.REPLAY)
+        val replayIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(
+            ApplicationClass.REPLAY)
         val replayPendingIntent = PendingIntent.getBroadcast(baseContext, 0, replayIntent, flag)
-        val playIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.PLAY)
+        val playIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(
+            ApplicationClass.PLAY)
         val playPendingIntent = PendingIntent.getBroadcast(baseContext, 0, playIntent, flag)
-        val forwardIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.FORWARD)
+        val forwardIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(
+            ApplicationClass.FORWARD)
         val forwardPendingIntent = PendingIntent.getBroadcast(baseContext, 0, forwardIntent, flag)
-        val nextIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(ApplicationClass.NEXT)
+        val nextIntent = Intent(baseContext, NotificationReceiver::class.java).setAction(
+            ApplicationClass.NEXT)
         val nextPendingIntent = PendingIntent.getBroadcast(baseContext, 0, nextIntent, flag)
 
         val imgArt = getImgArt(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path)
@@ -290,6 +298,8 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        MP3playerActivity.musicMP3Service?.stopService()
         return START_STICKY
     }
+
 }

@@ -3,9 +3,11 @@ package com.jaidev.seeaplayer.allAdapters
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ComponentName
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
@@ -13,10 +15,12 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
+import android.util.TypedValue
 import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
@@ -48,7 +52,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.FoldersActivity
 import com.jaidev.seeaplayer.MP3ConverterActivity
-import com.jaidev.seeaplayer.MP3playerActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.PlayerActivity
 import com.jaidev.seeaplayer.R
@@ -338,18 +341,14 @@ val indicator = binding.newIndicator
             if (actionMode != null) {
                 toggleSelection(position)
             } else {
-                when {
-                    isFolder -> {
-                        PlayerActivity.pipStatus = 1
-                        sendIntent(pos = position, ref = "FoldersActivity")
-                        markVideoAsPlayed(video.id)
-                        notifyDataSetChanged()
-                    }
-
-                    videoList[position].id == PlayerActivity.nowPlayingId -> {
+                when(video.id) {
+                   PlayerActivity.nowPlayingId -> {
                         sendIntent(pos = position, ref = "NowPlaying")
                     }
-
+                    else -> { PlayerActivity.pipStatus = 1
+                     sendIntent(pos = position, ref = "FoldersActivity")
+                     markVideoAsPlayed(video.id)
+                     notifyDataSetChanged()}
                 }
 
             }
@@ -499,6 +498,7 @@ val indicator = binding.newIndicator
 
             // Initialize UI components in the MP3 conversion view
             val convertingTextView = mp3View.findViewById<TextView>(R.id.convertingTextView)
+            val titleTextView = mp3View.findViewById<TextView>(R.id.titleTextView)
             val percentageTextView = mp3View.findViewById<TextView>(R.id.percentageTextView)
             val cancelButton = mp3View.findViewById<TextView>(R.id.cancelButton)
             val progressBar = mp3View.findViewById<ProgressBar>(R.id.progressBar)
@@ -506,7 +506,6 @@ val indicator = binding.newIndicator
             val completeBottomSheet = mp3View.findViewById<ConstraintLayout>(R.id.complete_bottomSheet)
             val videoPathAndTitle = mp3View.findViewById<TextView>(R.id.videoPathAndTitle)
             val openButton = mp3View.findViewById<Button>(R.id.openButton)
-            val playNow = mp3View.findViewById<Button>(R.id.playNow)
 
             bottomSheetDialog.dismiss()
             bottomSheetMP3Dialog.show()
@@ -519,7 +518,18 @@ val indicator = binding.newIndicator
 
             val inputFilePath = video.path
             val baseName = video.title.substringBeforeLast(".")
-            val outputFilePath = "${context.getExternalFilesDir(null)}/$baseName.mp3.mp3"
+            val customDirectoryName = "SeeA MP3 Audio"
+
+            // Initialize outputFilePath based on Android version
+            val outputFilePath: String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                "${context.getExternalFilesDir(null)}/$baseName.mp3"
+            } else {
+                val customDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), customDirectoryName)
+                if (!customDirectory.exists()) {
+                    customDirectory.mkdirs()
+                }
+                "${customDirectory.path}/$baseName.mp3"
+            }
 
             convertingView.visibility = View.VISIBLE
             completeBottomSheet.visibility = View.GONE
@@ -538,17 +548,48 @@ val indicator = binding.newIndicator
                 val dateAdded = System.currentTimeMillis()
                 val duration = getMP3Duration(outputFilePath)
 
+                // Insert the file into the MediaStore or custom directory
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.Audio.Media.DISPLAY_NAME, "$baseName.mp3")
+                        put(MediaStore.Audio.Media.MIME_TYPE, "audio/mpeg")
+                        put(MediaStore.Audio.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MUSIC}/$customDirectoryName")
+                        put(MediaStore.Audio.Media.IS_PENDING, 1)
+                    }
+
+                    val resolver = context.contentResolver
+                    val uri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+                    uri?.let {
+                        resolver.openOutputStream(it)?.use { outputStream ->
+                            file.inputStream().copyTo(outputStream)
+                        }
+
+                        contentValues.clear()
+                        contentValues.put(MediaStore.Audio.Media.IS_PENDING, 0)
+                        resolver.update(uri, contentValues, null, null)
+                    }
+                } else {
+                    val customDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), customDirectoryName)
+                    if (!customDirectory.exists()) {
+                        customDirectory.mkdirs()
+                    }
+                    file.renameTo(File("${customDirectory.path}$baseName.mp3"))
+                }
+
                 convertingView.visibility = View.GONE
                 completeBottomSheet.visibility = View.VISIBLE
-                videoPathAndTitle.text = "Saved to : SeeA MP3 Converter\n\nConverted_$baseName.mp3.mp3"
+                videoPathAndTitle.text = "Saved to : SeeA MP3 Converter /$customDirectoryName/\n$baseName.mp3"
 
                 val mp3FileData = MP3FileData(
                     id = UUID.randomUUID().toString(),
-                    title = "$baseName.mp3.mp3",
+                    title = "$baseName.mp3",
                     duration = duration,
                     size = fileSize,
                     dateAdded = dateAdded,
-                    path = outputFilePath
+                    path = outputFilePath,
+                    artUri = video.artUri.toString()
+
                 )
 
                 GlobalScope.launch(Dispatchers.IO) {
@@ -560,19 +601,23 @@ val indicator = binding.newIndicator
                             duration = mp3FileData.duration,
                             size = mp3FileData.size,
                             dateAdded = mp3FileData.dateAdded,
-                            path = mp3FileData.path
+                            path = mp3FileData.path,
+                            artUri = mp3FileData.artUri // Pass the artUri from the video
+
                         )
                     )
                 }
 
                 if (context is MP3ConverterActivity) {
-                    context.addMP3File(mp3FileData)
+                    context.addMP3File(mp3FileData )
                 }
             }
 
             // Define the onConversionFailed function
             fun onConversionFailed() {
                 convertingTextView.text = "Conversion Failed!"
+                Toast.makeText(context, "This video file is already converted or some problem is coming", Toast.LENGTH_LONG).show()
+
             }
 
             // Function to handle the conversion process
@@ -582,14 +627,24 @@ val indicator = binding.newIndicator
                     val ffmpegCommand = arrayOf("-i", inputFilePath, "-q:a", "0", "-map", "a", outputFilePath)
                     val rc = FFmpeg.execute(ffmpegCommand)
 
+                    val typedValue = TypedValue()
+                    val theme = context.theme
+                    theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+                    val defaultTextColor = ContextCompat.getColor(context, typedValue.resourceId)
+
                     withContext(Dispatchers.Main) {
                         if (rc == Config.RETURN_CODE_SUCCESS) {
                             onConversionSuccess()
                         } else {
                             if (attempt < maxRetries) {
                                 convertVideoToMP3()  // Retry
+                                convertingTextView.setTextColor(defaultTextColor)
+                                titleTextView.setTextColor(defaultTextColor)
                             } else {
                                 onConversionFailed()
+                                // Set text colors to red on failure
+                                convertingTextView.setTextColor(Color.RED)
+                                titleTextView.setTextColor(Color.RED)
                             }
                         }
                     }
@@ -599,43 +654,30 @@ val indicator = binding.newIndicator
             // Start the conversion process
             convertVideoToMP3()
 
+            // Enable statistics callback to update progress
             Config.enableStatisticsCallback { stats ->
                 GlobalScope.launch(Dispatchers.Main) {
                     val progress = (stats.time.toFloat() / video.duration) * 100
                     progressBar.progress = progress.toInt()
                     percentageTextView.text = "${progress.toInt()}%"
+
+                    // Ensure the final update if conversion reaches 100%
+                    if (progress >= 100) {
+                        progressBar.progress = 100
+                        percentageTextView.text = "100%"
+                    }
                 }
             }
 
-            playNow.setOnClickListener {
-                val intent = Intent(context, MP3playerActivity::class.java)
-                val file = File(outputFilePath)
-                val fileSize = formatFileSize(file.length())
-                val dateAdded = System.currentTimeMillis()
-                val duration = getMP3Duration(outputFilePath)
 
-                val mp3FileData = MP3FileData(
-                    id = UUID.randomUUID().toString(),
-                    title = "$baseName.mp3.mp3",
-                    duration = duration,
-                    size = fileSize,
-                    dateAdded = dateAdded,
-                    path = outputFilePath
-                )
-
-                val mp3Files = arrayListOf(mp3FileData)
-                intent.putExtra("mp3Files", mp3Files)
-                intent.putExtra("currentIndex", 0)
-
-                context.startActivity(intent)
-                bottomSheetMP3Dialog.dismiss()
-            }
 
             cancelButton.setOnClickListener {
                 FFmpeg.cancel()
                 bottomSheetMP3Dialog.dismiss()
             }
         }
+
+
 
 
         renameButton.setOnClickListener {
@@ -668,9 +710,9 @@ val indicator = binding.newIndicator
                     excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
                 }
             }
-// Create a chooser intent
+
             val chooserIntent = Intent.createChooser(shareIntent, "Sharing Video")
-// Exclude your app from the chooser intent
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
             }
@@ -796,8 +838,9 @@ val indicator = binding.newIndicator
         videoNameDelete.text = videoList[position].title
 
         alertDialogBuilder.setView(view)
-
+            .setCancelable(false)
         val alertDialog = alertDialogBuilder.create()
+
 
         deleteText.setOnClickListener {
             val file = File(videoList[position].path)

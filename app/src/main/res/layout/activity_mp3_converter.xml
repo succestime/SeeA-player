@@ -48,14 +48,15 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/addPlaylistBtn"
+                    android:id="@+id/convertVideoIntoMP3Btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="20sp"
+                    android:layout_marginHorizontal="10sp"
+                    android:layout_marginVertical="20sp"
                     android:background="@drawable/button_background"
-                    android:drawableLeft="@drawable/outline_headphones_24"
+                    android:drawableStart="@drawable/outline_headphones_24"
                     android:drawableTint="@color/cool_blue"
-                    android:text="Covert into MP3"
+                    android:text=" Your all converted MP3 files will be here."
                     android:textAllCaps="false"
                     android:textColor="@color/cool_blue" />
 
@@ -76,33 +77,49 @@
 
 
 
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/no_playlists_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No Playlists found."
+            android:text="No MP3 file found."
             android:textStyle="bold"
             android:textSize="15sp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
+            />
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nowPlaying"
+            android:name="com.jaidev.seeaplayer.musicActivity.MP3NowPlaying"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout="@layout/fragment_m_p3_now_playing" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-
-   >
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nowPlaying"
-        android:name="com.jaidev.seeaplayer.musicActivity.MP3NowPlaying"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout="@layout/fragment_m_p3_now_playing" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

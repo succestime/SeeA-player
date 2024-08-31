@@ -86,10 +86,10 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
             val deletedMusic = db.playlistMusicDao().getMusicByPath(deletedMusicPath)
             if (deletedMusic != null) {
                 // Remove the music from the playlist
-                db.playlistMusicDao().deleteMusicFromPlaylist(PlaylistDetails.playlistId, deletedMusic.musicid)
+                db.playlistMusicDao().deleteMusicFromPlaylist(PlaylistDetails.playlistId, deletedMusic.id)
 
                 // Remove the music from the database
-                db.playlistMusicDao().deleteMusic(deletedMusic.musicid)
+                db.playlistMusicDao().deleteMusic(deletedMusic.id)
             }
         }
         withContext(Dispatchers.Main) {
@@ -163,7 +163,7 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
                 db.playlistMusicDao().getAllPlaylists()
             }
             // Update the adapter with the fetched playlists
-            playlistAdapter.updatePlaylists(playlists.map { PlaylistMusic(it.musicid, it.name) })
+            playlistAdapter.updatePlaylists(playlists.map { PlaylistMusic(it.id, it.name) })
             // Update the visibility of the "No Playlists" text
             updateNoPlaylistsTextVisibility()
         }
@@ -175,7 +175,7 @@ class PlaylistActivity : AppCompatActivity() , OnPlaylistMusicCreatedListener {
             val playlists = withContext(Dispatchers.IO) {
                 db.playlistMusicDao().getAllPlaylists()
             }
-            playlistAdapter.updatePlaylists(playlists.map { PlaylistMusic(it.musicid, it.name) })
+            playlistAdapter.updatePlaylists(playlists.map { PlaylistMusic(it.id, it.name) })
             updateNoPlaylistsTextVisibility()
         }
     }

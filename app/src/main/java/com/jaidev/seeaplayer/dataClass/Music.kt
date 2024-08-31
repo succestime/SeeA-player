@@ -7,7 +7,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
-import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
@@ -71,9 +70,7 @@ class Playlist{
     lateinit var createdBy: String
     lateinit var createdOn: String
 }
-class MusicPlaylist{
-    var ref: ArrayList<Playlist> = ArrayList()
-}
+
 
 fun formatDuration(duration: Long):String{
     val minutes = TimeUnit.MINUTES.convert(duration , TimeUnit.MILLISECONDS)
@@ -126,13 +123,5 @@ fun favouriteChecker(id : String) : Int {
     return  -1
 }
 
-fun checkPlaylist(playlist: ArrayList<Music>) : ArrayList<Music>{
-    playlist.forEachIndexed { index, music ->
-        val file = File(music.path)
-        if (!file.exists())
-            playlist.removeAt(index)
-    }
-    return playlist
-}
 
 

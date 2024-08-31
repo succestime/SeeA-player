@@ -75,6 +75,14 @@ class RecantMusicAdapter (val  context : Context,
         fun onFileCountChanged(newCount: Int)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun disableSelectionMode() {
+        isSelectionModeEnabled = false
+        selectedItems.clear()
+        actionMode?.finish() // Finish the ActionMode if it's active
+        actionMode = null
+        notifyDataSetChanged() // Notify the adapter to refresh the views
+    }
 
 
     class MyAdapter(binding: RecantMusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -308,7 +316,7 @@ class RecantMusicAdapter (val  context : Context,
                                         MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
                                         PlayerMusicActivity.musicService?.stopService()
 
-                                        val currentlyPlayingMusic = ReMusicPlayerActivity.reMusicList.getOrNull(ReMusicPlayerActivity.songPosition)
+                                        val currentlyPlayingMusic = ReMusicPlayerActivity.reMusicListPA.getOrNull(ReMusicPlayerActivity.songPosition)
                                         val isCurrentlyPlaying = currentlyPlayingMusic?.path == video.path
 
                                         // Check if there is only one last music in the list and it is not currently playing
@@ -346,12 +354,12 @@ class RecantMusicAdapter (val  context : Context,
                                             PlayerMusicActivity.musicService?.stopService()
 
                                             // Remove the deleted song from the list
-                                            ReMusicPlayerActivity.reMusicList.removeAt(ReMusicPlayerActivity.songPosition)
+                                            ReMusicPlayerActivity.reMusicListPA.removeAt(ReMusicPlayerActivity.songPosition)
 
                                             // Check if there are other songs to play
-                                            if (ReMusicPlayerActivity.reMusicList.isNotEmpty()) {
+                                            if (ReMusicPlayerActivity.reMusicListPA.isNotEmpty()) {
                                                 // Adjust the song position if necessary
-                                                if (ReMusicPlayerActivity.songPosition >= ReMusicPlayerActivity.reMusicList.size) {
+                                                if (ReMusicPlayerActivity.songPosition >= ReMusicPlayerActivity.reMusicListPA.size) {
                                                     ReMusicPlayerActivity.songPosition = 0
                                                 }
 
@@ -362,10 +370,10 @@ class RecantMusicAdapter (val  context : Context,
                                                 DaysMusic.updateEmptyViewVisibility()
                                                 Glide.with(context)
                                                     .asBitmap()
-                                                    .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+                                                    .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
                                                     .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                                                     .into(ReNowPlaying.binding.songImgNP)
-                                                ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+                                                ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
                                             } else {
                                                 DaysMusic.updateEmptyViewVisibility()
                                                 ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
@@ -548,7 +556,7 @@ class RecantMusicAdapter (val  context : Context,
             MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
             PlayerMusicActivity.musicService?.stopService() // Stop the music service
 
-            val currentlyPlayingMusic = ReMusicPlayerActivity.reMusicList.getOrNull(ReMusicPlayerActivity.songPosition)
+            val currentlyPlayingMusic = ReMusicPlayerActivity.reMusicListPA.getOrNull(ReMusicPlayerActivity.songPosition)
             val isCurrentlyPlaying = currentlyPlayingMusic?.path == music.path
 
             // Check if there is only one last music in the list and it is not currently playing
@@ -588,9 +596,9 @@ class RecantMusicAdapter (val  context : Context,
 
 
                 // Check if there are other songs to play
-                if (ReMusicPlayerActivity.reMusicList.isNotEmpty()) {
+                if (ReMusicPlayerActivity.reMusicListPA.isNotEmpty()) {
                     // Adjust the song position if necessary
-                    if (ReMusicPlayerActivity.songPosition >= ReMusicPlayerActivity.reMusicList.size) {
+                    if (ReMusicPlayerActivity.songPosition >= ReMusicPlayerActivity.reMusicListPA.size) {
                         ReMusicPlayerActivity.songPosition = 0
                     }
 
@@ -602,10 +610,10 @@ class RecantMusicAdapter (val  context : Context,
 
                     Glide.with(context)
                         .asBitmap()
-                        .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+                        .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
                         .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                         .into(ReNowPlaying.binding.songImgNP)
-                    ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+                    ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
                 } else {
                     DaysMusic.updateEmptyViewVisibility()
                     ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()

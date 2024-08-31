@@ -49,6 +49,7 @@ import com.jaidev.seeaplayer.bottomNavigation.downloadNav
 import com.jaidev.seeaplayer.bottomNavigation.homeNav
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.dataClass.Folder
+import com.jaidev.seeaplayer.dataClass.MP3FileData
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
 import com.jaidev.seeaplayer.dataClass.RecantMusic
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         var musicRecantList = ArrayList<RecantMusic>()
         lateinit var videoList: ArrayList<VideoData>
         lateinit var MusicListMA: ArrayList<Music>
+        var MP3MusicList: ArrayList<MP3FileData> = ArrayList()
         lateinit var musicListSearch: ArrayList<Music>
         var search: Boolean = false
         lateinit var searchList: ArrayList<VideoData>
@@ -543,6 +545,7 @@ class MainActivity : AppCompatActivity() {
                     var value = sortValue
                     val dialog = MaterialAlertDialogBuilder(this)
                         .setTitle("Sort By")
+                        .setCancelable(false)
                         .setPositiveButton("OK") { _, _ ->
                             val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE).edit()
                             sortEditor.putInt("sortValue", value)
@@ -665,12 +668,21 @@ class MainActivity : AppCompatActivity() {
                             if (file.exists()) tempList.add(video)
                         }
 
+                        // Check if the folder contains MP3 files or if it’s already in the list
                         if (folderList.none { it.id == folderIdC }) {
+                            val folderPath = file.parent ?: ""
+                            val containsMp3 = containsMp3Files(folderPath)
                             val videoCount = getVideoCountInFolder(folderIdC)  // Get video count
 
-                            folderList.add(Folder(id = folderIdC, folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" } , videoCount = videoCount))
-
-
+                            if (containsMp3 || videoCount > 0) {
+                                folderList.add(
+                                    Folder(
+                                        id = folderIdC,
+                                        folderName = folderMap[folderIdC] ?: folderC.ifEmpty { "Internal memory" },
+                                        videoCount = videoCount
+                                    )
+                                )
+                            }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -694,6 +706,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         return tempList
+    }
+
+
+    @SuppressLint("Range")
+    private fun containsMp3Files(folderPath: String): Boolean {
+        val projection = arrayOf(MediaStore.Audio.Media.DATA)
+        val selection = "${MediaStore.Audio.Media.DATA} LIKE ?"
+        val selectionArgs = arrayOf("$folderPath/%")
+        val cursor = contentResolver.query(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            selectionArgs,
+            null
+        )
+        cursor?.use {
+            if (it.moveToFirst()) {
+                return true // Found at least one MP3 file in this folder
+            }
+        }
+        return false
     }
 
     @SuppressLint("Range")

@@ -11,5 +11,6 @@ data class MP3FileEntity(
     val duration: Long,
     val size: String,
     val dateAdded: Long?,
-    val path: String
+    val path: String,
+    var artUri: String
 )

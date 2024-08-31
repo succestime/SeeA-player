@@ -1,9 +1,10 @@
 package com.jaidev.seeaplayer.dataClass
 
-import android.media.MediaMetadataRetriever
 import android.net.Uri
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.songPosition
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 data class RecantMusic(val title: String,
                        val artist: String,
@@ -31,19 +32,23 @@ fun reSetSongPosition(increment: Boolean) {
 
     if(!ReMusicPlayerActivity.repeat){
         if (increment) {
-            if (ReMusicPlayerActivity.reMusicList.size - 1 == ReMusicPlayerActivity.songPosition)
-                ReMusicPlayerActivity.songPosition = 0
-            else ++ReMusicPlayerActivity.songPosition
+            if (ReMusicPlayerActivity.reMusicListPA.size - 1 == songPosition)
+               songPosition = 0
+            else ++songPosition
         } else {
             if (0 == ReMusicPlayerActivity.songPosition)
-                ReMusicPlayerActivity.songPosition = ReMusicPlayerActivity.reMusicList.size - 1
-            else --ReMusicPlayerActivity.songPosition
+               songPosition = ReMusicPlayerActivity.reMusicListPA.size - 1
+            else --songPosition
         }
 
     }
 }
-fun reGetImgArt(path: String): ByteArray? {
-    val retriever = MediaMetadataRetriever()
-    retriever.setDataSource(path)
-    return retriever.embeddedPicture
+fun exitReApplication() {
+    if (ReMusicPlayerActivity.musicService != null) {
+        //  PlayerMusicActivity.musicService!!.audioManager.abandonAudioFocus(PlayerMusicActivity.musicService)
+        ReMusicPlayerActivity.musicService!!.stopForeground(true)
+        ReMusicPlayerActivity.musicService!!.mediaPlayer!!.release()
+        ReMusicPlayerActivity.musicService = null
+    }
+    exitProcess(1)
 }

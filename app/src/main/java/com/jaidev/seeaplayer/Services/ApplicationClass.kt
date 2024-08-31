@@ -1,5 +1,5 @@
 
-package com.jaidev.seeaplayer
+package com.jaidev.seeaplayer.Services
 
 import android.annotation.SuppressLint
 import android.app.Application

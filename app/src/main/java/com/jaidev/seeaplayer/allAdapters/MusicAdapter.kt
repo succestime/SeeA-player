@@ -34,7 +34,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
@@ -107,6 +106,14 @@ class MusicAdapter(
 
     fun setMusicDeleteListener(listener: MusicDeleteListener) {
         musicDeleteListener = listener
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    fun disableSelectionMode() {
+        isSelectionModeEnabled = false
+        selectedItems.clear()
+        actionMode?.finish() // Finish the ActionMode if it's active
+        actionMode = null
+        notifyDataSetChanged() // Notify the adapter to refresh the views
     }
 
 
@@ -219,59 +226,6 @@ class MusicAdapter(
 
         }
 
-        when {
-            playlistDetails -> {
-
-                holder.root.setOnClickListener {
-                    if (actionMode != null) {
-                        // If action mode is active, toggle selection as usual
-                        toggleSelection(position)
-                    }else {
-                        sendIntent(ref = "PlaylistDetailsAdapter", pos = position)
-                    }
-                }
-
-                holder.root.setOnLongClickListener {
-                    toggleSelection(position)
-                    startActionMode()
-                    true
-                }
-
-                // Adjust for selection mode
-                if (isSelectionModeEnabled) {
-                    holder.playlstM.visibility = View.GONE
-                    if (!selectedItems.contains(position)) {
-                        holder.emptyCheck.visibility = View.VISIBLE
-                    }
-                } else {
-                    holder.playlstM.visibility = View.VISIBLE
-                    holder.emptyCheck.visibility = View.GONE
-                }
-
-                holder.more.visibility = View.GONE
-
-                holder.playlstM.setOnClickListener { view ->
-                    val popupMenu = PopupMenu(context, view)
-                    popupMenu.inflate(menu.playlist_remove)
-                    popupMenu.setOnMenuItemClickListener { item ->
-                        when (item.itemId) {
-                            id.remove_item -> {
-
-                                true
-                            }
-                            else -> false
-                        }
-                    }
-                    popupMenu.show()
-                }
-            }
-
-            selectionActivity ->{
-         holder.emptyCheck.visibility = View.VISIBLE
-
-            }
-        }
-
         holder.more.setOnClickListener {
             val music = musicList[position]
             showBottomSheetDialog(music, position)
@@ -281,7 +235,7 @@ class MusicAdapter(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n", "ObsoleteSdkInt")
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n", "ObsoleteSdkInt", "InflateParams")
     private fun showBottomSheetDialog(video: Music , position: Int) {
         val bottomSheetDialog = BottomSheetDialog(context)
         val view = LayoutInflater.from(context).inflate(R.layout.music_more_bottom_sheet, null)
@@ -484,6 +438,7 @@ class MusicAdapter(
             val dialogViewTone =
                 LayoutInflater.from(context).inflate(layout.favurite_ringtone, null)
             builderTone.setView(dialogViewTone)
+                .setCancelable(false)
 
             val dialogTone = builderTone.create()
 
@@ -575,7 +530,7 @@ class MusicAdapter(
     }
     private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
         return PlaylistMusic(
-            id = entity.musicid,
+            id = entity.id,
             name = entity.name,
             music = listOf() // Initialize with an empty list or fetch actual music if needed
         )
@@ -688,6 +643,7 @@ class MusicAdapter(
         musicNameDelete.text = musicList[position].title
 
         alertDialogBuilder.setView(view)
+            .setCancelable(false)
 
         val alertDialog = alertDialogBuilder.create()
         deleteText.setOnClickListener {

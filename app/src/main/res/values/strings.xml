@@ -99,6 +99,7 @@
     <string name="all_bookmarks">All Bookmarks</string>
     <string name="refresh_btn">Refresh</string>
     <string name="one">1</string>
+    <string name="zero">0</string>
     <string name="one_browse">1</string>
     <string name="durationChangeTextView">%1$s\n[ %2$s ]</string>
     <string name="vol_icon">vol_icon</string>

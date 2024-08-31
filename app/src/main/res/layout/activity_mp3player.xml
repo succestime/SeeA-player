@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,176 +7,287 @@
 
     tools:context=".MP3playerActivity">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:background="#BAB9B9">
 
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="0dp"
-            android:layout_height="50sp"
-            android:layout_centerHorizontal="true"
-            android:text="ajksdhfsadfgdsaf"
-            android:textSize="18sp"
-            android:gravity="center_horizontal"
-            android:maxLines="2"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/playerActivityMP3Image"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="-100dp"
+            android:layout_marginBottom="-20sp"
+            android:fitsSystemWindows="true"
+            android:scaleType="centerCrop"
+            android:transitionName="shared_element_transition_name"
+            app:layout_constraintBottom_toTopOf="@+id/lskahdgi"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/seekBar"
-            android:layout_width="0dp"
-            android:layout_height="8sp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_marginTop="20sp"
-            android:progressDrawable="@drawable/custom_seekbar_progress"
-            android:thumb="@drawable/custom_seekbar_thumb"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleTextView"
-            tools:ignore="NestedWeights" />
-        <TextView
-            android:id="@+id/remainingTimeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/seekBar"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="16sp"
-            android:layout_marginStart="15sp"
-            android:text="00:00"
-            android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+        </com.google.android.material.imageview.ShapeableImageView>
 
-        <TextView
-            android:id="@+id/elapsedTimeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/seekBar"
-            android:layout_marginTop="16sp"
-            android:layout_marginEnd="15sp"
-            android:text="Loading"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/seekBar" />
-
-        <LinearLayout
-            android:id="@+id/linearLayout9"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:gravity="center"
-            android:padding="15sp"
-            app:layout_constraintTop_toBottomOf="@+id/remainingTimeLabel"
-            tools:layout_editor_absoluteX="16dp">
+            android:backgroundTint="@color/transparent"
+            android:paddingTop="50sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/playlist_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                android:gravity="center_vertical"
+                app:layout_scrollFlags="scroll|enterAlwaysCollapsed|enterAlways|snap|snapMargins"
+                app:navigationIcon="@drawable/back_browser"
+                app:navigationIconTint="@color/white"
+                app:titleMarginStart="20sp"
+                app:titleTextAppearance="@style/CustomToolbarTitleText"
+                app:titleTextColor="?attr/titleTextColor">
 
-                android:id="@+id/pervBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20sp"
-                android:background="?attr/selectableItemBackground"
-                android:padding="5sp"
-
-                android:src="@drawable/round_mp3_skip_previous_24" />
-
-            <ImageView
-                android:id="@+id/playPauseBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20sp"
-                android:background="?attr/selectableItemBackground"
-                android:padding="5sp"
-                android:src="@drawable/round_play_circle_outline_24" />
-
-            <ImageView
-                android:id="@+id/nextBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20sp"
-                android:background="?attr/selectableItemBackground"
-                android:padding="5sp"
-                android:src="@drawable/round_mp3_skip_next_24" />
+            </com.google.android.material.appbar.MaterialToolbar>
+        </com.google.android.material.appbar.AppBarLayout>
 
 
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/askldfj"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/lskahdgi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30sp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
+            android:background="@drawable/rounded_bottom_sheet_3"
+           android:padding="16sp"
+            android:layout_marginTop="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+            <TextView
+                android:id="@+id/SongTitle"
+                android:layout_width="0dp"
+                android:layout_height="50sp"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_horizontal"
+                android:maxLines="2"
+                android:text="ajksdhfsadfgdsaf"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBarMPA"
+                android:layout_width="0dp"
+                android:layout_height="8sp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20sp"
+                android:layout_weight="1"
+                android:progressDrawable="@drawable/custom_seekbar_progress"
+                android:thumb="@drawable/custom_seekbar_thumb"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/SongTitle"
+                tools:ignore="NestedWeights" />
+
+            <TextView
+                android:id="@+id/remainingTimeLabelStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/seekBarMPA"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15sp"
+                android:layout_marginTop="16sp"
+                android:text="00:00"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seekBarMPA" />
+
+            <TextView
+                android:id="@+id/elapsedTimeLabelEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/seekBarMPA"
+                android:layout_marginTop="16sp"
+                android:layout_marginEnd="15sp"
+                android:text="Loading"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seekBarMPA" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:gravity="center"
+                android:padding="15sp"
+                app:layout_constraintTop_toBottomOf="@+id/remainingTimeLabelStart"
+                tools:layout_editor_absoluteX="16dp">
+
+                <ImageView
+
+                    android:id="@+id/pervBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20sp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="5sp"
+
+                    android:src="@drawable/round_mp3_skip_previous_24" />
+
+                <ImageView
+
+                    android:id="@+id/round_replay_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10sp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="5sp"
+                    android:src="@drawable/round_replay_10"
+                    app:tint="?android:attr/textColorPrimary" />
+
+                <ImageView
+                    android:id="@+id/playPauseBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20sp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="5sp"
+                    android:src="@drawable/round_play_circle_outline_24" />
+
+
+                <ImageView
+
+                    android:id="@+id/round_forward_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10sp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="5sp"
+                    android:src="@drawable/round_forward_10"
+                    app:tint="?android:attr/textColorPrimary" />
+
+                <ImageView
+                    android:id="@+id/nextBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20sp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="5sp"
+                    android:src="@drawable/round_mp3_skip_next_24" />
+
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/askldfj"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30sp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout9">
+
+                <LinearLayout
+                    android:id="@+id/shareMP3Layout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_gradient"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="18sp">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15sp"
+                        android:src="@drawable/share_communication_arrow_svgrepo_com"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Share MP3"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/setAsRingtoneLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15sp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_gradient"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="18sp">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15sp"
+                        android:src="@drawable/phone_call_ringing_svgrepo_com"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Set as Ringtone"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout6"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="?android:attr/windowBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout9">
+            app:layout_constraintTop_toBottomOf="@+id/lskahdgi">
 
-            <LinearLayout
-                android:id="@+id/shareMP3Layout"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/button_gradient"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="18sp"
-                android:layout_gravity="center">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/MP3ListQueue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/share_communication_arrow_svgrepo_com"
-                    android:layout_marginEnd="15sp"
-                    app:tint="@color/white" />
+            </androidx.recyclerview.widget.RecyclerView>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Share MP3"
-                    android:textSize="18sp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/setAsRingtoneLayout"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="15sp"
-                android:layout_weight="1"
-                android:background="@drawable/button_gradient"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="18sp"
-                android:layout_gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/phone_call_ringing_svgrepo_com"
-                    android:layout_marginEnd="15sp"
-                    app:tint="@color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Set as Ringtone"
-                    android:textSize="18sp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/MP3RecyclerviewShow"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout6" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

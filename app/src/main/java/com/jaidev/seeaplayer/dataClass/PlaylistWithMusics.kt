@@ -9,8 +9,8 @@ import androidx.room.Relation
 data class PlaylistWithMusics(
     @Embedded val playlistMusic: PlaylistMusicEntity,
     @Relation(
-        parentColumn = "musicid",
-        entityColumn = "musicid",
+        parentColumn = "id",
+        entityColumn = "id",
         associateBy = Junction(
             value = PlaylistMusicCrossRef::class,
             parentColumn = "playlistMusicId",

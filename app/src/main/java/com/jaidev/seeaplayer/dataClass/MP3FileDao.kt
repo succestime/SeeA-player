@@ -12,4 +12,7 @@ interface MP3FileDao {
 
     @Query("SELECT * FROM mp3_files")
     suspend fun getAllMP3Files(): List<MP3FileEntity>
+
+    @Query("DELETE FROM mp3_files WHERE id = :id")
+    suspend fun deleteById(id: String)
 }

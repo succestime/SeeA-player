@@ -8,13 +8,13 @@ import androidx.room.ForeignKey
     foreignKeys = [
         ForeignKey(
             entity = PlaylistMusicEntity::class,
-            parentColumns = ["musicid"],
+            parentColumns = ["id"],
             childColumns = ["playlistMusicId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = MusicEntity::class,
-            parentColumns = ["musicid"],
+            parentColumns = ["id"],
             childColumns = ["musicId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -24,3 +24,5 @@ data class PlaylistMusicCrossRef(
     val playlistMusicId: Long,
     val musicId: String
 )
+
+

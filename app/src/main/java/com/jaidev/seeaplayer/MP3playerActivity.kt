@@ -1,322 +1,509 @@
+
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
 import android.content.ComponentName
-import android.content.Context
+import android.content.ContentValues
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.media.MediaPlayer
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.IBinder
-import android.text.format.DateUtils
-import android.util.Log
-import android.widget.ImageView
+import android.provider.MediaStore
+import android.provider.Settings
+import android.view.LayoutInflater
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatSeekBar
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.jaidev.seeaplayer.Services.MediaPlayerService
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.arthenica.mobileffmpeg.FFmpeg
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.jaidev.seeaplayer.Services.MP3Service
+import com.jaidev.seeaplayer.allAdapters.MP3QueueAdapter
 import com.jaidev.seeaplayer.dataClass.MP3FileData
-import com.jaidev.seeaplayer.dataClass.ThemeHelper
+import com.jaidev.seeaplayer.dataClass.formatDuration
+import com.jaidev.seeaplayer.dataClass.setMP3SongPosition
+import com.jaidev.seeaplayer.databinding.ActivityMp3playerBinding
+import com.jaidev.seeaplayer.musicActivity.MP3NowPlaying
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.isPlaying
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.nowMusicPlayingId
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.songPosition
 import java.io.File
 
-class MP3playerActivity : AppCompatActivity() {
-
-    private lateinit var playPauseBtn: ImageView
-    private lateinit var pervBtn: ImageView
-    private lateinit var nextBtn: ImageView
-    private lateinit var seekBar: AppCompatSeekBar
-    private lateinit var elapsedTimeLabel: TextView
-    private lateinit var remainingTimeLabel: TextView
-    private lateinit var titleTextView: TextView
-    private lateinit var shareMP3Layout: LinearLayout
-
-
+class MP3playerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCompletionListener {
 
     companion object{
-        var isReceiverRegistered = false
-        lateinit var mp3Files: ArrayList<MP3FileData>
-        var currentIndex: Int = 0
-        var mediaPlayerService: MediaPlayerService? = null
-    }
+        lateinit var mp3MusicPA : ArrayList<MP3FileData>
+        var musicMP3Service: MP3Service? = null
+        @SuppressLint("StaticFieldLeak")
+        lateinit var binding: ActivityMp3playerBinding
+        @SuppressLint("StaticFieldLeak")
+        lateinit var mp3Adapter: MP3QueueAdapter
 
-    private var isBound = false
-
-    private val trackTitleReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val newTitle = intent.getStringExtra("trackTitle")
-            newTitle?.let {
-                titleTextView.text = it
-            }
-        }
-    }
-
-    private val playPauseReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val isPlaying = intent.getBooleanExtra("isPlaying", false)
-            updatePlayPauseButton(isPlaying)
-            if (isPlaying) {
-                updateSeekBar()
-            }
-        }
     }
 
 
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as MediaPlayerService.MediaPlayerBinder
-            mediaPlayerService = binder.getService()
-            isBound = true
-
-
-                mediaPlayerService?.setMp3Files(mp3Files, currentIndex)
-                mediaPlayerService?.onTrackCompleteListener = {
-                    mediaPlayerService?.moveToNextTrack()
-                }
-
-                playMP3File(mp3Files[currentIndex])
-
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            mediaPlayerService = null
-            isBound = false
-        }
-    }
-
-
-    @SuppressLint("UnspecifiedRegisterReceiverFlag", "ObsoleteSdkInt")
+    @SuppressLint("UnspecifiedRegisterReceiverFlag", "ObsoleteSdkInt", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val theme = ThemeHelper.getSavedTheme(this)
-        ThemeHelper.applyTheme(this, theme)
-        setContentView(R.layout.activity_mp3player)
-supportActionBar?.hide()
-        playPauseBtn = findViewById(R.id.playPauseBtn)
-        pervBtn = findViewById(R.id.pervBtn)
-        nextBtn = findViewById(R.id.nextBtn)
-        seekBar = findViewById(R.id.seekBar)
-        elapsedTimeLabel = findViewById(R.id.elapsedTimeLabel)
-        remainingTimeLabel = findViewById(R.id.remainingTimeLabel)
-        titleTextView = findViewById(R.id.titleTextView)
-        shareMP3Layout = findViewById(R.id.shareMP3Layout)
+        binding = ActivityMp3playerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        supportActionBar?.hide()
 
-        val mp3FilesExtra = intent.getSerializableExtra("mp3Files")
-        if (mp3FilesExtra is ArrayList<*>) {
-            @Suppress("UNCHECKED_CAST")
-            mp3Files = mp3FilesExtra as ArrayList<MP3FileData>
-        } else {
-            mp3Files = arrayListOf()
+        initializeLayout()
+
+        // Initialize the adapter with the scroll to position and click callback
+        mp3Adapter = MP3QueueAdapter(
+            this,
+            MainActivity.MP3MusicList,
+            songPosition,
+            { position -> scrollToPositionIfNotVisible(position) }, // Center the current item
+            { position -> onSongSelected(position) } // Handle the song click
+        )
+
+        binding.MP3ListQueue.adapter = mp3Adapter
+        binding.MP3ListQueue.layoutManager = LinearLayoutManager(this)
+
+        // Scroll to the currently playing song if it's not visible
+        scrollToPositionIfNotVisible(songPosition)
+
+//        val callback = MP3QueueTouchHelperCallback(mp3Adapter)
+//        val touchHelper = ItemTouchHelper(callback)
+//        touchHelper.attachToRecyclerView(binding.MP3ListQueue)
+
+
+        mp3Adapter.notifyDataSetChanged()
+
+//        restoreScrollPosition()
+
+        binding.shareMP3Layout.setOnClickListener {
+          if (mp3MusicPA.isNotEmpty()) {
+          val currentMP3File = mp3MusicPA[songPosition]
+           shareMP3File(currentMP3File)
+            }
+
+         }
+        binding.setAsRingtoneLayout.setOnClickListener {
+            if (mp3MusicPA.isNotEmpty()) {
+
+                showRingtoneBottomSheet()
+            }
         }
-        // ... existing setup code ...
-        handleIntent(intent)
-        currentIndex = intent.getIntExtra("currentIndex", 0)
+        binding.roundForward10.setOnClickListener {
+            musicMP3Service?.let {
+                val currentPosition = it.mediaPlayer?.currentPosition ?: 0
+                val newPosition = currentPosition + 10000 // Forward by 10 seconds (10,000 milliseconds)
+                it.mediaPlayer?.seekTo(newPosition.coerceAtMost(it.mediaPlayer?.duration ?: 0)) // Ensure it doesn't exceed duration
+                it.showNotification(R.drawable.round_pause_circle_outline_24)
+            }
+        }
 
-        Intent(this, MediaPlayerService::class.java).also { intent ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
+        binding.roundReplay10.setOnClickListener {
+            musicMP3Service?.let {
+                val currentPosition = it.mediaPlayer?.currentPosition ?: 0
+                val newPosition = currentPosition - 10000 // Rewind by 10 seconds (10,000 milliseconds)
+                it.mediaPlayer?.seekTo(newPosition.coerceAtLeast(0)) // Ensure it doesn't go below 0
+                it.showNotification(R.drawable.round_pause_circle_outline_24)
+            }
+        }
+
+
+        binding.playPauseBtn.setOnClickListener {
+            if (isPlaying) {
+                pauseMusic()
             } else {
-                startService(intent)
-            }
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-        }
-        registerReceiver(playPauseReceiver, IntentFilter("PLAY_PAUSE_ACTION"))
-        registerReceiver(trackTitleReceiver, IntentFilter("TRACK_TITLE"))
-        isReceiverRegistered = true
-        playPauseBtn.setOnClickListener {
-            if (isBound) {
-                if (mediaPlayerService?.isPlaying == true) {
-                    mediaPlayerService?.pauseAudio()
-                } else {
-                    mediaPlayerService?.resumeAudio()
-                    updateSeekBar()
-                }
-                updatePlayPauseButton(mediaPlayerService?.isPlaying == true)
-                mediaPlayerService?.updateNotification()
+                playMusic()
             }
         }
-        shareMP3Layout.setOnClickListener {
-            if (isBound) {
-                val mp3FileData = mp3Files[currentIndex] // Get the current MP3 file
-                shareMP3File(mp3FileData)
-            }
-        }
-        nextBtn.setOnClickListener {
-            if (isBound) {
-                mediaPlayerService?.moveToNextTrack()
-                updatePlayPauseButton(mediaPlayerService?.isPlaying == true)
-                updateSeekBar()
-                updateTrackTitle()  // Update the track title after changing the track
-            }
+        // Set up the navigation icon click listener to finish the activity
+        binding.playlistToolbar.setNavigationOnClickListener {
+            finish()
         }
 
-        pervBtn.setOnClickListener {
-            if (isBound) {
-                mediaPlayerService?.moveToPreviousTrack()
-                updatePlayPauseButton(mediaPlayerService?.isPlaying == true)
-                updateSeekBar()
-                updateTrackTitle()  // Update the track title after changing the track
-            }
-        }
+        // Set up menu item click listener
+
+        binding.nextBtn.setOnClickListener { prevNextSong(true) }
+        binding.pervBtn.setOnClickListener { prevNextSong(false) }
 
 
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.seekBarMPA.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser && isBound) {
-                    mediaPlayerService?.seekTo(progress)
-                    updateTimeLabels()
+                if (fromUser) {
+                    musicMP3Service!!.mediaPlayer!!.seekTo(progress)
+
+                    musicMP3Service!!.showNotification(if (isPlaying) R.drawable.round_pause_circle_outline_24 else R.drawable.round_play_circle_outline_24)
                 }
             }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        updateTimeLabels()
+                override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+    })
     }
-    private fun updateTrackTitle() {
-        if (isBound) {
-            // Assuming mediaPlayerService has a method to get the current track title or MP3FileData
-            val currentTrackTitle = mediaPlayerService?.getCurrentTrackTitle()
-            titleTextView.text = currentTrackTitle ?: "Unknown Track"
+    // Method to ensure the current playing song is visible on activity creation
+    private fun scrollToPositionIfNotVisible(position: Int) {
+        binding.MP3ListQueue.post {
+            val layoutManager = binding.MP3ListQueue.layoutManager as LinearLayoutManager
+            val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
+            val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
+
+            if (position < firstVisiblePosition || position > lastVisiblePosition) {
+                // Scroll smoothly to the position if it's not visible
+                binding.MP3ListQueue.smoothScrollToPosition(position)
+            } else {
+                // Optionally adjust with offset if partially visible
+                val offset = binding.MP3ListQueue.height / 2 - (binding.MP3ListQueue.getChildAt(0)?.height ?: 0) / 2
+                layoutManager.scrollToPositionWithOffset(position, offset)
+            }
         }
     }
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        intent?.let {
-            handleIntent(it)
+
+
+    private fun onSongSelected(position: Int) {
+        songPosition = position
+        mp3Adapter.updateCurrentSongPosition(songPosition) // Update the adapter with the new song position
+        setLayout() // Update the UI with the new song details
+        createMediaPlayer() // Prepare and start playing the new song
+    }
+
+
+//    override fun onPause() {
+//        super.onPause()
+//        saveScrollPosition()
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        saveScrollPosition()
+//    }
+//
+//    private fun saveScrollPosition() {
+//        // Save the current scroll position of the RecyclerView
+//        val layoutManager = binding.MP3ListQueue.layoutManager as LinearLayoutManager
+//        savedScrollPosition = layoutManager.findFirstVisibleItemPosition()
+//        getPreferences(Context.MODE_PRIVATE).edit()
+//            .putInt(SCROLL_POSITION_KEY, savedScrollPosition)
+//            .apply()
+//    }
+//
+//    private fun restoreScrollPosition() {
+//        // Restore the saved scroll position of the RecyclerView
+//        val layoutManager = binding.MP3ListQueue.layoutManager as LinearLayoutManager
+//        savedScrollPosition = getPreferences(Context.MODE_PRIVATE).getInt(SCROLL_POSITION_KEY, 0)
+//        layoutManager.scrollToPosition(savedScrollPosition)
+//    }
+
+
+    private fun prevNextSong(increment: Boolean) {
+        if (increment) {
+            setMP3SongPosition(increment = true)
+            mp3Adapter.updateCurrentSongPosition(songPosition) // Update adapter
+            setLayout()
+            createMediaPlayer()
+        } else {
+            setMP3SongPosition(increment = false)
+            mp3Adapter.updateCurrentSongPosition(songPosition) // Update adapter
+            setLayout()
+            createMediaPlayer()
         }
+    }
+    private fun playMusic() {
+        isPlaying = true
+        musicMP3Service!!.mediaPlayer!!.start()
+    binding.playPauseBtn.setImageResource(R.drawable.round_pause_circle_outline_24)
+        musicMP3Service!!.showNotification(R.drawable.round_pause_circle_outline_24)
+
+    }
+
+    private fun pauseMusic() {
+        isPlaying = false
+        musicMP3Service!!.mediaPlayer!!.pause()
+    binding.playPauseBtn.setImageResource(R.drawable.round_play_circle_outline_24)
+        musicMP3Service!!.showNotification(R.drawable.round_play_circle_outline_24)
+
+    }
+    private fun initializeLayout(){
+        songPosition = intent.getIntExtra("index" , 0)
+        when (intent.getStringExtra("class")) {
+            "MP3AudioList" -> {
+                val intent = Intent(this, MP3Service::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+                mp3MusicPA = ArrayList()
+                mp3MusicPA.addAll(MainActivity.MP3MusicList)
+                setLayout()
+
+
+            }
+            "MP3NowPlaying" -> {
+                setLayout()
+                binding.remainingTimeLabelStart.text = formatDuration(musicMP3Service!!.mediaPlayer!!.currentPosition.toLong())
+                binding.elapsedTimeLabelEnd.text = formatDuration(musicMP3Service!!.mediaPlayer!!.duration.toLong())
+                binding.seekBarMPA.progress = musicMP3Service!!.mediaPlayer!!.currentPosition
+                binding.seekBarMPA.max = musicMP3Service!!.mediaPlayer!!.duration
+                if(isPlaying) binding.playPauseBtn.setImageResource(R.drawable.round_pause_circle_outline_24)
+                else   binding.playPauseBtn.setImageResource(R.drawable.round_play_circle_outline_24)
+            }
+        }
+    }
+
+
+    private fun setLayout(){
+        Glide.with(applicationContext)
+            .load(mp3MusicPA[songPosition].artUri)
+            .into(binding.playerActivityMP3Image)
+        binding.playerActivityMP3Image.foreground = ContextCompat.getDrawable(this@MP3playerActivity, R.drawable.gray_overlay)
+
+        binding.SongTitle.text = mp3MusicPA[songPosition].title
+
+
+    }
+    @SuppressLint("NotifyDataSetChanged")
+private fun createMediaPlayer(){
+    try {
+        if (  musicMP3Service!!.mediaPlayer == null)   musicMP3Service!!.mediaPlayer = MediaPlayer()
+        musicMP3Service!!.mediaPlayer!!.reset()
+        musicMP3Service!!.mediaPlayer!!.setDataSource(mp3MusicPA[songPosition].path)
+        musicMP3Service!!.mediaPlayer!!.prepare()
+        musicMP3Service!!.mediaPlayer!!.start()
+        isPlaying = true
+        binding.playPauseBtn.setImageResource(R.drawable.round_pause_circle_outline_24)
+      binding.remainingTimeLabelStart.text = formatDuration(musicMP3Service!!.mediaPlayer!!.currentPosition.toLong())
+        binding.elapsedTimeLabelEnd.text = formatDuration(musicMP3Service!!.mediaPlayer!!.duration.toLong())
+        binding.seekBarMPA.progress = 0
+        binding.seekBarMPA.max = musicMP3Service!!.mediaPlayer!!.duration
+        musicMP3Service!!.showNotification(R.drawable.round_pause_circle_outline_24)
+        musicMP3Service!!.mediaPlayer!!.setOnCompletionListener(this)
+    nowMusicPlayingId = mp3MusicPA[songPosition].id
+
+    }catch (e: Exception){
+        return
+    }
+}
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+
+            val binder = service as MP3Service.MyBinder
+            musicMP3Service = binder.currentService()
+        musicMP3Service!!.seekBarSetup()
+        mp3Adapter.updateCurrentSongPosition(songPosition) // Update adapter
+
+        createMediaPlayer()
+
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        musicMP3Service = null
     }
     @SuppressLint("ObsoleteSdkInt")
-    private fun shareMP3File(mp3FileData: MP3FileData) {
-        val mp3File = File(mp3FileData.path)
-        val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // Use FileProvider to share the file on Android N and above
-            FileProvider.getUriForFile(
-                this,
-                "$packageName.fileprovider",
-                mp3File
-            )
-        } else {
-            Uri.fromFile(mp3File)
+    private fun showRingtoneBottomSheet() {
+        val bottomSheetDialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.ringtone_music_bottom_sheet, null)
+        bottomSheetDialog.setContentView(view)
+
+
+        // Store the reference to the TextView
+      val  mp3TitleTextView = view.findViewById<TextView>(R.id.MP3Title)
+        // Assuming mediaPlayerService has a method to get the current track title or MP3FileData
+        val currentTrackTitle = mp3MusicPA[songPosition].title
+        mp3TitleTextView?.text = currentTrackTitle ?: "Unknown Track"
+
+        // Set up the bottom sheet options (e.g., Phone Ringtone, Notification Ringtone)
+        view.findViewById<LinearLayout>(R.id.setAsPhoneRingtoneButton).setOnClickListener {
+            val builderTone = AlertDialog.Builder(this)
+            val dialogViewTone =
+                LayoutInflater.from(this).inflate(R.layout.favurite_ringtone, null)
+            builderTone.setView(dialogViewTone)
+
+            val dialogTone = builderTone.create()
+
+            val notButton: Button = dialogViewTone.findViewById(R.id.not_button)
+            val yesButton: Button = dialogViewTone.findViewById(R.id.yes_button)
+
+            notButton.setOnClickListener {
+                dialogTone.dismiss()
+            }
+
+            // Inside yesButton.setOnClickListener
+            yesButton.setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!Settings.System.canWrite(this@MP3playerActivity)) {
+                        // Request permission to write system settings
+                        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                        intent.data = Uri.parse("package:$packageName")
+                        startActivity(intent)
+                    } else {
+                        setAsRingtone(mp3MusicPA[songPosition].path)
+                    }
+                } else {
+                    // For devices below Android 6.0
+                    setAsRingtone(mp3MusicPA[songPosition].path)
+                }
+                dialogTone.dismiss()
+                bottomSheetDialog.dismiss()
+            }
+            dialogTone.show()
+            bottomSheetDialog.dismiss()
         }
 
-        // Create the share intent
+
+        view.findViewById<LinearLayout>(R.id.setAsNotificationRingtoneButton).setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.System.canWrite(this@MP3playerActivity)) {
+                    val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                    intent.data = Uri.parse("package:$packageName")
+                    startActivity(intent)
+                } else {
+                    setAsNotificationTone(mp3MusicPA[songPosition].path)
+                }
+            } else {
+                setAsNotificationTone(mp3MusicPA[songPosition].path)
+            }
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
+    }
+
+
+
+    // Method to set the MP3 file as a ringtone
+    private fun setAsRingtone(mp3FilePath: String) {
+        val file = File(mp3FilePath)
+
+        // Define the target location for the file in the Ringtones directory
+        val ringtoneDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES), "SeeA MP3 Audio")
+        if (!ringtoneDir.exists()) {
+            ringtoneDir.mkdirs() // Create the directory if it doesn't exist
+        }
+
+        try {
+            // Copy the file to the public Ringtones directory
+            val newFile = File(ringtoneDir, file.name)
+            file.copyTo(newFile, overwrite = true)
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DATA, newFile.absolutePath)
+                put(MediaStore.MediaColumns.TITLE, mp3MusicPA[songPosition].title)
+                put(MediaStore.MediaColumns.MIME_TYPE, "audio/mpeg")
+                put(MediaStore.Audio.Media.IS_RINGTONE, true)
+                put(MediaStore.Audio.Media.IS_NOTIFICATION, false)
+                put(MediaStore.Audio.Media.IS_ALARM, false)
+                put(MediaStore.Audio.Media.IS_MUSIC, false)
+            }
+
+            val uri = MediaStore.Audio.Media.getContentUriForPath(newFile.absolutePath)
+            val newUri = contentResolver.insert(uri!!, contentValues)
+
+            RingtoneManager.setActualDefaultRingtoneUri(
+                this,
+                RingtoneManager.TYPE_RINGTONE,
+                newUri
+            )
+
+            Toast.makeText(this, "Ringtone set to ${mp3MusicPA[songPosition].title}", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to set ringtone: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setAsNotificationTone(mp3FilePath: String) {
+        val file = File(mp3FilePath)
+
+        // Define the target location for the file in the Notifications directory
+        val notificationDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS), "SeeA MP3 Audio")
+        if (!notificationDir.exists()) {
+            notificationDir.mkdirs() // Create the directory if it doesn't exist
+        }
+
+        val trimmedFile = File(notificationDir, "trimmed_${file.name}")
+        try {
+            // Use FFmpeg to trim the audio to 2 seconds
+            val command = arrayOf("-i", file.absolutePath, "-t", "00:00:03", "-c", "copy", trimmedFile.absolutePath)
+            val rc = FFmpeg.execute(command)
+
+            if (rc != 0) {
+                throw Exception("FFmpeg failed with return code $rc")
+            }
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DATA, trimmedFile.absolutePath)
+                put(MediaStore.MediaColumns.TITLE, mp3MusicPA[songPosition].title)
+                put(MediaStore.MediaColumns.MIME_TYPE, "audio/mpeg")
+                put(MediaStore.Audio.Media.IS_RINGTONE, false)
+                put(MediaStore.Audio.Media.IS_NOTIFICATION, true)
+                put(MediaStore.Audio.Media.IS_ALARM, false)
+                put(MediaStore.Audio.Media.IS_MUSIC, false)
+            }
+
+            val uri = MediaStore.Audio.Media.getContentUriForPath(trimmedFile.absolutePath)
+            val newUri = contentResolver.insert(uri!!, contentValues)
+
+            RingtoneManager.setActualDefaultRingtoneUri(
+                this,
+                RingtoneManager.TYPE_NOTIFICATION,
+                newUri
+            )
+
+            Toast.makeText(this, "Notification tone set to ${mp3MusicPA[songPosition].title}", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to set notification tone: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun shareMP3File(mp3FileData: MP3FileData) {
+        val mp3File = File(mp3FileData.path)
+        if (!mp3File.exists()) {
+            return
+        }
+
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "audio/mpeg"
-            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_STREAM, getUriForFile(mp3File))
+            putExtra(Intent.EXTRA_SUBJECT, "Sharing ${mp3FileData.title}")
+            putExtra(Intent.EXTRA_TEXT, "Listen to this audio file: ${mp3FileData.title}")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        // Start the sharing activity
-        startActivity(Intent.createChooser(shareIntent, "Share MP3 file via"))
-    }
-    private fun handleIntent(intent: Intent) {
-        val mp3FilePath = intent.getStringExtra("mp3FilePath")
-        val mp3FileTitle = intent.getStringExtra("mp3FileTitle")
-        val newMp3Files = intent.getSerializableExtra("mp3Files") as? ArrayList<MP3FileData>
-        val newIndex = intent.getIntExtra("currentIndex", 0)
-
-        if (mp3FilePath != null && mp3FileTitle != null) {
-            if (isBound && mediaPlayerService != null) {
-                // Update the MP3 file list if provided
-                newMp3Files?.let {
-                    mp3Files = it
-                }
-                currentIndex = newIndex
-
-                // Play the new file
-                playMP3File(mp3Files[currentIndex])
-            }
-        }
-    }
-
-
-
-
-
-    private fun broadcastNowPlaying() {
-        if (isBound) {
-            val intent = Intent("NOW_PLAYING_ACTION")
-            intent.putExtra("isPlaying", mediaPlayerService?.isPlaying)
-            intent.putExtra("trackTitle", mediaPlayerService?.getCurrentTrackTitle())
-            sendBroadcast(intent)
-            Log.d("MP3playerActivity", "Broadcasting now playing: ${mediaPlayerService?.getCurrentTrackTitle()}")
-        }
-    }
-    private fun playMP3File(mp3FileData: MP3FileData) {
-        if (isBound) {
-            mediaPlayerService?.playMP3(mp3FileData.path, mp3FileData.title)
-            titleTextView.text = mp3FileData.title
-            updatePlayPauseButton(mediaPlayerService?.isPlaying == true)
-            updateSeekBar()
-            broadcastNowPlaying() // Notify other activities about the current track
-
-        }
-    }
-
-    private fun updatePlayPauseButton(isPlaying: Boolean) {
-        if (isBound) {
-            val iconRes = if (isPlaying) R.drawable.round_pause_circle_outline_24 else R.drawable.round_play_circle_outline_24
-            playPauseBtn.setImageResource(iconRes)
-        }
-        playPauseBtn.setImageResource(
-            if (isPlaying) R.drawable.round_pause_circle_outline_24 else R.drawable.round_play_circle_outline_24
-        )
+        startActivity(Intent.createChooser(shareIntent, "Share MP3 via"))
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    private fun updateSeekBar() {
-        if (isBound && mediaPlayerService?.isPlaying == true) {
-            seekBar.progress = mediaPlayerService?.getCurrentPosition() ?: 0
-            seekBar.max = mediaPlayerService?.getDuration() ?: 0
-
-            // Re-run this method every 1 second to update the progress
-            seekBar.postDelayed({ updateSeekBar() }, 100)
-
-            updateTimeLabels()
+    private fun getUriForFile(file: File): Uri {
+        return if (Build.VERSION.SDK_INT >= Build .VERSION_CODES.N) {
+            FileProvider.getUriForFile(
+                this,
+                "$packageName.provider",
+                file
+            )
+        } else {
+            Uri.fromFile(file)
         }
     }
 
-    private fun updateTimeLabels() {
-        if (isBound) {
-            val totalDuration = mediaPlayerService?.getDuration()?.div(1000) ?: 0
-            elapsedTimeLabel.text = DateUtils.formatElapsedTime(totalDuration.toLong())
-            val currentProgress = mediaPlayerService?.getCurrentPosition()?.div(1000) ?: 0
-            remainingTimeLabel.text = DateUtils.formatElapsedTime(currentProgress.toLong())
-        }
-    }
+    override fun onCompletion(mp: MediaPlayer?) {
+        setMP3SongPosition(increment = true)
+        createMediaPlayer()
+        setLayout()
+        mp3Adapter.updateCurrentSongPosition(songPosition) // Update adapter
 
-
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    override fun onResume() {
-        super.onResume()
-        registerReceiver(trackTitleReceiver, IntentFilter("TRACK_TITLE"))
-        registerReceiver(playPauseReceiver, IntentFilter("PLAY_PAUSE_ACTION"))
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (isReceiverRegistered) {
-            unregisterReceiver(trackTitleReceiver)
-            unregisterReceiver(playPauseReceiver)
-            isReceiverRegistered = false
-        }
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isBound) {
-            unbindService(serviceConnection)
-            isBound = false
-        }
-
+        // Refresh now playing image & text on song completion
+        MP3NowPlaying.binding.songNameNP.isSelected = true
+        Glide.with(applicationContext)
+            .load(mp3MusicPA[songPosition].artUri)
+            .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+            .into(MP3NowPlaying.binding.songImgNP)
+        MP3NowPlaying.binding.songNameNP.text = mp3MusicPA[songPosition].title
     }
 
 

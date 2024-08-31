@@ -49,10 +49,10 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
 
             Glide.with(this)
                 .asBitmap()
-                .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+                .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgNP)
-            binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+            binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
             playMusic()
         }
 
@@ -91,13 +91,13 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
                 binding.songNameNP.isSelected = true
                 Glide.with(requireContext())
                     .asBitmap()
-                    .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+                    .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
                     .apply(
                         RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop()
                     )
                     .into(binding.songImgNP)
                 binding.songNameNP.text =
-                    ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+                    ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
                 if (ReMusicPlayerActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
                 else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
 
@@ -131,10 +131,10 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
         } else {
             binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
         }
-        ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].title
+        ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
         Glide.with(requireContext())
             .asBitmap()
-            .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+            .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgNP)
     }

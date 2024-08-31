@@ -25,8 +25,10 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAd
     companion object{
        @SuppressLint("StaticFieldLeak")
         lateinit var binding: FragmentNowPlayingBinding
+
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_now_playing, container, false)
         binding = FragmentNowPlayingBinding.bind(view)
@@ -34,6 +36,7 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAd
 
         adapter = MusicAdapter(requireContext(), MainActivity.MusicListMA)
         adapter.setMusicDeleteListener(this)
+
 
         binding.playPauseBtnNP.setOnClickListener {
             if(PlayerMusicActivity.isPlaying) pauseMusic() else playMusic()
@@ -78,6 +81,8 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAd
             binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
             if(PlayerMusicActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
             else binding.playPauseBtnNP.setIconResource(R.drawable.play_icon)
+        }else{
+            binding.root.visibility = View.GONE
         }
 
         }catch (e: Exception) {

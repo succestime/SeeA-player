@@ -592,8 +592,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         if(musicService == null){
             val binder = service as MusicService.MyBinder
             musicService = binder.currentService()
-//            musicService!!.audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-//            musicService!!.audioManager.requestAudioFocus(musicService, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+
         }
         createMediaPlayer()
         musicService!!.

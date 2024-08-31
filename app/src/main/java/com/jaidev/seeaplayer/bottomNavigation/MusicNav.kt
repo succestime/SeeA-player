@@ -1,7 +1,10 @@
 package com.jaidev.seeaplayer
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -39,6 +42,7 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
     companion object{
         @SuppressLint("StaticFieldLeak")
         private lateinit var binding: FragmentMusicNavBinding
+        const val ACTION_HIDE_MP3_NOW_PLAYING = "com.jaidev.seeaplayer.ACTION_HIDE_MP3_NOW_PLAYING"
 
         fun updateEmptyState() {
             if (MusicListMA.isEmpty()) {
@@ -46,6 +50,13 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
             } else {
                 binding.musicemptyStateLayout.visibility = View.GONE
             }
+        }
+    }
+
+    private val hideNowPlayingReceiver = object : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.R)
+        override fun onReceive(context: Context?, intent: Intent?) {
+            refreshMusicList()
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,12 +75,13 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
         setupActionBar()
+        requireContext().registerReceiver(hideNowPlayingReceiver, IntentFilter(musicNav.ACTION_HIDE_MP3_NOW_PLAYING))
 
         binding.musicRV.setHasFixedSize(true)
         binding.musicRV.setItemViewCacheSize(15)
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())
-        adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true)
-        adapterf = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@musicNav, isMusic = false)
+        adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true )
+        adapterf = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@musicNav, isMusic = false  )
         adapter.setMusicDeleteListener(this)
         adapterf.setMusicDeleteListener(this)
         binding.musicRV.adapter = adapter
@@ -183,6 +195,13 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
         refreshMusicList()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Disable selection mode in the adapter
+        adapter.disableSelectionMode()
+        requireContext().unregisterReceiver(hideNowPlayingReceiver)
+
+    }
 
 
     @Deprecated("Deprecated in Java")

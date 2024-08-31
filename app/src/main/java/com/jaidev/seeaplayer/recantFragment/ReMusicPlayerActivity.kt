@@ -44,7 +44,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
     private var appOpenAd : AppOpenAd? = null
     companion object {
         // of PlayerActivity of this reMusicActivity
-        var reMusicList: ArrayList<RecantMusic> = ArrayList()
+        var reMusicListPA: ArrayList<RecantMusic> = ArrayList()
         var songPosition: Int = 0
         var isPlaying: Boolean = false
         var musicService : MusicService? = null
@@ -73,9 +73,9 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
 
         fun setLayout(context: Context) {
-            if (!fileExists(reMusicList[songPosition].path)) {
+            if (!fileExists(reMusicListPA[songPosition].path)) {
                 // Check if there are other songs to play
-                if (reMusicList.size > 1) {
+                if (reMusicListPA.size > 1) {
                     reSetSongPosition(increment = true)
                     setLayout(context)
                     createMediaPlayer(context)
@@ -87,11 +87,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 return
             }
             Glide.with(context)
-                .load(getImgArt(reMusicList[songPosition].path))
+                .load(getImgArt(reMusicListPA[songPosition].path))
                 .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
                 .into(binding.songImgPA)
 
-            binding.songNamePA.text = reMusicList[songPosition].title
+            binding.songNamePA.text = reMusicListPA[songPosition].title
 
             if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(context, R.color.cool_green))
             else binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(context, R.color.cool_pink))
@@ -107,9 +107,9 @@ class ReMusicPlayerActivity : AppCompatActivity()
         }
         fun createMediaPlayer(context: Context) {
             try {
-                if (!fileExists(reMusicList[songPosition].path)) {
+                if (!fileExists(reMusicListPA[songPosition].path)) {
                     // Check if there are other songs to play
-                    if (reMusicList.size > 1) {
+                    if (reMusicListPA.size > 1) {
                         reSetSongPosition(increment = true)
                         setLayout(context)
                         createMediaPlayer(context)
@@ -122,7 +122,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 }
                 if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
                 musicService!!.mediaPlayer!!.reset()
-                musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
+                musicService!!.mediaPlayer!!.setDataSource(reMusicListPA[songPosition].path)
                 musicService!!.mediaPlayer!!.prepare()
                 musicService!!.mediaPlayer!!.start()
                 isPlaying = true
@@ -191,8 +191,8 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
                     R.color.cool_green))
                 // Shuffle the music list
-                originalMusicListPA = ArrayList(reMusicList) // Save original list
-                reMusicList.shuffle()
+                originalMusicListPA = ArrayList(reMusicListPA) // Save original list
+                reMusicListPA.shuffle()
 
                 // Reset song position to start from the beginning
                 songPosition = 0
@@ -206,9 +206,9 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 binding.shuffleBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
                     R.color.cool_pink))
                 // Find the current song in the original list and update the song position
-                val currentSong = reMusicList[songPosition]
-                reMusicList = ArrayList(originalMusicListPA)
-                songPosition = reMusicList.indexOf(currentSong)
+                val currentSong = reMusicListPA[songPosition]
+                reMusicListPA = ArrayList(originalMusicListPA)
+                songPosition = reMusicListPA.indexOf(currentSong)
 
                 // Create and start playing music from the current position in the original list order
                 setLayout()
@@ -276,25 +276,25 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
 
     private fun setLayout(){
-                if (!fileExists(reMusicList[songPosition].path)) {
-                    // Check if there are other songs to play
-                    if (reMusicList.size > 1) {
-                        reSetSongPosition(increment = true)
-                        setLayout()
-                        createMediaPlayer()
-                    }else{
-                        ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
-                        ReNowPlaying.binding.root.visibility = View.GONE
+        if (!fileExists(reMusicListPA[songPosition].path)) {
+            // Check if there are other songs to play
+            if (reMusicListPA.size > 1) {
+                reSetSongPosition(increment = true)
+                setLayout()
+                createMediaPlayer()
+            }else{
+                ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                ReNowPlaying.binding.root.visibility = View.GONE
 
-                    }
-                    return
-                }
+            }
+            return
+        }
         Glide.with(applicationContext)
-            .load(getImgArt(reMusicList[songPosition].path))
+            .load(getImgArt(reMusicListPA[songPosition].path))
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(binding.songImgPA)
 
-        binding.songNamePA.text = reMusicList[songPosition].title
+        binding.songNamePA.text = reMusicListPA[songPosition].title
 
         if (repeat) binding.repeatBtnPA.setColorFilter(ContextCompat.getColor(applicationContext,
             R.color.cool_green
@@ -313,22 +313,22 @@ class ReMusicPlayerActivity : AppCompatActivity()
     }
     private fun createMediaPlayer(){
         try {
-                if (!fileExists(reMusicList[songPosition].path)) {
-                    // Check if there are other songs to play
-                    if (reMusicList.size > 1) {
-                        reSetSongPosition(increment = true)
-                        setLayout()
-                        createMediaPlayer()
-                    }else{
-                        ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
-                        ReNowPlaying.binding.root.visibility = View.GONE
+            if (!fileExists(reMusicListPA[songPosition].path)) {
+                // Check if there are other songs to play
+                if (reMusicListPA.size > 1) {
+                    reSetSongPosition(increment = true)
+                    setLayout()
+                    createMediaPlayer()
+                }else{
+                    ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                    ReNowPlaying.binding.root.visibility = View.GONE
 
-                    }
-                    return
                 }
+                return
+            }
             if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
             musicService!!.mediaPlayer!!.reset()
-            musicService!!.mediaPlayer!!.setDataSource(reMusicList[songPosition].path)
+            musicService!!.mediaPlayer!!.setDataSource(reMusicListPA[songPosition].path)
             musicService!!.mediaPlayer!!.prepare()
             musicService!!.mediaPlayer!!.start()
             isPlaying = true
@@ -346,7 +346,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
     fun getCurrentSong(): RecantMusic {
         // Assuming you have a list of songs and a variable to store the current song position
         val currentSongPosition = songPosition
-        return reMusicList[currentSongPosition]
+        return reMusicListPA[currentSongPosition]
     }
     private fun initializeLayout(){
         songPosition =  intent.getIntExtra("index" , 0)
@@ -355,9 +355,9 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
-                reMusicList = ArrayList()
-                reMusicList.addAll(MainActivity.musicRecantList)
-                originalMusicListPA = ArrayList(reMusicList) // Save original list
+                reMusicListPA = ArrayList()
+                reMusicListPA.addAll(MainActivity.musicRecantList)
+                originalMusicListPA = ArrayList(reMusicListPA) // Save original list
                 setLayout()
             }
 
@@ -374,10 +374,10 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
-                reMusicList = ArrayList()
-                reMusicList.addAll(MainActivity.musicRecantList)
-                originalMusicListPA = ArrayList(reMusicList) // Save original list
-                reMusicList.shuffle()
+                reMusicListPA = ArrayList()
+                reMusicListPA.addAll(MainActivity.musicRecantList)
+                originalMusicListPA = ArrayList(reMusicListPA) // Save original list
+                reMusicListPA.shuffle()
                 setLayout()
             }
         }
@@ -412,12 +412,12 @@ class ReMusicPlayerActivity : AppCompatActivity()
 
         if(!repeat){
             if (increment) {
-                if (reMusicList.size - 1 == songPosition)
+                if (reMusicListPA.size - 1 == songPosition)
                     songPosition = 0
                 else ++songPosition
             } else {
                 if (0 == songPosition)
-                    songPosition = reMusicList.size - 1
+                    songPosition = reMusicListPA.size - 1
                 else --songPosition
             }
 

@@ -41,7 +41,6 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
 
     lateinit var videoAdapter: PlaylistMusicShowAdapter
     private val db by lazy { DatabaseClientMusic.getInstance(this) }
-    private lateinit var musicDatabase: DatabaseClientMusic
     companion object{
         val videoList = ArrayList<Music>()
         var playlistId: Long = -1
@@ -216,10 +215,10 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
             val deletedMusic = db.playlistMusicDao().getMusicByPath(deletedMusicPath)
             if (deletedMusic != null) {
                 // Remove the music from the playlist
-                db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, deletedMusic.musicid)
+                db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, deletedMusic.id)
 
                 // Remove the music from the database
-                db.playlistMusicDao().deleteMusic(deletedMusic.musicid)
+                db.playlistMusicDao().deleteMusic(deletedMusic.id)
             }
         }
         withContext(Dispatchers.Main) {
@@ -294,7 +293,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
             videoList.clear()
             videoList.addAll(sortedVideos.map { videoEntity ->
                 Music(
-                    id = videoEntity.musicid,
+                    id = videoEntity.id,
                     title = videoEntity.title,
                     duration = videoEntity.duration,
                     size = videoEntity.size,
@@ -673,7 +672,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
         videoList.clear()
         videoList.addAll(playlistWithVideos.music.map {
             Music(
-                id = it.musicid,
+                id = it.id,
                 title = it.title,
                 duration = it.duration,
                 size = it.size,
@@ -719,7 +718,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
                 videoList.clear()
                 videoList.addAll(sortedVideos.map {
                     Music(
-                        id = it.musicid,
+                        id = it.id,
                         title = it.title,
                         duration = it.duration,
                         size = it.size,
@@ -752,7 +751,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
                     // Insert the video only if it doesn't already exist
                     db.playlistMusicDao().insertMusic(
                         MusicEntity(
-                            musicid = music.id,
+                            id = music.id,
                             title = music.title,
                             duration = music.duration,
                             size = music.size,

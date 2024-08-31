@@ -24,7 +24,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
-        android:name=".ApplicationClass"
+        android:name=".Services.ApplicationClass"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -40,7 +40,9 @@
         <activity
             android:name=".MP3playerActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/statusBarPlaylistTheme"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".MP3ConverterActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
@@ -333,25 +335,24 @@
 
         <service android:name=".Services.MusicService" />
 
-        <service
-            android:name=".Services.MediaPlayerService"
+        <service android:name=".Services.MP3Service"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback"
             tools:ignore="ForegroundServicePermission">
         </service>
+
+
+
         <service android:name=".Services.FolderDetectionService" />
         <service android:name=".Services.FileDownloadService" />
 
         <receiver
-            android:name=".musicActivity.NotificationReceiver"
+            android:name=".Services.NotificationReceiver"
             android:enabled="true" />
         <receiver
-            android:name=".Services.MediaButtonReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
+            android:name=".musicActivity.MP3NotificationReceiver"
+            android:enabled="true" />
+
 
         <receiver
             android:name=".Services.DownloadCompleteReceiver"

@@ -48,7 +48,7 @@ class ReMoreMusicBottomSheet : BottomSheetDialogFragment() {
             shareIntent.type = "audio/*"
             shareIntent.putExtra(
                 Intent.EXTRA_STREAM,
-                Uri.parse(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path)
+                Uri.parse(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path)
             )
             startActivity(Intent.createChooser(shareIntent, "Sharing Music File!!"))
             dismiss()
@@ -181,7 +181,7 @@ class ReMoreMusicBottomSheet : BottomSheetDialogFragment() {
         val currentSong = (requireActivity() as ReMusicPlayerActivity).getCurrentSong()
 
         Glide.with(this)
-            .load(getImgArt(ReMusicPlayerActivity.reMusicList[ReMusicPlayerActivity.songPosition].path))
+            .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
             .placeholder(R.drawable.music_speaker_three)
             .error(R.drawable.music_speaker_three)
             .into(binding.thumbnail)

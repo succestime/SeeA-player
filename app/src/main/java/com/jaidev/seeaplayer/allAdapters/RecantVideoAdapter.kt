@@ -77,6 +77,14 @@ class RecentVideoAdapter(private val context: Context,
 
 
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun disableSelectionMode() {
+        isSelectionModeEnabled = false
+        selectedItems.clear()
+        actionMode?.finish() // Finish the ActionMode if it's active
+        actionMode = null
+        notifyDataSetChanged() // Notify the adapter to refresh the views
+    }
 
 
 

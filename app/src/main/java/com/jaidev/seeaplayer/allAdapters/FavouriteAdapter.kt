@@ -440,6 +440,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
         val dialogViewTone =
             LayoutInflater.from(context).inflate(R.layout.favurite_ringtone, null)
         builderTone.setView(dialogViewTone)
+            .setCancelable(false)
 
         val dialogTone = builderTone.create()
 
@@ -476,6 +477,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
         val dialogView =
             LayoutInflater.from(context).inflate(R.layout.favurite_remove, null)
         builder.setView(dialogView)
+            .setCancelable(false)
 
         val dialog = builder.create()
 
@@ -526,7 +528,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
 
     private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
         return PlaylistMusic(
-            id = entity.musicid,
+            id = entity.id,
             name = entity.name,
             music = listOf() // Initialize with an empty list or fetch actual music if needed
         )

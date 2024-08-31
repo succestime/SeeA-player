@@ -95,8 +95,6 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
         }
         checkAndRemoveDeletedSongs()
         setSwipeRefreshBackgroundColor()
-        shuffleEmpty()
-
         loadFavouriteSongs()
     }
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
@@ -166,6 +164,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
             val builder = android.app.AlertDialog.Builder(this)
             val dialogView = LayoutInflater.from(this).inflate(R.layout.favurite_remove_all, null)
             builder.setView(dialogView)
+                .setCancelable(false)
 
             val dialog = builder.create()
 
@@ -376,7 +375,11 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
 
 
     private fun shuffleEmpty() {
-        if (favouriteSongs.size < 1) binding.shuffleBtnFA.visibility = View.INVISIBLE
+        if (favouriteSongs.size < 1) {
+            binding.shuffleBtnFA.visibility = View.INVISIBLE
+        } else {
+            binding.shuffleBtnFA.visibility = View.VISIBLE
+        }
 
         binding.shuffleBtnFA.setOnClickListener {
             val intent = Intent(this, PlayerMusicActivity::class.java)
@@ -713,7 +716,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
     }
     private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
         return PlaylistMusic(
-            id = entity.musicid,
+            id = entity.id,
             name = entity.name,
             music = listOf() // Initialize with an empty list or fetch actual music if needed
         )

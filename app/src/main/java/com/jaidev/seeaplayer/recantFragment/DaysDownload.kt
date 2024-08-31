@@ -87,7 +87,11 @@ class DaysDownload : Fragment(),   RecentVideoAdapter.OnFileCountChangeListener 
     }
 
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Disable selection mode in the adapter
+        adapter.disableSelectionMode()
+    }
     @SuppressLint("SetTextI18n")
     override fun onFileCountChanged(newCount: Int) {
         binding.daysTotalVideos.text = "$newCount Videos"

@@ -106,7 +106,11 @@ companion object{
         binding.daysTotalMusics.text = "$newCount Musics"
 
     }
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Disable selection mode in the adapter
+        adapter.disableSelectionMode()
+    }
     override fun onMusicDeleted() {
         updateEmptyViewVisibility()
         loadRecentMusics()

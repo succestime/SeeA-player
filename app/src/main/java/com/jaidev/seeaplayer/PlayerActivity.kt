@@ -75,7 +75,7 @@ import kotlin.system.exitProcess
 
 
 
-class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener
+class  PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener
     , GestureDetector.OnGestureListener ,   VideoAdapter.OnFileCountChangeListener
 {
     private lateinit var binding: ActivityPlayerBinding
@@ -247,11 +247,11 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 playInFullscreen(enable = isFullscreen)
                 seekBarFeature()
                 createPlayer()
+
             }
 
         }
     }
-
     private fun initializePlayer() {
         player = SimpleExoPlayer.Builder(this).build()
         binding.playerView.player = player
@@ -1061,7 +1061,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
     override fun onDestroy() {
         super.onDestroy()
         player.pause()
-        player.release()
+//        player.release()
         audioManager?.abandonAudioFocus(this)
 
     }

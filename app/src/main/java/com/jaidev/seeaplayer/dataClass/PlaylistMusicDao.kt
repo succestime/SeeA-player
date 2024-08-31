@@ -18,7 +18,7 @@ interface PlaylistMusicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMusic(musicEntity: MusicEntity)
 
-    @Query("SELECT EXISTS(SELECT 1 FROM music WHERE musicid = :musicId)")
+    @Query("SELECT EXISTS(SELECT 1 FROM music WHERE id = :musicId)")
     suspend fun musicExists(musicId: String): Boolean
 
     @Insert
@@ -29,16 +29,16 @@ interface PlaylistMusicDao {
 
 
     @Transaction
-    @Query("SELECT * FROM musicPlaylists WHERE musicid = :playlistMusicId")
+    @Query("SELECT * FROM musicPlaylists WHERE id = :playlistMusicId")
     suspend fun getPlaylistWithMusic(playlistMusicId: Long): PlaylistWithMusics
 
 
 
-    @Query("SELECT COUNT(*) FROM music WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)")
+    @Query("SELECT COUNT(*) FROM music WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)")
     suspend fun getMusicCountForPlaylist(playlistMusicId: Long): Int
 
 
-    @Query("SELECT SUM(duration) FROM music WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)")
+    @Query("SELECT SUM(duration) FROM music WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)")
     suspend fun getTotalDurationForPlaylist(playlistMusicId: Long): Long
 
     @Transaction
@@ -57,7 +57,7 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.title COLLATE NOCASE ASC
         LIMIT 1
@@ -67,7 +67,7 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.title COLLATE NOCASE DESC
         LIMIT 1
@@ -77,7 +77,7 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.duration ASC
         LIMIT 1
@@ -87,7 +87,7 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.duration DESC
         LIMIT 1
@@ -97,7 +97,7 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.dateAdded ASC
         LIMIT 1
@@ -107,7 +107,7 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.dateAdded DESC
         LIMIT 1
@@ -117,7 +117,7 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.size ASC
         LIMIT 1
@@ -127,17 +127,17 @@ interface PlaylistMusicDao {
     @Query("""
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
         ORDER BY v.size DESC
         LIMIT 1
     """)
     suspend fun getFirstMusicImageUriBySizeDesc(playlistMusicId: Long): String?
 
-    @Query("UPDATE musicPlaylists SET name = :newName WHERE musicid = :playlistMusicId")
+    @Query("UPDATE musicPlaylists SET name = :newName WHERE id = :playlistMusicId")
     suspend fun updatePlaylistName(playlistMusicId: Long, newName: String)
 
-    @Query("DELETE FROM musicPlaylists  WHERE musicid = :playlistMusicId")
+    @Query("DELETE FROM musicPlaylists  WHERE id = :playlistMusicId")
     suspend fun deletePlaylist(playlistMusicId: Long) // Add this method to delete a playlist by ID
 
 
@@ -145,7 +145,7 @@ interface PlaylistMusicDao {
         """
         SELECT v.artUri 
         FROM music v
-        JOIN PlaylistMusicCrossRef pv ON v.musicid = pv.musicId
+        JOIN PlaylistMusicCrossRef pv ON v.id = pv.musicId
         WHERE pv.playlistMusicId = :playlistMusicId
     """
     )
@@ -169,7 +169,7 @@ interface PlaylistMusicDao {
     @Query(
         """
     SELECT * FROM music
-    WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+    WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
     ORDER BY title COLLATE NOCASE ASC
 """
     )
@@ -179,7 +179,7 @@ interface PlaylistMusicDao {
     @Query(
         """
     SELECT * FROM music
-    WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+    WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
     ORDER BY title COLLATE NOCASE DESC
 """
     )
@@ -189,7 +189,7 @@ interface PlaylistMusicDao {
     @Query(
         """
         SELECT * FROM music
-        WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+        WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
         ORDER BY duration DESC
     """
     )
@@ -200,7 +200,7 @@ interface PlaylistMusicDao {
     @Query(
         """
     SELECT * FROM music
-    WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+    WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
     ORDER BY duration ASC
 """
     )
@@ -211,7 +211,7 @@ interface PlaylistMusicDao {
     @Query(
         """
         SELECT * FROM music
-        WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+        WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
         ORDER BY dateAdded DESC
     """
     )
@@ -222,7 +222,7 @@ interface PlaylistMusicDao {
     @Query(
         """
         SELECT * FROM music
-        WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+        WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
         ORDER BY dateAdded ASC
     """
     )
@@ -232,7 +232,7 @@ interface PlaylistMusicDao {
     @Query(
         """
         SELECT * FROM music
-        WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+        WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
         ORDER BY size DESC
     """
     )
@@ -242,24 +242,28 @@ interface PlaylistMusicDao {
     @Query(
         """
         SELECT * FROM music
-        WHERE musicid IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
+        WHERE id IN (SELECT musicId FROM PlaylistMusicCrossRef WHERE playlistMusicId = :playlistMusicId)
         ORDER BY size ASC
     """
     )
     suspend fun getMusicSortedBySizeAsc(playlistMusicId: Long): List<MusicEntity>
 
-    @Query("UPDATE musicPlaylists SET sortOrder = :sortOrder WHERE musicid = :playlistMusicId")
+    @Query("UPDATE musicPlaylists SET sortOrder = :sortOrder WHERE id = :playlistMusicId")
     suspend fun updateSortOrder(playlistMusicId: Long, sortOrder: PlaylistVideoActivity.SortType)
 
     // Get the sort order for a specific playlist
-    @Query("SELECT sortOrder FROM musicPlaylists WHERE musicid = :playlistMusicId")
+    @Query("SELECT sortOrder FROM musicPlaylists WHERE id = :playlistMusicId")
     suspend fun getSortOrder(playlistMusicId: Long): PlaylistVideoActivity.SortType
 
     @Query("SELECT * FROM music WHERE path = :path LIMIT 1")
     suspend fun getMusicByPath(path: String): MusicEntity?
 
-    @Query("DELETE FROM music WHERE musicid = :musicId")
+    @Query("DELETE FROM music WHERE id = :musicId")
     suspend fun deleteMusic(musicId: String)
     @Query("SELECT * FROM music")
     suspend fun getAllMusic(): List<MusicEntity>
+
+    @Query("SELECT * FROM music WHERE id = :musicId LIMIT 1")
+    suspend fun getMusicById(musicId: String): MusicEntity?
+
 }
