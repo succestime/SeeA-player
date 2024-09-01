@@ -239,6 +239,8 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
             }
         }
     }
+
+
     @SuppressLint("NotifyDataSetChanged")
     private fun loadVideosFromDatabase() {
         binding.progressBar.visibility = View.VISIBLE // Show ProgressBar

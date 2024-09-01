@@ -4,17 +4,21 @@ package com.jaidev.seeaplayer.allAdapters
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ComponentName
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.media.MediaMetadataRetriever
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.text.format.Formatter
+import android.util.TypedValue
 import android.view.ActionMode
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -22,23 +26,39 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.arthenica.mobileffmpeg.Config
+import com.arthenica.mobileffmpeg.FFmpeg
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jaidev.seeaplayer.MP3ConverterActivity
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.dataClass.MP3AppDatabase
+import com.jaidev.seeaplayer.dataClass.MP3FileData
+import com.jaidev.seeaplayer.dataClass.MP3FileEntity
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.databinding.RecantDownloadViewBinding
-import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.recantFragment.DaysDownload
 import com.jaidev.seeaplayer.recantFragment.ReVideoPlayerActivity
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.UUID
 
 class RecentVideoAdapter(private val context: Context,
                          private var videoReList: ArrayList<RecantVideo> ,
@@ -174,92 +194,404 @@ class RecentVideoAdapter(private val context: Context,
             }
         }
         holder.more.setOnClickListener {
-            newPosition = position
-
-            val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.recant_video_more_features, holder.root, false)
-            val bindingMf = RecantVideoMoreFeaturesBinding.bind(customDialog)
-            val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
-                .create()
-            dialog.show()
-
-            // Get the window attributes of the dialog
-            val window = dialog.window
-            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
-            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
-
-            bindingMf.deleteBtn.setOnClickListener {
-                dialog.dismiss()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-                    showPermissionRequestDialog()
-                } else {
-                    showDeleteDialog(position)
-                }
-
-            }
-
-            bindingMf.shareBtn.setOnClickListener {
-                val shareIntent = Intent()
-                shareIntent.action = Intent.ACTION_SEND_MULTIPLE
-                shareIntent.type = "video/*"
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoReList[position].path))
-                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                // Get the list of apps that can handle the intent
-                val packageManager = context.packageManager
-                val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
-                val excludedComponents = mutableListOf<ComponentName>()
-
-
-                // Iterate through the list and exclude your app
-                for (resolvedActivity in resolvedActivityList) {
-                    if (resolvedActivity.activityInfo.packageName == context.packageName) {
-                        excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
-                    }
-                }
-
-                // Create a chooser intent
-                val chooserIntent = Intent.createChooser(shareIntent, "Sharing Video")
-
-                // Exclude your app from the chooser intent
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-                }
-
-                chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                ContextCompat.startActivity(context, chooserIntent, null)
-                dialog.dismiss()
-            }
-
-            bindingMf.infoBtn.setOnClickListener {
-
-                dialog.dismiss()
-                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
-                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
-                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
-                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
-                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
-                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
-
-                // Populate dialog views with data
-                fileNameTextView.text = videoReList[position].title
-                durationTextView.text = DateUtils.formatElapsedTime(videoReList[position].duration / 1000)
-                sizeTextView.text = Formatter.formatShortFileSize(context, videoReList[position].size.toLong())
-                locationTextView.text = videoReList[position].path
-
-                val dialogIF = MaterialAlertDialogBuilder(context)
-                    .setView(customDialogIF)
-                    .setCancelable(false)
-                    .create()
-                positiveButton.setOnClickListener {
-                    dialogIF.dismiss()
-                }
-                dialogIF.show()
-            }
+            showBottomSheetDialog(video, position)
 
         }
 
     }
 
+
+    @OptIn(DelicateCoroutinesApi::class)
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n", "ObsoleteSdkInt")
+    private fun showBottomSheetDialog(video: RecantVideo, position: Int) {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context).inflate(R.layout.re_video_more_bottom_sheet, null)
+        bottomSheetDialog.setContentView(view)
+        view.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
+
+        val textTitle = view.findViewById<TextView>(R.id.textTitle)
+        val deleteButton = view.findViewById<LinearLayout>(R.id.deleteButton)
+        val playButton = view.findViewById<LinearLayout>(R.id.playButton)
+        val shareButton = view.findViewById<LinearLayout>(R.id.shareButton)
+        val propertiesButton = view.findViewById<LinearLayout>(R.id.propertiesButton)
+        val convertToMP3Button = view.findViewById<LinearLayout>(R.id.convertToMP3Button)
+
+
+        textTitle.text = video.title
+
+//            // Handle the create playlist button click
+//            createPlaylistButton.setOnClickListener {
+//                // Inflate the new bottom sheet layout for creating a playlist
+//                val createPlaylistView = LayoutInflater.from(context).inflate(
+//                    R.layout.video_playlist_bottom_dialog, null
+//                )
+//
+//                val createPlaylistDialog = BottomSheetDialog(context)
+//                createPlaylistDialog.setContentView(createPlaylistView)
+//
+//                // Find the views in the create playlist bottom sheet layout
+//                val renameField = createPlaylistView.findViewById<TextInputEditText>(R.id.renameField)
+//                val createButton = createPlaylistView.findViewById<Button>(R.id.button_create_playlist)
+//
+//                renameField.addTextChangedListener(object : TextWatcher {
+//                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//
+//                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+//
+//                    override fun afterTextChanged(s: Editable?) {
+//                        createButton.setBackgroundColor(
+//                            if (s.isNullOrEmpty()) {
+//                                ContextCompat.getColor(context, R.color.button_background_default)
+//                            } else {
+//                                ContextCompat.getColor(context, R.color.cool_blue)
+//                            }
+//                        )
+//                    }
+//                })
+//
+//                createButton.setOnClickListener {
+//                    val playlistName = renameField.text.toString().trim()
+//                    if (playlistName.isNotEmpty()) {
+//                        GlobalScope.launch(Dispatchers.IO) {
+//                            val dao = DatabaseClient.getInstance(context).playlistDao()
+//
+//                            // Create a new playlist entity
+//                            val newPlaylist = PlaylistEntity(
+//                                name = playlistName
+//                            )
+//
+//                            // Insert the new playlist into the database and get its ID
+//                            val playlistId = dao.insertPlaylist(newPlaylist)
+//
+//                            // Add the selected song to the newly created playlist
+//                            val crossRef = PlaylistVideoCrossRef(
+//                                playlistId = playlistId,
+//                                videoId = video.id // Assuming playlist is of type Music
+//                            )
+//                            dao.insertPlaylistVideoCrossRef(crossRef)
+//
+//                            withContext(Dispatchers.Main) {
+//                                // Dismiss the dialogs
+//                                createPlaylistDialog.dismiss()
+//                                bottomSheetPLDialog.dismiss()
+//                                val numberOfSongs = 1 // Change this if you are adding multiple songs
+//                                Toast.makeText(context, "$numberOfSongs song(s) added to the playlist '$playlistName'", Toast.LENGTH_SHORT).show()
+//                            }
+//                        }
+//                    } else {
+//                        // Handle empty name case (e.g., show an error message)
+//                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//
+//                // Show the create playlist bottom sheet
+//                createPlaylistDialog.show()
+//                bottomSheetPLDialog.dismiss()
+//            }
+//
+//            bottomSheetPLDialog.show()
+//            bottomSheetDialog.dismiss()
+//        }
+
+
+//         Handle Convert to MP3 button click
+        convertToMP3Button.setOnClickListener {
+            val bottomSheetMP3Dialog = BottomSheetDialog(context)
+            val mp3View = LayoutInflater.from(context).inflate(R.layout.mp3_converter_layout, null)
+
+            bottomSheetMP3Dialog.setContentView(mp3View)
+            bottomSheetMP3Dialog.setCancelable(false) // This line makes the dialog non-dismissible
+
+            mp3View.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
+
+            // Initialize UI components in the MP3 conversion view
+            val convertingTextView = mp3View.findViewById<TextView>(R.id.convertingTextView)
+            val titleTextView = mp3View.findViewById<TextView>(R.id.titleTextView)
+            val percentageTextView = mp3View.findViewById<TextView>(R.id.percentageTextView)
+            val cancelButton = mp3View.findViewById<TextView>(R.id.cancelButton)
+            val progressBar = mp3View.findViewById<ProgressBar>(R.id.progressBar)
+            val convertingView = mp3View.findViewById<RelativeLayout>(R.id.convertingView)
+            val completeBottomSheet = mp3View.findViewById<ConstraintLayout>(R.id.complete_bottomSheet)
+            val videoPathAndTitle = mp3View.findViewById<TextView>(R.id.videoPathAndTitle)
+            val openButton = mp3View.findViewById<Button>(R.id.openButton)
+            val cancel1Button = mp3View.findViewById<Button>(R.id.cancel1Button)
+
+            bottomSheetDialog.dismiss()
+            bottomSheetMP3Dialog.show()
+
+            openButton.setOnClickListener {
+                val intent = Intent(context, MP3ConverterActivity::class.java)
+                context.startActivity(intent)
+                bottomSheetMP3Dialog.dismiss()
+            }
+
+            cancel1Button.setOnClickListener {
+                bottomSheetMP3Dialog.dismiss()
+            }
+
+            val inputFilePath = video.path
+            val baseName = video.title.substringBeforeLast(".")
+            val customDirectoryName = "SeeA MP3 Audio"
+
+            // Initialize outputFilePath based on Android version
+            val outputFilePath: String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                "${context.getExternalFilesDir(null)}/$baseName.mp3"
+            } else {
+                val customDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), customDirectoryName)
+                if (!customDirectory.exists()) {
+                    customDirectory.mkdirs()
+                }
+                "${customDirectory.path}/$baseName.mp3"
+            }
+
+            convertingView.visibility = View.VISIBLE
+            completeBottomSheet.visibility = View.GONE
+
+            var attempt = 0
+            val maxRetries = 3
+
+            // Define the onConversionSuccess function
+            fun onConversionSuccess() {
+                convertingTextView.text = "Conversion Complete!"
+                progressBar.progress = 100
+                percentageTextView.text = "100%"
+
+                val file = File(outputFilePath)
+                val fileSize = formatFileSize(file.length())
+                val dateAdded = System.currentTimeMillis()
+                val duration = getMP3Duration(outputFilePath)
+
+                // Insert the file into the MediaStore or custom directory
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.Audio.Media.DISPLAY_NAME, "$baseName.mp3")
+                        put(MediaStore.Audio.Media.MIME_TYPE, "audio/mpeg")
+                        put(MediaStore.Audio.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MUSIC}/$customDirectoryName")
+                        put(MediaStore.Audio.Media.IS_PENDING, 1)
+                    }
+
+                    val resolver = context.contentResolver
+                    val uri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+                    uri?.let {
+                        resolver.openOutputStream(it)?.use { outputStream ->
+                            file.inputStream().copyTo(outputStream)
+                        }
+
+                        contentValues.clear()
+                        contentValues.put(MediaStore.Audio.Media.IS_PENDING, 0)
+                        resolver.update(uri, contentValues, null, null)
+                    }
+                } else {
+                    val customDirectory = File(
+                        Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_MUSIC), customDirectoryName)
+                    if (!customDirectory.exists()) {
+                        customDirectory.mkdirs()
+                    }
+                    file.renameTo(File("${customDirectory.path}$baseName.mp3"))
+                }
+
+                convertingView.visibility = View.GONE
+                completeBottomSheet.visibility = View.VISIBLE
+                videoPathAndTitle.text = "Saved to : SeeA MP3 Converter /$customDirectoryName/\n$baseName.mp3"
+
+                val mp3FileData = MP3FileData(
+                    id = UUID.randomUUID().toString(),
+                    title = "$baseName.mp3",
+                    duration = duration,
+                    size = fileSize,
+                    dateAdded = dateAdded,
+                    path = outputFilePath,
+                    artUri = video.artUri.toString()
+
+                )
+
+                GlobalScope.launch(Dispatchers.IO) {
+                    val db = MP3AppDatabase.getDatabase(context)
+                    db.mp3FileDao().insert(
+                        MP3FileEntity(
+                            id = mp3FileData.id,
+                            title = mp3FileData.title,
+                            duration = mp3FileData.duration,
+                            size = mp3FileData.size,
+                            dateAdded = mp3FileData.dateAdded,
+                            path = mp3FileData.path,
+                            artUri = mp3FileData.artUri // Pass the artUri from the video
+
+                        )
+                    )
+                }
+
+                if (context is MP3ConverterActivity) {
+                    context.addMP3File(mp3FileData )
+                }
+            }
+
+            // Define the onConversionFailed function
+            fun onConversionFailed() {
+                convertingTextView.text = "Conversion Failed!"
+                Toast.makeText(context, "This video file is already converted or some problem is coming", Toast.LENGTH_LONG).show()
+
+            }
+
+            // Function to handle the conversion process
+            fun convertVideoToMP3() {
+                GlobalScope.launch(Dispatchers.IO) {
+                    attempt++
+                    val ffmpegCommand = arrayOf("-i", inputFilePath, "-q:a", "0", "-map", "a", outputFilePath)
+                    val rc = FFmpeg.execute(ffmpegCommand)
+
+                    val typedValue = TypedValue()
+                    val theme = context.theme
+                    theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+                    val defaultTextColor = ContextCompat.getColor(context, typedValue.resourceId)
+
+                    withContext(Dispatchers.Main) {
+                        if (rc == Config.RETURN_CODE_SUCCESS) {
+                            onConversionSuccess()
+                        } else {
+                            if (attempt < maxRetries) {
+                                convertVideoToMP3()  // Retry
+                                convertingTextView.setTextColor(defaultTextColor)
+                                titleTextView.setTextColor(defaultTextColor)
+                            } else {
+                                onConversionFailed()
+                                // Set text colors to red on failure
+                                convertingTextView.setTextColor(Color.RED)
+                                titleTextView.setTextColor(Color.RED)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Start the conversion process
+            convertVideoToMP3()
+
+            // Enable statistics callback to update progress
+            Config.enableStatisticsCallback { stats ->
+                GlobalScope.launch(Dispatchers.Main) {
+                    val progress = (stats.time.toFloat() / video.duration) * 100
+                    progressBar.progress = progress.toInt()
+                    percentageTextView.text = "${progress.toInt()}%"
+
+                    // Ensure the final update if conversion reaches 100%
+                    if (progress >= 100) {
+                        progressBar.progress = 100
+                        percentageTextView.text = "100%"
+                    }
+                }
+            }
+
+
+
+            cancelButton.setOnClickListener {
+                FFmpeg.cancel()
+                bottomSheetMP3Dialog.dismiss()
+            }
+        }
+
+
+
+        deleteButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                showPermissionRequestDialog()
+            } else {
+                showDeleteDialog(position)
+            }
+        }
+
+        shareButton.setOnClickListener{
+            bottomSheetDialog.dismiss()
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND_MULTIPLE
+            shareIntent.type = "video/*"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(video.path))
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            // Get the list of apps that can handle the intent
+            val packageManager = context.packageManager
+            val resolvedActivityList = packageManager.queryIntentActivities(shareIntent, 0)
+            val excludedComponents = mutableListOf<ComponentName>()
+
+
+            // Iterate through the list and exclude your app
+            for (resolvedActivity in resolvedActivityList) {
+                if (resolvedActivity.activityInfo.packageName == context.packageName) {
+                    excludedComponents.add(ComponentName(resolvedActivity.activityInfo.packageName, resolvedActivity.activityInfo.name))
+                }
+            }
+
+            // Create a chooser intent
+            val chooserIntent = Intent.createChooser(shareIntent, "Sharing Video")
+
+            // Exclude your app from the chooser intent
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+            }
+
+            chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            ContextCompat.startActivity(context, chooserIntent, null)
+
+        }
+
+        propertiesButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+            val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+            val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+            val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+            val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+            val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+            // Populate dialog views with data
+            fileNameTextView.text = videoReList[position].title
+            durationTextView.text = DateUtils.formatElapsedTime(videoReList[position].duration / 1000)
+            sizeTextView.text = Formatter.formatShortFileSize(context, videoReList[position].size.toLong())
+            locationTextView.text = videoReList[position].path
+
+            val dialogIF = MaterialAlertDialogBuilder(context)
+                .setView(customDialogIF)
+                .setCancelable(false)
+                .create()
+            positiveButton.setOnClickListener {
+                dialogIF.dismiss()
+            }
+            dialogIF.show()
+        }
+
+        playButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            sendIntent(pos = position, ref = "VideoMoreAdapter")
+        }
+
+        bottomSheetDialog.show()
+    }
+    private fun formatFileSize(sizeInBytes: Long): String {
+        val kb = sizeInBytes / 1024
+        val mb = kb / 1024
+        return when {
+            mb > 0 -> "${mb} MB"
+            kb > 0 -> "${kb} KB"
+            else -> "${sizeInBytes} B"
+        }
+    }
+
+    // Function to get MP3 duration
+    private fun getMP3Duration(filePath: String): Long {
+        val mediaMetadataRetriever = MediaMetadataRetriever()
+        return try {
+            mediaMetadataRetriever.setDataSource(filePath)
+            val durationStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            durationStr?.toLongOrNull() ?: 0L
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0L
+        } finally {
+            mediaMetadataRetriever.release()
+        }
+    }
     override fun getItemCount(): Int {
         return videoReList.size
     }
@@ -427,7 +759,7 @@ class RecentVideoAdapter(private val context: Context,
         videoNameDelete.text = videoReList[position].title
 
         alertDialogBuilder.setView(view)
-
+            .setCancelable(false)
         val alertDialog = alertDialogBuilder.create()
 
         deleteText.setOnClickListener {
@@ -551,3 +883,4 @@ class RecentVideoAdapter(private val context: Context,
     }
 
 }
+

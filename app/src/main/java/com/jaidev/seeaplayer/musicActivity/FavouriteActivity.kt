@@ -40,13 +40,15 @@ import com.jaidev.seeaplayer.dataClass.PlaylistMusic
 import com.jaidev.seeaplayer.dataClass.PlaylistMusicCrossRef
 import com.jaidev.seeaplayer.dataClass.PlaylistMusicEntity
 import com.jaidev.seeaplayer.dataClass.ThemeHelper
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.ActivityFavouriteBinding
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.songPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-
 class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeChangeListener
 {
 
@@ -58,6 +60,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
     companion object {
         var favouritesChanged: Boolean = false
         var favouriteSongs: ArrayList<Music> = ArrayList()
+
     }
     private val favouritesUpdatedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -71,10 +74,13 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
         binding = ActivityFavouriteBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-
         musicDatabase = MusicFavDatabase.getDatabase(this)
+
+
+        setSwipeRefreshBackgroundColor()
+
         binding.favouriteRV.setHasFixedSize(true)
-        binding.favouriteRV.setItemViewCacheSize(50)
+        binding.favouriteRV.setItemViewCacheSize(5)
         binding.favouriteRV.layoutManager =  LinearLayoutManager(this)
         adapter = FavouriteAdapter(this, favouriteSongs , this)
         binding.favouriteRV.adapter = adapter
@@ -93,10 +99,16 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
             val bottomSheetFragment = AddMusicFavBottomSheetFragment.newInstance(favouriteSongs)
             bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
         }
-        checkAndRemoveDeletedSongs()
-        setSwipeRefreshBackgroundColor()
-        loadFavouriteSongs()
+
+        // Delay loading the favourite songs to ensure the activity opens immediately
+        lifecycleScope.launch {
+            delay(200) // Add a slight delay (200 ms) to allow the UI to render
+            loadFavouriteSongs() // Now load the favourite songs
+        }
+
     }
+
+
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun showBottomSheetDialog() {
         val bottomSheetDialog = BottomSheetDialog(this)
@@ -124,7 +136,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
             val firstSong = favouriteSongs[0]
 
             Glide.with(this)
-                .load(firstSong.artUri)
+                .load(getImgArt(favouriteSongs[songPosition].path))
                 .apply(
                     RequestOptions()
                         .placeholder(R.color.gray) // Use the newly created drawable
@@ -206,7 +218,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
         bottomSheetDialog.show()
     }
 
-//    @SuppressLint("ObsoleteSdkInt")
+    //    @SuppressLint("ObsoleteSdkInt")
 //    private fun requestPinShortcutPermission() {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //            val shortcutManager = getSystemService(ShortcutManager::class.java)
@@ -257,28 +269,34 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
 //            Toast.makeText(this, "Your Android version does not support pinned shortcuts.", Toast.LENGTH_SHORT).show()
 //        }
 //    }
-
-
-
-
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
-        if (favouritesChanged) {
-            loadFavouriteSongs()
-            adapter.updateFavourites(favouriteSongs)
-            adapter.notifyDataSetChanged()
-            favouritesChanged = false
+        // Delay loading the favourite songs to ensure the activity opens immediately
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                delay(200) // Add a slight delay (200 ms) to allow the UI to render
+                if (favouritesChanged) {
+                    loadFavouriteSongs()
+                    adapter.updateFavourites(favouriteSongs)
+                    adapter.notifyDataSetChanged()
+
+                    favouritesChanged = false
+                }
+                if (favouriteSongs.isNotEmpty()) {
+                    binding.progressBar.visibility = View.GONE // Show ProgressBar
+                } else {
+                    binding.progressBar.visibility = View.VISIBLE // Show ProgressBar
+                }
+            }
+            checkAndRemoveDeletedSongs()  // Check for and remove deleted songs
+
         }
-
-        checkAndRemoveDeletedSongs()  // Check for and remove deleted songs
-
     }
 
     override fun onPause() {
         super.onPause()
         checkAndRemoveDeletedSongs()  // Check for and remove deleted songs
-
     }
     private fun shareFavoriteSongs() {
         if (favouriteSongs.isNotEmpty()) {
@@ -341,16 +359,13 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
 
     @SuppressLint("NotifyDataSetChanged")
     private fun loadFavouriteSongs() {
-        // Load the favorite songs from the database
-        lifecycleScope.launch {
+        binding.progressBar.visibility = View.VISIBLE // Show ProgressBar
+        lifecycleScope.launch(Dispatchers.IO) {
             val favoriteEntities = musicDatabase.musicFavDao().getAllMusic()
             favouriteSongs.clear()
             favouriteSongs.addAll(favoriteEntities.map { it.toMusic() })
-            adapter.notifyDataSetChanged()
-            // Conditionally set the menu item listener based on the number of favorite songs
             if (favouriteSongs.isNotEmpty()) {
                 binding.playlistToolbar.menu.findItem(R.id.MorePlaylist).isVisible = true
-
                 // Set up menu item click listener only if there are favorite songs
                 binding.playlistToolbar.setOnMenuItemClickListener { menuItem ->
                     when (menuItem.itemId) {
@@ -364,15 +379,16 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
             } else {
                 // Hide the menu items if there are no favorite songs
                 binding.playlistToolbar.menu.findItem(R.id.MorePlaylist).isVisible = false
-
-
             }
-            shuffleEmpty()  // Update shuffle button and empty state view
-            checkAndRemoveDeletedSongs()  // Check for and remove deleted songs
-
+            // Switch to the main thread to update UI
+            withContext(Dispatchers.Main) {
+                adapter.notifyDataSetChanged()
+                binding.progressBar.visibility = View.GONE // Hide ProgressBar
+                shuffleEmpty()  // Update shuffle button and empty state view
+                checkAndRemoveDeletedSongs()  // Check for and remove deleted songs
+            }
         }
     }
-
 
     private fun shuffleEmpty() {
         if (favouriteSongs.size < 1) {
@@ -727,7 +743,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
     }
     override fun onDestroy() {
         super.onDestroy()
-        // Unregister the receiver
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(favouritesUpdatedReceiver)
     }
     @Deprecated("Deprecated in Java")

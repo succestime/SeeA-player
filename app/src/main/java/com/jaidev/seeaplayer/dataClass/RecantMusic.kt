@@ -1,21 +1,20 @@
 package com.jaidev.seeaplayer.dataClass
 
 import android.net.Uri
-import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.songPosition
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-data class RecantMusic(val title: String,
-                       val artist: String,
-                       val album: String,
-                       val timestamp: Long,
-                       val id: String,
-                       val duration: Long = 0,
-                       val path: String,
-                       val albumArtUri: Uri ,
-
-                       val size: String,
+data class RecantMusic(
+    val title: String,
+    val artist: String,
+    val album: String,
+    val timestamp: Long,
+    val id: String,
+    val duration: Long = 0,
+    val path: String,
+    val albumArtUri: Uri,
+    val size: String,
                        ) {
 
 
@@ -28,21 +27,23 @@ fun reFormatDuration(duration: Long):String{
 
 }
 
-fun reSetSongPosition(increment: Boolean) {
+fun setReSongPosition(increment: Boolean) {
 
     if(!ReMusicPlayerActivity.repeat){
         if (increment) {
-            if (ReMusicPlayerActivity.reMusicListPA.size - 1 == songPosition)
-               songPosition = 0
-            else ++songPosition
+            if (ReMusicPlayerActivity.reMusicListPA.size - 1 == ReMusicPlayerActivity.songPosition)
+                ReMusicPlayerActivity.songPosition = 0
+            else ++ReMusicPlayerActivity.songPosition
         } else {
             if (0 == ReMusicPlayerActivity.songPosition)
-               songPosition = ReMusicPlayerActivity.reMusicListPA.size - 1
-            else --songPosition
+                ReMusicPlayerActivity.songPosition = ReMusicPlayerActivity.reMusicListPA.size - 1
+            else --ReMusicPlayerActivity.songPosition
         }
 
     }
 }
+
+
 fun exitReApplication() {
     if (ReMusicPlayerActivity.musicService != null) {
         //  PlayerMusicActivity.musicService!!.audioManager.abandonAudioFocus(PlayerMusicActivity.musicService)

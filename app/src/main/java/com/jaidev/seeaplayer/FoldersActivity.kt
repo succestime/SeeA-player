@@ -182,7 +182,6 @@ class FoldersActivity : AppCompatActivity(), VideoAdapter.VideoDeleteListener , 
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
         }
-
         if (isDarkMode) {
             window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_cool_blue)
         } else {

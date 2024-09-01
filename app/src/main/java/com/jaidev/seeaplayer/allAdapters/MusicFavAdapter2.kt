@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Music
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.PlaylistAddMusicViewBinding
 
 class MusicFavAdapter2(
@@ -56,7 +57,7 @@ class MusicFavAdapter2(
         holder.title.text = video.title
         holder.duration.text = DateUtils.formatElapsedTime(video.duration / 1000)
         Glide.with(context)
-            .load(video.artUri)
+            .load(getImgArt(video.path))
             .apply(
                 RequestOptions()
                     .placeholder(R.color.gray) // Use the newly created drawable
@@ -75,14 +76,12 @@ class MusicFavAdapter2(
 
         holder.root.setOnClickListener {
             if (!holder.root.isEnabled) return@setOnClickListener
-
             if (selectedItems.contains(position)) {
                 selectedItems.remove(position)
             } else {
                 selectedItems.add(position)
             }
             notifyItemChanged(position)
-            notifyDataSetChanged()
             selectionChangeListener?.onSelectionChanged(selectedItems.size)
         }
     }

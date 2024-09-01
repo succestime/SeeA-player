@@ -30,7 +30,7 @@ import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reFormatDuration
-import com.jaidev.seeaplayer.dataClass.reSetSongPosition
+import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.databinding.ActivityReMusicPlayerBinding
 import com.jaidev.seeaplayer.musicActivity.ReMoreMusicBottomSheet
 import com.jaidev.seeaplayer.musicActivity.SpeedMusicBottomSheet
@@ -76,11 +76,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
             if (!fileExists(reMusicListPA[songPosition].path)) {
                 // Check if there are other songs to play
                 if (reMusicListPA.size > 1) {
-                    reSetSongPosition(increment = true)
+                    setSongPosition(increment = true)
                     setLayout(context)
                     createMediaPlayer(context)
                 }else{
-                    ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                    musicService!!.mediaPlayer!!.stop()
                     ReNowPlaying.binding.root.visibility = View.GONE
 
                 }
@@ -110,11 +110,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
                 if (!fileExists(reMusicListPA[songPosition].path)) {
                     // Check if there are other songs to play
                     if (reMusicListPA.size > 1) {
-                        reSetSongPosition(increment = true)
+                        setSongPosition(increment = true)
                         setLayout(context)
                         createMediaPlayer(context)
                     }else{
-                        ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                        musicService!!.mediaPlayer!!.stop()
                         ReNowPlaying.binding.root.visibility = View.GONE
 
                     }
@@ -279,11 +279,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
         if (!fileExists(reMusicListPA[songPosition].path)) {
             // Check if there are other songs to play
             if (reMusicListPA.size > 1) {
-                reSetSongPosition(increment = true)
+                setSongPosition(increment = true)
                 setLayout()
                 createMediaPlayer()
             }else{
-                ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                musicService!!.mediaPlayer!!.stop()
                 ReNowPlaying.binding.root.visibility = View.GONE
 
             }
@@ -316,11 +316,11 @@ class ReMusicPlayerActivity : AppCompatActivity()
             if (!fileExists(reMusicListPA[songPosition].path)) {
                 // Check if there are other songs to play
                 if (reMusicListPA.size > 1) {
-                    reSetSongPosition(increment = true)
+                    setSongPosition(increment = true)
                     setLayout()
                     createMediaPlayer()
                 }else{
-                    ReMusicPlayerActivity.musicService!!.mediaPlayer!!.stop()
+                    musicService!!.mediaPlayer!!.stop()
                     ReNowPlaying.binding.root.visibility = View.GONE
 
                 }
@@ -352,6 +352,15 @@ class ReMusicPlayerActivity : AppCompatActivity()
         songPosition =  intent.getIntExtra("index" , 0)
         when(intent.getStringExtra("class")){
             "RecantMusicAdapter" -> {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent, this, BIND_AUTO_CREATE)
+                startService(intent)
+                reMusicListPA = ArrayList()
+                reMusicListPA.addAll(MainActivity.musicRecantList)
+                originalMusicListPA = ArrayList(reMusicListPA) // Save original list
+                setLayout()
+            }
+            "MusicBottomPlayAdapter" -> {
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
@@ -428,7 +437,7 @@ class ReMusicPlayerActivity : AppCompatActivity()
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         if (service is MusicService.MyBinder) {
             val binder = service as MusicService.MyBinder
-            ReMusicPlayerActivity.musicService = binder.currentService()
+            musicService = binder.currentService()
 //            isServiceBound = true
         }
         createMediaPlayer()

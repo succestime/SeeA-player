@@ -1,30 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshMusic"
-    tools:context=".recantFragment.DaysMusic">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".musicNav">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:ignore="ExtraText">
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
+        <ViewStub
+            android:id="@+id/emptyStateLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            tools:ignore="MissingConstraints">
+            android:layout_height="match_parent"
+            android:layout="@layout/music_nav_empty_state_layout"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone" />
 
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
-
+                android:orientation="vertical"
+                tools:ignore="MissingConstraints">
 
                 <TextView
                     android:id="@+id/daysTotalMusics"
@@ -35,69 +50,43 @@
                     android:text="Total Musics"
                     android:textSize="15sp"
                     android:textStyle="bold" />
-
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/MusicRV"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="10dp"
-                    android:paddingBottom="60dp"
-                    android:scrollbars="vertical"
-                    />
             </LinearLayout>
+        </LinearLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/MusicRV"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scrollbars="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+            app:layout_constraintBottom_toTopOf="@+id/nowPlaying" />
 
-</LinearLayout>
-        <ViewStub
-            android:id="@+id/emptyStateLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout="@layout/recant_empty_state_layout"
-            android:layout_gravity="center"
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/shuffleBtn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="40sp"
+            android:backgroundTint="@color/white"
+            app:icon="@drawable/shuffle_icon"
+            app:iconSize="35dp"
+
+            app:iconTint="?attr/themeColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone"/>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/shuffleBtn"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="64dp"
-                android:backgroundTint="@color/white"
-                app:icon="@drawable/shuffle_icon"
-                app:iconSize="35dp"
-
-                app:iconTint="?attr/themeColor"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.838"
-                app:strokeColor="?attr/themeColor"
-                app:strokeWidth="2dp"
-                tools:ignore="MissingConstraints" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintVertical_bias="0.852"
+            app:strokeColor="?attr/themeColor"
+            app:strokeWidth="2dp"
+            tools:ignore="MissingConstraints" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nowPlaying"
+            android:name="com.jaidev.seeaplayer.recantFragment.ReNowPlaying"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:name="com.jaidev.seeaplayer.recantFragment.ReNowPlaying"
             tools:layout="@layout/fragment_now_playing" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-

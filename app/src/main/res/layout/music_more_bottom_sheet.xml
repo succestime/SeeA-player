@@ -24,7 +24,7 @@
             android:layout_width="70sp"
             android:layout_height="70sp"
             android:scaleType="centerCrop"
-            android:background="@color/black"
+            android:background="#B8B8B8"
             app:shapeAppearanceOverlay="@style/curved_image_video" />
 
         <!-- Text section -->

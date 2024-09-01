@@ -30,6 +30,7 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
 import com.jaidev.seeaplayer.dataClass.MusicFavEntity
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlaylistDetails
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -160,7 +161,7 @@ class PlaylistMusicShowAdapter(
         holder.titleTextView.text = video.title
         holder.albumName.text = video.album
         Glide.with(context)
-            .load(video.artUri)
+            .load(getImgArt(video.path))
             .apply(
                 RequestOptions()
                     .placeholder(R.color.gray) // Use the newly created drawable
@@ -249,7 +250,7 @@ class PlaylistMusicShowAdapter(
         duration.text = DateUtils.formatElapsedTime(video.duration / 1000)
         videoTitle.text = video.title
         Glide.with(context)
-            .load(video.artUri)
+            .load(getImgArt(video.path))
             .apply(
                 RequestOptions()
                     .placeholder(R.color.gray) // Use the newly created drawable

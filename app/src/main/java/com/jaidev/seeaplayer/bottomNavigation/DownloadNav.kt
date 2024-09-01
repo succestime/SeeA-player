@@ -18,7 +18,6 @@ import com.jaidev.seeaplayer.allAdapters.ReDownloadAdapter
 import com.jaidev.seeaplayer.databinding.FragmentDownloadNavBinding
 
 
-
 class downloadNav : Fragment() {
     private lateinit var adapter: ReDownloadAdapter
     private lateinit var binding: FragmentDownloadNavBinding
@@ -49,12 +48,14 @@ class downloadNav : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        binding.viewPagerDownload.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+        binding.viewPagerDownload.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 binding.myTabLayout.selectTab(binding.myTabLayout.getTabAt(position))
+
             }
         })
+
         return view
     }
     private fun setupActionBar() {

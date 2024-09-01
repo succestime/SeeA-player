@@ -375,6 +375,15 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 if(isPlaying) binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
                 else binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
             }
+            "FavNowPlaying" ->{
+                setLayout()
+                binding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+                binding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+                binding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
+                binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
+                if(isPlaying) binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
+                else binding.playPauseBtnPA.setIconResource(R.drawable.round_play)
+            }
             "MusicAdapter" -> {
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)

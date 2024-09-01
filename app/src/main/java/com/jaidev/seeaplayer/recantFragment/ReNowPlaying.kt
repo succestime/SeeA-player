@@ -16,7 +16,7 @@ import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.dataClass.getImgArt
-import com.jaidev.seeaplayer.dataClass.reSetSongPosition
+import com.jaidev.seeaplayer.dataClass.setReSongPosition
 import com.jaidev.seeaplayer.databinding.FragmentReNowPlayingBinding
 
 class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , RecantMusicAdapter.OnFileCountChangeListener {
@@ -32,6 +32,18 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
         binding.root.visibility = View.GONE
         adapter = RecantMusicAdapter(requireContext(), MainActivity.musicRecantList , isReMusic = true ,this@ReNowPlaying  , isMusic = false)
         initializeBinding()
+        binding.nextBtnNP.setOnClickListener {
+            setReSongPosition(increment = true)
+            ReMusicPlayerActivity.createMediaPlayer(requireContext())
+            ReMusicPlayerActivity.setLayout(requireContext())
+            Glide.with(this)
+                .asBitmap()
+                .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
+                .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
+                .into(binding.songImgNP)
+            binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
+            playMusic()
+        }
         return view
     }
 
@@ -43,18 +55,7 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
                 playMusic()
             }
         }
-        binding.nextBtnNP.setOnClickListener {
-            reSetSongPosition(increment = true)
-            context?.let { it1 -> ReMusicPlayerActivity.createMediaPlayer(it1) }
 
-            Glide.with(this)
-                .asBitmap()
-                .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))
-                .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
-                .into(binding.songImgNP)
-            binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
-            playMusic()
-        }
 
         binding.root.setOnClickListener {
             try {
@@ -98,8 +99,8 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
                     .into(binding.songImgNP)
                 binding.songNameNP.text =
                     ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
-                if (ReMusicPlayerActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
-                else binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+                if (ReMusicPlayerActivity.isPlaying) binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_circle_outline_24)
+                else binding.playPauseBtnNP.setIconResource(R.drawable.round_play_circle_outline_24)
 
             }
         }catch (_: Exception) {
@@ -110,14 +111,14 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
     private fun playMusic(){
         ReMusicPlayerActivity.isPlaying = true
         ReMusicPlayerActivity.musicService!!.mediaPlayer!!.start()
-        binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+        binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_circle_outline_24)
 
 //        ReMusicPlayerActivity.musicService!!.showNotification(R.drawable.ic_pause_icon)
     }
     private fun pauseMusic(){
         ReMusicPlayerActivity.isPlaying = false
         ReMusicPlayerActivity.musicService!!.mediaPlayer!!.pause()
-        binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+        binding.playPauseBtnNP.setIconResource(R.drawable.round_play_circle_outline_24)
 
 //        ReMusicPlayerActivity.musicService!!.showNotification(R.drawable.play_music_icon)
     }
@@ -126,12 +127,12 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
 
         if (ReMusicPlayerActivity.isPlaying) {
 
-            binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_24)
+            binding.playPauseBtnNP.setIconResource(R.drawable.round_pause_circle_outline_24)
 
         } else {
-            binding.playPauseBtnNP.setIconResource(R.drawable.round_play)
+            binding.playPauseBtnNP.setIconResource(R.drawable.round_play_circle_outline_24)
         }
-        ReNowPlaying.binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
+        binding.songNameNP.text = ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].title
         Glide.with(requireContext())
             .asBitmap()
             .load(getImgArt(ReMusicPlayerActivity.reMusicListPA[ReMusicPlayerActivity.songPosition].path))

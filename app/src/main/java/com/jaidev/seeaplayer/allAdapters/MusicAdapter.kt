@@ -49,8 +49,6 @@ import com.jaidev.seeaplayer.R.*
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
 import com.jaidev.seeaplayer.dataClass.MusicFavEntity
-import com.jaidev.seeaplayer.dataClass.PlaylistMusic
-import com.jaidev.seeaplayer.dataClass.PlaylistMusicEntity
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
@@ -138,13 +136,13 @@ class MusicAdapter(
         "SuspiciousIndentation", "ObsoleteSdkInt"
     )
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
-
-        holder.title.text = musicList[position].title
-        holder.album.text = musicList[position].album
+        val video = musicList[position]
+        holder.title.text = video.title
+        holder.album.text = video.album
 
 
             Glide.with(context)
-                .load(getImgArt(musicList[position].path))
+                .load(getImgArt(video.path))
                 .apply(
                     RequestOptions()
                         .placeholder(color.gray) // Use the newly created drawable
@@ -238,7 +236,7 @@ class MusicAdapter(
     @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n", "ObsoleteSdkInt", "InflateParams")
     private fun showBottomSheetDialog(video: Music , position: Int) {
         val bottomSheetDialog = BottomSheetDialog(context)
-        val view = LayoutInflater.from(context).inflate(R.layout.music_more_bottom_sheet, null)
+        val view = LayoutInflater.from(context).inflate(layout.music_more_bottom_sheet, null)
         bottomSheetDialog.setContentView(view)
         view.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
 
@@ -260,7 +258,7 @@ class MusicAdapter(
         textSubtitle.text = video.album
         textTitle.text = video.title
         Glide.with(context)
-            .load(video.artUri)
+            .load(getImgArt(video.path))
             .apply(
                 RequestOptions()
                     .placeholder(R.color.gray) // Use the newly created drawable
@@ -528,13 +526,13 @@ class MusicAdapter(
 
         bottomSheetDialog.show()
     }
-    private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
-        return PlaylistMusic(
-            id = entity.id,
-            name = entity.name,
-            music = listOf() // Initialize with an empty list or fetch actual music if needed
-        )
-    }
+//    private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
+//        return PlaylistMusic(
+//            id = entity.id,
+//            name = entity.name,
+//            music = listOf() // Initialize with an empty list or fetch actual music if needed
+//        )
+//    }
 
     private fun setRingtone(filePath: String) {
         val file = File(filePath)
@@ -637,7 +635,9 @@ class MusicAdapter(
         Glide.with(context)
             .asBitmap()
             .load(getImgArt(musicList[position].path))
-            .apply(RequestOptions().placeholder(mipmap.ic_logo_o).centerCrop())
+            .placeholder(R.color.gray) // Use the newly created drawable
+            .error(R.drawable.music_note_svgrepo_com)
+            .centerCrop()
             .into(iconImageView)
 
         musicNameDelete.text = musicList[position].title

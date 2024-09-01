@@ -30,6 +30,7 @@ import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setSongPosition
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
+import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.songPosition
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
 
 class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
@@ -180,6 +181,26 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
             PlayerMusicActivity.binding.seekBarPA.progress = 0
             PlayerMusicActivity.binding.seekBarPA.max = mediaPlayer!!.duration
             PlayerMusicActivity.nowMusicPlayingId = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].id
+            PlayerMusicActivity.loudnessEnhancer = LoudnessEnhancer(mediaPlayer!!.audioSessionId)
+            PlayerMusicActivity.loudnessEnhancer.enabled = true
+        } catch (e: Exception) {
+            return
+        }
+    }
+    fun createMediaPlayer1() {
+        try {
+            if (mediaPlayer == null) mediaPlayer = MediaPlayer()
+            mediaPlayer?.reset()
+            mediaPlayer?.setDataSource(ReMusicPlayerActivity.reMusicListPA[songPosition].path)
+            mediaPlayer?.prepare()
+
+            ReMusicPlayerActivity.binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
+            showNotification(R.drawable.round_pause_24)
+            ReMusicPlayerActivity.binding.tvSeekBarStart.text = formatDuration(mediaPlayer!!.currentPosition.toLong())
+            ReMusicPlayerActivity.binding.tvSeekBarEnd.text = formatDuration(mediaPlayer!!.duration.toLong())
+            ReMusicPlayerActivity.binding.seekBarPA.progress = 0
+            ReMusicPlayerActivity.binding.seekBarPA.max = mediaPlayer!!.duration
+            ReMusicPlayerActivity.nowMusicPlayingId = ReMusicPlayerActivity.reMusicListPA[PlayerMusicActivity.songPosition].id
             PlayerMusicActivity.loudnessEnhancer = LoudnessEnhancer(mediaPlayer!!.audioSessionId)
             PlayerMusicActivity.loudnessEnhancer.enabled = true
         } catch (e: Exception) {

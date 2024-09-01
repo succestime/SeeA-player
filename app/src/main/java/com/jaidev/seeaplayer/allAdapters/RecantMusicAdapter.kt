@@ -3,17 +3,20 @@ package com.jaidev.seeaplayer.allAdapters
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ComponentName
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.media.MediaScannerConnection
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.ActionMode
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -21,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -30,18 +34,26 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.imageview.ShapeableImageView
 import com.jaidev.seeaplayer.R
+import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
+import com.jaidev.seeaplayer.dataClass.MusicFavEntity
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
-import com.jaidev.seeaplayer.dataClass.reSetSongPosition
+import com.jaidev.seeaplayer.dataClass.setReSongPosition
 import com.jaidev.seeaplayer.databinding.RecantMusicViewBinding
-import com.jaidev.seeaplayer.databinding.RecantVideoMoreFeaturesBinding
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.recantFragment.DaysMusic
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity
 import com.jaidev.seeaplayer.recantFragment.ReMusicPlayerActivity.Companion.binding
 import com.jaidev.seeaplayer.recantFragment.ReNowPlaying
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class RecantMusicAdapter (val  context : Context,
@@ -54,7 +66,6 @@ class RecantMusicAdapter (val  context : Context,
 
                           ): RecyclerView.Adapter<RecantMusicAdapter.MyAdapter>() {
 
-    private var newPosition = 0
     private val selectedItems = HashSet<Int>()
     private var actionMode: ActionMode? = null
     private var isSelectionModeEnabled = false // Flag to track whether selection mode is active
@@ -110,10 +121,10 @@ class RecantMusicAdapter (val  context : Context,
     override fun onBindViewHolder(holder: MyAdapter, @SuppressLint("RecyclerView") position: Int) {
         val video = musicReList[position]
 
-        holder.title.text = musicReList[position].title
-        holder.album.text = musicReList[position].album
+        holder.title.text = video.title
+        holder.album.text = video.album
         Glide.with(context)
-            .load(getImgArt(musicReList[position].path))
+            .load(getImgArt(video.path))
             .apply(RequestOptions()
                 .placeholder(R.color.gray) // Use the newly created drawable
                 .error(R.drawable.music_note_svgrepo_com) // Use the newly created drawable
@@ -168,68 +179,249 @@ class RecantMusicAdapter (val  context : Context,
         }
 
         holder.more.setOnClickListener {
-            newPosition = position
-            val customDialog = LayoutInflater.from(context)
-                .inflate(R.layout.recant_video_more_features, holder.root, false)
-            val bindingMf = RecantVideoMoreFeaturesBinding.bind(customDialog)
-            val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
-                .create()
-            dialog.show()
-            // Get the window attributes of the dialog
-            val window = dialog.window
-            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) // Set dialog width and height
-            window?.setGravity(Gravity.BOTTOM) // Set dialog gravity to bottom
+            showBottomSheetDialog(video, position)
+
+        }
+    }
 
 
-            bindingMf.deleteBtn.setOnClickListener {
-                dialog.dismiss()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-                    showPermissionRequestDialog()
+    @OptIn(DelicateCoroutinesApi::class)
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n", "ObsoleteSdkInt", "InflateParams")
+    private fun showBottomSheetDialog(video: RecantMusic, position: Int) {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context).inflate(R.layout.re_music_more_bottom_sheet, null)
+        bottomSheetDialog.setContentView(view)
+        view.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
+
+        val imageThumbnail = view.findViewById<ShapeableImageView>(R.id.imageThumbnail)
+        val textTitle = view.findViewById<TextView>(R.id.textTitle)
+        val textSubtitle = view.findViewById<TextView>(R.id.textSubtitle)
+        val ringtoneButton = view.findViewById<LinearLayout>(R.id.ringtoneButton)
+        val deleteButton = view.findViewById<LinearLayout>(R.id.deleteButton)
+        val playButton = view.findViewById<LinearLayout>(R.id.playButton)
+        val shareButton = view.findViewById<LinearLayout>(R.id.shareButton)
+        val propertiesButton = view.findViewById<LinearLayout>(R.id.propertiesButton)
+        val addToFavouriteButton = view.findViewById<LinearLayout>(R.id.addToFavouriteButton)
+        val favouriteIcon = view.findViewById<ImageView>(R.id.favouriteIcon)
+        val favouriteTitle = view.findViewById<TextView>(R.id.favouriteTitle)
+
+
+        textSubtitle.text = video.album
+        textTitle.text = video.title
+        Glide.with(context)
+            .load(getImgArt(video.path))
+            .apply(
+                RequestOptions()
+                    .placeholder(R.color.gray) // Use the newly created drawable
+                    .error(R.drawable.music_note_svgrepo_com) // Use the newly created drawable
+                    .centerCrop()
+            )
+            .into(imageThumbnail)
+
+
+        // Fetch the MusicFavDao once
+        val musicDao = MusicFavDatabase.getDatabase(context).musicFavDao()
+
+        // Check if the song is already in favorites and update UI
+        GlobalScope.launch(Dispatchers.Main) {
+            val isFavorite = withContext(Dispatchers.IO) {
+                musicDao.getAllMusic().any { it.id == video.id }
+            }
+
+            if (isFavorite) {
+                favouriteIcon.setImageResource(R.drawable.round_favorite_music)
+                favouriteTitle.text = "Added to Favourites"
+            } else {
+                favouriteIcon.setImageResource(R.drawable.round_favorite_border_music)
+                favouriteTitle.text = "Add to Favourites"
+            }
+
+            addToFavouriteButton.setOnClickListener {
+                GlobalScope.launch(Dispatchers.IO) {
+                    if (isFavorite) {
+                        musicDao.deleteMusic(
+                            MusicFavEntity(
+                                id = video.id,
+                                title = video.title,
+                                album = video.album,
+                                artist = video.artist,
+                                duration = video.duration,
+                                path = video.path,
+                                size = video.size,
+                                artUri = video.albumArtUri.toString(),
+                                dateAdded = video.timestamp
+                            )
+                        )
+                    } else {
+                        musicDao.insertMusic(
+                            MusicFavEntity(
+                                id = video.id,
+                                title = video.title,
+                                album = video.album,
+                                artist = video.artist,
+                                duration = video.duration,
+                                path = video.path,
+                                size = video.size,
+                                artUri = video.albumArtUri.toString(),
+                                dateAdded = video.timestamp
+                            )
+                        )
+                    }
+                }
+                bottomSheetDialog.dismiss()
+            }
+        }
+
+
+        ringtoneButton.setOnClickListener {
+            val builderTone = AlertDialog.Builder(context)
+            val dialogViewTone =
+                LayoutInflater.from(context).inflate(R.layout.favurite_ringtone, null)
+            builderTone.setView(dialogViewTone)
+                .setCancelable(false)
+
+            val dialogTone = builderTone.create()
+
+            val notButton: Button = dialogViewTone.findViewById(R.id.not_button)
+            val yesButton: Button = dialogViewTone.findViewById(R.id.yes_button)
+
+            notButton.setOnClickListener {
+                dialogTone.dismiss()
+            }
+
+            yesButton.setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!Settings.System.canWrite(context)) {
+                        // Request permission
+                        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                        intent.data = Uri.parse("package:" + context.packageName)
+                        ContextCompat.startActivity(context, intent, null)
+                    } else {
+                        setRingtone(video.path)
+                    }
                 } else {
-                    showDeleteDialog(position)
+                    setRingtone(video.path)
                 }
+                dialogTone.dismiss()
+                bottomSheetDialog.dismiss()
             }
-            bindingMf.shareBtn.setOnClickListener {
 
-                dialog.dismiss()
-                val shareIntent = Intent()
-                shareIntent.action = Intent.ACTION_SEND
-                shareIntent.type = "audio/*"
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(musicReList[position].path))
-                ContextCompat.startActivity(
+            dialogTone.show()
+            bottomSheetDialog.dismiss()
+        }
+
+        playButton.setOnClickListener {
+            sendIntent(ref = "MusicBottomPlayAdapter", pos = position)
+            bottomSheetDialog.dismiss()
+        }
+
+        deleteButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                showPermissionRequestDialog()
+            } else {
+                showDeleteDialog(position)
+            }
+        }
+        propertiesButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+            val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+            val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+            val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+            val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+            val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+            // Populate dialog views with data
+            fileNameTextView.text = musicReList[position].title
+            durationTextView.text = DateUtils.formatElapsedTime(musicReList[position].duration / 1000)
+            sizeTextView.text = Formatter.formatShortFileSize(context, musicReList[position].size.toLong())
+            locationTextView.text = musicReList[position].path
+
+            val dialogIF = MaterialAlertDialogBuilder(context)
+                .setView(customDialogIF)
+                .setCancelable(false)
+                .create()
+            positiveButton.setOnClickListener {
+                dialogIF.dismiss()
+            }
+            dialogIF.show()
+        }
+
+        shareButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.type = "audio/*"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(musicReList[position].path))
+            ContextCompat.startActivity(
+                context,
+                Intent.createChooser(shareIntent, "Sharing Music File!!"),
+                null
+            )
+
+        }
+
+
+        bottomSheetDialog.show()
+    }
+
+    private fun sendIntent(ref: String, pos: Int){
+        val intent = Intent(context, ReMusicPlayerActivity::class.java)
+        intent.putExtra("index", pos)
+        intent.putExtra("class", ref)
+        ContextCompat.startActivity(context, intent, null)
+    }
+
+    private fun setRingtone(filePath: String) {
+        val file = File(filePath)
+        val contentUri = Uri.fromFile(file)
+
+        if (contentUri != null) {
+            val resolver = context.contentResolver
+            val ringtoneUri = MediaStore.Audio.Media.getContentUriForPath(filePath)
+
+            // Check if the file is already in the MediaStore
+            val cursor = resolver.query(
+                ringtoneUri!!,
+                arrayOf(MediaStore.MediaColumns._ID),
+                MediaStore.MediaColumns.DATA + "=?",
+                arrayOf(file.absolutePath),
+                null
+            )
+
+            var uri: Uri? = null
+
+            if (cursor != null && cursor.moveToFirst()) {
+                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID))
+                uri = ContentUris.withAppendedId(ringtoneUri, id)
+            } else {
+                val contentValues = ContentValues()
+                contentValues.put(MediaStore.MediaColumns.DATA, file.absolutePath)
+                contentValues.put(MediaStore.MediaColumns.TITLE, file.name)
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3")
+                contentValues.put(MediaStore.Audio.Media.IS_RINGTONE, true)
+                contentValues.put(MediaStore.Audio.Media.IS_NOTIFICATION, false)
+                contentValues.put(MediaStore.Audio.Media.IS_ALARM, false)
+                contentValues.put(MediaStore.Audio.Media.IS_MUSIC, false)
+
+                // Insert the ringtone into the media store
+                uri = resolver.insert(ringtoneUri, contentValues)
+            }
+
+            cursor?.close()
+
+            // Set the ringtone
+            if (uri != null) {
+                RingtoneManager.setActualDefaultRingtoneUri(
                     context,
-                    Intent.createChooser(shareIntent, "Sharing Music File!!"),
-                    null
+                    RingtoneManager.TYPE_RINGTONE,
+                    uri
                 )
-
-
+                Toast.makeText(context, "Ringtone set successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to set ringtone", Toast.LENGTH_SHORT).show()
             }
-            bindingMf.infoBtn.setOnClickListener {
-                dialog.dismiss()
-                val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
-                val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
-                val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
-                val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
-                val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
-                val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
-
-                // Populate dialog views with data
-                fileNameTextView.text = musicReList[position].title
-                durationTextView.text = DateUtils.formatElapsedTime(musicReList[position].duration / 1000)
-                sizeTextView.text = Formatter.formatShortFileSize(context, musicReList[position].size.toLong())
-                locationTextView.text = musicReList[position].path
-
-                val dialogIF = MaterialAlertDialogBuilder(context)
-                    .setView(customDialogIF)
-                    .setCancelable(false)
-                    .create()
-                positiveButton.setOnClickListener {
-                    dialogIF.dismiss()
-                }
-                dialogIF.show()
-            }
-
-
         }
     }
 
@@ -364,7 +556,7 @@ class RecantMusicAdapter (val  context : Context,
                                                 }
 
                                                 // Move to the next song and update the player
-                                                reSetSongPosition(increment = true)
+                                                setReSongPosition(increment = true)
                                                 ReMusicPlayerActivity.createMediaPlayer(context)
                                                 ReMusicPlayerActivity.setLayout(context)
                                                 DaysMusic.updateEmptyViewVisibility()
@@ -502,7 +694,9 @@ class RecantMusicAdapter (val  context : Context,
         Glide.with(context)
             .asBitmap()
             .load(getImgArt(musicReList[position].path))
-            .apply(RequestOptions().placeholder(R.mipmap.ic_logo_o).centerCrop())
+            .placeholder(R.color.gray) // Use the newly created drawable
+            .error(R.drawable.music_note_svgrepo_com)
+            .centerCrop()
             .into(iconImageView)
 
         musicNameDelete.text = musicReList[position].title
@@ -547,6 +741,9 @@ class RecantMusicAdapter (val  context : Context,
 
         alertDialog.show()
     }
+
+
+
     @SuppressLint("NotifyDataSetChanged")
     private fun deleteVideo(position: Int) {
         val music = musicReList[position]
@@ -603,7 +800,7 @@ class RecantMusicAdapter (val  context : Context,
                     }
 
                     // Move to the next song and update the player
-                    reSetSongPosition(increment = true)
+                    setReSongPosition(increment = true)
                     ReMusicPlayerActivity.createMediaPlayer(context)
                     ReMusicPlayerActivity.setLayout(context)
                     DaysMusic.updateEmptyViewVisibility()
@@ -648,3 +845,4 @@ class RecantMusicAdapter (val  context : Context,
 
 
 }
+

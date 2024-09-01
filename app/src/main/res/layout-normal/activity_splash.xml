@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/splashActivity"
-
-    android:fitsSystemWindows="true"
+    android:background="#0F4D6C"
     android:gravity="center"
     tools:context=".SplashActivity">
 <!--    android:background="@color/dark_cool_blue"-->

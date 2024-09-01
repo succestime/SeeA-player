@@ -494,6 +494,8 @@ val indicator = binding.newIndicator
             val bottomSheetMP3Dialog = BottomSheetDialog(context)
             val mp3View = LayoutInflater.from(context).inflate(R.layout.mp3_converter_layout, null)
             bottomSheetMP3Dialog.setContentView(mp3View)
+            bottomSheetMP3Dialog.setCancelable(false) // This line makes the dialog non-dismissible
+
             mp3View.background = context.getDrawable(R.drawable.rounded_bottom_sheet_2)
 
             // Initialize UI components in the MP3 conversion view
@@ -506,6 +508,7 @@ val indicator = binding.newIndicator
             val completeBottomSheet = mp3View.findViewById<ConstraintLayout>(R.id.complete_bottomSheet)
             val videoPathAndTitle = mp3View.findViewById<TextView>(R.id.videoPathAndTitle)
             val openButton = mp3View.findViewById<Button>(R.id.openButton)
+            val cancel1Button = mp3View.findViewById<Button>(R.id.cancel1Button)
 
             bottomSheetDialog.dismiss()
             bottomSheetMP3Dialog.show()
@@ -515,7 +518,9 @@ val indicator = binding.newIndicator
                 context.startActivity(intent)
                 bottomSheetMP3Dialog.dismiss()
             }
-
+            cancel1Button.setOnClickListener {
+                bottomSheetMP3Dialog.dismiss()
+            }
             val inputFilePath = video.path
             val baseName = video.title.substringBeforeLast(".")
             val customDirectoryName = "SeeA MP3 Audio"

@@ -39,11 +39,11 @@ companion object{
     }
 }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "SuspiciousIndentation")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_days_music, container, false)
         binding = FragmentDaysMusicBinding.bind(view)
-        try {
+
             binding.MusicRV.setHasFixedSize(true)
             binding.MusicRV.setItemViewCacheSize(50)
             binding.MusicRV.layoutManager = LinearLayoutManager(requireContext())
@@ -51,7 +51,7 @@ companion object{
             binding.MusicRV.adapter = adapter
             binding.daysTotalMusics.text = "0 Musics"
 
-            loadRecentMusics()
+                    loadRecentMusics()
 
             val handler = Handler(Looper.getMainLooper())
             handler.postDelayed({
@@ -66,8 +66,7 @@ companion object{
                 swipeRefreshLayout.isRefreshing = false
             }
             shuffleEmpty()
-        } catch (_: Exception) {
-        }
+
         return view
 
     }
@@ -85,14 +84,13 @@ companion object{
     }
 
     @SuppressLint("SetTextI18n")
-    private fun loadRecentMusics() {
+    fun loadRecentMusics() {
         val recantMusics = getAllRecantMusics(requireContext())
         val sevenDaysAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)
         val reMusics = recantMusics.filter { it.timestamp >= sevenDaysAgo }
         recantMusics.sortedByDescending { it.timestamp }
         adapter.updateRecentMusics(reMusics)
 
-        // Update the total music count text
         binding.daysTotalMusics.text = "${reMusics.size} Musics"
 
         updateEmptyViewVisibility()

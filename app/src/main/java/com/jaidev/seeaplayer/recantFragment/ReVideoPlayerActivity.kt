@@ -691,6 +691,11 @@ class ReVideoPlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChan
                 recantPlayerList.addAll(MainActivity.videoRecantList)
                 createPlayer()
             }
+            "VideoMoreAdapter" -> {
+                recantPlayerList = ArrayList()
+                recantPlayerList.addAll(MainActivity.videoRecantList)
+                createPlayer()
+            }
         }
     }
     private fun initializePlayer() {

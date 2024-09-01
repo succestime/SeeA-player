@@ -31,6 +31,7 @@ import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
 import com.jaidev.seeaplayer.dataClass.MusicFavEntity
 import com.jaidev.seeaplayer.dataClass.PlaylistMusic
 import com.jaidev.seeaplayer.dataClass.PlaylistMusicEntity
+import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.FavouriteViewBinding
 import com.jaidev.seeaplayer.musicActivity.FavouriteActivity.Companion.favouriteSongs
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
@@ -86,12 +87,13 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: MyAdapter, position: Int) {
+        val video = musicList[position]
 
 
         holder.name.text = musicList[position].title
         holder.album.text = musicList[position].album
         Glide.with(context)
-            .load(musicList[position].artUri)
+            .load(getImgArt(video.path))
             .apply(
                 RequestOptions()
                     .placeholder(R.color.gray) // Use the newly created drawable
@@ -122,31 +124,40 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
         }
 
         holder.moreChoose.setOnClickListener {
-            showBottomSheetDialog(musicList[position], position)
+            showBottomSheetDialog(video, position)
         }
         holder.root.setOnClickListener {
             if (isSelectionMode) {
                 toggleSelection(position)
+                notifyItemChanged(position)
             } else {
-                val intent = Intent(context, PlayerMusicActivity::class.java)
-                intent.putExtra("index", position)
-                intent.putExtra("class", "FavouriteAdapter")
-                ContextCompat.startActivity(context, intent, null)
+                when (video.id) {
+                    PlayerMusicActivity.nowMusicPlayingId ->
+                        sendIntent(
+                            ref = "FavNowPlaying",
+                            pos = PlayerMusicActivity.songPosition
+                        )
+                    else -> sendIntent(ref = "FavouriteAdapter", pos = position)
+                }
+
             }
         }
 
 
         holder.root.setOnLongClickListener {
-            if (!isSelectionMode) {
                 isSelectionMode = true
                 toggleSelection(position)
-                notifyDataSetChanged() // Refresh all items to update their visibility
-            }
+            notifyDataSetChanged()
             true
         }
     }
 
-
+    private fun sendIntent(ref: String, pos: Int){
+        val intent = Intent(context, PlayerMusicActivity::class.java)
+        intent.putExtra("index", pos)
+        intent.putExtra("class", ref)
+        ContextCompat.startActivity(context, intent, null)
+    }
     override fun getItemCount(): Int {
         return musicList.size
     }
@@ -205,7 +216,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
         notifyDataSetChanged()
     }
 
-//FavouriteAdapter
+    //FavouriteAdapter
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("SetTextI18n", "InflateParams", "ObsoleteSdkInt")
     private fun showBottomSheetDialog(playlist: Music, position: Int) {
@@ -230,7 +241,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
         textSubtitle.text = playlist.album
 
         Glide.with(context)
-            .load(playlist.artUri)
+            .load(getImgArt(playlist.path))
             .apply(
                 RequestOptions()
                     .placeholder(R.color.gray) // Use the newly created drawable
@@ -348,156 +359,10 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
 //        bottomSheetDialog.dismiss()
 //    }
 
-    removeToFavouriteButton.setOnClickListener {
-        val removedMusic = musicList[position]
-
-        // Remove from the database
-        GlobalScope.launch(Dispatchers.IO) {
-            val musicFavDao = MusicFavDatabase.getDatabase(context).musicFavDao()
-            val musicFavEntity = MusicFavEntity(
-                id = removedMusic.id,
-                title = removedMusic.title,
-                album = removedMusic.album,
-                artist = removedMusic.artist,
-                duration = removedMusic.duration,
-                path = removedMusic.path,
-                size = removedMusic.size,
-                artUri = removedMusic.artUri,
-                dateAdded = removedMusic.dateAdded
-            )
-            musicFavDao.deleteMusic(musicFavEntity)
-        }
-
-        // Remove from the list and update UI
-        musicList.removeAt(position)
-        notifyItemRemoved(position)
-        notifyItemRangeChanged(position, musicList.size)
-
-        Toast.makeText(context, "${removedMusic.title} removed from favorites", Toast.LENGTH_SHORT).show()
-
-        bottomSheetDialog.dismiss() // Close the bottom sheet dialog
-    }
-
-    propertiesButton.setOnClickListener {
-        val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
-        val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
-        val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
-        val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
-        val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
-        val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
-
-        // Populate dialog views with data
-        fileNameTextView.text = musicList[position].title
-        durationTextView.text = DateUtils.formatElapsedTime(musicList[position].duration / 1000)
-        sizeTextView.text = Formatter.formatShortFileSize(context, musicList[position].size.toLong())
-        locationTextView.text = musicList[position].path
-
-        val dialogIF = MaterialAlertDialogBuilder(context)
-            .setView(customDialogIF)
-            .setCancelable(false)
-            .create()
-        positiveButton.setOnClickListener {
-            dialogIF.dismiss()
-
-        }
-        dialogIF.show()
-        bottomSheetDialog.dismiss()
-
-    }
-
-
-    playButton.setOnClickListener {
-        val intent = Intent(context, PlayerMusicActivity::class.java)
-        intent.putExtra("index", position)
-        intent.putExtra("class", "FavouriteBottomAdapter")
-        ContextCompat.startActivity(context, intent, null)
-        bottomSheetDialog.dismiss()
-    }
-
-    shareButton.setOnClickListener {
-        val shareIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            type = "audio/*"
-            putExtra(Intent.EXTRA_STREAM, Uri.parse(musicList[position].path))
-            putExtra(
-                Intent.EXTRA_TEXT,
-                "Check out this song: ${musicList[position].title} from the album ${musicList[position].album}"
-            )
-        }
-
-        ContextCompat.startActivity(
-            context,
-            Intent.createChooser(shareIntent, "Sharing Music File!!"),
-            null
-        )
-
-        bottomSheetDialog.dismiss()
-    }
-
-
-    ringtoneButton.setOnClickListener {
-        val builderTone = android.app.AlertDialog.Builder(context)
-        val dialogViewTone =
-            LayoutInflater.from(context).inflate(R.layout.favurite_ringtone, null)
-        builderTone.setView(dialogViewTone)
-            .setCancelable(false)
-
-        val dialogTone = builderTone.create()
-
-        val notButton: Button = dialogViewTone.findViewById(R.id.not_button)
-        val yesButton: Button = dialogViewTone.findViewById(R.id.yes_button)
-
-        notButton.setOnClickListener {
-            dialogTone.dismiss()
-        }
-
-        yesButton.setOnClickListener {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                if (!android.provider.Settings.System.canWrite(context)) {
-                    // Request permission
-                    val intent = Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                    intent.data = Uri.parse("package:" + context.packageName)
-                    ContextCompat.startActivity(context, intent, null)
-                } else {
-                    setRingtone(playlist.path)
-                }
-            } else {
-                setRingtone(playlist.path)
-            }
-            dialogTone.dismiss()
-            bottomSheetDialog.dismiss()
-        }
-
-        dialogTone.show()
-        bottomSheetDialog.dismiss()
-    }
-
-    removeButton.setOnClickListener {
-        val builder = android.app.AlertDialog.Builder(context)
-        val dialogView =
-            LayoutInflater.from(context).inflate(R.layout.favurite_remove, null)
-        builder.setView(dialogView)
-            .setCancelable(false)
-
-        val dialog = builder.create()
-
-        val cancelButton: Button = dialogView.findViewById(R.id.cancel_button)
-        val removeMusicButton: Button = dialogView.findViewById(R.id.remove_button)
-
-        cancelButton.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        removeMusicButton.setOnClickListener {
-            // Remove the item from the list
+        removeToFavouriteButton.setOnClickListener {
             val removedMusic = musicList[position]
-            musicList.removeAt(position)
 
-            // Notify the adapter about the item removed
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position, musicList.size)
-
-            // Remove the item from the database
+            // Remove from the database
             GlobalScope.launch(Dispatchers.IO) {
                 val musicFavDao = MusicFavDatabase.getDatabase(context).musicFavDao()
                 val musicFavEntity = MusicFavEntity(
@@ -514,17 +379,163 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
                 musicFavDao.deleteMusic(musicFavEntity)
             }
 
-            dialog.dismiss()
+            // Remove from the list and update UI
+            musicList.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, musicList.size)
+
+            Toast.makeText(context, "${removedMusic.title} removed from favorites", Toast.LENGTH_SHORT).show()
+
+            bottomSheetDialog.dismiss() // Close the bottom sheet dialog
+        }
+
+        propertiesButton.setOnClickListener {
+            val customDialogIF = LayoutInflater.from(context).inflate(R.layout.info_one_dialog, null)
+            val positiveButton = customDialogIF.findViewById<Button>(R.id.positiveButton)
+            val fileNameTextView = customDialogIF.findViewById<TextView>(R.id.fileName)
+            val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
+            val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
+            val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
+
+            // Populate dialog views with data
+            fileNameTextView.text = musicList[position].title
+            durationTextView.text = DateUtils.formatElapsedTime(musicList[position].duration / 1000)
+            sizeTextView.text = Formatter.formatShortFileSize(context, musicList[position].size.toLong())
+            locationTextView.text = musicList[position].path
+
+            val dialogIF = MaterialAlertDialogBuilder(context)
+                .setView(customDialogIF)
+                .setCancelable(false)
+                .create()
+            positiveButton.setOnClickListener {
+                dialogIF.dismiss()
+
+            }
+            dialogIF.show()
+            bottomSheetDialog.dismiss()
+
+        }
+
+
+        playButton.setOnClickListener {
+            val intent = Intent(context, PlayerMusicActivity::class.java)
+            intent.putExtra("index", position)
+            intent.putExtra("class", "FavouriteBottomAdapter")
+            ContextCompat.startActivity(context, intent, null)
+            bottomSheetDialog.dismiss()
+        }
+
+        shareButton.setOnClickListener {
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "audio/*"
+                putExtra(Intent.EXTRA_STREAM, Uri.parse(musicList[position].path))
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    "Check out this song: ${musicList[position].title} from the album ${musicList[position].album}"
+                )
+            }
+
+            ContextCompat.startActivity(
+                context,
+                Intent.createChooser(shareIntent, "Sharing Music File!!"),
+                null
+            )
+
             bottomSheetDialog.dismiss()
         }
 
 
-        dialog.show()
-        bottomSheetDialog.dismiss()
-    }
+        ringtoneButton.setOnClickListener {
+            val builderTone = android.app.AlertDialog.Builder(context)
+            val dialogViewTone =
+                LayoutInflater.from(context).inflate(R.layout.favurite_ringtone, null)
+            builderTone.setView(dialogViewTone)
+                .setCancelable(false)
 
-    bottomSheetDialog.show()
-}
+            val dialogTone = builderTone.create()
+
+            val notButton: Button = dialogViewTone.findViewById(R.id.not_button)
+            val yesButton: Button = dialogViewTone.findViewById(R.id.yes_button)
+
+            notButton.setOnClickListener {
+                dialogTone.dismiss()
+            }
+
+            yesButton.setOnClickListener {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    if (!android.provider.Settings.System.canWrite(context)) {
+                        // Request permission
+                        val intent = Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                        intent.data = Uri.parse("package:" + context.packageName)
+                        ContextCompat.startActivity(context, intent, null)
+                    } else {
+                        setRingtone(playlist.path)
+                    }
+                } else {
+                    setRingtone(playlist.path)
+                }
+                dialogTone.dismiss()
+                bottomSheetDialog.dismiss()
+            }
+
+            dialogTone.show()
+            bottomSheetDialog.dismiss()
+        }
+
+        removeButton.setOnClickListener {
+            val builder = android.app.AlertDialog.Builder(context)
+            val dialogView =
+                LayoutInflater.from(context).inflate(R.layout.favurite_remove, null)
+            builder.setView(dialogView)
+                .setCancelable(false)
+
+            val dialog = builder.create()
+
+            val cancelButton: Button = dialogView.findViewById(R.id.cancel_button)
+            val removeMusicButton: Button = dialogView.findViewById(R.id.remove_button)
+
+            cancelButton.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            removeMusicButton.setOnClickListener {
+                // Remove the item from the list
+                val removedMusic = musicList[position]
+                musicList.removeAt(position)
+
+                // Notify the adapter about the item removed
+                notifyItemRemoved(position)
+                notifyItemRangeChanged(position, musicList.size)
+
+                // Remove the item from the database
+                GlobalScope.launch(Dispatchers.IO) {
+                    val musicFavDao = MusicFavDatabase.getDatabase(context).musicFavDao()
+                    val musicFavEntity = MusicFavEntity(
+                        id = removedMusic.id,
+                        title = removedMusic.title,
+                        album = removedMusic.album,
+                        artist = removedMusic.artist,
+                        duration = removedMusic.duration,
+                        path = removedMusic.path,
+                        size = removedMusic.size,
+                        artUri = removedMusic.artUri,
+                        dateAdded = removedMusic.dateAdded
+                    )
+                    musicFavDao.deleteMusic(musicFavEntity)
+                }
+
+                dialog.dismiss()
+                bottomSheetDialog.dismiss()
+            }
+
+
+            dialog.show()
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
+    }
 
     private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
         return PlaylistMusic(
