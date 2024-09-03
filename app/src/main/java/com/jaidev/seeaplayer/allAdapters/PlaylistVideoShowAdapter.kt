@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,9 +24,7 @@ import com.jaidev.seeaplayer.PlaylistVideoActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
 import com.jaidev.seeaplayer.dataClass.VideoData
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.text.NumberFormat
 
 class PlaylistVideoShowAdapter(
     private val context: Context,
@@ -275,20 +274,19 @@ class PlaylistVideoShowAdapter(
             val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
             val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
             val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
-            val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
+//            val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
 
             fileNameTextView.text = video.title
             durationTextView.text = DateUtils.formatElapsedTime(video.duration / 1000)
-            val sizeInBytes = video.size.toLong()
-            val sizeInMb = sizeInBytes / (1024 * 1024)
-            val formattedSizeInMb = String.format("%.1fMB", sizeInMb.toDouble())
-            val formattedSizeInBytes = String.format("(%,d bytes)", sizeInBytes)
-            sizeTextView.text = "$formattedSizeInMb $formattedSizeInBytes"
             locationTextView.text = video.path
 
-            val dateFormat = SimpleDateFormat("MMMM d, yyyy, HH:mm", Locale.getDefault())
-            val formattedDate = video.dateAdded?.let { Date(it) }?.let { dateFormat.format(it) }
-            dateTextView.text = formattedDate ?: "Unknown date"
+            // Ensure video.size is properly converted to a numeric type
+            val sizeInBytes = video.size.toLongOrNull() ?: 0L
+
+            // Format the size to display both in human-readable format and in bytes with commas
+            val formattedSize = Formatter.formatShortFileSize(context, sizeInBytes)
+            val bytesWithCommas = NumberFormat.getInstance().format(sizeInBytes)
+            sizeTextView.text = "$formattedSize ($bytesWithCommas bytes)"
 
             val dialogIF = MaterialAlertDialogBuilder(context)
                 .setView(customDialogIF)

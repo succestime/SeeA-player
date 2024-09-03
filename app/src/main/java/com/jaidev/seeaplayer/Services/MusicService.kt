@@ -93,7 +93,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
             ApplicationClass.NEXT)
         val nextPendingIntent = PendingIntent.getBroadcast(baseContext, 0, nextIntent, flag)
 
-        val imgArt = getImgArt(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path)
+        val imgArt = getImgArt(PlayerMusicActivity.musicListPA[songPosition].path)
         val image = if (imgArt != null) {
             BitmapFactory.decodeByteArray(imgArt, 0, imgArt.size)
         } else {
@@ -102,8 +102,8 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
 
         val notification = androidx.core.app.NotificationCompat.Builder(baseContext, ApplicationClass.CHANNEL_ID)
             .setContentIntent(contentIntent)
-            .setContentTitle(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title)
-            .setContentText(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artist)
+            .setContentTitle(PlayerMusicActivity.musicListPA[songPosition].title)
+            .setContentText(PlayerMusicActivity.musicListPA[songPosition].artist)
             .setSmallIcon(R.drawable.music_icon)
             .setLargeIcon(image)
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSession.sessionToken))
@@ -171,7 +171,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
         try {
             if (mediaPlayer == null) mediaPlayer = MediaPlayer()
             mediaPlayer?.reset()
-            mediaPlayer?.setDataSource(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].path)
+            mediaPlayer?.setDataSource(PlayerMusicActivity.musicListPA[songPosition].path)
             mediaPlayer?.prepare()
 
             PlayerMusicActivity.binding.playPauseBtnPA.setIconResource(R.drawable.round_pause_24)
@@ -180,7 +180,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
             PlayerMusicActivity.binding.tvSeekBarEnd.text = formatDuration(mediaPlayer!!.duration.toLong())
             PlayerMusicActivity.binding.seekBarPA.progress = 0
             PlayerMusicActivity.binding.seekBarPA.max = mediaPlayer!!.duration
-            PlayerMusicActivity.nowMusicPlayingId = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].id
+            PlayerMusicActivity.nowMusicPlayingId = PlayerMusicActivity.musicListPA[songPosition].musicid
             PlayerMusicActivity.loudnessEnhancer = LoudnessEnhancer(mediaPlayer!!.audioSessionId)
             PlayerMusicActivity.loudnessEnhancer.enabled = true
         } catch (e: Exception) {
@@ -200,7 +200,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
             ReMusicPlayerActivity.binding.tvSeekBarEnd.text = formatDuration(mediaPlayer!!.duration.toLong())
             ReMusicPlayerActivity.binding.seekBarPA.progress = 0
             ReMusicPlayerActivity.binding.seekBarPA.max = mediaPlayer!!.duration
-            ReMusicPlayerActivity.nowMusicPlayingId = ReMusicPlayerActivity.reMusicListPA[PlayerMusicActivity.songPosition].id
+            ReMusicPlayerActivity.nowMusicPlayingId = ReMusicPlayerActivity.reMusicListPA[songPosition].id
             PlayerMusicActivity.loudnessEnhancer = LoudnessEnhancer(mediaPlayer!!.audioSessionId)
             PlayerMusicActivity.loudnessEnhancer.enabled = true
         } catch (e: Exception) {
@@ -276,20 +276,20 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
         setSongPosition(increment = increment)
         createMediaPlayer()
         Glide.with(context)
-            .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
+            .load(PlayerMusicActivity.musicListPA[songPosition].artUri)
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(PlayerMusicActivity.binding.songImgPA)
 
-        PlayerMusicActivity.binding.songNamePA.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
+        PlayerMusicActivity.binding.songNamePA.text = PlayerMusicActivity.musicListPA[songPosition].title
         Glide.with(context)
-            .load(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].artUri)
+            .load(PlayerMusicActivity.musicListPA[songPosition].artUri)
             .apply(RequestOptions().placeholder(R.drawable.music_speaker_three).centerCrop())
             .into(NowPlaying.binding.songImgNP)
 
-        NowPlaying.binding.songNameNP.text = PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].title
+        NowPlaying.binding.songNameNP.text = PlayerMusicActivity.musicListPA[songPosition].title
         playMusic()
 
-        PlayerMusicActivity.fIndex = favouriteChecker(PlayerMusicActivity.musicListPA[PlayerMusicActivity.songPosition].id)
+        PlayerMusicActivity.fIndex = favouriteChecker(PlayerMusicActivity.musicListPA[songPosition].musicid)
 
         if (PlayerMusicActivity.isFavourite) {
             PlayerMusicActivity.binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_music)

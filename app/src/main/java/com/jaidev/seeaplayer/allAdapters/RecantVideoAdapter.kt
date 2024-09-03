@@ -58,6 +58,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.text.NumberFormat
 import java.util.UUID
 
 class RecentVideoAdapter(private val context: Context,
@@ -548,7 +549,14 @@ class RecentVideoAdapter(private val context: Context,
             // Populate dialog views with data
             fileNameTextView.text = videoReList[position].title
             durationTextView.text = DateUtils.formatElapsedTime(videoReList[position].duration / 1000)
-            sizeTextView.text = Formatter.formatShortFileSize(context, videoReList[position].size.toLong())
+            // Ensure video.size is properly converted to a numeric type
+            val sizeInBytes = video.size.toLongOrNull() ?: 0L
+            val formattedSize = Formatter.formatShortFileSize(context, sizeInBytes)
+            val bytesWithCommas = NumberFormat.getInstance().format(sizeInBytes)
+            sizeTextView.text = "$formattedSize ($bytesWithCommas bytes)"
+
+
+
             locationTextView.text = videoReList[position].path
 
             val dialogIF = MaterialAlertDialogBuilder(context)

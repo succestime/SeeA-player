@@ -55,6 +55,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.text.NumberFormat
 
 class RecantMusicAdapter (val  context : Context,
                           var musicReList : ArrayList<RecantMusic>,
@@ -225,7 +226,7 @@ class RecantMusicAdapter (val  context : Context,
         // Check if the song is already in favorites and update UI
         GlobalScope.launch(Dispatchers.Main) {
             val isFavorite = withContext(Dispatchers.IO) {
-                musicDao.getAllMusic().any { it.id == video.id }
+                musicDao.getAllMusic().any { it.musicid == video.id }
             }
 
             if (isFavorite) {
@@ -241,7 +242,7 @@ class RecantMusicAdapter (val  context : Context,
                     if (isFavorite) {
                         musicDao.deleteMusic(
                             MusicFavEntity(
-                                id = video.id,
+                                musicid = video.id,
                                 title = video.title,
                                 album = video.album,
                                 artist = video.artist,
@@ -255,7 +256,7 @@ class RecantMusicAdapter (val  context : Context,
                     } else {
                         musicDao.insertMusic(
                             MusicFavEntity(
-                                id = video.id,
+                                musicid = video.id,
                                 title = video.title,
                                 album = video.album,
                                 artist = video.artist,
@@ -335,7 +336,12 @@ class RecantMusicAdapter (val  context : Context,
             // Populate dialog views with data
             fileNameTextView.text = musicReList[position].title
             durationTextView.text = DateUtils.formatElapsedTime(musicReList[position].duration / 1000)
-            sizeTextView.text = Formatter.formatShortFileSize(context, musicReList[position].size.toLong())
+            // Ensure video.size is properly converted to a numeric type
+            val sizeInBytes = video.size.toLongOrNull() ?: 0L
+            val formattedSize = Formatter.formatShortFileSize(context, sizeInBytes)
+            val bytesWithCommas = NumberFormat.getInstance().format(sizeInBytes)
+            sizeTextView.text = "$formattedSize ($bytesWithCommas bytes)"
+
             locationTextView.text = musicReList[position].path
 
             val dialogIF = MaterialAlertDialogBuilder(context)

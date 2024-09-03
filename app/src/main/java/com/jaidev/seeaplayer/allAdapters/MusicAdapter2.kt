@@ -62,7 +62,7 @@ class MusicAdapter2(
             )
             .into(holder.image)
         // Check if the video is already in the playlist
-        if (videosInPlaylist.contains(video.id)) {
+        if (videosInPlaylist.contains(video.musicid)) {
             holder.emptyCheck.visibility = View.GONE
             holder.fillCheck.visibility = View.VISIBLE
             holder.root.isEnabled = false

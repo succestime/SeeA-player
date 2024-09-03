@@ -79,14 +79,14 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
             binding.root.post {
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    val sortOrder = dao.getSortOrder(playlist.id)
+                    val sortOrder = dao.getSortOrder(playlist.musicid)
 
-                    val videoCount = dao.getMusicCountForPlaylist(playlist.id)
+                    val videoCount = dao.getMusicCountForPlaylist(playlist.musicid)
                     val totalDurationMillis =
-                        if (videoCount > 0) dao.getTotalDurationForPlaylist(playlist.id) else 0
+                        if (videoCount > 0) dao.getTotalDurationForPlaylist(playlist.musicid) else 0
                     val totalDurationFormatted =
                         if (totalDurationMillis > 0) formatDuration(totalDurationMillis) else ""
-                    val firstVideoImageUri = dao.getFirstMusicImageUri(playlist.id, sortOrder)
+                    val firstVideoImageUri = dao.getFirstMusicImageUri(playlist.musicid, sortOrder)
 
                     withContext(Dispatchers.Main) {
                         binding.totalVideoContain.text = if (videoCount > 0) {
@@ -112,7 +112,7 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
 
             binding.root.setOnClickListener {
                 val intent = Intent(context, PlaylistDetails::class.java).apply {
-                    putExtra("playlistId", playlist.id)
+                    putExtra("playlistId", playlist.musicid)
                     PlaylistDetails.videoList.clear()
                 }
                 context.startActivity(intent)
@@ -146,9 +146,9 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
 
             // Launch a coroutine to call the suspend functions
             CoroutineScope(Dispatchers.IO).launch {
-                val sortOrder = dao.getSortOrder(playlist.id)
-                val videoCount = dao.getMusicCountForPlaylist(playlist.id)
-                val imageUri = dao.getFirstMusicImageUri(playlist.id, sortOrder)
+                val sortOrder = dao.getSortOrder(playlist.musicid)
+                val videoCount = dao.getMusicCountForPlaylist(playlist.musicid)
+                val imageUri = dao.getFirstMusicImageUri(playlist.musicid, sortOrder)
 
                 withContext(Dispatchers.Main) {
                     textSubtitle.text = "$videoCount musics"
@@ -168,7 +168,7 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
 
             playButton.setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val videoUris = dao.getMusicForPlaylist(playlist.id) // Fetch the video URIs from the database
+                    val videoUris = dao.getMusicForPlaylist(playlist.musicid) // Fetch the video URIs from the database
 
                     withContext(Dispatchers.Main) {
                         if (videoUris.isEmpty()) {
@@ -235,7 +235,7 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
                     val newName = editText.text.toString().trim()
                     if (newName.isNotEmpty() && newName != playlist.name) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            dao.updatePlaylistName(playlist.id, newName)
+                            dao.updatePlaylistName(playlist.musicid, newName)
                             withContext(Dispatchers.Main) {
                                 playlist.name = newName
                                 adapter.notifyItemChanged(position)
@@ -302,9 +302,9 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
             playlistName.text = playlist.name
             // Load the playlist image using Glide
             CoroutineScope(Dispatchers.IO).launch {
-                val sortOrder = dao.getSortOrder(playlist.id)
+                val sortOrder = dao.getSortOrder(playlist.musicid)
 
-                val imageUri = dao.getFirstMusicImageUri(playlist.id , sortOrder)
+                val imageUri = dao.getFirstMusicImageUri(playlist.musicid , sortOrder)
                 withContext(Dispatchers.Main) {
                     Glide.with(context)
                         .load(imageUri)
@@ -333,7 +333,7 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
 
             btnDelete.setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
-                    dao.deletePlaylist(playlist.id)
+                    dao.deletePlaylist(playlist.musicid)
                     withContext(Dispatchers.Main) {
                         adapter.playlists.removeAt(adapterPosition)
                         adapter.notifyItemRemoved(adapterPosition)

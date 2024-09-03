@@ -68,9 +68,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.UUID
 
 @SuppressLint("NotifyDataSetChanged")
@@ -733,16 +730,19 @@ val indicator = binding.newIndicator
             val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
             val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
             val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
-            val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
 // Populate dialog views with data
             fileNameTextView.text = video.title
             durationTextView.text = DateUtils.formatElapsedTime(video.duration / 1000)
-            sizeTextView.text = Formatter.formatShortFileSize(context, video.size.toLong())
+            // Ensure video.size is properly converted to a numeric type
+            val sizeInBytes = video.size.toLongOrNull() ?: 0L
+
+            // Format the size to display both in human-readable format and in bytes with commas
+            val formattedSize = Formatter.formatShortFileSize(context, sizeInBytes)
+            val bytesWithCommas = NumberFormat.getInstance().format(sizeInBytes)
+            sizeTextView.text = "$formattedSize ($bytesWithCommas bytes)"
+
             locationTextView.text = video.path
-// Format and set the date
-            val dateFormat = SimpleDateFormat("MMMM d, yyyy, HH:mm", Locale.getDefault())
-            dateTextView.text = video.dateAdded?.let { it1 -> Date(it1) }
-                ?.let { it2 -> dateFormat.format(it2) }
+
             val dialogIF = MaterialAlertDialogBuilder(context)
                 .setView(customDialogIF)
                 .setCancelable(false)

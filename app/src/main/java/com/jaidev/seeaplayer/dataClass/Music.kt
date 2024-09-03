@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 data class Music(
-    val id: String,
+    val musicid: String,
     var title: String,
     val album: String,
     val artist: String,
@@ -36,7 +36,7 @@ data class Music(
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
+        parcel.writeString(musicid)
         parcel.writeString(title)
         parcel.writeString(album)
         parcel.writeString(artist)
@@ -115,7 +115,7 @@ fun exitApplication() {
 fun favouriteChecker(id : String) : Int {
     PlayerMusicActivity.isFavourite = false
     FavouriteActivity.favouriteSongs.forEachIndexed { index, music ->
-        if (id == music.id){
+        if (id == music.musicid){
             PlayerMusicActivity.isFavourite = true
             return index
         }

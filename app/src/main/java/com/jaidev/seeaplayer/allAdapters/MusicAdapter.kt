@@ -209,7 +209,7 @@ class MusicAdapter(
                         pos = position
                     )
 
-                    musicList[position].id == PlayerMusicActivity.nowMusicPlayingId ->
+                    musicList[position].musicid == PlayerMusicActivity.nowMusicPlayingId ->
                         sendIntent(
                             ref = "NowPlaying",
                             pos = PlayerMusicActivity.songPosition
@@ -274,7 +274,7 @@ class MusicAdapter(
         // Check if the song is already in favorites and update UI
         GlobalScope.launch(Dispatchers.Main) {
             val isFavorite = withContext(Dispatchers.IO) {
-                musicDao.getAllMusic().any { it.id == video.id }
+                musicDao.getAllMusic().any { it.musicid == video.musicid }
             }
 
             if (isFavorite) {
@@ -290,7 +290,7 @@ class MusicAdapter(
                     if (isFavorite) {
                         musicDao.deleteMusic(
                             MusicFavEntity(
-                                id = video.id,
+                                musicid = video.musicid,
                                 title = video.title,
                                 album = video.album,
                                 artist = video.artist,
@@ -304,7 +304,7 @@ class MusicAdapter(
                     } else {
                         musicDao.insertMusic(
                             MusicFavEntity(
-                                id = video.id,
+                                musicid = video.musicid,
                                 title = video.title,
                                 album = video.album,
                                 artist = video.artist,
@@ -498,7 +498,12 @@ class MusicAdapter(
             // Populate dialog views with data
             fileNameTextView.text = musicList[position].title
             durationTextView.text = DateUtils.formatElapsedTime(musicList[position].duration / 1000)
-            sizeTextView.text = Formatter.formatShortFileSize(context, musicList[position].size.toLong())
+            // Ensure video.size is properly converted to a numeric type
+            val sizeInBytes = video.size.toLongOrNull() ?: 0L
+            val formattedSize = Formatter.formatShortFileSize(context, sizeInBytes)
+            val bytesWithCommas = NumberFormat.getInstance().format(sizeInBytes)
+            sizeTextView.text = "$formattedSize ($bytesWithCommas bytes)"
+
             locationTextView.text = musicList[position].path
 
             val dialogIF = MaterialAlertDialogBuilder(context)
@@ -651,7 +656,7 @@ class MusicAdapter(
             if (file.exists() && file.delete()) {
                 MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
                 MainActivity.MusicListMA.removeAt(position)
-                if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
+                if (musicList[position].musicid == PlayerMusicActivity.nowMusicPlayingId) {
                     if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
                         PlayerMusicActivity.musicService?.prevNextSong(true, context)
                         musicNav.updateEmptyState()
@@ -900,7 +905,7 @@ class MusicAdapter(
                                     MediaScannerConnection.scanFile(context, arrayOf(file.path), null, null)
                                     notifyItemChanged(position)
 
-                                    if (musicList[position].id == PlayerMusicActivity.nowMusicPlayingId) {
+                                    if (musicList[position].musicid == PlayerMusicActivity.nowMusicPlayingId) {
                                         if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
                                             musicNav.updateEmptyState()
                                             PlayerMusicActivity.musicService?.prevNextSong(true, context)
@@ -1064,7 +1069,7 @@ class MusicAdapter(
         val music = musicList[position]
         music.title = newName
         notifyItemChanged(position)
-        saveMusicTitle(music.id, newName)
+        saveMusicTitle(music.musicid, newName)
         val defaultTitle = music.title
         showRenameDialog(position, defaultTitle)
 
@@ -1115,7 +1120,7 @@ class MusicAdapter(
 
     private fun loadMusicTitles() {
         for (music in musicList) {
-            val savedTitle = sharedPreferences.getString(music.id, null)
+            val savedTitle = sharedPreferences.getString(music.musicid, null)
             savedTitle?.let {
                 music.title = it
             }

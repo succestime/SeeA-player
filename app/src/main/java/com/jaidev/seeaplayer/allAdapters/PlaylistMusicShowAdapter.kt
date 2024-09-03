@@ -10,6 +10,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.provider.MediaStore
 import android.text.format.DateUtils
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,9 +40,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.text.NumberFormat
 
 class PlaylistMusicShowAdapter(
     private val context: Context,
@@ -274,7 +273,7 @@ class PlaylistMusicShowAdapter(
         // Check if the song is already in favorites and update UI
         GlobalScope.launch(Dispatchers.Main) {
             val isFavorite = withContext(Dispatchers.IO) {
-                musicDao.getAllMusic().any { it.id == video.id }
+                musicDao.getAllMusic().any { it.musicid == video.musicid }
             }
 
             if (isFavorite) {
@@ -290,7 +289,7 @@ class PlaylistMusicShowAdapter(
                     if (isFavorite) {
                         musicDao.deleteMusic(
                             MusicFavEntity(
-                                id = video.id,
+                                musicid = video.musicid,
                                 title = video.title,
                                 album = video.album,
                                 artist = video.artist,
@@ -304,7 +303,7 @@ class PlaylistMusicShowAdapter(
                     } else {
                         musicDao.insertMusic(
                             MusicFavEntity(
-                                id = video.id,
+                                musicid = video.musicid,
                                 title = video.title,
                                 album = video.album,
                                 artist = video.artist,
@@ -410,20 +409,18 @@ class PlaylistMusicShowAdapter(
             val durationTextView = customDialogIF.findViewById<TextView>(R.id.DurationDetail)
             val sizeTextView = customDialogIF.findViewById<TextView>(R.id.sizeDetail)
             val locationTextView = customDialogIF.findViewById<TextView>(R.id.locationDetail)
-            val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
+//            val dateTextView = customDialogIF.findViewById<TextView>(R.id.dateDetail)
 
             fileNameTextView.text = video.title
             durationTextView.text = DateUtils.formatElapsedTime(video.duration / 1000)
-            val sizeInBytes = video.size.toLong()
-            val sizeInMb = sizeInBytes / (1024 * 1024)
-            val formattedSizeInMb = String.format("%.1fMB", sizeInMb.toDouble())
-            val formattedSizeInBytes = String.format("(%,d bytes)", sizeInBytes)
-            sizeTextView.text = "$formattedSizeInMb $formattedSizeInBytes"
             locationTextView.text = video.path
+            // Ensure video.size is properly converted to a numeric type
+            val sizeInBytes = video.size.toLongOrNull() ?: 0L
 
-            val dateFormat = SimpleDateFormat("MMMM d, yyyy, HH:mm", Locale.getDefault())
-            val formattedDate = video.dateAdded?.let { Date(it) }?.let { dateFormat.format(it) }
-            dateTextView.text = formattedDate ?: "Unknown date"
+            // Format the size to display both in human-readable format and in bytes with commas
+            val formattedSize = Formatter.formatShortFileSize(context, sizeInBytes)
+            val bytesWithCommas = NumberFormat.getInstance().format(sizeInBytes)
+            sizeTextView.text = "$formattedSize ($bytesWithCommas bytes)"
 
             val dialogIF = MaterialAlertDialogBuilder(context)
                 .setView(customDialogIF)

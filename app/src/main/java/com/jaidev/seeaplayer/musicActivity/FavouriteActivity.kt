@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,6 +34,7 @@ import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.allAdapters.AddToPlaylistViewAdapter
 import com.jaidev.seeaplayer.allAdapters.FavouriteAdapter
 import com.jaidev.seeaplayer.dataClass.DatabaseClientMusic
+import com.jaidev.seeaplayer.dataClass.FavouriteViewModel
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
 import com.jaidev.seeaplayer.dataClass.MusicFavEntity
@@ -56,6 +58,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
     private lateinit var adapter: FavouriteAdapter
     private lateinit var musicDatabase: MusicFavDatabase
     private var isAllSelected = false
+    private lateinit var viewModel: FavouriteViewModel
 
     companion object {
         var favouritesChanged: Boolean = false
@@ -67,6 +70,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
             loadFavouriteSongs() // Refresh the list when a broadcast is received
         }
     }
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val theme = ThemeHelper.getSavedTheme(this)
@@ -86,28 +90,33 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
         binding.favouriteRV.adapter = adapter
 
         favouritesChanged = false
+        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(FavouriteViewModel::class.java)
 
-        // Set the default navigation icon to exit the activity
-        binding.playlistToolbar.setNavigationOnClickListener {
-            finish()
-        }
-        // Register the receiver
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            favouritesUpdatedReceiver, IntentFilter("com.yourpackage.FAVORITES_UPDATED")
-        )
-        binding.addVideosButton.setOnClickListener {
-            val bottomSheetFragment = AddMusicFavBottomSheetFragment.newInstance(favouriteSongs)
-            bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
-        }
 
         // Delay loading the favourite songs to ensure the activity opens immediately
         lifecycleScope.launch {
             delay(200) // Add a slight delay (200 ms) to allow the UI to render
             loadFavouriteSongs() // Now load the favourite songs
         }
-
+        setupUI()
     }
 
+    private fun setupUI() {
+        // Your existing setup code for UI components
+
+        // Register receiver and handle other UI elements
+        binding.playlistToolbar.setNavigationOnClickListener {
+            finish()
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            favouritesUpdatedReceiver, IntentFilter("com.yourpackage.FAVORITES_UPDATED")
+        )
+
+        binding.addVideosButton.setOnClickListener {
+            val bottomSheetFragment = AddMusicFavBottomSheetFragment.newInstance(favouriteSongs)
+            bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
+        }
+    }
 
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun showBottomSheetDialog() {
@@ -133,7 +142,6 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
 
         // Set the image thumbnail and text subtitle
         if (favouriteSongs.isNotEmpty()) {
-            val firstSong = favouriteSongs[0]
 
             Glide.with(this)
                 .load(getImgArt(favouriteSongs[songPosition].path))
@@ -269,29 +277,14 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
 //            Toast.makeText(this, "Your Android version does not support pinned shortcuts.", Toast.LENGTH_SHORT).show()
 //        }
 //    }
-    @SuppressLint("NotifyDataSetChanged")
+
     override fun onResume() {
         super.onResume()
-        // Delay loading the favourite songs to ensure the activity opens immediately
-        lifecycleScope.launch {
-            withContext(Dispatchers.Main) {
-                delay(200) // Add a slight delay (200 ms) to allow the UI to render
-                if (favouritesChanged) {
-                    loadFavouriteSongs()
-                    adapter.updateFavourites(favouriteSongs)
-                    adapter.notifyDataSetChanged()
-
-                    favouritesChanged = false
-                }
-                if (favouriteSongs.isNotEmpty()) {
-                    binding.progressBar.visibility = View.GONE // Show ProgressBar
-                } else {
-                    binding.progressBar.visibility = View.VISIBLE // Show ProgressBar
-                }
-            }
-            checkAndRemoveDeletedSongs()  // Check for and remove deleted songs
-
+        if (favouritesChanged) {
+            viewModel.refreshFavourites()
+            favouritesChanged = false
         }
+        checkAndRemoveDeletedSongs()  // Check for and remove deleted songs
     }
 
     override fun onPause() {
@@ -704,7 +697,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
                         val crossRefs = selectedSongs.map { song ->
                             PlaylistMusicCrossRef(
                                 playlistMusicId = playlistId,
-                                musicId = song.id // Use song.id to reference the music
+                                musicId = song.musicid // Use song.id to reference the music
                             )
                         }
                         dao.insertPlaylistMusicCrossRef(crossRefs)
@@ -732,7 +725,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
     }
     private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
         return PlaylistMusic(
-            id = entity.id,
+            musicid = entity.musicid,
             name = entity.name,
             music = listOf() // Initialize with an empty list or fetch actual music if needed
         )
@@ -762,7 +755,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
 // Extension function to convert Music to MusicFavEntity
 fun Music.toMusicFavEntity(): MusicFavEntity {
     return MusicFavEntity(
-        id = this.id,
+        musicid = this.musicid,
         title = this.title,
         album = this.album,
         artist = this.artist,
@@ -778,7 +771,7 @@ fun Music.toMusicFavEntity(): MusicFavEntity {
 // Extension function to convert MusicFavEntity to Music
 fun MusicFavEntity.toMusic(): Music {
     return Music(
-        id = this.id,
+        musicid = this.musicid,
         title = this.title,
         album = this.album,
         artist = this.artist,

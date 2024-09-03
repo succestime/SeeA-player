@@ -85,7 +85,7 @@ class AddMusicFavBottomSheetFragment : BottomSheetDialogFragment(), MusicFavAdap
 
                 // Filter out songs that are already in favorites
                 val newFavorites = selectedItems.filter { selectedSong ->
-                    existingFavs.none { favSong -> favSong.id.toString() == selectedSong.id.toString() }
+                    existingFavs.none { favSong -> favSong.musicid == selectedSong.musicid }
                 }
 
                 if (newFavorites.isNotEmpty()) {
@@ -94,7 +94,7 @@ class AddMusicFavBottomSheetFragment : BottomSheetDialogFragment(), MusicFavAdap
                     try {
                         for (song in newFavorites) {
                             val musicFavEntity = MusicFavEntity(
-                                id = song.id,
+                                musicid = song.musicid,
                                 title = song.title,
                                 album = song.album,
                                 artist = song.artist,

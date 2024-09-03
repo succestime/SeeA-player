@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "music_table")
 data class MusicFavEntity(
-    @PrimaryKey val id: String,
+    @PrimaryKey val musicid: String,
     val title: String,
     val album: String,
     val artist: String,

@@ -101,7 +101,6 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
         }
 
         binding.favouriteBtn.setOnClickListener {
-            FavouriteActivity.favouriteSongs.clear()
             startActivity(Intent(requireContext(), FavouriteActivity::class.java))
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         }

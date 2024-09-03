@@ -258,7 +258,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         }
 
         binding.favouriteBtnPA.setOnClickListener {
-            fIndex = favouriteChecker(musicListPA[songPosition].id)
+            fIndex = favouriteChecker(musicListPA[songPosition].musicid)
             val currentMusic = musicListPA[songPosition]
 
             if(isFavourite) {
@@ -282,7 +282,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
     private fun addToFavorites(music: Music) {
         val musicFavEntity = MusicFavEntity(
-            id = music.id,
+            musicid = music.musicid,
             title = music.title,
             album = music.album,
             artist = music.artist,
@@ -300,7 +300,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
 
     private fun deleteFromFavorites(music: Music) {
         val musicFavEntity = MusicFavEntity(
-           id = music.id,
+            musicid = music.musicid,
             title = music.title,
             album = music.album,
             artist = music.artist,
@@ -496,7 +496,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
     }
 
     private fun setLayout() {
-        fIndex = favouriteChecker(musicListPA[songPosition].id)
+        fIndex = favouriteChecker(musicListPA[songPosition].musicid)
 
         Glide.with(applicationContext)
             .load(getImgArt(musicListPA[songPosition].path))
@@ -541,7 +541,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             NowPlaying.binding.root.visibility = View.VISIBLE
             binding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
             musicService!!.mediaPlayer!!.setOnCompletionListener(this)
-            nowMusicPlayingId = musicListPA[songPosition].id
+            nowMusicPlayingId = musicListPA[songPosition].musicid
             loudnessEnhancer = LoudnessEnhancer(musicService!!.mediaPlayer!!.audioSessionId)
             loudnessEnhancer.enabled = true
 
@@ -620,7 +620,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         if (musicListPA.isNotEmpty()) {
             // Check if the currently playing music has been deleted
             val deletedMusic = musicListPA[songPosition]
-            if (deletedMusic.id != nowMusicPlayingId) {
+            if (deletedMusic.musicid != nowMusicPlayingId) {
                 // The currently playing music has been deleted, adjust the song position
 
                 createMediaPlayer()

@@ -643,8 +643,9 @@ class MainActivity : AppCompatActivity() {
                     val sizeC = it.getString(it.getColumnIndex(MediaStore.Video.Media.SIZE)) ?: ""
                     val pathC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DATA)) ?: ""
                     val durationC = it.getString(it.getColumnIndex(MediaStore.Video.Media.DURATION))?.toLong() ?: 0L
-                    val dateAddedMillis = it.getLong(it.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)) * 1000 // Convert to milliseconds
-
+                    // Ensure date is in seconds and convert to milliseconds
+                    val dateAddedSecs = it.getLong(it.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
+                    val dateAddedMillis = dateAddedSecs * 1000L // Convert to milliseconds
                     try {
                         val file = File(pathC)
                         val artUriC = Uri.fromFile(file)
@@ -779,7 +780,7 @@ class MainActivity : AppCompatActivity() {
                     if (durationC > 0) {
 
                         val music = Music(
-                            id = idC,
+                            musicid = idC,
                             title = titleC,
                             album = albumC,
                             artist = artistC,

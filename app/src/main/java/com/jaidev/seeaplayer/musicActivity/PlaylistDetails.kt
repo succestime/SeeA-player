@@ -177,7 +177,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
                     lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
                             selectedVideos.forEach { video ->
-                                db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, video.id)
+                                db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, video.musicid)
                             }
                         }
 
@@ -215,10 +215,10 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
             val deletedMusic = db.playlistMusicDao().getMusicByPath(deletedMusicPath)
             if (deletedMusic != null) {
                 // Remove the music from the playlist
-                db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, deletedMusic.id)
+                db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, deletedMusic.musicid)
 
                 // Remove the music from the database
-                db.playlistMusicDao().deleteMusic(deletedMusic.id)
+                db.playlistMusicDao().deleteMusic(deletedMusic.musicid)
             }
         }
         withContext(Dispatchers.Main) {
@@ -295,7 +295,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
             videoList.clear()
             videoList.addAll(sortedVideos.map { videoEntity ->
                 Music(
-                    id = videoEntity.id,
+                    musicid = videoEntity.musicid,
                     title = videoEntity.title,
                     duration = videoEntity.duration,
                     size = videoEntity.size,
@@ -655,7 +655,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
     private suspend fun removeVideoFromPlaylist(video: Music) {
         withContext(Dispatchers.IO) {
             // Remove the video from the playlist
-            db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, video.id)
+            db.playlistMusicDao().deleteMusicFromPlaylist(playlistId, video.musicid)
         }
         // Reload the videos after removing
         loadVideosForPlaylist()
@@ -674,7 +674,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
         videoList.clear()
         videoList.addAll(playlistWithVideos.music.map {
             Music(
-                id = it.id,
+                musicid = it.musicid,
                 title = it.title,
                 duration = it.duration,
                 size = it.size,
@@ -720,7 +720,7 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
                 videoList.clear()
                 videoList.addAll(sortedVideos.map {
                     Music(
-                        id = it.id,
+                        musicid = it.musicid,
                         title = it.title,
                         duration = it.duration,
                         size = it.size,
@@ -748,12 +748,12 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
         lifecycleScope.launch(Dispatchers.IO) {  // Use Dispatchers.IO to run on a background thread
             selectedVideos.forEach { music ->
                 // Check if the video already exists in the videos table
-                val videoExists = db.playlistMusicDao().musicExists(music.id)
+                val videoExists = db.playlistMusicDao().musicExists(music.musicid)
                 if (!videoExists) {
                     // Insert the video only if it doesn't already exist
                     db.playlistMusicDao().insertMusic(
                         MusicEntity(
-                            id = music.id,
+                            musicid = music.musicid,
                             title = music.title,
                             duration = music.duration,
                             size = music.size,
@@ -767,10 +767,10 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
                 }
 
                 // Check if the video is already in the playlist
-                val isVideoInPlaylist = db.playlistMusicDao().isMusicInPlaylist(playlistId, music.id)
+                val isVideoInPlaylist = db.playlistMusicDao().isMusicInPlaylist(playlistId, music.musicid)
                 if (!isVideoInPlaylist) {
                     // Insert the video into the playlist if it's not already in the playlist
-                    db.playlistMusicDao().insertPlaylistMusicCrossRef(PlaylistMusicCrossRef(playlistId, music.id))
+                    db.playlistMusicDao().insertPlaylistMusicCrossRef(PlaylistMusicCrossRef(playlistId, music.musicid))
                 } else {
                     // Show a toast if the video is already in the playlist
                     withContext(Dispatchers.Main) {

@@ -12,7 +12,7 @@ data class VideoEntity(
     val size: String,
     val path: String,
     val artUri: String,
-    val dateAdded: Long?,
+    val dateAdded: Long,
     val isNew: Boolean = false,
     val isPlayed: Boolean = false
 )

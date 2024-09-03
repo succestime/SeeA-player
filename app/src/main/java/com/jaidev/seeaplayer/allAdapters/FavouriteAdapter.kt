@@ -40,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.NumberFormat
 
 class FavouriteAdapter(private val context: Context, private var musicList : ArrayList<Music> ,
                        private val selectionModeChangeListener: OnSelectionModeChangeListener
@@ -131,7 +132,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
                 toggleSelection(position)
                 notifyItemChanged(position)
             } else {
-                when (video.id) {
+                when (video.musicid) {
                     PlayerMusicActivity.nowMusicPlayingId ->
                         sendIntent(
                             ref = "FavNowPlaying",
@@ -366,7 +367,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
             GlobalScope.launch(Dispatchers.IO) {
                 val musicFavDao = MusicFavDatabase.getDatabase(context).musicFavDao()
                 val musicFavEntity = MusicFavEntity(
-                    id = removedMusic.id,
+                    musicid = removedMusic.musicid,
                     title = removedMusic.title,
                     album = removedMusic.album,
                     artist = removedMusic.artist,
@@ -400,7 +401,11 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
             // Populate dialog views with data
             fileNameTextView.text = musicList[position].title
             durationTextView.text = DateUtils.formatElapsedTime(musicList[position].duration / 1000)
-            sizeTextView.text = Formatter.formatShortFileSize(context, musicList[position].size.toLong())
+            // Ensure video.size is properly converted to a numeric type
+            val sizeInBytes = playlist.size.toLongOrNull() ?: 0L
+            val formattedSize = Formatter.formatShortFileSize(context, sizeInBytes)
+            val bytesWithCommas = NumberFormat.getInstance().format(sizeInBytes)
+            sizeTextView.text = "$formattedSize ($bytesWithCommas bytes)"
             locationTextView.text = musicList[position].path
 
             val dialogIF = MaterialAlertDialogBuilder(context)
@@ -512,7 +517,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
                 GlobalScope.launch(Dispatchers.IO) {
                     val musicFavDao = MusicFavDatabase.getDatabase(context).musicFavDao()
                     val musicFavEntity = MusicFavEntity(
-                        id = removedMusic.id,
+                        musicid = removedMusic.musicid,
                         title = removedMusic.title,
                         album = removedMusic.album,
                         artist = removedMusic.artist,
@@ -539,7 +544,7 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
 
     private fun mapEntityToPlaylistMusic(entity: PlaylistMusicEntity): PlaylistMusic {
         return PlaylistMusic(
-            id = entity.id,
+            musicid = entity.musicid,
             name = entity.name,
             music = listOf() // Initialize with an empty list or fetch actual music if needed
         )

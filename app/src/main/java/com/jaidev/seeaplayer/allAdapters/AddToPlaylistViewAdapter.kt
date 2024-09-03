@@ -66,11 +66,11 @@ class AddToPlaylistViewAdapter(
 
             binding.root.post {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val sortOrder = dao.getSortOrder(playlist.id)
-                    val videoCount = dao.getMusicCountForPlaylist(playlist.id)
-                    val totalDurationMillis = if (videoCount > 0) dao.getTotalDurationForPlaylist(playlist.id) else 0
+                    val sortOrder = dao.getSortOrder(playlist.musicid)
+                    val videoCount = dao.getMusicCountForPlaylist(playlist.musicid)
+                    val totalDurationMillis = if (videoCount > 0) dao.getTotalDurationForPlaylist(playlist.musicid) else 0
                     val totalDurationFormatted = if (totalDurationMillis > 0) formatDuration(totalDurationMillis) else ""
-                    val firstVideoImageUri = dao.getFirstMusicImageUri(playlist.id, sortOrder)
+                    val firstVideoImageUri = dao.getFirstMusicImageUri(playlist.musicid, sortOrder)
 
                     withContext(Dispatchers.Main) {
                         binding.totalVideoContain.text = if (videoCount > 0) {
@@ -98,7 +98,7 @@ class AddToPlaylistViewAdapter(
 
                     // Log the music details
                     musicToAdd.forEach { music ->
-                        Log.d("AddToPlaylistViewAdapter", "Checking music ID: ${music.id}, Path: ${music.path}")
+                        Log.d("AddToPlaylistViewAdapter", "Checking music ID: ${music.musicid}, Path: ${music.path}")
                     }
 
                     // Validate Music and Playlist exist before inserting into cross-reference
@@ -108,9 +108,9 @@ class AddToPlaylistViewAdapter(
                             Log.e("AddToPlaylistViewAdapter", "File does not exist at path: ${music.path}")
                             false
                         } else {
-                            dao.getMusicById(music.id) != null  // Check if the music exists in the database
+                            dao.getMusicById(music.musicid) != null  // Check if the music exists in the database
                         }
-                    }.map { it.id }
+                    }.map { it.musicid }
 
                     if (validMusicIds.isEmpty()) {
                         withContext(Dispatchers.Main) {
@@ -123,13 +123,13 @@ class AddToPlaylistViewAdapter(
                         return@launch
                     }
 
-                    val alreadyInPlaylist = validMusicIds.all { dao.isMusicInPlaylist(playlist.id, it) }
+                    val alreadyInPlaylist = validMusicIds.all { dao.isMusicInPlaylist(playlist.musicid, it) }
 
                     if (!alreadyInPlaylist) {
                         validMusicIds.forEach { musicId ->
                             dao.insertPlaylistMusicCrossRef(
                                 PlaylistMusicCrossRef(
-                                    playlistMusicId = playlist.id,
+                                    playlistMusicId = playlist.musicid,
                                     musicId = musicId
                                 )
                             )
