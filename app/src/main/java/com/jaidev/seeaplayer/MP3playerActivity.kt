@@ -505,6 +505,12 @@ private fun createMediaPlayer(){
             .into(MP3NowPlaying.binding.songImgNP)
         MP3NowPlaying.binding.songNameNP.text = mp3MusicPA[songPosition].title
     }
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+            super.onBackPressed()
+            overridePendingTransition(R.anim.anim_no_change ,R.anim.slide_out_bottom
+            )
+        }
 
 
 }

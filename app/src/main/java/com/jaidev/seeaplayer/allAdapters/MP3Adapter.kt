@@ -103,6 +103,10 @@ class MP3Adapter(private val context: Context, private val mp3Files: ArrayList<M
         intent.putExtra("index", pos)
         intent.putExtra("class", ref)
         ContextCompat.startActivity(context, intent, null)
+        (context as Activity).overridePendingTransition(
+            R.anim.slide_in_bottom,
+            R.anim.anim_no_change // Using a transparent animation for exit
+        )
     }
 
     override fun getItemCount(): Int {

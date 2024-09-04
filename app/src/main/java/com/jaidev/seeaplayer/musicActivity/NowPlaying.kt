@@ -58,6 +58,9 @@ class NowPlaying : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAd
             intent.putExtra("index", PlayerMusicActivity.songPosition)
             intent.putExtra("class", "NowPlaying")
             ContextCompat.startActivity(requireContext(), intent, null)
+            requireActivity().overridePendingTransition( R.anim.slide_in_bottom,
+                R.anim.anim_no_change)
+
         }
 
         return view

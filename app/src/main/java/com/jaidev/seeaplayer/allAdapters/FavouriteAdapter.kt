@@ -2,6 +2,7 @@
 package com.jaidev.seeaplayer.allAdapters
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -33,7 +34,6 @@ import com.jaidev.seeaplayer.dataClass.PlaylistMusic
 import com.jaidev.seeaplayer.dataClass.PlaylistMusicEntity
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.FavouriteViewBinding
-import com.jaidev.seeaplayer.musicActivity.FavouriteActivity.Companion.favouriteSongs
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -158,18 +158,16 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
         intent.putExtra("index", pos)
         intent.putExtra("class", ref)
         ContextCompat.startActivity(context, intent, null)
+        (context as Activity).overridePendingTransition(
+            R.anim.slide_in_bottom,
+            R.anim.anim_no_change // Using a transparent animation for exit
+        )
     }
     override fun getItemCount(): Int {
         return musicList.size
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateFavourites(newFavourites: List<Music>) {
-        favouriteSongs.clear()
-        favouriteSongs.addAll(newFavourites)
-        notifyDataSetChanged()
-    }
-    // Add this method to your FavouriteAdapter class
+
     fun isSelected(position: Int): Boolean {
         return selectedItems.contains(position)
     }
@@ -427,6 +425,10 @@ class FavouriteAdapter(private val context: Context, private var musicList : Arr
             intent.putExtra("index", position)
             intent.putExtra("class", "FavouriteBottomAdapter")
             ContextCompat.startActivity(context, intent, null)
+            (context as Activity).overridePendingTransition(
+                R.anim.slide_in_bottom,
+                R.anim.anim_no_change // Using a transparent animation for exit
+            )
             bottomSheetDialog.dismiss()
         }
 

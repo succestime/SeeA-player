@@ -113,7 +113,6 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         updateNextMusicTitle()
 
 
-
         playerMusicLayout = binding.PlayerMusicLayout
         // Set the background color of SwipeRefreshLayout based on app theme
         setMusicLayoutBackgroundColor()
@@ -288,7 +287,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             artist = music.artist,
             duration = music.duration,
             path = music.path,
-            size = music.size.toString(),
+            size = music.size,
             artUri = music.artUri,
             dateAdded = music.dateAdded
         )
@@ -306,7 +305,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             artist = music.artist,
             duration = music.duration,
             path = music.path,
-            size = music.size.toString(),
+            size = music.size,
             artUri = music.artUri,
             dateAdded = music.dateAdded
         )
@@ -419,6 +418,7 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                musicListPA = ArrayList()
                 musicListPA.addAll(PlaylistDetails.videoList)
               originalMusicListPA = ArrayList(musicListPA)
+
                 setLayout()
             }
 
@@ -469,7 +469,6 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
                 musicListPA = ArrayList()
                 musicListPA.addAll(FavouriteActivity.favouriteSongs)
                 musicListPA.shuffle()
-                createMediaPlayer()
                 setLayout()
             }
         "MusicNav2" -> {
@@ -512,12 +511,13 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
             R.color.cool_green))
         if (!isShuffleEnabled)  binding.shuffleBtnPA.setImageResource(R.drawable.shuffle_icon)
         else binding.shuffleBtnPA.setImageResource(R.drawable.media_playlist_consecutive_svgrepo_com__1_)
-//        if(min15 || min30 || min60) binding.timerBtnPA?.setColorFilter(ContextCompat.getColor(applicationContext,
-//            R.color.cool_green
-//        ))
-        if(isFavourite) binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_music)
-        else binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_border_music)
+        if(isFavourite) {
+            binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_music)
 
+        }else{
+            binding.favouriteBtnPA.setImageResource(R.drawable.round_favorite_border_music)
+
+        }
     }
 
     private fun createMediaPlayer() {
@@ -703,7 +703,12 @@ class PlayerMusicActivity : AppCompatActivity() , ServiceConnection, MediaPlayer
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
     }
-
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.anim_no_change ,R.anim.slide_out_bottom
+        )
+    }
 }
 
 

@@ -27,6 +27,7 @@ import com.google.android.gms.ads.appopen.AppOpenAd
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.Services.MusicService
+import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reFormatDuration
@@ -42,6 +43,8 @@ class ReMusicPlayerActivity : AppCompatActivity()
     lateinit var mAdView: AdView
     private lateinit var reMusicPlayerLayout: ConstraintLayout
     private var appOpenAd : AppOpenAd? = null
+    private lateinit var musicDatabase: MusicFavDatabase
+
     companion object {
         // of PlayerActivity of this reMusicActivity
         var reMusicListPA: ArrayList<RecantMusic> = ArrayList()
@@ -251,7 +254,10 @@ class ReMusicPlayerActivity : AppCompatActivity()
             }
         }
 
+
     }
+
+
     private fun   setMusicLayoutBackgroundColor() {
         val isDarkMode = when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
             android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
@@ -501,7 +507,12 @@ class ReMusicPlayerActivity : AppCompatActivity()
         loadAppOpenAd()
 
     }
-
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.anim_no_change ,R.anim.slide_out_bottom
+        )
+    }
     @SuppressLint("ObsoleteSdkInt")
     override fun onSpeedSelected(speed: Float) {
         musicService?.mediaPlayer?.let { mediaPlayer ->

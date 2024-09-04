@@ -2,6 +2,7 @@
 package com.jaidev.seeaplayer.allAdapters
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.ContentUris
@@ -1134,6 +1135,10 @@ class MusicAdapter(
         intent.putExtra("index", pos)
         intent.putExtra("class", ref)
         startActivity(context, intent, null)
+        (context as Activity).overridePendingTransition(
+            anim.slide_in_bottom,
+            anim.anim_no_change // Using a transparent animation for exit
+        )
     }
 
 

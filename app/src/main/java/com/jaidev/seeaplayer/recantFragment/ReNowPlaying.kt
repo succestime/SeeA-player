@@ -63,6 +63,8 @@ class ReNowPlaying : Fragment(), RecantMusicAdapter.MusicDeleteListener  , Recan
                 intent.putExtra("index", ReMusicPlayerActivity.songPosition)
                 intent.putExtra("class", "ReNowPlaying")
                 ContextCompat.startActivity(requireContext(), intent, null)
+                requireActivity().overridePendingTransition( R.anim.slide_in_bottom,
+                    R.anim.anim_no_change)
             }catch (_:Exception){
 
             }

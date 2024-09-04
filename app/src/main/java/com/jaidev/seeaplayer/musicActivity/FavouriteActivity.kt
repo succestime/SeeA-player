@@ -62,7 +62,7 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
 
     companion object {
         var favouritesChanged: Boolean = false
-        var favouriteSongs: ArrayList<Music> = ArrayList()
+       var favouriteSongs: ArrayList<Music> = ArrayList()
 
     }
     private val favouritesUpdatedReceiver = object : BroadcastReceiver() {
@@ -395,6 +395,9 @@ class FavouriteActivity : AppCompatActivity(), FavouriteAdapter.OnSelectionModeC
             intent.putExtra("index", 0)
             intent.putExtra("class", "FavouriteShuffle")
             startActivity(intent)
+            overridePendingTransition(
+                R.anim.slide_in_bottom,
+                R.anim.anim_no_change )
         }
 
         // Update visibility of emptyStateLayout and playlistToolbar.menu

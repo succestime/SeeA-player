@@ -58,6 +58,8 @@ class MP3NowPlaying : Fragment() {
             intent.putExtra("index", songPosition)
             intent.putExtra("class", "MP3NowPlaying")
            ContextCompat.startActivity(requireContext(), intent, null)
+           requireActivity().overridePendingTransition( R.anim.slide_in_bottom,
+               R.anim.anim_no_change)
         }
         return view
     }

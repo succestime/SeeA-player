@@ -173,13 +173,17 @@ class PlaylistViewAdapter(private val context: Context, private var playlists: M
                     withContext(Dispatchers.Main) {
                         if (videoUris.isEmpty()) {
                             // Show a toast message if the playlist is empty
-                            Toast.makeText(context, "No videos in this playlist", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "No songs in this playlist", Toast.LENGTH_SHORT).show()
                         } else {
                             val intent = Intent(context, PlayerFileActivity::class.java).apply {
                                 action = Intent.ACTION_SEND_MULTIPLE
                                 putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(videoUris.map { Uri.parse(it) }))
                             }
                             context.startActivity(intent)
+                            (context as Activity).overridePendingTransition(
+                                R.anim.slide_in_bottom,
+                                R.anim.anim_no_change // Using a transparent animation for exit
+                            )
                         }
                         bottomSheetDialog.dismiss() // Dismiss the dialog after clicking play
                     }

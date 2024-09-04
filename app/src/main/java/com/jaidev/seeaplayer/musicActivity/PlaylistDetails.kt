@@ -124,6 +124,10 @@ class PlaylistDetails : AppCompatActivity(), PlaylistMusicShowAdapter.OnSelectio
                 val intent = Intent(this, PlayerMusicActivity::class.java)
                 intent.putParcelableArrayListExtra("SelectedMusicList", ArrayList(videoList))
                 startActivity(intent)
+                overridePendingTransition(
+                    R.anim.slide_in_bottom,
+                    R.anim.anim_no_change // Using a transparent animation for exit
+                )
             } else {
                 Toast.makeText(this, "No music in the playlist to play.", Toast.LENGTH_SHORT).show()
             }

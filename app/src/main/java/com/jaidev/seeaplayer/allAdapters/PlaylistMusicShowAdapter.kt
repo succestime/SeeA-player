@@ -1,6 +1,7 @@
 package com.jaidev.seeaplayer.allAdapters
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.ContentValues
@@ -195,6 +196,10 @@ class PlaylistMusicShowAdapter(
                 intent.putExtra("index", position)
                 intent.putExtra("class", "FavouriteAShuffle")
                 ContextCompat.startActivity(context, intent, null)
+                (context as Activity).overridePendingTransition(
+                    R.anim.slide_in_bottom,
+                    R.anim.anim_no_change // Using a transparent animation for exit
+                )
             }
         }
 
@@ -373,6 +378,10 @@ class PlaylistMusicShowAdapter(
             intent.putExtra("index", position)
             intent.putExtra("class", "bottomSheetPlay")
             ContextCompat.startActivity(context, intent, null)
+            (context as Activity).overridePendingTransition(
+                R.anim.slide_in_bottom,
+                R.anim.anim_no_change // Using a transparent animation for exit
+            )
             bottomSheetDialog.dismiss()
 
 
