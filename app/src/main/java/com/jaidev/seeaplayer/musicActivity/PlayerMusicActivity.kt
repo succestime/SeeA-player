@@ -24,11 +24,13 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.MusicFavouriteFunctionality.FavouriteActivity
+import com.jaidev.seeaplayer.MusicPlaylistFunctionality.PlaylistDetails
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.Services.MusicService
 import com.jaidev.seeaplayer.dataClass.Music
-import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
-import com.jaidev.seeaplayer.dataClass.MusicFavEntity
+import com.jaidev.seeaplayer.dataClass.MusicFavouriteData.MusicFavDatabase
+import com.jaidev.seeaplayer.dataClass.MusicFavouriteData.MusicFavEntity
 import com.jaidev.seeaplayer.dataClass.favouriteChecker
 import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt

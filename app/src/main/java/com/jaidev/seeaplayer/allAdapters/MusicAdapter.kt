@@ -45,17 +45,17 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.MusicNav
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.R.*
 import com.jaidev.seeaplayer.dataClass.Music
-import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
-import com.jaidev.seeaplayer.dataClass.MusicFavEntity
+import com.jaidev.seeaplayer.dataClass.MusicFavouriteData.MusicFavDatabase
+import com.jaidev.seeaplayer.dataClass.MusicFavouriteData.MusicFavEntity
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.databinding.MusicViewBinding
 import com.jaidev.seeaplayer.musicActivity.NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.binding
-import com.jaidev.seeaplayer.musicNav
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -660,13 +660,13 @@ class MusicAdapter(
                 if (musicList[position].musicid == PlayerMusicActivity.nowMusicPlayingId) {
                     if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
                         PlayerMusicActivity.musicService?.prevNextSong(true, context)
-                        musicNav.updateEmptyState()
+                        MusicNav.updateEmptyState()
 
                     } else {
                         PlayerMusicActivity.musicService?.stopService() // Stop the music service
                         PlayerMusicActivity.musicService?.mediaPlayer?.stop()
                         NowPlaying.binding.root.visibility = View.GONE
-                        musicNav.updateEmptyState()
+                        MusicNav.updateEmptyState()
 
                     }
                 }
@@ -676,7 +676,7 @@ class MusicAdapter(
                         MainActivity.dataChanged = true
                         musicList.removeAt(position)
                         notifyDataSetChanged()
-                        musicNav.updateEmptyState()
+                        MusicNav.updateEmptyState()
 
                         musicDeleteListener?.onMusicDeleted()
                     }
@@ -685,7 +685,7 @@ class MusicAdapter(
                         MainActivity.dataChanged = true
                         MainActivity.MusicListMA.removeAt(position)
                         notifyDataSetChanged()
-                        musicNav.updateEmptyState()
+                        MusicNav.updateEmptyState()
 
                         musicDeleteListener?.onMusicDeleted()
                     }
@@ -908,22 +908,22 @@ class MusicAdapter(
 
                                     if (musicList[position].musicid == PlayerMusicActivity.nowMusicPlayingId) {
                                         if (PlayerMusicActivity.musicListPA.isNotEmpty()) {
-                                            musicNav.updateEmptyState()
+                                            MusicNav.updateEmptyState()
                                             PlayerMusicActivity.musicService?.prevNextSong(true, context)
                                         } else {
                                             PlayerMusicActivity.musicService?.stopService() // Stop the music service
                                             PlayerMusicActivity.musicService?.mediaPlayer?.stop()
                                             NowPlaying.binding.root.visibility = View.GONE
-                                            musicNav.updateEmptyState()
+                                            MusicNav.updateEmptyState()
 
                                         }
                                     }
                                     musicList.removeAt(position)
-                                    musicNav.updateEmptyState()
+                                    MusicNav.updateEmptyState()
 
                                 }
                             }
-                            musicNav.updateEmptyState()
+                            MusicNav.updateEmptyState()
                             selectedItems.clear()
                             notifyDataSetChanged()
                             musicDeleteListener?.onMusicDeleted()

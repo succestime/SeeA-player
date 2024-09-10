@@ -19,8 +19,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.jaidev.seeaplayer.MP3ConverterActivity
-import com.jaidev.seeaplayer.MP3playerActivity
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3ConverterActivity
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3playerActivity
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.dataClass.exitApplication

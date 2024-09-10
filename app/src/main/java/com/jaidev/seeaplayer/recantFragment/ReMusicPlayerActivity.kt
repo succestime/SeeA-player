@@ -27,7 +27,7 @@ import com.google.android.gms.ads.appopen.AppOpenAd
 import com.jaidev.seeaplayer.MainActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.Services.MusicService
-import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
+import com.jaidev.seeaplayer.dataClass.MusicFavouriteData.MusicFavDatabase
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.reFormatDuration

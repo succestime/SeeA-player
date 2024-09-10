@@ -21,22 +21,22 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.jaidev.seeaplayer.MP3playerActivity
-import com.jaidev.seeaplayer.MP3playerActivity.Companion.mp3Adapter
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3NotificationReceiver
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3NowPlaying
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3playerActivity
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3playerActivity.Companion.mp3Adapter
 import com.jaidev.seeaplayer.MainActivity
+import com.jaidev.seeaplayer.MusicNav
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.dataClass.exitMP3Application
+import com.jaidev.seeaplayer.dataClass.MP3Data.exitMP3Application
+import com.jaidev.seeaplayer.dataClass.MP3Data.setMP3SongPosition
 import com.jaidev.seeaplayer.dataClass.formatDuration
 import com.jaidev.seeaplayer.dataClass.getImgArt
-import com.jaidev.seeaplayer.dataClass.setMP3SongPosition
-import com.jaidev.seeaplayer.musicActivity.MP3NotificationReceiver
-import com.jaidev.seeaplayer.musicActivity.MP3NowPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.isPlaying
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.loudnessEnhancer
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.nowMusicPlayingId
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity.Companion.songPosition
-import com.jaidev.seeaplayer.musicNav
 
 class MP3Service: Service() , AudioManager.OnAudioFocusChangeListener{
     private var myBinder = MyBinder()
@@ -71,7 +71,7 @@ class MP3Service: Service() , AudioManager.OnAudioFocusChangeListener{
         isPlaying = false
         handler.removeCallbacks(runnable)
         MP3playerActivity.musicMP3Service = null // Ensure service reference is cleared
-        val intent = Intent(musicNav.ACTION_HIDE_MP3_NOW_PLAYING)
+        val intent = Intent(MusicNav.ACTION_HIDE_MP3_NOW_PLAYING)
         sendBroadcast(intent)
     }
     fun showNotification(playPauseBtn: Int) {

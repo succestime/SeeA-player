@@ -43,11 +43,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jaidev.seeaplayer.MP3ConverterActivity
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3ConverterActivity
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.dataClass.MP3AppDatabase
-import com.jaidev.seeaplayer.dataClass.MP3FileData
-import com.jaidev.seeaplayer.dataClass.MP3FileEntity
+import com.jaidev.seeaplayer.dataClass.MP3Data.MP3AppDatabase
+import com.jaidev.seeaplayer.dataClass.MP3Data.MP3FileData
+import com.jaidev.seeaplayer.dataClass.MP3Data.MP3FileEntity
 import com.jaidev.seeaplayer.dataClass.RecantVideo
 import com.jaidev.seeaplayer.databinding.RecantDownloadViewBinding
 import com.jaidev.seeaplayer.recantFragment.DaysDownload

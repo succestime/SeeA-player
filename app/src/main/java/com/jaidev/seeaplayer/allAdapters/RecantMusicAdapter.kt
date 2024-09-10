@@ -39,8 +39,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.jaidev.seeaplayer.R
-import com.jaidev.seeaplayer.dataClass.MusicFavDatabase
-import com.jaidev.seeaplayer.dataClass.MusicFavEntity
+import com.jaidev.seeaplayer.dataClass.MusicFavouriteData.MusicFavDatabase
+import com.jaidev.seeaplayer.dataClass.MusicFavouriteData.MusicFavEntity
 import com.jaidev.seeaplayer.dataClass.RecantMusic
 import com.jaidev.seeaplayer.dataClass.getImgArt
 import com.jaidev.seeaplayer.dataClass.setReSongPosition

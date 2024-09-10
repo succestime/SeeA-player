@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="60sp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".musicActivity.MP3NowPlaying"
+    tools:context=".MP3ConverterFunctionality.MP3NowPlaying"
     android:layout_marginStart="5sp"
     android:layout_marginEnd="7sp"
     android:background="@drawable/curved_nowpalying_background">

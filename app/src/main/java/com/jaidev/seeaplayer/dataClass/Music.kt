@@ -5,7 +5,7 @@ package com.jaidev.seeaplayer.dataClass
 import android.media.MediaMetadataRetriever
 import android.os.Parcel
 import android.os.Parcelable
-import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
+import com.jaidev.seeaplayer.MusicFavouriteFunctionality.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess

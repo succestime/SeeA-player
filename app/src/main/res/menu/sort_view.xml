@@ -16,6 +16,13 @@
         app:showAsAction="ifRoom"
         />
 
+    <item android:id="@+id/folderOrder"
+        android:title="folderOrder"
+        app:tint="?android:attr/textColorPrimary"
+        android:icon="@drawable/folder_icon"
+        app:showAsAction="ifRoom"
+        />
+
 
 
 </menu>

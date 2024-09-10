@@ -24,15 +24,15 @@ import com.jaidev.seeaplayer.MainActivity.Companion.MusicListMA
 import com.jaidev.seeaplayer.MainActivity.Companion.musicListSearch
 import com.jaidev.seeaplayer.MainActivity.Companion.musicRecantList
 import com.jaidev.seeaplayer.MainActivity.Companion.search
+import com.jaidev.seeaplayer.MusicFavouriteFunctionality.FavouriteActivity
+import com.jaidev.seeaplayer.MusicPlaylistFunctionality.PlaylistActivity
 import com.jaidev.seeaplayer.Subscription.SeeAOne
 import com.jaidev.seeaplayer.allAdapters.MusicAdapter
 import com.jaidev.seeaplayer.allAdapters.RecantMusicAdapter
 import com.jaidev.seeaplayer.databinding.FragmentMusicNavBinding
-import com.jaidev.seeaplayer.musicActivity.FavouriteActivity
 import com.jaidev.seeaplayer.musicActivity.PlayerMusicActivity
-import com.jaidev.seeaplayer.musicActivity.PlaylistActivity
 
-class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdapter.MusicDeleteListener ,    RecantMusicAdapter.OnFileCountChangeListener
+class MusicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdapter.MusicDeleteListener ,    RecantMusicAdapter.OnFileCountChangeListener
 {
 
     lateinit var adapter: MusicAdapter
@@ -77,13 +77,13 @@ class musicNav : Fragment(), MusicAdapter.MusicDeleteListener ,  RecantMusicAdap
         val view = inflater.inflate(R.layout.fragment_music_nav, container, false)
         binding = FragmentMusicNavBinding.bind(view)
         setupActionBar()
-        requireContext().registerReceiver(hideNowPlayingReceiver, IntentFilter(musicNav.ACTION_HIDE_MP3_NOW_PLAYING))
+        requireContext().registerReceiver(hideNowPlayingReceiver, IntentFilter(MusicNav.ACTION_HIDE_MP3_NOW_PLAYING))
 
         binding.musicRV.setHasFixedSize(true)
         binding.musicRV.setItemViewCacheSize(15)
         binding.musicRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = MusicAdapter(requireContext(), MusicListMA, isMusic = true )
-        adapterf = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@musicNav, isMusic = false  )
+        adapterf = RecantMusicAdapter(requireContext(), musicRecantList, isReMusic = true, this@MusicNav, isMusic = false  )
         adapter.setMusicDeleteListener(this)
         adapterf.setMusicDeleteListener(this)
         binding.musicRV.adapter = adapter

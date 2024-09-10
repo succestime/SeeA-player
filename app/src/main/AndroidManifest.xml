@@ -38,24 +38,24 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".MP3playerActivity"
+            android:name=".MP3ConverterFunctionality.MP3playerActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
             android:exported="false"
             android:theme="@style/statusBarPlaylistTheme"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".MP3ConverterActivity"
+            android:name=".MP3ConverterFunctionality.MP3ConverterActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale"
 
             android:exported="false" />
         <activity
-            android:name=".PlaylistVideoActivity"
+            android:name=".VideoPlaylistFunctionality.PlaylistVideoActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/statusBarPlaylistTheme"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".PlaylistFolderActivity"
+            android:name=".VideoPlaylistFunctionality.PlaylistFolderActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"
@@ -282,18 +282,18 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".musicActivity.PlaylistDetails"
+            android:name=".MusicPlaylistFunctionality.PlaylistDetails"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/statusBarPlaylistTheme"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".musicActivity.PlaylistActivity"
+            android:name=".MusicPlaylistFunctionality.PlaylistActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".musicActivity.FavouriteActivity"
+            android:name=".MusicFavouriteFunctionality.FavouriteActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
@@ -350,7 +350,7 @@
             android:name=".Services.NotificationReceiver"
             android:enabled="true" />
         <receiver
-            android:name=".musicActivity.MP3NotificationReceiver"
+            android:name=".MP3ConverterFunctionality.MP3NotificationReceiver"
             android:enabled="true" />
 
 

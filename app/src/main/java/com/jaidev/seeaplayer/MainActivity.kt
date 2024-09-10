@@ -45,11 +45,11 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jaidev.seeaplayer.Services.FolderDetectionService
-import com.jaidev.seeaplayer.bottomNavigation.downloadNav
-import com.jaidev.seeaplayer.bottomNavigation.homeNav
+import com.jaidev.seeaplayer.bottomNavigation.DownloadNav
+import com.jaidev.seeaplayer.bottomNavigation.HomeNav
 import com.jaidev.seeaplayer.browserActivity.LinkTubeActivity
 import com.jaidev.seeaplayer.dataClass.Folder
-import com.jaidev.seeaplayer.dataClass.MP3FileData
+import com.jaidev.seeaplayer.dataClass.MP3Data.MP3FileData
 import com.jaidev.seeaplayer.dataClass.Music
 import com.jaidev.seeaplayer.dataClass.NaturalOrderComparator
 import com.jaidev.seeaplayer.dataClass.RecantMusic
@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
         linkTubeActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             // Hide progress bar when returning from LinkTubeActivity
             binding.mainActivityProgressbar.visibility = View.GONE
-            setFragment(homeNav())
+            setFragment(HomeNav())
             binding.bottomNav.selectedItemId = R.id.home // Manually set the selected item
         }
 
@@ -290,13 +290,13 @@ class MainActivity : AppCompatActivity() {
             try {
                 when (it.itemId) {
                     R.id.home -> {
-                        setFragment(homeNav())
+                        setFragment(HomeNav())
                     }
                     R.id.music -> {
-                        setFragment(musicNav())
+                        setFragment(MusicNav())
                     }
                     R.id.download -> {
-                        setFragment(downloadNav())
+                        setFragment(DownloadNav())
                     }
                     R.id.linkTube -> {
                         val intent = Intent(this@MainActivity, LinkTubeActivity::class.java)
@@ -323,7 +323,7 @@ class MainActivity : AppCompatActivity() {
             MusicListMA = getAllAudio()
             videoRecantList = getAllRecantVideos(this)
             musicRecantList = getAllRecantMusics(this)
-            setFragment(homeNav())
+            setFragment(HomeNav())
 
             runnable = Runnable {
                 if(dataChanged){
@@ -339,7 +339,7 @@ class MainActivity : AppCompatActivity() {
             MusicListMA = getAllAudio()
             videoRecantList = getAllRecantVideos(this)
             musicRecantList = getAllRecantMusics(this)
-            setFragment(homeNav())
+            setFragment(HomeNav())
         }
     }
 
@@ -501,7 +501,7 @@ class MainActivity : AppCompatActivity() {
                     MusicListMA = getAllAudio()
                     videoRecantList = getAllRecantVideos(this)
                     musicRecantList = getAllRecantMusics(this)
-                    setFragment(homeNav())
+                    setFragment(HomeNav())
                     // Check if either READ_MEDIA_AUDIO or WRITE_EXTERNAL_STORAGE is granted
                     if (grantedPermissions.contains(Manifest.permission.READ_MEDIA_AUDIO) ||
                         grantedPermissions.contains(WRITE_EXTERNAL_STORAGE)
@@ -567,6 +567,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         val profileMenuItem = menu.findItem(R.id.profile)
         profileMenuItem.setOnMenuItemClickListener { item ->
             // Handle the click event here
@@ -587,6 +588,36 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+//        val folderMenuItem = menu.findItem(R.id.folderOrder)
+//        folderMenuItem.setOnMenuItemClickListener { item ->
+//            // Handle the click event here
+//            when (item.itemId) {
+//                R.id.folderOrder -> {
+//                    // Inflate the layout
+//                    val inflater = LayoutInflater.from(this)
+//                    val dialogView = inflater.inflate(R.layout.see_player_short_order_and_more, null)
+//
+//                    // Build and show the AlertDialog
+//                    val dialog = MaterialAlertDialogBuilder(this)
+//                        .setView(dialogView)
+//                        .setCancelable(true)
+//                        .setPositiveButton("Done") { dialogInterface, _ ->
+//                            // Handle the Done button click if needed
+//                            dialogInterface.dismiss()
+//                        }
+//                        .create()
+//
+//                    dialog.show()
+//
+//                    true
+//
+//
+//                }
+//
+//                else -> false
+//            }
+//        }
 
 
         return true

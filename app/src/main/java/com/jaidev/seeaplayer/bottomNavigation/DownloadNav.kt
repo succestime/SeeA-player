@@ -18,7 +18,7 @@ import com.jaidev.seeaplayer.allAdapters.ReDownloadAdapter
 import com.jaidev.seeaplayer.databinding.FragmentDownloadNavBinding
 
 
-class downloadNav : Fragment() {
+class DownloadNav : Fragment() {
     private lateinit var adapter: ReDownloadAdapter
     private lateinit var binding: FragmentDownloadNavBinding
 

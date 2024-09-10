@@ -19,17 +19,15 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.jaidev.seeaplayer.MP3ConverterActivity
+import com.jaidev.seeaplayer.MP3ConverterFunctionality.MP3ConverterActivity
 import com.jaidev.seeaplayer.MainActivity
-import com.jaidev.seeaplayer.PlaylistFolderActivity
 import com.jaidev.seeaplayer.R
 import com.jaidev.seeaplayer.SearchActivity
 import com.jaidev.seeaplayer.Subscription.SeeAOne
+import com.jaidev.seeaplayer.VideoPlaylistFunctionality.PlaylistFolderActivity
 import com.jaidev.seeaplayer.allAdapters.ChipAdapter
 import com.jaidev.seeaplayer.allAdapters.FoldersAdapter
-import com.jaidev.seeaplayer.allAdapters.VideoAdapter
 import com.jaidev.seeaplayer.allAdapters.VideoSearchAdapter
 import com.jaidev.seeaplayer.browserActivity.PlayerFileActivity
 import com.jaidev.seeaplayer.dataClass.ChipItem
@@ -37,7 +35,7 @@ import com.jaidev.seeaplayer.dataClass.ThemeHelper
 import com.jaidev.seeaplayer.dataClass.VideoData
 import com.jaidev.seeaplayer.databinding.FragmentHomeNavBinding
 
-class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSearchAdapter.OnItemClickListener{
+class HomeNav : Fragment() , VideoSearchAdapter.OnItemClickListener{
     private lateinit var foldersAdapter: FoldersAdapter
     private lateinit var searchAdapter: VideoSearchAdapter
 
@@ -48,10 +46,8 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var searchItem: MenuItem
     private val iconModelArrayList = ArrayList<ChipItem>()
-    private lateinit var chipsAdapter: ChipAdapter
     private lateinit var playbackIconsAdapter: ChipAdapter
 
-    lateinit var mAdView: AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -65,31 +61,28 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
         binding = FragmentHomeNavBinding.inflate(inflater, container, false)
         val theme = ThemeHelper.getSavedTheme(requireContext())
         ThemeHelper.applyTheme(requireContext(),theme)
+
+
+        setupActionBar()
+        folderGetFunction()
+        swipeRefreshLayout = binding.swipeRefreshFolder
+
+        binding.swipeRefreshFolder.setOnRefreshListener {
+            refreshFolderList()
+        }
+        setSwipeRefreshBackgroundColor()
+
+        MobileAds.initialize(requireContext()){}
+        horizontalIconList()
+        return binding.root
+    }
+
+    private fun folderGetFunction(){
         binding.folderRV.setHasFixedSize(true)
         binding.folderRV.setItemViewCacheSize(10)
         binding.folderRV.layoutManager = LinearLayoutManager(requireContext())
         foldersAdapter = FoldersAdapter(requireContext(), MainActivity.folderList)
         binding.folderRV.adapter = foldersAdapter
-
-        searchAdapter = VideoSearchAdapter(requireContext(), MainActivity.videoList, isSearchActivity = false , isFolder = true, isShort = true , this)
-        binding.searchRecyclerView.setHasFixedSize(true)
-        binding.searchRecyclerView.setItemViewCacheSize(10)
-        binding.searchRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.searchRecyclerView.visibility = View.GONE
-        binding.searchRecyclerView.adapter = searchAdapter
-        setupActionBar()
-
-        swipeRefreshLayout = binding.swipeRefreshFolder
-
-//        binding.totalFolder.text = "${MainActivity.folderList.size} folders"
-
-
-        binding.swipeRefreshFolder.setOnRefreshListener {
-
-            refreshFolderList()
-        }
-        // Set the background color of SwipeRefreshLayout based on app theme
-        setSwipeRefreshBackgroundColor()
 
         if (MainActivity.folderList.isEmpty()) {
             binding.videoEmptyStateLayout.visibility = View.VISIBLE
@@ -97,9 +90,12 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
             binding.videoEmptyStateLayout.visibility = View.GONE
         }
 
-        MobileAds.initialize(requireContext()){}
-        horizontalIconList()
-        return binding.root
+        searchAdapter = VideoSearchAdapter(requireContext(), MainActivity.videoList, isSearchActivity = false , isFolder = true, isShort = true , this)
+        binding.searchRecyclerView.setHasFixedSize(true)
+        binding.searchRecyclerView.setItemViewCacheSize(10)
+        binding.searchRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.searchRecyclerView.visibility = View.GONE
+        binding.searchRecyclerView.adapter = searchAdapter
     }
     @SuppressLint("NotifyDataSetChanged")
     private fun horizontalIconList() {
@@ -141,15 +137,10 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
         @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun refreshFolderList() {
-        // Call the refresh function in MainActivity
         (activity as MainActivity).refreshFolderList()
-        // Update the adapter with the new data
         foldersAdapter.notifyDataSetChanged()
         searchAdapter.notifyDataSetChanged()
-
-//        binding.totalFolder.text = "${MainActivity.folderList.size} Folders"
         swipeRefreshLayout.isRefreshing = false
-
         if (MainActivity.folderList.isEmpty()) {
             binding.videoEmptyStateLayout.visibility = View.VISIBLE
         } else {
@@ -258,10 +249,7 @@ class homeNav : Fragment(),   VideoAdapter.OnFileCountChangeListener , VideoSear
         refreshFolderList()
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun onFileCountChanged(newCount: Int) {
-//        binding.totalFolder.text = "$newCount Folders"
-    }
+
 
     override fun onItemClick(fileItem: VideoData) {
         PlayerFileActivity.pipStatus = 1
