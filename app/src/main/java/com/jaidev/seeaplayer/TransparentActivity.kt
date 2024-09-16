@@ -48,7 +48,7 @@ class TransparentActivity : AppCompatActivity() {
                     }
                     // Show the progress bar
                     progressBar.visibility = View.VISIBLE
-                    // Fetch the title and image asynchronously using coroutines
+
                     fetchDownloadLink(videoUrl)
                 }
             }
